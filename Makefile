@@ -205,11 +205,39 @@ ollama-start: ## Start Ollama server
 
 ollama-pull: ## Pull recommended models for code analysis
 	ollama pull qwen2.5-coder:7b
-	ollama pull qwen2.5:1.5b
+	ollama pull qwen2.5-coder:14b
+	ollama pull deepseek-coder:6.7b
 	@echo "$(GREEN)Models pulled!$(NC)"
+
+ollama-list: ## List available Ollama models
+	@echo "$(BLUE)Available Ollama models:$(NC)"
+	@ollama list 2>/dev/null || echo "Ollama not running"
 
 mcp-server: ## Start MCP server for Claude Desktop
 	$(PYTHON) -m code2logic.mcp_server
+
+# ============================================================================
+# LLM Configuration
+# ============================================================================
+
+llm: ## Configure LLM providers (Ollama, LiteLLM)
+	@echo "$(BLUE)Configuring LLM providers...$(NC)"
+	$(PYTHON) scripts/configure_llm.py
+
+llm-list: ## List all available LLM models
+	$(PYTHON) scripts/configure_llm.py --list
+
+llm-test: ## Test configured LLM models
+	$(PYTHON) scripts/configure_llm.py --test
+
+llm-status: ## Show LLM configuration status
+	@echo "$(BLUE)LLM Status:$(NC)"
+	@echo "Ollama:"
+	@curl -s http://localhost:11434/api/version 2>/dev/null && echo " ✓ Running" || echo " ✗ Not running"
+	@echo "\nModels:"
+	@ollama list 2>/dev/null | head -10 || echo "  None available"
+	@echo "\nConfig:"
+	@cat ~/.code2logic/llm_config.json 2>/dev/null | head -20 || echo "  Not configured (run: make llm)"
 
 # ============================================================================
 # Release
