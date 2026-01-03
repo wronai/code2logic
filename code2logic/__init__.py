@@ -84,6 +84,22 @@ from .file_formats import (
     generate_file_json,
     generate_file_yaml,
 )
+from .adaptive import (
+    AdaptiveReproducer,
+    AdaptiveResult,
+    get_llm_capabilities,
+    LLM_CAPABILITIES,
+)
+from .universal import (
+    UniversalReproducer,
+    UniversalParser,
+    CodeGenerator,
+    CodeLogic,
+    CodeElement,
+    Language,
+    ElementType,
+    reproduce_file,
+)
 
 __all__ = [
     # Version
@@ -146,4 +162,18 @@ __all__ = [
     "generate_file_csv",
     "generate_file_json",
     "generate_file_yaml",
+    # Adaptive
+    "AdaptiveReproducer",
+    "AdaptiveResult",
+    "get_llm_capabilities",
+    "LLM_CAPABILITIES",
+    # Universal
+    "UniversalReproducer",
+    "UniversalParser",
+    "CodeGenerator",
+    "CodeLogic",
+    "CodeElement",
+    "Language",
+    "ElementType",
+    "reproduce_file",
 ]
