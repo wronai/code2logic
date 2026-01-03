@@ -140,7 +140,15 @@ git-clean: ## Ensure git working tree is clean
 	@git diff --cached --quiet || (echo "Index has staged but uncommitted changes. Commit before publishing."; exit 1)
 
 check-bumpver: ## Ensure bumpver is installed
-	@$(PYTHON) -c "import bumpver" >/dev/null 2>&1 || (echo "Missing bumpver. Install dev deps: pip install -e '.[dev]'"; exit 1)
+	@$(PYTHON) -c "import bumpver" >/dev/null 2>&1 || ( \
+		echo "Missing bumpver. Installing bumpver..."; \
+		$(PYTHON) -m pip install "bumpver>=2023.1129" >/dev/null; \
+		$(PYTHON) -c "import bumpver" >/dev/null 2>&1 || ( \
+			echo "bumpver still missing. Installing project dev dependencies..."; \
+			$(PIP) install -e \".[dev]\"; \
+			$(PYTHON) -c "import bumpver" >/dev/null 2>&1 || (echo "Failed to install bumpver."; exit 1); \
+		); \
+	)
 
 
 bump-patch: check-bumpver ## Bump patch version (updates pyproject.toml and code2logic/__init__.py)

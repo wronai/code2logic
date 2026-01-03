@@ -156,6 +156,14 @@ from .schemas import (
     MarkdownSchema,
     JSONSchema,
 )
+from .quality import (
+    QualityAnalyzer,
+    QualityReport,
+    QualityIssue,
+    analyze_quality,
+    get_quality_summary,
+)
+from .similarity import get_refactoring_suggestions
 from .chunked_reproduction import (
     ChunkedReproducer,
     ChunkedResult,

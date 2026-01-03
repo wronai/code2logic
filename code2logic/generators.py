@@ -774,12 +774,17 @@ class YAMLGenerator:
     
     def _function_to_dict(self, f: FunctionInfo, detail: str) -> dict:
         """Convert function to dict for nested output."""
+        # Clean function name (remove any newlines or special chars)
+        name = f.name.replace('\n', '').strip() if f.name else ''
+        
         data = {
-            'name': f.name,
+            'name': name,
             'signature': self._build_signature(f),
         }
         if detail in ('standard', 'full'):
-            data['intent'] = f.intent
+            # Clean intent - remove newlines and limit length
+            intent = f.intent.replace('\n', ' ').strip()[:100] if f.intent else ''
+            data['intent'] = intent
         if detail == 'full':
             data['lines'] = f.lines
             data['is_async'] = f.is_async
@@ -791,9 +796,17 @@ class YAMLGenerator:
     
     def _build_signature(self, f: FunctionInfo) -> str:
         """Build compact signature string."""
-        params = ','.join(f.params[:4])
-        if len(f.params) > 4:
-            params += f'...+{len(f.params)-4}'
+        # Clean params - remove newlines and extra spaces
+        clean_params = []
+        for p in f.params[:6]:
+            p_clean = p.replace('\n', ' ').replace('  ', ' ').strip()
+            if p_clean:
+                clean_params.append(p_clean)
+        
+        params = ','.join(clean_params)
+        if len(f.params) > 6:
+            params += f'...+{len(f.params)-6}'
+        
         ret = f"->{f.return_type}" if f.return_type else ""
         return f"({params}){ret}"
     

@@ -307,3 +307,86 @@ python examples/13_project_benchmark.py \
   --project /path/to/project \
   --formats yaml logicml
 ```
+
+---
+
+## Quality Analysis API
+
+### Analyze Code Quality
+
+```python
+from code2logic import (
+    analyze_project,
+    analyze_quality,
+    get_quality_summary,
+)
+
+project = analyze_project('/path/to/project')
+report = analyze_quality(project)
+
+print(get_quality_summary(report))
+# Quality Score: 85.0/100
+# Issues Found: 3
+# Issues by Severity:
+#   🔴 High: 1
+#   🟡 Medium: 2
+```
+
+### Quality Thresholds
+
+| Metric | Default | Description |
+|--------|---------|-------------|
+| `file_lines` | 500 | Max lines per file |
+| `function_lines` | 50 | Max lines per function |
+| `class_methods` | 20 | Max methods per class |
+| `function_params` | 7 | Max parameters per function |
+
+### Custom Thresholds
+
+```python
+from code2logic import QualityAnalyzer
+
+analyzer = QualityAnalyzer(thresholds={
+    'file_lines': 300,
+    'function_lines': 30,
+})
+report = analyzer.analyze(project)
+```
+
+---
+
+## Duplicate Detection & Refactoring
+
+### Find Similar Functions
+
+```python
+from code2logic import analyze_project, get_refactoring_suggestions
+from code2logic.similarity import SimilarityDetector
+
+project = analyze_project('/path/to/project')
+
+detector = SimilarityDetector(threshold=80.0)
+similar = detector.find_similar_functions(project.modules)
+duplicates = detector.find_duplicate_signatures(project.modules)
+
+# Get refactoring suggestions
+suggestions = get_refactoring_suggestions(similar)
+for s in suggestions:
+    print(f"{s['function']}: {s['recommendation']}")
+```
+
+### Suggestion Types
+
+| Type | Description |
+|------|-------------|
+| `extract_to_base_class` | Same method in multiple classes |
+| `extract_to_utility` | Same function in multiple modules |
+| `consolidate` | Duplicate implementations to merge |
+
+### Example Output
+
+```
+set_llm_client: Extract 'set_llm_client' to a shared base class or mixin
+is_available: Extract 'is_available' to a shared base class or mixin
+process_data: Extract 'process_data' to a shared utility module
+```

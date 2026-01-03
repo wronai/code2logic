@@ -163,3 +163,76 @@ class SimilarityDetector:
 def is_rapidfuzz_available() -> bool:
     """Check if Rapidfuzz is available."""
     return RAPIDFUZZ_AVAILABLE
+
+
+def get_refactoring_suggestions(similar_functions: Dict[str, List[str]]) -> List[Dict[str, any]]:
+    """
+    Generate refactoring suggestions based on similar functions.
+    
+    Args:
+        similar_functions: Dict from find_similar_functions or find_duplicate_signatures
+        
+    Returns:
+        List of refactoring suggestions with type, functions, and recommendation
+    """
+    suggestions = []
+    
+    # Group by function name pattern
+    name_groups: Dict[str, List[str]] = {}
+    for func_full, matches in similar_functions.items():
+        # Extract function name
+        if '::' in func_full:
+            _, func_part = func_full.rsplit('::', 1)
+            if '.' in func_part:
+                func_name = func_part.split('.')[-1]
+            else:
+                func_name = func_part
+        else:
+            func_name = func_full
+        
+        if func_name not in name_groups:
+            name_groups[func_name] = []
+        name_groups[func_name].append(func_full)
+        for match in matches:
+            # Remove score suffix
+            match_clean = match.split(' (')[0] if ' (' in match else match
+            if match_clean not in name_groups[func_name]:
+                name_groups[func_name].append(match_clean)
+    
+    for func_name, locations in name_groups.items():
+        if len(locations) < 2:
+            continue
+        
+        # Determine suggestion type
+        classes = set()
+        modules = set()
+        for loc in locations:
+            if '::' in loc:
+                mod, rest = loc.rsplit('::', 1)
+                modules.add(mod)
+                if '.' in rest:
+                    cls_name = rest.split('.')[0]
+                    classes.add(cls_name)
+        
+        suggestion = {
+            'function': func_name,
+            'locations': locations,
+            'count': len(locations),
+        }
+        
+        if len(classes) > 1:
+            suggestion['type'] = 'extract_to_base_class'
+            suggestion['recommendation'] = f"Extract '{func_name}' to a shared base class or mixin"
+        elif len(modules) > 1:
+            suggestion['type'] = 'extract_to_utility'
+            suggestion['recommendation'] = f"Extract '{func_name}' to a shared utility module"
+        else:
+            suggestion['type'] = 'consolidate'
+            suggestion['recommendation'] = f"Consider consolidating duplicate '{func_name}' implementations"
+        
+        suggestions.append(suggestion)
+    
+    # Sort by count (most duplicates first)
+    suggestions.sort(key=lambda x: -x['count'])
+    
+    return suggestions
