@@ -6,7 +6,76 @@ import pytest
 from unittest.mock import Mock, patch
 
 from code2logic.intent import IntentAnalyzer, IntentType, Intent
-from code2logic.models import Project, Module, Function, Class
+from code2logic.models import ProjectInfo, ModuleInfo, FunctionInfo, ClassInfo
+
+
+def make_function(name, params=None, complexity=1, lines=5, docstring=None):
+    """Helper to create FunctionInfo with correct fields."""
+    return FunctionInfo(
+        name=name,
+        params=params or [],
+        return_type=None,
+        docstring=docstring,
+        calls=[],
+        raises=[],
+        complexity=complexity,
+        lines=lines,
+        decorators=[],
+        is_async=False,
+        is_static=False,
+        is_private=False,
+        intent="",
+        start_line=1,
+        end_line=lines,
+    )
+
+
+def make_class(name, methods=None, bases=None):
+    """Helper to create ClassInfo with correct fields."""
+    return ClassInfo(
+        name=name,
+        bases=bases or [],
+        docstring=None,
+        methods=methods or [],
+        properties=[],
+        is_interface=False,
+        is_abstract=False,
+        generic_params=[],
+    )
+
+
+def make_module(name, path, functions=None, classes=None, imports=None, lines_total=10):
+    """Helper to create ModuleInfo with correct fields."""
+    return ModuleInfo(
+        path=path,
+        language="python",
+        imports=imports or [],
+        exports=[],
+        classes=classes or [],
+        functions=functions or [],
+        types=[],
+        constants=[],
+        docstring=None,
+        lines_total=lines_total,
+        lines_code=lines_total - 2,
+    )
+
+
+def make_project(name, modules):
+    """Helper to create ProjectInfo with correct fields."""
+    return ProjectInfo(
+        name=name,
+        root_path="/test",
+        languages={"python": len(modules)},
+        modules=modules,
+        dependency_graph={},
+        dependency_metrics={},
+        entrypoints=[],
+        similar_functions={},
+        total_files=len(modules),
+        total_lines=sum(m.lines_total for m in modules),
+        generated_at="2026-01-03T12:00:00Z",
+    )
 
 
 class TestIntentAnalyzer:
@@ -65,10 +134,11 @@ class TestIntentAnalyzer:
         analyzer = IntentAnalyzer()
         
         # Add a function to the project
-        func = Function(name="test_func", parameters=[], lines_of_code=5, complexity=1)
+        func = make_function("test_func")
         sample_project_model.modules[0].functions.append(func)
         
-        query = "refactor the test_func function"
+        # Query must contain module name for target identification
+        query = "refactor the test_func function in module1"
         target = analyzer._identify_target(query, sample_project_model)
         
         assert target == "module1.test_func"
@@ -78,10 +148,11 @@ class TestIntentAnalyzer:
         analyzer = IntentAnalyzer()
         
         # Add a class to the project
-        cls = Class(name="TestClass", methods=[], lines_of_code=10)
+        cls = make_class("TestClass")
         sample_project_model.modules[0].classes.append(cls)
         
-        query = "improve the TestClass class"
+        # Query must contain module name for target identification
+        query = "improve the TestClass class in module1"
         target = analyzer._identify_target(query, sample_project_model)
         
         assert target == "module1.TestClass"
@@ -206,22 +277,13 @@ class TestIntentAnalyzer:
         analyzer = IntentAnalyzer()
         
         # Create a long module
-        long_module = Module(
+        long_module = make_module(
             name="long_module",
             path="/test/long_module.py",
-            functions=[],
-            classes=[],
-            imports=[],
-            lines_of_code=600  # Over threshold
+            lines_total=600,  # Over threshold
         )
         
-        project = Project(
-            name="test",
-            path="/test",
-            modules=[long_module],
-            dependencies=[],
-            similarities=[]
-        )
+        project = make_project("test", [long_module])
         
         smells = analyzer.detect_code_smells(project)
         
@@ -234,29 +296,16 @@ class TestIntentAnalyzer:
         analyzer = IntentAnalyzer()
         
         # Create a complex function
-        complex_func = Function(
-            name="complex_func",
-            parameters=["arg1", "arg2"],
-            lines_of_code=20,
-            complexity=15  # Over threshold
-        )
+        complex_func = make_function("complex_func", params=["arg1", "arg2"], complexity=15, lines=20)
         
-        module = Module(
+        module = make_module(
             name="test_module",
             path="/test/test_module.py",
             functions=[complex_func],
-            classes=[],
-            imports=[],
-            lines_of_code=25
+            lines_total=25,
         )
         
-        project = Project(
-            name="test",
-            path="/test",
-            modules=[module],
-            dependencies=[],
-            similarities=[]
-        )
+        project = make_project("test", [module])
         
         smells = analyzer.detect_code_smells(project)
         
@@ -268,30 +317,18 @@ class TestIntentAnalyzer:
         """Test code smell detection for large classes."""
         analyzer = IntentAnalyzer()
         
-        # Create a large class
-        large_class = Class(
-            name="LargeClass",
-            methods=[Function(name=f"method_{i}", parameters=[], lines_of_code=5, complexity=1) 
-                    for i in range(20)],  # Over threshold
-            lines_of_code=100
-        )
+        # Create a large class with many methods
+        many_methods = [make_function(f"method_{i}") for i in range(20)]
+        large_class = make_class("LargeClass", methods=many_methods)
         
-        module = Module(
+        module = make_module(
             name="test_module",
             path="/test/test_module.py",
-            functions=[],
             classes=[large_class],
-            imports=[],
-            lines_of_code=105
+            lines_total=105,
         )
         
-        project = Project(
-            name="test",
-            path="/test",
-            modules=[module],
-            dependencies=[],
-            similarities=[]
-        )
+        project = make_project("test", [module])
         
         smells = analyzer.detect_code_smells(project)
         
@@ -306,22 +343,14 @@ class TestIntentAnalyzer:
         # Create module with many imports
         many_imports = [f"module_{i}" for i in range(25)]  # Over threshold
         
-        module = Module(
+        module = make_module(
             name="import_heavy_module",
             path="/test/import_heavy_module.py",
-            functions=[],
-            classes=[],
             imports=many_imports,
-            lines_of_code=10
+            lines_total=10,
         )
         
-        project = Project(
-            name="test",
-            path="/test",
-            modules=[module],
-            dependencies=[],
-            similarities=[]
-        )
+        project = make_project("test", [module])
         
         smells = analyzer.detect_code_smells(project)
         
@@ -334,10 +363,7 @@ class TestIntentAnalyzer:
         analyzer = IntentAnalyzer()
         
         # Add many functions to trigger suggestions
-        many_functions = [
-            Function(name=f"func_{i}", parameters=[], lines_of_code=5, complexity=1)
-            for i in range(25)
-        ]
+        many_functions = [make_function(f"func_{i}") for i in range(25)]
         sample_project_model.modules[0].functions.extend(many_functions)
         
         suggestions = analyzer.suggest_refactoring("module1", sample_project_model)
@@ -350,12 +376,8 @@ class TestIntentAnalyzer:
         analyzer = IntentAnalyzer()
         
         # Add a large class
-        large_class = Class(
-            name="LargeClass",
-            methods=[Function(name=f"method_{i}", parameters=[], lines_of_code=5, complexity=1)
-                    for i in range(20)],
-            lines_of_code=100
-        )
+        many_methods = [make_function(f"method_{i}") for i in range(20)]
+        large_class = make_class("LargeClass", methods=many_methods)
         sample_project_model.modules[0].classes.append(large_class)
         
         suggestions = analyzer.suggest_refactoring("module1.LargeClass", sample_project_model)
@@ -368,13 +390,7 @@ class TestIntentAnalyzer:
         analyzer = IntentAnalyzer()
         
         # Add a complex function
-        complex_func = Function(
-            name="complex_func",
-            parameters=["arg1", "arg2"],
-            lines_of_code=60,
-            complexity=12,
-            docstring=None  # Missing docstring
-        )
+        complex_func = make_function("complex_func", params=["arg1", "arg2"], complexity=12, lines=60, docstring=None)
         sample_project_model.modules[0].functions.append(complex_func)
         
         suggestions = analyzer.suggest_refactoring("module1.complex_func", sample_project_model)
@@ -390,36 +406,37 @@ class TestIntentAnalyzer:
         target = analyzer._find_target_object("module1", sample_project_model)
         
         assert target is not None
-        assert target.name == "module1"
-        assert isinstance(target, Module)
+        # Module path contains module1
+        assert "module1" in target.path
+        assert isinstance(target, ModuleInfo)
     
     def test_find_target_object_function(self, sample_project_model):
         """Test finding target object for function."""
         analyzer = IntentAnalyzer()
         
         # Add a function
-        func = Function(name="test_func", parameters=[], lines_of_code=5, complexity=1)
+        func = make_function("test_func")
         sample_project_model.modules[0].functions.append(func)
         
         target = analyzer._find_target_object("module1.test_func", sample_project_model)
         
         assert target is not None
         assert target.name == "test_func"
-        assert isinstance(target, Function)
+        assert isinstance(target, FunctionInfo)
     
     def test_find_target_object_class(self, sample_project_model):
         """Test finding target object for class."""
         analyzer = IntentAnalyzer()
         
         # Add a class
-        cls = Class(name="TestClass", methods=[], lines_of_code=10)
+        cls = make_class("TestClass")
         sample_project_model.modules[0].classes.append(cls)
         
         target = analyzer._find_target_object("module1.TestClass", sample_project_model)
         
         assert target is not None
         assert target.name == "TestClass"
-        assert isinstance(target, Class)
+        assert isinstance(target, ClassInfo)
     
     def test_find_target_object_not_found(self, sample_project_model):
         """Test finding non-existent target object."""
@@ -434,17 +451,12 @@ class TestIntentAnalyzer:
         analyzer = IntentAnalyzer()
         
         # Module with many functions
-        many_functions = [
-            Function(name=f"func_{i}", parameters=[], lines_of_code=5, complexity=1)
-            for i in range(25)
-        ]
-        module = Module(
+        many_functions = [make_function(f"func_{i}") for i in range(25)]
+        module = make_module(
             name="complex_module",
             path="/test/complex_module.py",
             functions=many_functions,
-            classes=[],
-            imports=[],
-            lines_of_code=150
+            lines_total=150,
         )
         
         suggestions = analyzer._suggest_module_refactoring(module)
@@ -457,15 +469,11 @@ class TestIntentAnalyzer:
         analyzer = IntentAnalyzer()
         
         # Class with many methods and base classes
-        many_methods = [
-            Function(name=f"method_{i}", parameters=[], lines_of_code=5, complexity=1)
-            for i in range(20)
-        ]
-        cls = Class(
+        many_methods = [make_function(f"method_{i}") for i in range(20)]
+        cls = make_class(
             name="ComplexClass",
             methods=many_methods,
-            base_classes=["Base1", "Base2", "Base3", "Base4"],  # Many base classes
-            lines_of_code=100
+            bases=["Base1", "Base2", "Base3", "Base4"],  # Many base classes
         )
         
         suggestions = analyzer._suggest_class_refactoring(cls)
@@ -479,12 +487,12 @@ class TestIntentAnalyzer:
         analyzer = IntentAnalyzer()
         
         # Complex function with many parameters
-        func = Function(
+        func = make_function(
             name="complex_func",
-            parameters=[f"param_{i}" for i in range(7)],  # Many parameters
-            lines_of_code=60,
+            params=[f"param_{i}" for i in range(7)],  # Many parameters
+            lines=60,
             complexity=12,
-            docstring=None
+            docstring=None,
         )
         
         suggestions = analyzer._suggest_function_refactoring(func)

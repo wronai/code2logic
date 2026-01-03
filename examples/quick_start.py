@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 def main():
     print("""
 ╔═══════════════════════════════════════════════════════════════════════╗
-║                     CODE2LOGIC QUICK START GUIDE                       ║
+║                     CODE2LOGIC QUICK START GUIDE                      ║
 ╚═══════════════════════════════════════════════════════════════════════╝
 """)
     

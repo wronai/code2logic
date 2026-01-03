@@ -74,6 +74,7 @@ code2logic/parsers.py,method,UniversalParser._extract_ast_class,"(self,node)->Cl
 code2logic/parsers.py,method,UniversalParser._ann_str,"(self,node)->str",python,Convert AST annotation to string.,other,parser,"ast,re"
 code2logic/parsers.py,method,UniversalParser._parse_js_ts,"(self,filepath,content,language)->ModuleInfo",python,Parse JS/TS using regex patterns.,transform,parser,"ast,re"
 code2logic/parsers.py,function,is_tree_sitter_available,()->bool,python,Check if Tree-sitter is available.,validate,parser,"ast,re"
+code2logic/intent.py,class,IntentType,(Enum),python,,other,code2logic,re
 code2logic/intent.py,class,EnhancedIntentGenerator,(),python,,transform,code2logic,re
 code2logic/intent.py,method,"EnhancedIntentGenerator.__(self,","(lang,str )",python,Initialize the intent generator.,other,code2logic,re
 code2logic/intent.py,method,"EnhancedIntentGenerator.te(self,","(name,str,,ing)->   ",python,Generate intent from function name and optional docstring.,other,code2logic,re
@@ -83,6 +84,44 @@ code2logic/intent.py,method,"EnhancedIntentGenerator._name(self,","(name,str))->
     ",python,Split function name into words.,other,code2logic,re
 code2logic/intent.py,method,EnhancedIntentGenerator.ailable_features(cls) ,"(> d)->tr, bool]:
     ",python,dictionary of available NLP features.,other,code2logic,re
+code2logic/intent.py,class,"Analyzer:
+    ",(),python,,other,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .__(self)","(
+   )",python,tialize the intent analyzer with patterns.''',other,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .ct_keywords(self,","(quer, str))->tr]:
+    ",python,ract keywords from a query string.''',other,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .late_intent_confidence(self,","(keyw,ds,ns)->
+    ",python,culate confidence score based on keyword matches.''',other,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .ify_target(self,","(quer, str,,t)->   ",python,"ntify the target of the query (module, function, class, or p",read,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .ate_description(self,","(inte,_type,)->   ",python,erate a description for the detected intent.''',other,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .ate_suggestions(self,","(inte,_type,,t)->tr]:
+    ",python,erate suggestions based on intent type.''',other,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .e_intent(self,","(quer, str,,t)->ntent]:
+    ",python,Analyze a query and return detected intents sorted by confid,other,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    ._code_smells(self,","(proj,t)->ict]:
+    ",python,Detect code smells in the project.,other,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .t_refactoring(self,","(targ,,t)->tr]:
+    ",python,Generate refactoring suggestions for a target.,transform,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .target_object(self,","(targ,,t)->   ",python,d the object referenced by target string.''',read,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .st_module_refactoring(self,","(modu,)->tr]:
+    ",python,erate refactoring suggestions for a module.''',transform,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .st_class_refactoring(self,","(cls,ny))->tr]:
+    ",python,erate refactoring suggestions for a class.''',transform,code2logic,re
+code2logic/intent.py,method,"Analyzer:
+    .st_function_refactoring(self,","(func,Any))->tr]:
+    ",python,erate refactoring suggestions for a function.''',transform,code2logic,re
 code2logic/generators.py,class,MarkdownGenerator,(),python,,transform,generator,json
 code2logic/generators.py,method,MarkdownGenerator.generate,"(self,project,detail_level)->str",python,Generate Markdown output.,other,generator,json
 code2logic/generators.py,method,MarkdownGenerator.: List[st,"(], p,ject,)",python,tructure tree.''',validate,generator,json
@@ -318,19 +357,26 @@ tests/test_intent.py,method,TestIntentAnalyzer.test_find_target_object_not_found
 tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_module_refactoring,(self),python,Test module-specific refactoring suggestions.,transform,test,pytest
 tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_class_refactoring,(self),python,Test class-specific refactoring suggestions.,transform,test,pytest
 tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_function_refactoring,(self),python,Test function-specific refactoring suggestions.,transform,test,pytest
+tests/test_intent.py,function,make_function,"(name,params,complexity,lines...+1)",python,Helper to create FunctionInfo with correct fields.,create,test,pytest
+tests/test_intent.py,function,make_class,"(name,methods,bases)",python,Helper to create ClassInfo with correct fields.,create,test,pytest
+tests/test_intent.py,function,make_module,"(name,path,functions,classes...+2)",python,Helper to create ModuleInfo with correct fields.,create,test,pytest
+tests/test_intent.py,function,make_project,"(name,modules)",python,Helper to create ProjectInfo with correct fields.,create,test,pytest
 tests/test_analyzer.py,class,TestProjectAnalyzer,(),python,,other,test,pytest
 tests/test_analyzer.py,method,TestProjectAnalyzer.test_init,"(self,temp_project_dir)",python,Test ProjectAnalyzer initialization.,lifecycle,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_init_with_config,"(self,temp_project_dir)",python,Test ProjectAnalyzer initialization with config.,lifecycle,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_discover_source_files,"(self,sample_project)",python,Test source file discovery.,validate,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_discover_source_files_filters_non_source,"(self,temp_project_dir)",python,Test that non-source files are filtered out.,validate,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_discover_source_files_ignores_common_dirs,"(self,temp_project_dir)",python,Test that common directories are ignored.,validate,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_parse_file_tree_sitter_success,"(self,mock_fallback,mock_tree_sitter,sample_project)",python,Test successful parsing with Tree-sitter.,transform,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_parse_file_fallback_success,"(self,mock_fallback,mock_tree_sitter,sample_project)",python,Test fallback parsing when Tree-sitter fails.,transform,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_parse_file_both_fail,"(self,mock_fallback,mock_tree_sitter,sample_project)",python,Test when both parsers fail.,transform,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_extract_metadata,"(self,sample_project)",python,Test metadata extraction.,other,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_complete,"(self,mock_similarity,mock_dependency,sample_project)",python,Test complete analysis process.,other,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_without_files,"(self,temp_project_dir)",python,Test analysis with no source files.,other,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_generate_output,"(self,mock_generator_class,sample_project_model)",python,Test output generation.,other,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_generate_output_without_analysis,"(self,sample_project_model)",python,Test output generation without prior analysis.,validate,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_read_project_file_error,"(self,temp_project_dir)",python,Test error handling in _read_project_file.,read,test,pytest
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_analysis_with_config,"(self,sample_project)",python,Test analysis with custom configuration.,validate,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_init_with_verbose,"(self,temp_project_dir,capsys)",python,Test ProjectAnalyzer initialization with verbose mode.,lifecycle,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_returns_project_info,"(self,sample_project)",python,Test that analyze returns ProjectInfo.,other,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_finds_source_files,"(self,sample_project)",python,Test that analysis finds Python files.,read,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_ignores_non_source_files,"(self,temp_project_dir)",python,Test that non-source files are ignored.,other,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_ignores_common_dirs,"(self,temp_project_dir)",python,Test that common directories are ignored.,other,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_extracts_functions,"(self,temp_project_dir)",python,Test that analysis extracts functions.,other,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_extracts_classes,"(self,temp_project_dir)",python,Test that analysis extracts classes.,other,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_extracts_imports,"(self,temp_project_dir)",python,Test that analysis extracts imports.,other,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_counts_lines,"(self,temp_project_dir)",python,Test that analysis counts lines.,other,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_empty_project,"(self,temp_project_dir)",python,Test analysis of empty project.,other,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_detect_entrypoints,"(self,temp_project_dir)",python,Test entry point detection.,other,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_get_statistics,"(self,sample_project)",python,Test get_statistics method.,read,test,pytest
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_language_detection,"(self,temp_project_dir)",python,Test language detection from file extensions.,other,test,pytest
+tests/test_analyzer.py,class,TestAnalyzeProjectFunction,(),python,,other,test,pytest
+tests/test_analyzer.py,method,TestAnalyzeProjectFunction.test_analyze_project,"(self,sample_project)",python,Test analyze_project function.,other,test,pytest
+tests/test_analyzer.py,class,TestGetLibraryStatus,(),python,,read,test,pytest
+tests/test_analyzer.py,method,TestGetLibraryStatus.test_get_library_status,(self),python,Test get_library_status function.,read,test,pytest

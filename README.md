@@ -248,6 +248,11 @@ Contributions welcome! Please read our [Contributing Guide](CONTRIBUTING.md).
 
 MIT License - see [LICENSE](LICENSE) for details.
 
+## 📚 Documentation
+
+- [API Documentation](DOCS.md) - Complete API reference
+- [Refactoring Plan](TODO.md) - Development roadmap
+
 ## 🔗 Links
 
 - [Documentation](https://code2logic.readthedocs.io)

@@ -1,4 +1,4 @@
-# code2logic | 24f 8219L | python:24
+# code2logic | 24f 8598L | python:24
 
 ENTRY: code2logic/cli.py code2logic/llm.py code2logic/analyzer.py
 
@@ -13,10 +13,11 @@ ENTRY: code2logic/cli.py code2logic/llm.py code2logic/analyzer.py
   gherkin.py (766L) C:GherkinGenerator,nitionGenerator:
     "",YAMLGenerator:
     "" | F:herkin(csv_con
-  intent.py (180L) C:EnhancedIntentGenerator
+  intent.py (429L) C:IntentType,EnhancedIntentGenerator,Analyzer:
+    
   llm.py (355L) C:OllamaClient,LiteLLMClient,CodeAnalyzer | F:get_available_backends
   mcp_server.py (292L) F:handle_request,call_tool,run_server
-  models.py (150L) -
+  models.py (154L) -
   parsers.py (772L) C:TreeSitterParser,UniversalParser | F:is_tree_sitter_available
   similarity.py (123L) C:SimilarityDetector | F:is_rapidfuzz_available
 
@@ -31,9 +32,9 @@ ENTRY: code2logic/cli.py code2logic/llm.py code2logic/analyzer.py
 
 [tests]
   __init__.py (3L) -
-  conftest.py (233L) F:sample_python_code,sample_javascript_code,sample_java_code,temp_project_dir
-  test_analyzer.py (193L) C:TestProjectAnalyzer
+  conftest.py (314L) F:sample_python_code,sample_javascript_code,sample_java_code,temp_project_dir
+  test_analyzer.py (180L) C:TestProjectAnalyzer,TestAnalyzeProjectFunction,TestGetLibraryStatus
   test_generators.py (207L) C:TestMarkdownGenerator,tCompactGenerator:
  ,tJSONGenerator:
   | F:sample_project
-  test_intent.py (356L) C:TestIntentAnalyzer
+  test_intent.py (353L) C:TestIntentAnalyzer | F:make_function,make_class,make_module,make_project

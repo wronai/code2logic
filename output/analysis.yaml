@@ -1,7 +1,7 @@
 project: code2logic
 statistics:
   files: 24
-  lines: 8219
+  lines: 8598
   languages:
     python: 24
 modules:
@@ -226,12 +226,17 @@ modules:
     intent: Check if Tree-sitter is available.
 - path: code2logic/intent.py
   language: python
-  lines: 180
+  lines: 429
   imports:
   - re
   exports:
+  - IntentType
   - EnhancedIntentGenerator
+  - "Analyzer:\n    "
   classes:
+  - name: IntentType
+    bases:
+    - Enum
   - name: EnhancedIntentGenerator
     bases: []
     methods:
@@ -250,6 +255,48 @@ modules:
     - name: 'ailable_features(cls) '
       signature: "(> d)->tr, bool]:\n    "
       intent: dictionary of available NLP features.
+  - name: "Analyzer:\n    "
+    bases: []
+    methods:
+    - name: __(self)
+      signature: "(\n   )"
+      intent: tialize the intent analyzer with patterns."""
+    - name: ct_keywords(self,
+      signature: "(quer, str):> L)->tr]:\n    "
+      intent: ract keywords from a query string."""
+    - name: late_intent_confidence(self,
+      signature: "(keyw,ds: List:tr], patt,ns: List:tr]) -> f)->\n    "
+      intent: culate confidence score based on keyword matches."""
+    - name: ify_target(self,
+      signature: '(quer, str,:roj,t: Any):> s)->   '
+      intent: ntify the target of the query (module, function, class, or project)."""
+    - name: ate_description(self,
+      signature: '(inte,_type: Inte:Type, targ,: str):> s)->   '
+      intent: erate a description for the detected intent."""
+    - name: ate_suggestions(self,
+      signature: "(inte,_type: Inte:Type, targ,: str,:roj,t: Any):> L)->tr]:\n    "
+      intent: erate suggestions based on intent type."""
+    - name: e_intent(self,
+      signature: "(quer, str,:roj,t: Any):> L)->ntent]:\n    "
+      intent: Analyze a query and return detected intents sorted by confidence.
+    - name: _code_smells(self,
+      signature: "(proj,t: Any):> L)->ict]:\n    "
+      intent: Detect code smells in the project.
+    - name: t_refactoring(self,
+      signature: "(targ,: str,:roj,t: Any):> L)->tr]:\n    "
+      intent: Generate refactoring suggestions for a target.
+    - name: target_object(self,
+      signature: '(targ,: str,:roj,t: Any):> A)->   '
+      intent: d the object referenced by target string."""
+    - name: st_module_refactoring(self,
+      signature: "(modu,: Any):> L)->tr]:\n    "
+      intent: erate refactoring suggestions for a module."""
+    - name: st_class_refactoring(self,
+      signature: "(cls:,ny):> L)->tr]:\n    "
+      intent: erate refactoring suggestions for a class."""
+    - name: st_function_refactoring(self,
+      signature: "(func,Any):> L)->tr]:\n    "
+      intent: erate refactoring suggestions for a function."""
 - path: code2logic/__init__.py
   language: python
   lines: 76
@@ -406,7 +453,7 @@ modules:
       intent: limit commas)."""
 - path: code2logic/models.py
   language: python
-  lines: 150
+  lines: 154
   imports: []
   exports: []
 - path: code2logic/similarity.py
@@ -774,7 +821,7 @@ modules:
     intent: Run duplicate detection.
 - path: tests/conftest.py
   language: python
-  lines: 233
+  lines: 314
   imports:
   - pytest
   - tempfile
@@ -916,10 +963,14 @@ modules:
     intent: a sample project for testing generators.
 - path: tests/test_intent.py
   language: python
-  lines: 356
+  lines: 353
   imports:
   - pytest
   exports:
+  - make_function
+  - make_class
+  - make_module
+  - make_project
   - TestIntentAnalyzer
   classes:
   - name: TestIntentAnalyzer
@@ -970,13 +1021,28 @@ modules:
     - name: test_analyze_intent_multiple
       signature: (self,sample_project_model)
       intent: Test intent analysis with multiple possible intents.
+  functions:
+  - name: make_function
+    signature: (name,params,complexity,lines...+1)
+    intent: Helper to create FunctionInfo with correct fields.
+  - name: make_class
+    signature: (name,methods,bases)
+    intent: Helper to create ClassInfo with correct fields.
+  - name: make_module
+    signature: (name,path,functions,classes...+2)
+    intent: Helper to create ModuleInfo with correct fields.
+  - name: make_project
+    signature: (name,modules)
+    intent: Helper to create ProjectInfo with correct fields.
 - path: tests/test_analyzer.py
   language: python
-  lines: 193
+  lines: 180
   imports:
   - pytest
   exports:
   - TestProjectAnalyzer
+  - TestAnalyzeProjectFunction
+  - TestGetLibraryStatus
   classes:
   - name: TestProjectAnalyzer
     bases: []
@@ -984,45 +1050,54 @@ modules:
     - name: test_init
       signature: (self,temp_project_dir)
       intent: Test ProjectAnalyzer initialization.
-    - name: test_init_with_config
-      signature: (self,temp_project_dir)
-      intent: Test ProjectAnalyzer initialization with config.
-    - name: test_discover_source_files
+    - name: test_init_with_verbose
+      signature: (self,temp_project_dir,capsys)
+      intent: Test ProjectAnalyzer initialization with verbose mode.
+    - name: test_analyze_returns_project_info
       signature: (self,sample_project)
-      intent: Test source file discovery.
-    - name: test_discover_source_files_filters_non_source
+      intent: Test that analyze returns ProjectInfo.
+    - name: test_analyze_finds_source_files
+      signature: (self,sample_project)
+      intent: Test that analysis finds Python files.
+    - name: test_ignores_non_source_files
       signature: (self,temp_project_dir)
-      intent: Test that non-source files are filtered out.
-    - name: test_discover_source_files_ignores_common_dirs
+      intent: Test that non-source files are ignored.
+    - name: test_ignores_common_dirs
       signature: (self,temp_project_dir)
       intent: Test that common directories are ignored.
-    - name: test_parse_file_tree_sitter_success
-      signature: (self,mock_fallback,mock_tree_sitter,sample_project)
-      intent: Test successful parsing with Tree-sitter.
-    - name: test_parse_file_fallback_success
-      signature: (self,mock_fallback,mock_tree_sitter,sample_project)
-      intent: Test fallback parsing when Tree-sitter fails.
-    - name: test_parse_file_both_fail
-      signature: (self,mock_fallback,mock_tree_sitter,sample_project)
-      intent: Test when both parsers fail.
-    - name: test_extract_metadata
-      signature: (self,sample_project)
-      intent: Test metadata extraction.
-    - name: test_analyze_complete
-      signature: (self,mock_similarity,mock_dependency,sample_project)
-      intent: Test complete analysis process.
-    - name: test_analyze_without_files
+    - name: test_analyze_extracts_functions
       signature: (self,temp_project_dir)
-      intent: Test analysis with no source files.
-    - name: test_generate_output
-      signature: (self,mock_generator_class,sample_project_model)
-      intent: Test output generation.
-    - name: test_generate_output_without_analysis
-      signature: (self,sample_project_model)
-      intent: Test output generation without prior analysis.
-    - name: test_read_project_file_error
+      intent: Test that analysis extracts functions.
+    - name: test_analyze_extracts_classes
       signature: (self,temp_project_dir)
-      intent: Test error handling in _read_project_file.
-    - name: test_analysis_with_config
+      intent: Test that analysis extracts classes.
+    - name: test_analyze_extracts_imports
+      signature: (self,temp_project_dir)
+      intent: Test that analysis extracts imports.
+    - name: test_analyze_counts_lines
+      signature: (self,temp_project_dir)
+      intent: Test that analysis counts lines.
+    - name: test_analyze_empty_project
+      signature: (self,temp_project_dir)
+      intent: Test analysis of empty project.
+    - name: test_detect_entrypoints
+      signature: (self,temp_project_dir)
+      intent: Test entry point detection.
+    - name: test_get_statistics
       signature: (self,sample_project)
-      intent: Test analysis with custom configuration.
+      intent: Test get_statistics method.
+    - name: test_language_detection
+      signature: (self,temp_project_dir)
+      intent: Test language detection from file extensions.
+  - name: TestAnalyzeProjectFunction
+    bases: []
+    methods:
+    - name: test_analyze_project
+      signature: (self,sample_project)
+      intent: Test analyze_project function.
+  - name: TestGetLibraryStatus
+    bases: []
+    methods:
+    - name: test_get_library_status
+      signature: (self)
+      intent: Test get_library_status function.

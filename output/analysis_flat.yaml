@@ -1,6 +1,6 @@
 project: code2logic
 files: 24
-lines: 8219
+lines: 8598
 elements:
 - path: code2logic/cli.py
   type: function
@@ -575,6 +575,12 @@ elements:
   imports: ast,re
 - path: code2logic/intent.py
   type: class
+  name: IntentType
+  signature: (Enum)
+  language: python
+  docstring: Types of user intents for code analysis.
+- path: code2logic/intent.py
+  type: class
   name: EnhancedIntentGenerator
   signature: ()
   language: python
@@ -621,6 +627,129 @@ elements:
   signature: "(> d)->tr, bool]:\n    "
   language: python
   intent: dictionary of available NLP features.
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: class
+  name: "Analyzer:\n    "
+  signature: ()
+  language: python
+  docstring: '  Analyzes user queries to detect intent and provi'
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .__(self)"
+  signature: "(\n   )"
+  language: python
+  intent: tialize the intent analyzer with patterns."""
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .ct_keywords(self,"
+  signature: "(quer, str):> L)->tr]:\n    "
+  language: python
+  intent: ract keywords from a query string."""
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .late_intent_confidence(self,"
+  signature: "(keyw,ds: List:tr], patt,ns: List:tr]) -> f)->\n    "
+  language: python
+  intent: culate confidence score based on keyword matches."""
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .ify_target(self,"
+  signature: '(quer, str,:roj,t: Any):> s)->   '
+  language: python
+  intent: ntify the target of the query (module, function, class, or p
+  category: read
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .ate_description(self,"
+  signature: '(inte,_type: Inte:Type, targ,: str):> s)->   '
+  language: python
+  intent: erate a description for the detected intent."""
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .ate_suggestions(self,"
+  signature: "(inte,_type: Inte:Type, targ,: str,:roj,t: Any):> L)->tr]:\n    "
+  language: python
+  intent: erate suggestions based on intent type."""
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .e_intent(self,"
+  signature: "(quer, str,:roj,t: Any):> L)->ntent]:\n    "
+  language: python
+  intent: Analyze a query and return detected intents sorted by confid
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    ._code_smells(self,"
+  signature: "(proj,t: Any):> L)->ict]:\n    "
+  language: python
+  intent: Detect code smells in the project.
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .t_refactoring(self,"
+  signature: "(targ,: str,:roj,t: Any):> L)->tr]:\n    "
+  language: python
+  intent: Generate refactoring suggestions for a target.
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .target_object(self,"
+  signature: '(targ,: str,:roj,t: Any):> A)->   '
+  language: python
+  intent: d the object referenced by target string."""
+  category: read
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .st_module_refactoring(self,"
+  signature: "(modu,: Any):> L)->tr]:\n    "
+  language: python
+  intent: erate refactoring suggestions for a module."""
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .st_class_refactoring(self,"
+  signature: "(cls:,ny):> L)->tr]:\n    "
+  language: python
+  intent: erate refactoring suggestions for a class."""
+  category: other
+  domain: code2logic
+  imports: re
+- path: code2logic/intent.py
+  type: method
+  name: "Analyzer:\n    .st_function_refactoring(self,"
+  signature: "(func,Any):> L)->tr]:\n    "
+  language: python
+  intent: erate refactoring suggestions for a function."""
   category: other
   domain: code2logic
   imports: re
@@ -2261,6 +2390,42 @@ elements:
   category: other
   domain: tests
   imports: pytest
+- path: tests/test_intent.py
+  type: function
+  name: make_function
+  signature: (name,params,complexity,lines...+1)
+  language: python
+  intent: Helper to create FunctionInfo with correct fields.
+  category: create
+  domain: tests
+  imports: pytest
+- path: tests/test_intent.py
+  type: function
+  name: make_class
+  signature: (name,methods,bases)
+  language: python
+  intent: Helper to create ClassInfo with correct fields.
+  category: create
+  domain: tests
+  imports: pytest
+- path: tests/test_intent.py
+  type: function
+  name: make_module
+  signature: (name,path,functions,classes...+2)
+  language: python
+  intent: Helper to create ModuleInfo with correct fields.
+  category: create
+  domain: tests
+  imports: pytest
+- path: tests/test_intent.py
+  type: function
+  name: make_project
+  signature: (name,modules)
+  language: python
+  intent: Helper to create ProjectInfo with correct fields.
+  category: create
+  domain: tests
+  imports: pytest
 - path: tests/test_analyzer.py
   type: class
   name: TestProjectAnalyzer
@@ -2278,127 +2443,148 @@ elements:
   imports: pytest
 - path: tests/test_analyzer.py
   type: method
-  name: TestProjectAnalyzer.test_init_with_config
-  signature: (self,temp_project_dir)
+  name: TestProjectAnalyzer.test_init_with_verbose
+  signature: (self,temp_project_dir,capsys)
   language: python
-  intent: Test ProjectAnalyzer initialization with config.
+  intent: Test ProjectAnalyzer initialization with verbose mode.
   category: lifecycle
   domain: tests
   imports: pytest
 - path: tests/test_analyzer.py
   type: method
-  name: TestProjectAnalyzer.test_discover_source_files
+  name: TestProjectAnalyzer.test_analyze_returns_project_info
   signature: (self,sample_project)
   language: python
-  intent: Test source file discovery.
-  category: validate
+  intent: Test that analyze returns ProjectInfo.
+  category: other
   domain: tests
   imports: pytest
 - path: tests/test_analyzer.py
   type: method
-  name: TestProjectAnalyzer.test_discover_source_files_filters_non_source
-  signature: (self,temp_project_dir)
-  language: python
-  intent: Test that non-source files are filtered out.
-  category: validate
-  domain: tests
-  imports: pytest
-- path: tests/test_analyzer.py
-  type: method
-  name: TestProjectAnalyzer.test_discover_source_files_ignores_common_dirs
-  signature: (self,temp_project_dir)
-  language: python
-  intent: Test that common directories are ignored.
-  category: validate
-  domain: tests
-  imports: pytest
-- path: tests/test_analyzer.py
-  type: method
-  name: TestProjectAnalyzer.test_parse_file_tree_sitter_success
-  signature: (self,mock_fallback,mock_tree_sitter,sample_project)
-  language: python
-  intent: Test successful parsing with Tree-sitter.
-  category: transform
-  domain: tests
-  imports: pytest
-- path: tests/test_analyzer.py
-  type: method
-  name: TestProjectAnalyzer.test_parse_file_fallback_success
-  signature: (self,mock_fallback,mock_tree_sitter,sample_project)
-  language: python
-  intent: Test fallback parsing when Tree-sitter fails.
-  category: transform
-  domain: tests
-  imports: pytest
-- path: tests/test_analyzer.py
-  type: method
-  name: TestProjectAnalyzer.test_parse_file_both_fail
-  signature: (self,mock_fallback,mock_tree_sitter,sample_project)
-  language: python
-  intent: Test when both parsers fail.
-  category: transform
-  domain: tests
-  imports: pytest
-- path: tests/test_analyzer.py
-  type: method
-  name: TestProjectAnalyzer.test_extract_metadata
+  name: TestProjectAnalyzer.test_analyze_finds_source_files
   signature: (self,sample_project)
   language: python
-  intent: Test metadata extraction.
-  category: other
-  domain: tests
-  imports: pytest
-- path: tests/test_analyzer.py
-  type: method
-  name: TestProjectAnalyzer.test_analyze_complete
-  signature: (self,mock_similarity,mock_dependency,sample_project)
-  language: python
-  intent: Test complete analysis process.
-  category: other
-  domain: tests
-  imports: pytest
-- path: tests/test_analyzer.py
-  type: method
-  name: TestProjectAnalyzer.test_analyze_without_files
-  signature: (self,temp_project_dir)
-  language: python
-  intent: Test analysis with no source files.
-  category: other
-  domain: tests
-  imports: pytest
-- path: tests/test_analyzer.py
-  type: method
-  name: TestProjectAnalyzer.test_generate_output
-  signature: (self,mock_generator_class,sample_project_model)
-  language: python
-  intent: Test output generation.
-  category: other
-  domain: tests
-  imports: pytest
-- path: tests/test_analyzer.py
-  type: method
-  name: TestProjectAnalyzer.test_generate_output_without_analysis
-  signature: (self,sample_project_model)
-  language: python
-  intent: Test output generation without prior analysis.
-  category: validate
-  domain: tests
-  imports: pytest
-- path: tests/test_analyzer.py
-  type: method
-  name: TestProjectAnalyzer.test_read_project_file_error
-  signature: (self,temp_project_dir)
-  language: python
-  intent: Test error handling in _read_project_file.
+  intent: Test that analysis finds Python files.
   category: read
   domain: tests
   imports: pytest
 - path: tests/test_analyzer.py
   type: method
-  name: TestProjectAnalyzer.test_analysis_with_config
+  name: TestProjectAnalyzer.test_ignores_non_source_files
+  signature: (self,temp_project_dir)
+  language: python
+  intent: Test that non-source files are ignored.
+  category: other
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: method
+  name: TestProjectAnalyzer.test_ignores_common_dirs
+  signature: (self,temp_project_dir)
+  language: python
+  intent: Test that common directories are ignored.
+  category: other
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: method
+  name: TestProjectAnalyzer.test_analyze_extracts_functions
+  signature: (self,temp_project_dir)
+  language: python
+  intent: Test that analysis extracts functions.
+  category: other
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: method
+  name: TestProjectAnalyzer.test_analyze_extracts_classes
+  signature: (self,temp_project_dir)
+  language: python
+  intent: Test that analysis extracts classes.
+  category: other
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: method
+  name: TestProjectAnalyzer.test_analyze_extracts_imports
+  signature: (self,temp_project_dir)
+  language: python
+  intent: Test that analysis extracts imports.
+  category: other
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: method
+  name: TestProjectAnalyzer.test_analyze_counts_lines
+  signature: (self,temp_project_dir)
+  language: python
+  intent: Test that analysis counts lines.
+  category: other
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: method
+  name: TestProjectAnalyzer.test_analyze_empty_project
+  signature: (self,temp_project_dir)
+  language: python
+  intent: Test analysis of empty project.
+  category: other
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: method
+  name: TestProjectAnalyzer.test_detect_entrypoints
+  signature: (self,temp_project_dir)
+  language: python
+  intent: Test entry point detection.
+  category: other
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: method
+  name: TestProjectAnalyzer.test_get_statistics
   signature: (self,sample_project)
   language: python
-  intent: Test analysis with custom configuration.
-  category: validate
+  intent: Test get_statistics method.
+  category: read
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: method
+  name: TestProjectAnalyzer.test_language_detection
+  signature: (self,temp_project_dir)
+  language: python
+  intent: Test language detection from file extensions.
+  category: other
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: class
+  name: TestAnalyzeProjectFunction
+  signature: ()
+  language: python
+  docstring: Test the analyze_project convenience function.
+- path: tests/test_analyzer.py
+  type: method
+  name: TestAnalyzeProjectFunction.test_analyze_project
+  signature: (self,sample_project)
+  language: python
+  intent: Test analyze_project function.
+  category: other
+  domain: tests
+  imports: pytest
+- path: tests/test_analyzer.py
+  type: class
+  name: TestGetLibraryStatus
+  signature: ()
+  language: python
+  docstring: Test the get_library_status function.
+- path: tests/test_analyzer.py
+  type: method
+  name: TestGetLibraryStatus.test_get_library_status
+  signature: (self)
+  language: python
+  intent: Test get_library_status function.
+  category: read
   domain: tests
   imports: pytest

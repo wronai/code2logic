@@ -39,16 +39,16 @@ install-llm: ## Install LLM integration dependencies
 # ============================================================================
 
 test: ## Run tests
-	pytest tests/ -v
+	pytest tests/ -v -p no:aiohttp
 
 test-cov: ## Run tests with coverage
-	pytest tests/ -v --cov=code2logic --cov-report=term-missing --cov-report=html
+	pytest tests/ -v -p no:aiohttp --cov=code2logic --cov-report=term-missing --cov-report=html
 
 test-fast: ## Run tests without coverage (faster)
-	pytest tests/ -v --no-cov
+	pytest tests/ -v -p no:aiohttp --no-cov
 
 test-all: ## Run all tests including integration
-	pytest tests/ -v --cov=code2logic
+	pytest tests/ -v -p no:aiohttp --cov=code2logic
 	@echo "$(GREEN)All tests passed!$(NC)"
 
 # ============================================================================

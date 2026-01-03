@@ -74,6 +74,7 @@ code2logic/parsers.py,method,UniversalParser._extract_ast_class,"(self,node)->Cl
 code2logic/parsers.py,method,UniversalParser._ann_str,"(self,node)->str",python,Convert AST annotation to string.,other,parser,"ast,re",,,14,1,False,False,1f222391
 code2logic/parsers.py,method,UniversalParser._parse_js_ts,"(self,filepath,content,language)->ModuleInfo",python,Parse JS/TS using regex patterns.,transform,parser,"ast,re",,,95,1,False,False,670bd835
 code2logic/parsers.py,function,is_tree_sitter_available,()->bool,python,Check if Tree-sitter is available.,validate,parser,"ast,re",,,3,1,True,False,22e69ccd
+code2logic/intent.py,class,IntentType,(Enum),python,,other,code2logic,re,,,0,1,True,False,f7880532
 code2logic/intent.py,class,EnhancedIntentGenerator,(),python,,transform,code2logic,re,,,0,1,True,False,41f6f3be
 code2logic/intent.py,method,"EnhancedIntentGenerator.__(self,","(lang,str )",python,Initialize the intent generator.,other,code2logic,re,,,33,1,True,False,83ce3b88
 code2logic/intent.py,method,"EnhancedIntentGenerator.te(self,","(name,str,,ing)->   ",python,Generate intent from function name and optional docstring.,other,code2logic,re,,,46,1,True,False,0e01437e
@@ -83,6 +84,44 @@ code2logic/intent.py,method,"EnhancedIntentGenerator._name(self,","(name,str))->
     ",python,Split function name into words.,other,code2logic,re,,,27,1,False,False,f98aa5fe
 code2logic/intent.py,method,EnhancedIntentGenerator.ailable_features(cls) ,"(> d)->tr, bool]:
     ",python,dictionary of available NLP features.,other,code2logic,re,,,11,1,True,False,71328314
+code2logic/intent.py,class,"Analyzer:
+    ",(),python,,other,code2logic,re,,,0,1,True,False,8ca3eff5
+code2logic/intent.py,method,"Analyzer:
+    .__(self)","(
+   )",python,tialize the intent analyzer with patterns.''',other,code2logic,re,,,16,1,True,False,a0e94ea9
+code2logic/intent.py,method,"Analyzer:
+    .ct_keywords(self,","(quer, str))->tr]:
+    ",python,ract keywords from a query string.''',other,code2logic,re,,,6,1,True,False,93cfdefb
+code2logic/intent.py,method,"Analyzer:
+    .late_intent_confidence(self,","(keyw,ds,ns)->
+    ",python,culate confidence score based on keyword matches.''',other,code2logic,re,,,6,1,True,False,db08eef2
+code2logic/intent.py,method,"Analyzer:
+    .ify_target(self,","(quer, str,,t)->   ",python,"ntify the target of the query (module, function, class, or p",read,code2logic,re,,,19,1,True,False,093e3681
+code2logic/intent.py,method,"Analyzer:
+    .ate_description(self,","(inte,_type,)->   ",python,erate a description for the detected intent.''',other,code2logic,re,,,11,1,True,False,71183022
+code2logic/intent.py,method,"Analyzer:
+    .ate_suggestions(self,","(inte,_type,,t)->tr]:
+    ",python,erate suggestions based on intent type.''',other,code2logic,re,,,35,1,True,False,0d5ebc82
+code2logic/intent.py,method,"Analyzer:
+    .e_intent(self,","(quer, str,,t)->ntent]:
+    ",python,Analyze a query and return detected intents sorted by confid,other,code2logic,re,,,31,1,True,False,830c74c2
+code2logic/intent.py,method,"Analyzer:
+    ._code_smells(self,","(proj,t)->ict]:
+    ",python,Detect code smells in the project.,other,code2logic,re,,,52,1,False,False,cb6f4d90
+code2logic/intent.py,method,"Analyzer:
+    .t_refactoring(self,","(targ,,t)->tr]:
+    ",python,Generate refactoring suggestions for a target.,transform,code2logic,re,,,24,1,True,False,e29e4642
+code2logic/intent.py,method,"Analyzer:
+    .target_object(self,","(targ,,t)->   ",python,d the object referenced by target string.''',read,code2logic,re,,,17,1,True,False,dbc5d2d3
+code2logic/intent.py,method,"Analyzer:
+    .st_module_refactoring(self,","(modu,)->tr]:
+    ",python,erate refactoring suggestions for a module.''',transform,code2logic,re,,,15,1,True,False,4da14455
+code2logic/intent.py,method,"Analyzer:
+    .st_class_refactoring(self,","(cls,ny))->tr]:
+    ",python,erate refactoring suggestions for a class.''',transform,code2logic,re,,,12,1,True,False,65d8d472
+code2logic/intent.py,method,"Analyzer:
+    .st_function_refactoring(self,","(func,Any))->tr]:
+    ",python,erate refactoring suggestions for a function.''',transform,code2logic,re,,,20,1,True,False,b2b4b1a9
 code2logic/generators.py,class,MarkdownGenerator,(),python,,transform,generator,json,,,0,1,True,False,3c543433
 code2logic/generators.py,method,MarkdownGenerator.generate,"(self,project,detail_level)->str",python,Generate Markdown output.,other,generator,json,,,99,1,True,False,ef467922
 code2logic/generators.py,method,MarkdownGenerator.: List[st,"(], p,ject,)",python,tructure tree.''',validate,generator,json,,,25,1,True,False,040056fd
@@ -255,10 +294,10 @@ tests/conftest.py,function,sample_javascript_code,()->str,python,Sample JavaScri
 tests/conftest.py,function,sample_java_code,()->str,python,Sample Java code for testing.,other,test,"pytest,tempfile",,,37,1,True,False,b4f9e400
 tests/conftest.py,function,temp_project_dir,(),python,a temporary project directory.,other,test,"pytest,tempfile",,,4,1,True,False,335937c2
 tests/conftest.py,function,sample_project,"(temp_project_dir,sample_python_code)",python,a sample project with Python files.,other,test,"pytest,tempfile",,,25,1,True,False,bcd4ed64
-tests/conftest.py,function,sample_module,(),python,a sample module for testing.,other,test,"pytest,tempfile",,,38,1,True,False,5c468e29
-tests/conftest.py,function,sample_project_model,(),python,a sample project model for testing.,other,test,"pytest,tempfile",,,31,1,True,False,5357075d
+tests/conftest.py,function,sample_module,(),python,a sample module for testing.,other,test,"pytest,tempfile",,,66,1,True,False,5c468e29
+tests/conftest.py,function,sample_project_model,(),python,a sample project model for testing.,other,test,"pytest,tempfile",,,79,1,True,False,5357075d
 tests/conftest.py,function,mock_llm_config,(),python,Mock LLM configuration for testing.,other,test,"pytest,tempfile",,,9,1,True,False,23406af4
-tests/conftest.py,function,sample_analysis_result,(),python,Sample analysis result for testing.,validate,test,"pytest,tempfile",,,19,1,True,False,e996f386
+tests/conftest.py,function,sample_analysis_result,(),python,Sample analysis result for testing.,validate,test,"pytest,tempfile",,,23,1,True,False,e996f386
 tests/test_generators.py,class,TestMarkdownGenerator,(),python,,transform,test,"json,pytest",,,0,1,True,False,14371efb
 tests/test_generators.py,method,TestMarkdownGenerator.test_generate_basic,"(self,sample_project)",python,Test basic Markdown generation.,other,test,"json,pytest",,,8,1,True,False,7a9c8e09
 tests/test_generators.py,method,TestMarkdownGenerator.t_generate_includes_modules(se,"(f, s,ple_project))",python,Test that modules are included.''',other,test,"json,pytest",,,7,1,True,False,f1fc7405
@@ -292,8 +331,8 @@ tests/test_intent.py,method,TestIntentAnalyzer.test_init,(self),python,Test Inte
 tests/test_intent.py,method,TestIntentAnalyzer.test_extract_keywords,(self),python,Test keyword extraction from queries.,other,test,pytest,,,13,1,True,False,ff5c8fb0
 tests/test_intent.py,method,TestIntentAnalyzer.test_calculate_intent_confidence,(self),python,Test intent confidence calculation.,other,test,pytest,,,15,1,True,False,adf0ee4d
 tests/test_intent.py,method,TestIntentAnalyzer.test_identify_target_module,"(self,sample_project_model)",python,Test target identification for modules.,read,test,pytest,,,8,1,True,False,81eec024
-tests/test_intent.py,method,TestIntentAnalyzer.test_identify_target_function,"(self,sample_project_model)",python,Test target identification for functions.,read,test,pytest,,,12,1,True,False,da986215
-tests/test_intent.py,method,TestIntentAnalyzer.test_identify_target_class,"(self,sample_project_model)",python,Test target identification for classes.,read,test,pytest,,,12,1,True,False,23a64b76
+tests/test_intent.py,method,TestIntentAnalyzer.test_identify_target_function,"(self,sample_project_model)",python,Test target identification for functions.,read,test,pytest,,,13,1,True,False,da986215
+tests/test_intent.py,method,TestIntentAnalyzer.test_identify_target_class,"(self,sample_project_model)",python,Test target identification for classes.,read,test,pytest,,,13,1,True,False,23a64b76
 tests/test_intent.py,method,TestIntentAnalyzer.test_identify_target_project,"(self,sample_project_model)",python,Test target identification for project-level queries.,read,test,pytest,,,8,1,True,False,c5dc29a1
 tests/test_intent.py,method,TestIntentAnalyzer.test_generate_description,(self),python,Test description generation for intents.,other,test,pytest,,,9,1,True,False,14e02430
 tests/test_intent.py,method,TestIntentAnalyzer.test_generate_suggestions_refactor,(self),python,Test suggestion generation for refactor intent.,transform,test,pytest,,,7,1,True,False,0e40af38
@@ -304,33 +343,40 @@ tests/test_intent.py,method,TestIntentAnalyzer.test_analyze_intent_analyze,"(sel
 tests/test_intent.py,method,TestIntentAnalyzer.test_analyze_intent_optimize,"(self,sample_project_model)",python,Test intent analysis for optimization.,other,test,pytest,,,12,1,True,False,769c4a42
 tests/test_intent.py,method,TestIntentAnalyzer.test_analyze_intent_multiple,"(self,sample_project_model)",python,Test intent analysis with multiple possible intents.,other,test,pytest,,,14,1,True,False,554c89af
 tests/test_intent.py,method,TestIntentAnalyzer.test_analyze_intent_sorting,"(self,sample_project_model)",python,Test that intents are sorted by confidence.,other,test,pytest,,,12,1,True,False,97819611
-tests/test_intent.py,method,TestIntentAnalyzer.test_detect_code_smells_long_module,(self),python,Test code smell detection for long modules.,other,test,pytest,,,27,1,True,False,dde51961
-tests/test_intent.py,method,TestIntentAnalyzer.test_detect_code_smells_complex_function,(self),python,Test code smell detection for complex functions.,other,test,pytest,,,34,1,True,False,0cce0c7e
-tests/test_intent.py,method,TestIntentAnalyzer.test_detect_code_smells_large_class,(self),python,Test code smell detection for large classes.,other,test,pytest,,,34,1,True,False,a904ef34
-tests/test_intent.py,method,TestIntentAnalyzer.test_detect_code_smells_too_many_imports,(self),python,Test code smell detection for too many imports.,transform,test,pytest,,,29,1,True,False,72a930e3
-tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_refactoring_module,"(self,sample_project_model)",python,Test refactoring suggestions for modules.,transform,test,pytest,,,15,1,True,False,420027fe
-tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_refactoring_class,"(self,sample_project_model)",python,Test refactoring suggestions for classes.,transform,test,pytest,,,17,1,True,False,98ebca76
-tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_refactoring_function,"(self,sample_project_model)",python,Test refactoring suggestions for functions.,transform,test,pytest,,,19,1,True,False,521b24fc
-tests/test_intent.py,method,TestIntentAnalyzer.test_find_target_object_module,"(self,sample_project_model)",python,Test finding target object for module.,read,test,pytest,,,9,1,True,False,9d9f7a98
+tests/test_intent.py,method,TestIntentAnalyzer.test_detect_code_smells_long_module,(self),python,Test code smell detection for long modules.,other,test,pytest,,,18,1,True,False,dde51961
+tests/test_intent.py,method,TestIntentAnalyzer.test_detect_code_smells_complex_function,(self),python,Test code smell detection for complex functions.,other,test,pytest,,,21,1,True,False,0cce0c7e
+tests/test_intent.py,method,TestIntentAnalyzer.test_detect_code_smells_large_class,(self),python,Test code smell detection for large classes.,other,test,pytest,,,22,1,True,False,a904ef34
+tests/test_intent.py,method,TestIntentAnalyzer.test_detect_code_smells_too_many_imports,(self),python,Test code smell detection for too many imports.,transform,test,pytest,,,21,1,True,False,72a930e3
+tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_refactoring_module,"(self,sample_project_model)",python,Test refactoring suggestions for modules.,transform,test,pytest,,,12,1,True,False,420027fe
+tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_refactoring_class,"(self,sample_project_model)",python,Test refactoring suggestions for classes.,transform,test,pytest,,,13,1,True,False,98ebca76
+tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_refactoring_function,"(self,sample_project_model)",python,Test refactoring suggestions for functions.,transform,test,pytest,,,13,1,True,False,521b24fc
+tests/test_intent.py,method,TestIntentAnalyzer.test_find_target_object_module,"(self,sample_project_model)",python,Test finding target object for module.,read,test,pytest,,,10,1,True,False,9d9f7a98
 tests/test_intent.py,method,TestIntentAnalyzer.test_find_target_object_function,"(self,sample_project_model)",python,Test finding target object for function.,read,test,pytest,,,13,1,True,False,a59220ff
 tests/test_intent.py,method,TestIntentAnalyzer.test_find_target_object_class,"(self,sample_project_model)",python,Test finding target object for class.,read,test,pytest,,,13,1,True,False,2c498ec4
 tests/test_intent.py,method,TestIntentAnalyzer.test_find_target_object_not_found,"(self,sample_project_model)",python,Test finding non-existent target object.,read,test,pytest,,,7,1,True,False,c2b32f73
-tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_module_refactoring,(self),python,Test module-specific refactoring suggestions.,transform,test,pytest,,,22,1,True,False,e30de496
-tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_class_refactoring,(self),python,Test class-specific refactoring suggestions.,transform,test,pytest,,,21,1,True,False,a7c9c11d
+tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_module_refactoring,(self),python,Test module-specific refactoring suggestions.,transform,test,pytest,,,17,1,True,False,e30de496
+tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_class_refactoring,(self),python,Test class-specific refactoring suggestions.,transform,test,pytest,,,17,1,True,False,a7c9c11d
 tests/test_intent.py,method,TestIntentAnalyzer.test_suggest_function_refactoring,(self),python,Test function-specific refactoring suggestions.,transform,test,pytest,,,19,1,True,False,1ba4b4d9
+tests/test_intent.py,function,make_function,"(name,params,complexity,lines...+1)",python,Helper to create FunctionInfo with correct fields.,create,test,pytest,,,19,1,True,False,504ffa82
+tests/test_intent.py,function,make_class,"(name,methods,bases)",python,Helper to create ClassInfo with correct fields.,create,test,pytest,,,12,1,True,False,caddd2e1
+tests/test_intent.py,function,make_module,"(name,path,functions,classes...+2)",python,Helper to create ModuleInfo with correct fields.,create,test,pytest,,,15,1,True,False,28b29b99
+tests/test_intent.py,function,make_project,"(name,modules)",python,Helper to create ProjectInfo with correct fields.,create,test,pytest,,,15,1,True,False,cdfb1dd4
 tests/test_analyzer.py,class,TestProjectAnalyzer,(),python,,other,test,pytest,,,0,1,True,False,44d584a0
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_init,"(self,temp_project_dir)",python,Test ProjectAnalyzer initialization.,lifecycle,test,pytest,,,10,1,True,False,10a4776c
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_init_with_config,"(self,temp_project_dir)",python,Test ProjectAnalyzer initialization with config.,lifecycle,test,pytest,,,6,1,True,False,2a6f3d8e
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_discover_source_files,"(self,sample_project)",python,Test source file discovery.,validate,test,pytest,,,8,1,True,False,33869b31
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_discover_source_files_filters_non_source,"(self,temp_project_dir)",python,Test that non-source files are filtered out.,validate,test,pytest,,,12,1,True,False,bc1139e5
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_discover_source_files_ignores_common_dirs,"(self,temp_project_dir)",python,Test that common directories are ignored.,validate,test,pytest,,,18,1,True,False,8e4eda74
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_parse_file_tree_sitter_success,"(self,mock_fallback,mock_tree_sitter,sample_project)",python,Test successful parsing with Tree-sitter.,transform,test,pytest,,,24,1,True,False,6f545785
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_parse_file_fallback_success,"(self,mock_fallback,mock_tree_sitter,sample_project)",python,Test fallback parsing when Tree-sitter fails.,transform,test,pytest,,,29,1,True,False,720c438d
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_parse_file_both_fail,"(self,mock_fallback,mock_tree_sitter,sample_project)",python,Test when both parsers fail.,transform,test,pytest,,,19,1,True,False,07748b59
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_extract_metadata,"(self,sample_project)",python,Test metadata extraction.,other,test,pytest,,,12,1,True,False,1e1dbb2b
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_complete,"(self,mock_similarity,mock_dependency,sample_project)",python,Test complete analysis process.,other,test,pytest,,,39,1,True,False,200890c2
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_without_files,"(self,temp_project_dir)",python,Test analysis with no source files.,other,test,pytest,,,12,1,True,False,77cc64f7
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_generate_output,"(self,mock_generator_class,sample_project_model)",python,Test output generation.,other,test,pytest,,,14,1,True,False,a21d3f0f
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_generate_output_without_analysis,"(self,sample_project_model)",python,Test output generation without prior analysis.,validate,test,pytest,,,7,1,True,False,4aca585b
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_read_project_file_error,"(self,temp_project_dir)",python,Test error handling in _read_project_file.,read,test,pytest,,,9,1,True,False,86b36169
-tests/test_analyzer.py,method,TestProjectAnalyzer.test_analysis_with_config,"(self,sample_project)",python,Test analysis with custom configuration.,validate,test,pytest,,,20,1,True,False,2d371e96
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_init,"(self,temp_project_dir)",python,Test ProjectAnalyzer initialization.,lifecycle,test,pytest,,,8,1,True,False,10a4776c
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_init_with_verbose,"(self,temp_project_dir,capsys)",python,Test ProjectAnalyzer initialization with verbose mode.,lifecycle,test,pytest,,,6,1,True,False,61723b6c
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_returns_project_info,"(self,sample_project)",python,Test that analyze returns ProjectInfo.,other,test,pytest,,,8,1,True,False,c9cd493d
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_finds_source_files,"(self,sample_project)",python,Test that analysis finds Python files.,read,test,pytest,,,10,1,True,False,4cb67065
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_ignores_non_source_files,"(self,temp_project_dir)",python,Test that non-source files are ignored.,other,test,pytest,,,14,1,True,False,0fd0582e
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_ignores_common_dirs,"(self,temp_project_dir)",python,Test that common directories are ignored.,other,test,pytest,,,23,1,True,False,a21a9632
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_extracts_functions,"(self,temp_project_dir)",python,Test that analysis extracts functions.,other,test,pytest,,,23,1,True,False,e96ce9ec
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_extracts_classes,"(self,temp_project_dir)",python,Test that analysis extracts classes.,other,test,pytest,,,24,1,True,False,34784011
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_extracts_imports,"(self,temp_project_dir)",python,Test that analysis extracts imports.,other,test,pytest,,,19,1,True,False,dc85fbcd
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_counts_lines,"(self,temp_project_dir)",python,Test that analysis counts lines.,other,test,pytest,,,17,1,True,False,67e6a158
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_analyze_empty_project,"(self,temp_project_dir)",python,Test analysis of empty project.,other,test,pytest,,,8,1,True,False,1493320a
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_detect_entrypoints,"(self,temp_project_dir)",python,Test entry point detection.,other,test,pytest,,,11,1,True,False,cc0e2d65
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_get_statistics,"(self,sample_project)",python,Test get_statistics method.,read,test,pytest,,,11,1,True,False,d104c580
+tests/test_analyzer.py,method,TestProjectAnalyzer.test_language_detection,"(self,temp_project_dir)",python,Test language detection from file extensions.,other,test,pytest,,,10,1,True,False,f2b8d4fa
+tests/test_analyzer.py,class,TestAnalyzeProjectFunction,(),python,,other,test,pytest,,,0,1,True,False,e21a8625
+tests/test_analyzer.py,method,TestAnalyzeProjectFunction.test_analyze_project,"(self,sample_project)",python,Test analyze_project function.,other,test,pytest,,,6,1,True,False,32e47784
+tests/test_analyzer.py,class,TestGetLibraryStatus,(),python,,read,test,pytest,,,0,1,True,False,926b81a4
+tests/test_analyzer.py,method,TestGetLibraryStatus.test_get_library_status,(self),python,Test get_library_status function.,read,test,pytest,,,10,1,True,False,d42bd5cf

@@ -6,7 +6,32 @@ to generate human-readable intent descriptions for functions.
 """
 
 import re
-from typing import Optional, List, Tuple
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from typing import Optional, List, Tuple, Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from code2logic.models import ProjectInfo
+
+
+class IntentType(Enum):
+    """Types of user intents for code analysis."""
+    REFACTOR = auto()
+    ANALYZE = auto()
+    OPTIMIZE = auto()
+    DEBUG = auto()
+    DOCUMENT = auto()
+    TEST = auto()
+
+
+@dataclass
+class Intent:
+    """Represents a detected user intent."""
+    type: IntentType
+    confidence: float
+    target: str
+    description: str
+    suggestions: List[str] = field(default_factory=list)
 
 # Optional NLP imports with graceful degradation
 try:
@@ -244,3 +269,293 @@ class EnhancedIntentGenerator:
             'nltk_lemmatizer': NLTK_AVAILABLE,
             'spacy': SPACY_AVAILABLE,
         }
+
+
+class IntentAnalyzer:
+    """
+    Analyzes user queries to detect intent and provide suggestions.
+    
+    Used for understanding what the user wants to do with the code
+    (refactor, analyze, optimize, etc.) and providing relevant suggestions.
+    """
+    
+    def __init__(self):
+        """Initialize the intent analyzer with patterns."""
+        self.intent_patterns = {
+            IntentType.REFACTOR: ['refactor', 'restructure', 'improve', 'clean', 'reorganize', 'simplify'],
+            IntentType.ANALYZE: ['analyze', 'explain', 'understand', 'describe', 'show', 'structure'],
+            IntentType.OPTIMIZE: ['optimize', 'performance', 'speed', 'fast', 'efficient', 'memory'],
+            IntentType.DEBUG: ['debug', 'fix', 'bug', 'error', 'issue', 'problem'],
+            IntentType.DOCUMENT: ['document', 'comment', 'docstring', 'readme', 'documentation'],
+            IntentType.TEST: ['test', 'coverage', 'unittest', 'pytest', 'testing'],
+        }
+        self.code_smell_patterns = {
+            'long_module': 500,
+            'complex_function': 10,
+            'large_class': 15,
+            'too_many_imports': 20,
+        }
+    
+    def _extract_keywords(self, query: str) -> List[str]:
+        """Extract keywords from a query string."""
+        # Simple word extraction, filtering common stop words
+        stop_words = {'the', 'a', 'an', 'to', 'and', 'or', 'in', 'of', 'for', 'is', 'it', 'this', 'that', 'i'}
+        words = re.findall(r'\b\w+\b', query.lower())
+        return [w for w in words if w not in stop_words]
+    
+    def _calculate_intent_confidence(self, keywords: List[str], patterns: List[str]) -> float:
+        """Calculate confidence score based on keyword matches."""
+        if not patterns:
+            return 0.0
+        matches = sum(1 for k in keywords if k in patterns)
+        return matches / len(patterns)
+    
+    def _identify_target(self, query: str, project: Any) -> str:
+        """Identify the target of the query (module, function, class, or project)."""
+        query_lower = query.lower()
+        
+        # Check for module names
+        for module in project.modules:
+            module_name = getattr(module, 'name', None) or module.path.split('/')[-1].replace('.py', '')
+            if module_name.lower() in query_lower:
+                # Check for function within module
+                for func in module.functions:
+                    if func.name.lower() in query_lower:
+                        return f"{module_name}.{func.name}"
+                # Check for class within module
+                for cls in module.classes:
+                    if cls.name.lower() in query_lower:
+                        return f"{module_name}.{cls.name}"
+                return module_name
+        
+        return "project"
+    
+    def _generate_description(self, intent_type: IntentType, target: str) -> str:
+        """Generate a description for the detected intent."""
+        descriptions = {
+            IntentType.REFACTOR: f"Refactoring suggestions for {target}",
+            IntentType.ANALYZE: f"Analysis of {target}",
+            IntentType.OPTIMIZE: f"Performance optimization for {target}",
+            IntentType.DEBUG: f"Debugging assistance for {target}",
+            IntentType.DOCUMENT: f"Documentation suggestions for {target}",
+            IntentType.TEST: f"Testing suggestions for {target}",
+        }
+        return descriptions.get(intent_type, f"Analysis of {target}")
+    
+    def _generate_suggestions(self, intent_type: IntentType, target: str, project: Any) -> List[str]:
+        """Generate suggestions based on intent type."""
+        suggestions = {
+            IntentType.REFACTOR: [
+                "Review dependency structure",
+                "Consider extracting common functionality",
+                "Look for duplicate code patterns",
+            ],
+            IntentType.ANALYZE: [
+                "Review dependency graph",
+                "Check module structure",
+                "Examine function complexity",
+            ],
+            IntentType.OPTIMIZE: [
+                "Profile performance bottlenecks",
+                "Review algorithmic complexity",
+                "Consider caching strategies",
+            ],
+            IntentType.DEBUG: [
+                "Add logging statements",
+                "Review error handling",
+                "Check edge cases",
+            ],
+            IntentType.DOCUMENT: [
+                "Add module docstrings",
+                "Document public APIs",
+                "Create usage examples",
+            ],
+            IntentType.TEST: [
+                "Add unit tests",
+                "Improve test coverage",
+                "Add integration tests",
+            ],
+        }
+        return suggestions.get(intent_type, [])
+    
+    def analyze_intent(self, query: str, project: Any) -> List[Intent]:
+        """
+        Analyze a query and return detected intents sorted by confidence.
+        
+        Args:
+            query: User query string
+            project: Project model to analyze against
+            
+        Returns:
+            List of Intent objects sorted by confidence (descending)
+        """
+        keywords = self._extract_keywords(query)
+        target = self._identify_target(query, project)
+        intents = []
+        
+        for intent_type, patterns in self.intent_patterns.items():
+            confidence = self._calculate_intent_confidence(keywords, patterns)
+            if confidence > 0:
+                description = self._generate_description(intent_type, target)
+                suggestions = self._generate_suggestions(intent_type, target, project)
+                intents.append(Intent(
+                    type=intent_type,
+                    confidence=confidence,
+                    target=target,
+                    description=description,
+                    suggestions=suggestions,
+                ))
+        
+        # Sort by confidence descending
+        intents.sort(key=lambda x: x.confidence, reverse=True)
+        return intents
+    
+    def detect_code_smells(self, project: Any) -> List[dict]:
+        """
+        Detect code smells in the project.
+        
+        Args:
+            project: Project model to analyze
+            
+        Returns:
+            List of detected code smells
+        """
+        smells = []
+        
+        for module in project.modules:
+            module_name = getattr(module, 'name', None) or module.path.split('/')[-1].replace('.py', '')
+            lines = getattr(module, 'lines_of_code', None) or getattr(module, 'lines_total', 0)
+            
+            # Check for long module
+            if lines > self.code_smell_patterns['long_module']:
+                smells.append({
+                    'type': 'long_module',
+                    'target': module_name,
+                    'message': f"Module has {lines} lines (threshold: {self.code_smell_patterns['long_module']})",
+                })
+            
+            # Check for too many imports
+            if len(module.imports) > self.code_smell_patterns['too_many_imports']:
+                smells.append({
+                    'type': 'too_many_imports',
+                    'target': module_name,
+                    'message': f"Module has {len(module.imports)} imports",
+                })
+            
+            # Check functions
+            for func in module.functions:
+                complexity = getattr(func, 'complexity', 1)
+                if complexity > self.code_smell_patterns['complex_function']:
+                    smells.append({
+                        'type': 'complex_function',
+                        'target': f"{module_name}.{func.name}",
+                        'message': f"Function has complexity {complexity}",
+                    })
+            
+            # Check classes
+            for cls in module.classes:
+                if len(cls.methods) > self.code_smell_patterns['large_class']:
+                    smells.append({
+                        'type': 'large_class',
+                        'target': f"{module_name}.{cls.name}",
+                        'message': f"Class has {len(cls.methods)} methods",
+                    })
+        
+        return smells
+    
+    def suggest_refactoring(self, target: str, project: Any) -> List[str]:
+        """
+        Generate refactoring suggestions for a target.
+        
+        Args:
+            target: Target identifier (module, module.class, module.function)
+            project: Project model
+            
+        Returns:
+            List of refactoring suggestions
+        """
+        obj = self._find_target_object(target, project)
+        if obj is None:
+            return ["Target not found"]
+        
+        # Check object type and delegate
+        if hasattr(obj, 'functions') and hasattr(obj, 'classes'):
+            return self._suggest_module_refactoring(obj)
+        elif hasattr(obj, 'methods'):
+            return self._suggest_class_refactoring(obj)
+        elif hasattr(obj, 'complexity'):
+            return self._suggest_function_refactoring(obj)
+        
+        return []
+    
+    def _find_target_object(self, target: str, project: Any) -> Any:
+        """Find the object referenced by target string."""
+        parts = target.split('.')
+        
+        for module in project.modules:
+            module_name = getattr(module, 'name', None) or module.path.split('/')[-1].replace('.py', '')
+            if module_name == parts[0]:
+                if len(parts) == 1:
+                    return module
+                # Look for function or class
+                for func in module.functions:
+                    if func.name == parts[1]:
+                        return func
+                for cls in module.classes:
+                    if cls.name == parts[1]:
+                        return cls
+        return None
+    
+    def _suggest_module_refactoring(self, module: Any) -> List[str]:
+        """Generate refactoring suggestions for a module."""
+        suggestions = []
+        
+        if len(module.functions) > 20:
+            suggestions.append("Consider splitting this module into smaller, focused modules")
+        
+        if len(module.imports) > 15:
+            suggestions.append("Review imports and consider consolidating dependencies")
+        
+        lines = getattr(module, 'lines_of_code', None) or getattr(module, 'lines_total', 0)
+        if lines > 400:
+            suggestions.append("Module is large; consider extracting related functions into submodules")
+        
+        return suggestions or ["Module structure looks reasonable"]
+    
+    def _suggest_class_refactoring(self, cls: Any) -> List[str]:
+        """Generate refactoring suggestions for a class."""
+        suggestions = []
+        
+        if len(cls.methods) > 15:
+            suggestions.append("Consider splitting class into smaller classes with focused responsibilities")
+        
+        bases = getattr(cls, 'base_classes', []) or getattr(cls, 'bases', [])
+        if len(bases) > 3:
+            suggestions.append("Consider using composition over inheritance to reduce coupling")
+        
+        return suggestions or ["Class structure looks reasonable"]
+    
+    def _suggest_function_refactoring(self, func: Any) -> List[str]:
+        """Generate refactoring suggestions for a function."""
+        suggestions = []
+        
+        lines = getattr(func, 'lines_of_code', None) or getattr(func, 'lines', 0)
+        if lines > 50:
+            suggestions.append("Consider breaking this function into smaller helper functions")
+        
+        complexity = getattr(func, 'complexity', 1)
+        if complexity > 10:
+            suggestions.append("High cyclomatic complexity; consider simplifying control flow")
+        
+        params = getattr(func, 'parameters', []) or getattr(func, 'params', [])
+        if len(params) > 5:
+            suggestions.append("Many parameters; consider using a parameter object or builder pattern")
+        
+        if not getattr(func, 'docstring', None):
+            suggestions.append("Add a docstring to document the function's purpose")
+        
+        return suggestions or ["Function structure looks reasonable"]
+
+
+# Alias for backwards compatibility
+ProjectAnalyzer = IntentAnalyzer

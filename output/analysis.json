@@ -2,7 +2,7 @@
   "name": "code2logic",
   "statistics": {
     "files": 24,
-    "lines": 8219,
+    "lines": 8598,
     "languages": {
       "python": 24
     }
@@ -489,14 +489,23 @@
     {
       "path": "code2logic/intent.py",
       "language": "python",
-      "lines": 180,
+      "lines": 429,
       "imports": [
         "re"
       ],
       "exports": [
-        "EnhancedIntentGenerator"
+        "IntentType",
+        "EnhancedIntentGenerator",
+        "Analyzer:\n    "
       ],
       "classes": [
+        {
+          "name": "IntentType",
+          "bases": [
+            "Enum"
+          ],
+          "docstring": "Types of user intents for code analysis."
+        },
         {
           "name": "EnhancedIntentGenerator",
           "bases": [],
@@ -530,6 +539,91 @@
               "name": "ailable_features(cls) ",
               "signature": "(> d)->tr, bool]:\n    ",
               "intent": "dictionary of available NLP features.",
+              "is_async": false
+            }
+          ]
+        },
+        {
+          "name": "Analyzer:\n    ",
+          "bases": [],
+          "docstring": "  Analyzes user queries to detect intent and provide suggestions.\n    \n    Used for understanding wh",
+          "methods": [
+            {
+              "name": "__(self)",
+              "signature": "(\n   )",
+              "intent": "tialize the intent analyzer with patterns.\"\"\"",
+              "is_async": false
+            },
+            {
+              "name": "ct_keywords(self,",
+              "signature": "(quer, str):> L)->tr]:\n    ",
+              "intent": "ract keywords from a query string.\"\"\"",
+              "is_async": false
+            },
+            {
+              "name": "late_intent_confidence(self,",
+              "signature": "(keyw,ds: List:tr], patt,ns: List:tr]) -> f)->\n    ",
+              "intent": "culate confidence score based on keyword matches.\"\"\"",
+              "is_async": false
+            },
+            {
+              "name": "ify_target(self,",
+              "signature": "(quer, str,:roj,t: Any):> s)->   ",
+              "intent": "ntify the target of the query (module, function, class, or project).\"\"\"",
+              "is_async": false
+            },
+            {
+              "name": "ate_description(self,",
+              "signature": "(inte,_type: Inte:Type, targ,: str):> s)->   ",
+              "intent": "erate a description for the detected intent.\"\"\"",
+              "is_async": false
+            },
+            {
+              "name": "ate_suggestions(self,",
+              "signature": "(inte,_type: Inte:Type, targ,: str,:roj,t: Any):> L)->tr]:\n    ",
+              "intent": "erate suggestions based on intent type.\"\"\"",
+              "is_async": false
+            },
+            {
+              "name": "e_intent(self,",
+              "signature": "(quer, str,:roj,t: Any):> L)->ntent]:\n    ",
+              "intent": "Analyze a query and return detected intents sorted by confidence.",
+              "is_async": false
+            },
+            {
+              "name": "_code_smells(self,",
+              "signature": "(proj,t: Any):> L)->ict]:\n    ",
+              "intent": "Detect code smells in the project.",
+              "is_async": false
+            },
+            {
+              "name": "t_refactoring(self,",
+              "signature": "(targ,: str,:roj,t: Any):> L)->tr]:\n    ",
+              "intent": "Generate refactoring suggestions for a target.",
+              "is_async": false
+            },
+            {
+              "name": "target_object(self,",
+              "signature": "(targ,: str,:roj,t: Any):> A)->   ",
+              "intent": "d the object referenced by target string.\"\"\"",
+              "is_async": false
+            },
+            {
+              "name": "st_module_refactoring(self,",
+              "signature": "(modu,: Any):> L)->tr]:\n    ",
+              "intent": "erate refactoring suggestions for a module.\"\"\"",
+              "is_async": false
+            },
+            {
+              "name": "st_class_refactoring(self,",
+              "signature": "(cls:,ny):> L)->tr]:\n    ",
+              "intent": "erate refactoring suggestions for a class.\"\"\"",
+              "is_async": false
+            },
+            {
+              "name": "st_function_refactoring(self,",
+              "signature": "(func,Any):> L)->tr]:\n    ",
+              "intent": "erate refactoring suggestions for a function.\"\"\"",
               "is_async": false
             }
           ]
@@ -814,7 +908,7 @@
     {
       "path": "code2logic/models.py",
       "language": "python",
-      "lines": 150,
+      "lines": 154,
       "imports": [],
       "exports": []
     },
@@ -1500,7 +1594,7 @@
     {
       "path": "tests/conftest.py",
       "language": "python",
-      "lines": 233,
+      "lines": 314,
       "imports": [
         "pytest",
         "tempfile"
@@ -1713,11 +1807,15 @@
     {
       "path": "tests/test_intent.py",
       "language": "python",
-      "lines": 356,
+      "lines": 353,
       "imports": [
         "pytest"
       ],
       "exports": [
+        "make_function",
+        "make_class",
+        "make_module",
+        "make_project",
         "TestIntentAnalyzer"
       ],
       "classes": [
@@ -1908,17 +2006,45 @@
             }
           ]
         }
+      ],
+      "functions": [
+        {
+          "name": "make_function",
+          "signature": "(name,params,complexity,lines...+1)",
+          "intent": "Helper to create FunctionInfo with correct fields.",
+          "is_async": false
+        },
+        {
+          "name": "make_class",
+          "signature": "(name,methods,bases)",
+          "intent": "Helper to create ClassInfo with correct fields.",
+          "is_async": false
+        },
+        {
+          "name": "make_module",
+          "signature": "(name,path,functions,classes...+2)",
+          "intent": "Helper to create ModuleInfo with correct fields.",
+          "is_async": false
+        },
+        {
+          "name": "make_project",
+          "signature": "(name,modules)",
+          "intent": "Helper to create ProjectInfo with correct fields.",
+          "is_async": false
+        }
       ]
     },
     {
       "path": "tests/test_analyzer.py",
       "language": "python",
-      "lines": 193,
+      "lines": 180,
       "imports": [
         "pytest"
       ],
       "exports": [
-        "TestProjectAnalyzer"
+        "TestProjectAnalyzer",
+        "TestAnalyzeProjectFunction",
+        "TestGetLibraryStatus"
       ],
       "classes": [
         {
@@ -1933,87 +2059,107 @@
               "is_async": false
             },
             {
-              "name": "test_init_with_config",
-              "signature": "(self,temp_project_dir)",
-              "intent": "Test ProjectAnalyzer initialization with config.",
+              "name": "test_init_with_verbose",
+              "signature": "(self,temp_project_dir,capsys)",
+              "intent": "Test ProjectAnalyzer initialization with verbose mode.",
               "is_async": false
             },
             {
-              "name": "test_discover_source_files",
+              "name": "test_analyze_returns_project_info",
               "signature": "(self,sample_project)",
-              "intent": "Test source file discovery.",
+              "intent": "Test that analyze returns ProjectInfo.",
               "is_async": false
             },
             {
-              "name": "test_discover_source_files_filters_non_source",
+              "name": "test_analyze_finds_source_files",
+              "signature": "(self,sample_project)",
+              "intent": "Test that analysis finds Python files.",
+              "is_async": false
+            },
+            {
+              "name": "test_ignores_non_source_files",
               "signature": "(self,temp_project_dir)",
-              "intent": "Test that non-source files are filtered out.",
+              "intent": "Test that non-source files are ignored.",
               "is_async": false
             },
             {
-              "name": "test_discover_source_files_ignores_common_dirs",
+              "name": "test_ignores_common_dirs",
               "signature": "(self,temp_project_dir)",
               "intent": "Test that common directories are ignored.",
               "is_async": false
             },
             {
-              "name": "test_parse_file_tree_sitter_success",
-              "signature": "(self,mock_fallback,mock_tree_sitter,sample_project)",
-              "intent": "Test successful parsing with Tree-sitter.",
-              "is_async": false
-            },
-            {
-              "name": "test_parse_file_fallback_success",
-              "signature": "(self,mock_fallback,mock_tree_sitter,sample_project)",
-              "intent": "Test fallback parsing when Tree-sitter fails.",
-              "is_async": false
-            },
-            {
-              "name": "test_parse_file_both_fail",
-              "signature": "(self,mock_fallback,mock_tree_sitter,sample_project)",
-              "intent": "Test when both parsers fail.",
-              "is_async": false
-            },
-            {
-              "name": "test_extract_metadata",
-              "signature": "(self,sample_project)",
-              "intent": "Test metadata extraction.",
-              "is_async": false
-            },
-            {
-              "name": "test_analyze_complete",
-              "signature": "(self,mock_similarity,mock_dependency,sample_project)",
-              "intent": "Test complete analysis process.",
-              "is_async": false
-            },
-            {
-              "name": "test_analyze_without_files",
+              "name": "test_analyze_extracts_functions",
               "signature": "(self,temp_project_dir)",
-              "intent": "Test analysis with no source files.",
+              "intent": "Test that analysis extracts functions.",
               "is_async": false
             },
             {
-              "name": "test_generate_output",
-              "signature": "(self,mock_generator_class,sample_project_model)",
-              "intent": "Test output generation.",
-              "is_async": false
-            },
-            {
-              "name": "test_generate_output_without_analysis",
-              "signature": "(self,sample_project_model)",
-              "intent": "Test output generation without prior analysis.",
-              "is_async": false
-            },
-            {
-              "name": "test_read_project_file_error",
+              "name": "test_analyze_extracts_classes",
               "signature": "(self,temp_project_dir)",
-              "intent": "Test error handling in _read_project_file.",
+              "intent": "Test that analysis extracts classes.",
               "is_async": false
             },
             {
-              "name": "test_analysis_with_config",
+              "name": "test_analyze_extracts_imports",
+              "signature": "(self,temp_project_dir)",
+              "intent": "Test that analysis extracts imports.",
+              "is_async": false
+            },
+            {
+              "name": "test_analyze_counts_lines",
+              "signature": "(self,temp_project_dir)",
+              "intent": "Test that analysis counts lines.",
+              "is_async": false
+            },
+            {
+              "name": "test_analyze_empty_project",
+              "signature": "(self,temp_project_dir)",
+              "intent": "Test analysis of empty project.",
+              "is_async": false
+            },
+            {
+              "name": "test_detect_entrypoints",
+              "signature": "(self,temp_project_dir)",
+              "intent": "Test entry point detection.",
+              "is_async": false
+            },
+            {
+              "name": "test_get_statistics",
               "signature": "(self,sample_project)",
-              "intent": "Test analysis with custom configuration.",
+              "intent": "Test get_statistics method.",
+              "is_async": false
+            },
+            {
+              "name": "test_language_detection",
+              "signature": "(self,temp_project_dir)",
+              "intent": "Test language detection from file extensions.",
+              "is_async": false
+            }
+          ]
+        },
+        {
+          "name": "TestAnalyzeProjectFunction",
+          "bases": [],
+          "docstring": "Test the analyze_project convenience function.",
+          "methods": [
+            {
+              "name": "test_analyze_project",
+              "signature": "(self,sample_project)",
+              "intent": "Test analyze_project function.",
+              "is_async": false
+            }
+          ]
+        },
+        {
+          "name": "TestGetLibraryStatus",
+          "bases": [],
+          "docstring": "Test the get_library_status function.",
+          "methods": [
+            {
+              "name": "test_get_library_status",
+              "signature": "(self)",
+              "intent": "Test get_library_status function.",
               "is_async": false
             }
           ]

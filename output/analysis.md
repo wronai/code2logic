@@ -1,9 +1,9 @@
 # 📦 code2logic
 
 ```yaml
-generated: 2026-01-03T12:50:50.955139
+generated: 2026-01-03T12:59:01.526226
 files: 24
-lines: 8219
+lines: 8598
 languages: {"python": 24}
 entrypoints: ["code2logic/cli.py", "code2logic/llm.py", "code2logic/analyzer.py", "code2logic/parsers.py", "code2logic/intent.py"]
 ```
@@ -21,7 +21,8 @@ entrypoints: ["code2logic/cli.py", "code2logic/llm.py", "code2logic/analyzer.py"
 │   ├── gherkin.py: [python] GherkinGenerator, nitionGenerator:
     "", YAMLGenerator:
     "" +1
-│   ├── intent.py: [python] EnhancedIntentGenerator
+│   ├── intent.py: [python] IntentType, EnhancedIntentGenerator, Analyzer:
+    
 │   ├── llm.py: [python] OllamaClient, LiteLLMClient, CodeAnalyzer +1
 │   ├── mcp_server.py: [python] handle_request, call_tool, run_server
 │   ├── models.py: [python]
@@ -38,10 +39,10 @@ entrypoints: ["code2logic/cli.py", "code2logic/llm.py", "code2logic/analyzer.py"
 └── tests/
     ├── __init__.py: [python]
     ├── conftest.py: [python] sample_python_code, sample_javascript_code, sample_java_code +6
-    ├── test_analyzer.py: [python] TestProjectAnalyzer
+    ├── test_analyzer.py: [python] TestProjectAnalyzer, TestAnalyzeProjectFunction, TestGetLibraryStatus
     ├── test_generators.py: [python] sample_project, TestMarkdownGenerator, tCompactGenerator:
   +1
-    └── test_intent.py: [python] TestIntentAnalyzer
+    └── test_intent.py: [python] make_function, make_class, make_module +2
 ```
 
 ## 📄 Modules
@@ -377,13 +378,18 @@ methods:
 
 ```yaml
 path: code2logic/intent.py
-lang: python | lines: 180/247
+lang: python | lines: 429/562
 imports: [re]
 ```
 
 > Enhanced Intent Generator with NLP support.
 
 Uses lemmatization, pattern matching, and docstring ext
+
+**class `IntentType`(Enum)**
+
+> Types of user intents for code analysis.
+
 
 **class `EnhancedIntentGenerator`**
 
@@ -399,6 +405,38 @@ methods:
       # ract intent from docstring's first line.
   ailable_features(cls) (> d) -> tr, bool]:
       # dictionary of available NLP features.
+```
+
+**class `Analyzer:
+    `**
+
+>   Analyzes user queries to detect intent and provide suggestions.
+    
+    Used for understanding wh
+
+```yaml
+methods:
+  __(self)(
+   )  # tialize the intent analyzer with pattern
+  ct_keywords(self,(quer,  str):> L) -> tr]:
+      # ract keywords from a query string."""
+  late_intent_confidence(self,(keyw, ds: List:tr], patt, ns: List:tr]) -> f) -> 
+      # culate confidence score based on keyword
+  ify_target(self,(quer,  str,:roj, t: Any):> s) ->      # ntify the target of the query (module, f
+  ate_description(self,(inte, _type: Inte:Type, targ, : str):> s) ->      # erate a description for the detected int
+  ate_suggestions(self,(inte, _type: Inte:Type, targ, : str,:roj, t: Any):> L) -> tr]:
+      # erate suggestions based on intent type."
+  e_intent(self,(quer,  str,:roj, t: Any):> L) -> ntent]:
+      # Analyze a query and return detected inte
+  t_refactoring(self,(targ, : str,:roj, t: Any):> L) -> tr]:
+      # Generate refactoring suggestions for a t
+  target_object(self,(targ, : str,:roj, t: Any):> A) ->      # d the object referenced by target string
+  st_module_refactoring(self,(modu, : Any):> L) -> tr]:
+      # erate refactoring suggestions for a modu
+  st_class_refactoring(self,(cls:, ny):> L) -> tr]:
+      # erate refactoring suggestions for a clas
+  st_function_refactoring(self,(func, Any):> L) -> tr]:
+      # erate refactoring suggestions for a func
 ```
 
 ---
@@ -488,7 +526,7 @@ Provides Code2Logic functionality as an MCP serv
 
 ```yaml
 path: code2logic/models.py
-lang: python | lines: 150/171
+lang: python | lines: 154/178
 ```
 
 > Data models for Code2Logic.
@@ -753,7 +791,7 @@ lang: python | lines: 3/4
 
 ```yaml
 path: tests/conftest.py
-lang: python | lines: 233/288
+lang: python | lines: 314/368
 imports: [pytest, tempfile]
 ```
 
@@ -777,7 +815,7 @@ imports: [pytest, tempfile]
 
 ```yaml
 path: tests/test_analyzer.py
-lang: python | lines: 193/278
+lang: python | lines: 180/247
 imports: [pytest]
 ```
 
@@ -790,18 +828,36 @@ imports: [pytest]
 ```yaml
 methods:
   test_init(self, temp_project_dir)  # Test ProjectAnalyzer initialization.
-  test_init_with_config(self, temp_project_dir)  # Test ProjectAnalyzer initialization with
-  test_discover_source_files(self, sample_project)  # Test source file discovery.
-  test_discover_source_files_filters_non_source(self, temp_project_dir)  # Test that non-source files are filtered 
-  test_discover_source_files_ignores_common_dirs(self, temp_project_dir)  # Test that common directories are ignored
-  test_parse_file_tree_sitter_success(self, mock_fallback, mock_tree_sitter, sample_project)  # Test successful parsing with Tree-sitter
-  test_parse_file_fallback_success(self, mock_fallback, mock_tree_sitter, sample_project)  # Test fallback parsing when Tree-sitter f
-  test_parse_file_both_fail(self, mock_fallback, mock_tree_sitter, sample_project)  # Test when both parsers fail.
-  test_extract_metadata(self, sample_project)  # Test metadata extraction.
-  test_analyze_complete(self, mock_similarity, mock_dependency, sample_project)  # Test complete analysis process.
-  test_analyze_without_files(self, temp_project_dir)  # Test analysis with no source files.
-  test_generate_output(self, mock_generator_class, sample_project_model)  # Test output generation.
-  # ... +3 more
+  test_init_with_verbose(self, temp_project_dir, capsys)  # Test ProjectAnalyzer initialization with
+  test_analyze_returns_project_info(self, sample_project)  # Test that analyze returns ProjectInfo.
+  test_analyze_finds_source_files(self, sample_project)  # Test that analysis finds Python files.
+  test_ignores_non_source_files(self, temp_project_dir)  # Test that non-source files are ignored.
+  test_ignores_common_dirs(self, temp_project_dir)  # Test that common directories are ignored
+  test_analyze_extracts_functions(self, temp_project_dir)  # Test that analysis extracts functions.
+  test_analyze_extracts_classes(self, temp_project_dir)  # Test that analysis extracts classes.
+  test_analyze_extracts_imports(self, temp_project_dir)  # Test that analysis extracts imports.
+  test_analyze_counts_lines(self, temp_project_dir)  # Test that analysis counts lines.
+  test_analyze_empty_project(self, temp_project_dir)  # Test analysis of empty project.
+  test_detect_entrypoints(self, temp_project_dir)  # Test entry point detection.
+  # ... +2 more
+```
+
+**class `TestAnalyzeProjectFunction`**
+
+> Test the analyze_project convenience function.
+
+```yaml
+methods:
+  test_analyze_project(self, sample_project)  # Test analyze_project function.
+```
+
+**class `TestGetLibraryStatus`**
+
+> Test the get_library_status function.
+
+```yaml
+methods:
+  test_get_library_status(self)  # Test get_library_status function.
 ```
 
 ---
@@ -883,7 +939,7 @@ methods:
 
 ```yaml
 path: tests/test_intent.py
-lang: python | lines: 356/496
+lang: python | lines: 353/504
 imports: [pytest]
 ```
 
@@ -909,5 +965,12 @@ methods:
   test_analyze_intent_refactor(self, sample_project_model)  # Test intent analysis for refactoring.
   # ... +18 more
 ```
+
+**Functions:**
+
+- `make_function(name, params, complexity, lines, ...+1)` — Helper to create FunctionInfo with correct fields.
+- `make_class(name, methods, bases)` — Helper to create ClassInfo with correct fields.
+- `make_module(name, path, functions, classes, ...+2)` — Helper to create ModuleInfo with correct fields.
+- `make_project(name, modules)` — Helper to create ProjectInfo with correct fields.
 
 ---

@@ -168,3 +168,10 @@ class ProjectInfo:
     total_files: int
     total_lines: int
     generated_at: str
+
+
+# Backwards compatibility aliases for tests
+Project = ProjectInfo
+Module = ModuleInfo
+Function = FunctionInfo
+Class = ClassInfo
