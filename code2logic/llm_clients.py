@@ -14,6 +14,13 @@ Usage:
 """
 
 import os
+
+# Load .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 from typing import Optional, List, Dict, Any
 from abc import ABC, abstractmethod
 

@@ -79,6 +79,11 @@ from .benchmark import (
     FormatResult,
     BenchmarkResult,
 )
+from .file_formats import (
+    generate_file_csv,
+    generate_file_json,
+    generate_file_yaml,
+)
 
 __all__ = [
     # Version
@@ -137,4 +142,8 @@ __all__ = [
     "run_benchmark",
     "FormatResult",
     "BenchmarkResult",
+    # File Formats
+    "generate_file_csv",
+    "generate_file_json",
+    "generate_file_yaml",
 ]

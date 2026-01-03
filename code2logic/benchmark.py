@@ -15,8 +15,16 @@ Usage:
     results = benchmark.run_all("path/to/file.py")
 """
 
+import os
 import json
 import time
+
+# Load .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 from datetime import datetime
@@ -33,6 +41,7 @@ from .generators import (
 from .gherkin import GherkinGenerator
 from .reproduction import compare_code, extract_code_block, generate_file_gherkin
 from .llm_clients import BaseLLMClient, get_client
+from .file_formats import generate_file_csv, generate_file_json, generate_file_yaml
 
 
 @dataclass
@@ -154,22 +163,20 @@ class ReproductionBenchmark:
         Returns:
             Specification string
         """
+        # Use file-specific generators for better reproduction
         if format_name == 'gherkin':
-            # Use file-specific Gherkin for single files
             return generate_file_gherkin(file_path)
+        elif format_name == 'csv':
+            return generate_file_csv(file_path)
+        elif format_name == 'json':
+            return generate_file_json(file_path)
+        elif format_name == 'yaml':
+            return generate_file_yaml(file_path)
         
-        # For other formats, analyze parent directory
+        # For markdown, use project-level analysis
         project = analyze_project(str(file_path.parent))
-        
-        # Filter to just target file
-        target_name = file_path.name
-        
         gen = self.generators[format_name]
-        
-        if format_name in ['csv', 'json', 'yaml']:
-            return gen.generate(project, detail=detail)
-        else:
-            return gen.generate(project)
+        return gen.generate(project)
     
     def reproduce_with_format(
         self,
