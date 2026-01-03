@@ -119,8 +119,12 @@ class LogicMLGenerator:
         header_parts.append(f"{module.lines_total} lines")
         lines.append(' | '.join(header_parts))
         
-        # Handle re-export modules (no classes/functions, only imports)
-        if not module.classes and not module.functions and module.imports:
+        # Handle re-export modules (primarily __init__.py or export-like modules)
+        # Some parsers may classify import-only files as having "classes" (e.g., Enum)
+        # so we also special-case __init__.py.
+        if (path.name == "__init__.py" and module.imports) or (
+            not module.classes and not module.functions and module.imports
+        ):
             lines.append(f"# Re-export module")
             lines.append("type: re-export")
             lines.append("exports:")

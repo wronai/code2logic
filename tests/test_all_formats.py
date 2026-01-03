@@ -14,7 +14,6 @@ import pytest
 from pathlib import Path
 
 from code2logic import (
-    analyze_file,
     analyze_project,
     YAMLGenerator,
     JSONGenerator,
@@ -26,6 +25,19 @@ from code2logic import (
     validate_markdown,
     validate_json,
 )
+from code2logic.analyzer import UniversalParser
+from pathlib import Path
+
+
+def analyze_file(path: str):
+    """Analyze a single file and return ModuleInfo."""
+    parser = UniversalParser()
+    code = Path(path).read_text()
+    # Detect language from extension
+    ext = Path(path).suffix.lower()
+    lang_map = {'.py': 'python', '.js': 'javascript', '.ts': 'typescript'}
+    lang = lang_map.get(ext, 'python')
+    return parser.parse(code, path, lang)
 
 
 # =============================================================================

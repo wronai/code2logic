@@ -29,13 +29,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from code2logic import analyze_project, get_client, ReproductionMetrics
-from code2logic.gherkin import GherkinGenerator
-from code2logic.generators import YAMLGenerator
-from code2logic.markdown_format import MarkdownHybridGenerator
-from code2logic.logicml import LogicMLGenerator
 from code2logic.reproduction import extract_code_block
 from code2logic.models import ProjectInfo
 from code2logic.utils import cleanup_generated_root, estimate_tokens, write_text_atomic
+from code2logic.benchmarks.common import (
+    create_single_project,
+    generate_spec,
+    generate_spec_token,
+    get_token_reproduction_prompt,
+)
 
 
 @dataclass 
@@ -69,163 +71,8 @@ class TokenBenchmarkResult:
     error: str = ""
 
 
-class JSONGenerator:
-    """Generate JSON specification for code."""
-    
-    def generate(self, project: ProjectInfo, detail: str = 'full') -> str:
-        """Generate JSON specification."""
-        data = {
-            'project': project.name,
-            'files': project.total_files,
-            'lines': project.total_lines,
-            'modules': []
-        }
-        
-        for m in project.modules:
-            module = {
-                'path': m.path,
-                'language': m.language,
-                'imports': m.imports[:10],
-                'exports': m.exports[:10],
-            }
-            
-            if m.classes:
-                module['classes'] = []
-                for c in m.classes:
-                    cls = {
-                        'name': c.name,
-                        'bases': c.bases,
-                        'doc': c.docstring[:80] if c.docstring else '',
-                        'properties': c.properties[:15],
-                        'methods': [
-                            {
-                                'name': method.name,
-                                'params': method.params[:5],
-                                'returns': method.return_type or 'None',
-                                'doc': method.intent[:50] if method.intent else '',
-                                'async': method.is_async,
-                            }
-                            for method in c.methods[:15]
-                        ]
-                    }
-                    module['classes'].append(cls)
-            
-            if m.functions:
-                module['functions'] = [
-                    {
-                        'name': f.name,
-                        'params': f.params[:6],
-                        'returns': f.return_type or 'None',
-                        'doc': f.intent[:60] if f.intent else '',
-                        'async': f.is_async,
-                        'lines': f.lines,
-                    }
-                    for f in m.functions[:20]
-                ]
-            
-            data['modules'].append(module)
-        
-        return json.dumps(data, indent=2)
-
-
-class CompactJSONGenerator:
-    """Generate compact JSON (no indentation) for token efficiency."""
-    
-    def generate(self, project: ProjectInfo, detail: str = 'full') -> str:
-        """Generate compact JSON."""
-        gen = JSONGenerator()
-        full_json = gen.generate(project, detail)
-        # Parse and re-dump without indentation
-        data = json.loads(full_json)
-        return json.dumps(data, separators=(',', ':'))
-
-
-FORMATS = {
-    'json': JSONGenerator,
-    'json_compact': CompactJSONGenerator,
-    'yaml': YAMLGenerator,
-    'gherkin': GherkinGenerator,
-    'markdown': MarkdownHybridGenerator,
-}
-
-
-def generate_spec(project: ProjectInfo, fmt: str) -> str:
-    """Generate specification in given format."""
-    if fmt == 'gherkin':
-        gen = GherkinGenerator()
-        return gen.generate(project)
-    elif fmt == 'yaml':
-        gen = YAMLGenerator()
-        return gen.generate(project, detail='full')
-    elif fmt == 'markdown':
-        gen = MarkdownHybridGenerator()
-        spec = gen.generate(project)
-        return spec.content
-    elif fmt == 'json':
-        gen = JSONGenerator()
-        return gen.generate(project)
-    elif fmt == 'json_compact':
-        gen = CompactJSONGenerator()
-        return gen.generate(project)
-    elif fmt == 'logicml':
-        gen = LogicMLGenerator()
-        spec = gen.generate(project)
-        return spec.content
-    return ""
-
-
-def create_single_project(module_info, file_path: Path) -> ProjectInfo:
-    """Create ProjectInfo for a single file."""
-    return ProjectInfo(
-        name=file_path.name,
-        root_path=str(file_path.parent),
-        languages={'python': 1},
-        modules=[module_info],
-        dependency_graph={},
-        dependency_metrics={},
-        entrypoints=[],
-        similar_functions={},
-        total_files=1,
-        total_lines=module_info.lines_total,
-        generated_at=datetime.now().isoformat(),
-    )
-
-
 def get_reproduction_prompt(spec: str, fmt: str, file_name: str) -> str:
-    """Generate reproduction prompt."""
-    
-    format_hints = {
-        'json': "Parse the JSON structure and implement all classes and functions.",
-        'json_compact': "Parse the compact JSON and implement all elements.",
-        'yaml': "Parse the YAML structure and implement all classes and functions with exact signatures.",
-        'gherkin': "Implement scenarios as SIMPLE, MINIMAL Python code. NO extra error classes, NO over-engineering. Keep code short and direct.",
-        'markdown': "Parse embedded Gherkin (behaviors) and YAML (structures).",
-        'logicml': """Parse LogicML and generate VALID Python code:
-- 'sig: (params) -> Type' = def func(params) -> Type
-- 'sig: async (params)' = async def func(params)
-- 'sig: @property (self)' = @property decorator
-- 'bases: [BaseModel]' = class X(BaseModel) with Field()
-- 'type: re-export' = from .module import X
-CRITICAL: Ensure valid syntax - balanced brackets, proper indentation, no undefined variables.""",
-    }
-    
-    # Truncate spec for token efficiency
-    max_spec = 5000
-    spec_truncated = spec[:max_spec] if len(spec) > max_spec else spec
-    
-    prompt = f"""Generate Python code from this {fmt.upper()} specification.
-{format_hints.get(fmt, '')}
-
-{spec_truncated}
-
-Requirements:
-- Complete, working Python code for {file_name}
-- Include imports and type hints
-- Implement all functions with actual logic
-
-```python
-"""
-    return prompt
+    return get_token_reproduction_prompt(spec, fmt, file_name)
 
 
 def test_code(code: str) -> Tuple[bool, bool]:
@@ -342,7 +189,7 @@ def process_file_format(args) -> TokenBenchmarkResult:
     
     try:
         # Generate spec
-        spec = generate_spec(single_project, fmt)
+        spec = generate_spec_token(single_project, fmt)
         result.spec_size = len(spec)
         result.spec_tokens = estimate_tokens(spec)
         

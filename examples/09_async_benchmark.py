@@ -44,6 +44,11 @@ from code2logic.markdown_format import MarkdownHybridGenerator
 from code2logic.reproduction import extract_code_block
 from code2logic.models import ProjectInfo
 from code2logic.utils import cleanup_generated_root, write_text_atomic
+from code2logic.benchmarks.common import (
+    create_single_project,
+    generate_spec,
+    get_async_reproduction_prompt,
+)
 
 
 FORMATS = ['gherkin', 'yaml', 'markdown']
@@ -147,87 +152,8 @@ class MultiProviderLLM:
         return {p.name: p.available for p in self.providers}
 
 
-def generate_spec(project: ProjectInfo, fmt: str) -> str:
-    """Generate specification in given format."""
-    if fmt == 'gherkin':
-        gen = GherkinGenerator()
-        return gen.generate(project)
-    elif fmt == 'yaml':
-        gen = YAMLGenerator()
-        return gen.generate(project, detail='full')
-    elif fmt == 'markdown':
-        gen = MarkdownHybridGenerator()
-        spec = gen.generate(project)
-        return spec.content
-    return ""
-
-
-def create_single_project(module_info, file_path: Path) -> ProjectInfo:
-    """Create ProjectInfo for a single file."""
-    return ProjectInfo(
-        name=file_path.name,
-        root_path=str(file_path.parent),
-        languages={'python': 1},
-        modules=[module_info],
-        dependency_graph={},
-        dependency_metrics={},
-        entrypoints=[],
-        similar_functions={},
-        total_files=1,
-        total_lines=module_info.lines_total,
-        generated_at=datetime.now().isoformat(),
-    )
-
-
 def get_reproduction_prompt(spec: str, fmt: str, file_name: str, with_tests: bool = False) -> str:
-    """Generate reproduction prompt with optional unittest generation."""
-    
-    base_prompts = {
-        'gherkin': f"""Generate Python code from this Gherkin/BDD specification.
-Implement all scenarios as working, production-ready code.
-
-{spec[:6000]}
-
-Requirements:
-- Generate complete, working Python code for {file_name}
-- Include all imports
-- Use type hints
-- Add docstrings""",
-        
-        'yaml': f"""Generate Python code from this YAML specification.
-Match the structure exactly with all classes and functions.
-
-{spec[:6000]}
-
-Requirements:
-- Generate complete, working Python code for {file_name}
-- Include all imports  
-- Use type hints
-- Implement all methods with actual logic""",
-        
-        'markdown': f"""Generate Python code from this Markdown specification.
-It contains embedded Gherkin (behaviors) and YAML (structures).
-
-{spec[:6000]}
-
-Requirements:
-- Generate complete, working Python code for {file_name}
-- Include all imports
-- Implement all classes and functions
-- Use type hints throughout""",
-    }
-    
-    prompt = base_prompts.get(fmt, base_prompts['yaml'])
-    
-    if with_tests:
-        prompt += """
-
-IMPORTANT: Also generate a unittest test class at the end of the file.
-Include tests for each function/method with at least 2 test cases each.
-Use unittest.TestCase as base class.
-Name the test class Test<ClassName> or TestFunctions."""
-
-    return prompt
+    return get_async_reproduction_prompt(spec, fmt, file_name, with_tests=with_tests)
 
 
 def test_code_quality(code: str, file_name: str) -> Tuple[bool, bool, str]:

@@ -122,7 +122,7 @@ class TreeSitterParser:
             # Imports
             elif node_type == 'import_statement':
                 imports.extend(self._extract_py_import(child, content))
-            elif node_type == 'import_from_statement':
+            elif node_type in ('import_from_statement', 'from_import_statement', 'import_from'):
                 imports.extend(self._extract_py_from_import(child, content))
             
             # Functions
@@ -304,18 +304,36 @@ class TreeSitterParser:
     def _extract_py_from_import(self, node, content: str) -> List[str]:
         """Extract from ... import ... statement."""
         imports = []
-        module = None
+        module_parts = []
+        seen_import_kw = False
         for c in node.children:
-            if c.type in ('dotted_name', 'import_prefix'):
-                module = self._text(c, content)
-        if module:
-            for c in node.children:
-                if c.type == 'identifier':
-                    imports.append(f"{module}.{self._text(c, content)}")
-                elif c.type == 'aliased_import':
-                    n = self._find_child(c, 'identifier')
-                    if n:
-                        imports.append(f"{module}.{self._text(n, content)}")
+            if c.type == 'import':
+                seen_import_kw = True
+                continue
+
+            if not seen_import_kw:
+                if c.type == 'import_prefix':
+                    module_parts.append(self._text(c, content))
+                elif c.type in ('relative_import', 'relative_import_statement'):
+                    module_parts.append(self._text(c, content))
+                elif c.type == 'dotted_name':
+                    module_parts.append(self._text(c, content))
+
+        module = ''.join(module_parts).strip().lstrip('.')
+
+        for c in node.children:
+            if c.type == 'identifier':
+                name = self._text(c, content)
+                imports.append(f"{module}.{name}" if module else name)
+            elif c.type == 'dotted_name':
+                name = self._text(c, content)
+                if seen_import_kw:
+                    imports.append(f"{module}.{name}" if module else name)
+            elif c.type == 'aliased_import':
+                n = self._find_child(c, 'identifier')
+                if n:
+                    name = self._text(n, content)
+                    imports.append(f"{module}.{name}" if module else name)
         return imports
     
     def _extract_py_constant(self, node, content: str) -> Optional[str]:
@@ -673,6 +691,10 @@ class UniversalParser:
         Returns:
             ModuleInfo if parsing succeeds, None otherwise
         """
+        if isinstance(filepath, str) and isinstance(content, str):
+            if "\n" in filepath and "\n" not in content:
+                filepath, content = content, filepath
+
         if language == 'python':
             return self._parse_python(filepath, content)
         elif language in ('javascript', 'typescript'):

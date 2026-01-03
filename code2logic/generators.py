@@ -373,6 +373,22 @@ class JSONGenerator:
         if flat:
             return self._generate_flat(project, detail)
         return self._generate_nested(project, detail)
+
+    def generate_from_module(self, module: ModuleInfo, detail: str = 'full') -> str:
+        project = ProjectInfo(
+            name=Path(module.path).name,
+            root_path=str(Path(module.path).parent),
+            languages={module.language: 1},
+            modules=[module],
+            dependency_graph={},
+            dependency_metrics={},
+            entrypoints=[],
+            similar_functions={},
+            total_files=1,
+            total_lines=module.lines_total,
+            generated_at="",
+        )
+        return self.generate(project, flat=False, detail=detail)
     
     def _generate_nested(self, project: ProjectInfo, detail: str) -> str:
         """Generate nested JSON structure."""
@@ -584,6 +600,22 @@ class YAMLGenerator:
         
         return yaml.dump(data, default_flow_style=False, allow_unicode=True, 
                         sort_keys=False, width=120)
+
+    def generate_from_module(self, module: ModuleInfo, detail: str = 'full') -> str:
+        project = ProjectInfo(
+            name=Path(module.path).name,
+            root_path=str(Path(module.path).parent),
+            languages={module.language: 1},
+            modules=[module],
+            dependency_graph={},
+            dependency_metrics={},
+            entrypoints=[],
+            similar_functions={},
+            total_files=1,
+            total_lines=module.lines_total,
+            generated_at="",
+        )
+        return self.generate(project, flat=False, detail=detail)
     
     def _build_flat_data(self, project: ProjectInfo, detail: str) -> dict:
         """Build flat data structure optimized for comparisons."""

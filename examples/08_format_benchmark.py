@@ -44,6 +44,11 @@ from code2logic.logicml import LogicMLGenerator
 from code2logic.reproduction import extract_code_block
 from code2logic.models import ProjectInfo
 from code2logic.utils import cleanup_generated_root, write_text_atomic
+from code2logic.benchmarks.common import (
+    create_single_project,
+    generate_spec,
+    get_simple_reproduction_prompt,
+)
 
 
 @dataclass
@@ -105,63 +110,10 @@ class BenchmarkSummary:
 FORMATS = ['gherkin', 'yaml', 'markdown']
 
 
-def generate_spec(project: ProjectInfo, fmt: str) -> str:
-    """Generate specification in given format."""
-    if fmt == 'gherkin':
-        gen = GherkinGenerator()
-        return gen.generate(project)
-    elif fmt == 'yaml':
-        gen = YAMLGenerator()
-        return gen.generate(project, detail='full')
-    elif fmt == 'markdown':
-        gen = MarkdownHybridGenerator()
-        spec = gen.generate(project)
-        return spec.content
-    elif fmt == 'json':
-        gen = JSONGenerator()
-        return gen.generate(project, detail='full')
-    elif fmt == 'logicml':
-        gen = LogicMLGenerator()
-        spec = gen.generate(project)
-        return spec.content
-    return ""
-
-
 def reproduce_code(spec: str, fmt: str, file_name: str, client) -> Tuple[str, float]:
     """Reproduce code from spec using LLM. Returns (code, time)."""
     
-    prompts = {
-        'gherkin': f"""Generate Python code from this Gherkin/BDD specification.
-Implement all scenarios as working code.
-
-{spec[:5000]}
-
-Generate complete Python code for {file_name}:""",
-        
-        'yaml': f"""Generate Python code from this YAML specification.
-Match the structure exactly.
-
-{spec[:5000]}
-
-Generate complete Python code for {file_name}:""",
-        
-        'markdown': f"""Generate Python code from this Markdown specification.
-It contains embedded Gherkin and YAML sections.
-
-{spec[:5000]}
-
-Generate complete Python code for {file_name}:""",
-
-        'logicml': f"""Generate Python code from this LogicML specification.
-'sig:' = EXACT function signature, 'does:' = docstring, 'attrs:' = class attributes.
-Match signatures EXACTLY.
-
-{spec[:5000]}
-
-Generate complete Python code for {file_name}:""",
-    }
-    
-    prompt = prompts.get(fmt, prompts['yaml'])
+    prompt = get_simple_reproduction_prompt(spec, fmt, file_name)
     
     start = time.time()
     try:
@@ -240,23 +192,6 @@ def save_generated_code(output_dir: Path, file_name: str, fmt: str, spec: str, g
     # Save generated code
     code_path = fmt_dir / f"{file_name}_generated.py"
     write_text_atomic(code_path, generated)
-
-
-def create_single_project(module_info, file_path: Path) -> ProjectInfo:
-    """Create ProjectInfo for a single file."""
-    return ProjectInfo(
-        name=file_path.name,
-        root_path=str(file_path.parent),
-        languages={'python': 1},
-        modules=[module_info],
-        dependency_graph={},
-        dependency_metrics={},
-        entrypoints=[],
-        similar_functions={},
-        total_files=1,
-        total_lines=module_info.lines_total,
-        generated_at=datetime.now().isoformat(),
-    )
 
 
 def run_benchmark(
