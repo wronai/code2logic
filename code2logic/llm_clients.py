@@ -150,10 +150,10 @@ class OllamaLocalClient(BaseLLMClient):
         """Initialize Ollama client.
         
         Args:
-            model: Model to use (default from OLLAMA_MODEL or qwen2.5-coder:7b)
+            model: Model to use (default from OLLAMA_MODEL or qwen2.5-coder:14b)
             host: Ollama host URL (default from OLLAMA_HOST or localhost:11434)
         """
-        self.model = model or os.environ.get('OLLAMA_MODEL', 'qwen2.5-coder:7b')
+        self.model = model or os.environ.get('OLLAMA_MODEL', 'qwen2.5-coder:14b')
         self.host = host or os.environ.get('OLLAMA_HOST', 'http://localhost:11434')
     
     def generate(self, prompt: str, system: str = None, max_tokens: int = 4000) -> str:
@@ -215,7 +215,7 @@ class LiteLLMClient(BaseLLMClient):
         Args:
             model: Model identifier (e.g., 'ollama/qwen2.5-coder:7b', 'gpt-4')
         """
-        self.model = model or os.environ.get('LITELLM_MODEL', 'ollama/qwen2.5-coder:7b')
+        self.model = model or os.environ.get('LITELLM_MODEL', 'ollama/qwen2.5-coder:14b')
     
     def generate(self, prompt: str, system: str = None, max_tokens: int = 4000) -> str:
         """Generate completion using LiteLLM."""

@@ -340,7 +340,7 @@ def save_repeatability_report(results: Dict[str, RepeatabilityResult], output: s
 def main():
     parser = argparse.ArgumentParser(description='Repeatability Test')
     parser.add_argument('--file', '-f', required=True, help='File to test')
-    parser.add_argument('--formats', nargs='+', default=['yaml', 'logicml', 'gherkin'])
+    parser.add_argument('--formats', nargs='+', default=['yaml', 'toon', 'logicml', 'gherkin'])
     parser.add_argument('--runs', '-r', type=int, default=3, help='Number of runs per format')
     parser.add_argument('--output', '-o', default='examples/output/repeatability_test.json')
     parser.add_argument('--verbose', '-v', action='store_true')

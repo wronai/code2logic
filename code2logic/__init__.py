@@ -172,6 +172,20 @@ from .errors import (
     AnalysisResult,
     create_error_handler,
 )
+from .reproducer import (
+    SpecReproducer,
+    SpecValidator,
+    ReproductionResult,
+    FileValidation,
+    reproduce_project,
+    validate_files,
+)
+from .toon_format import (
+    TOONGenerator,
+    TOONParser,
+    generate_toon,
+    parse_toon,
+)
 from .chunked_reproduction import (
     ChunkedReproducer,
     ChunkedResult,

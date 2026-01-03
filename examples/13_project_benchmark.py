@@ -31,10 +31,11 @@ from code2logic.gherkin import GherkinGenerator
 from code2logic.generators import YAMLGenerator
 from code2logic.markdown_format import MarkdownHybridGenerator
 from code2logic.logicml import LogicMLGenerator
+from code2logic.toon_format import TOONGenerator
 from code2logic.reproduction import extract_code_block
 
 
-FORMATS = ['yaml', 'markdown', 'json', 'logicml']
+FORMATS = ['yaml', 'toon', 'markdown', 'json', 'logicml']
 
 
 @dataclass

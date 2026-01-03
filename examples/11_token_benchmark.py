@@ -250,7 +250,7 @@ def run_token_benchmark(
     """Run benchmark with token tracking."""
     
     if formats is None:
-        formats = ['json', 'yaml', 'gherkin', 'markdown']
+        formats = ['json', 'yaml', 'toon', 'gherkin', 'markdown']
 
     formats = [f.strip() for f in formats if f and f.strip()]
     
@@ -461,7 +461,7 @@ def save_token_report(results: List[TokenBenchmarkResult], output: str):
 def main():
     parser = argparse.ArgumentParser(description='Token-Aware Format Benchmark')
     parser.add_argument('--folder', '-f', default='tests/samples/')
-    parser.add_argument('--formats', nargs='+', default=['json', 'yaml', 'gherkin', 'markdown'])
+    parser.add_argument('--formats', nargs='+', default=['json', 'yaml', 'toon', 'gherkin', 'markdown'])
     parser.add_argument('--limit', '-l', type=int)
     parser.add_argument('--workers', '-w', type=int, default=3)
     parser.add_argument('--output', '-o', default='examples/output/token_benchmark.json')

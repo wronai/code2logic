@@ -8,6 +8,7 @@ from ..gherkin import GherkinGenerator
 from ..generators import JSONGenerator, YAMLGenerator
 from ..logicml import LogicMLGenerator
 from ..markdown_format import MarkdownHybridGenerator
+from ..toon_format import TOONGenerator
 from ..models import ProjectInfo
 
 
@@ -45,6 +46,9 @@ def generate_spec(project: ProjectInfo, fmt: str) -> str:
         gen = LogicMLGenerator()
         spec = gen.generate(project)
         return spec.content
+    if fmt == "toon":
+        gen = TOONGenerator()
+        return gen.generate(project, detail="full")
     return ""
 
 
@@ -184,6 +188,12 @@ def get_token_reproduction_prompt(spec: str, fmt: str, file_name: str) -> str:
 - 'bases: [BaseModel]' = class X(BaseModel) with Field()
 - 'type: re-export' = from .module import X
 CRITICAL: Ensure valid syntax - balanced brackets, proper indentation, no undefined variables.""",
+        "toon": """Parse TOON (Token-Oriented Object Notation) format:
+- 'modules[N]{field1,field2}:' = tabular array with N items
+- 'classes[N]{name,bases,methods}:' = class definitions
+- 'methods[N]{name,sig,async,lines}:' = method list
+- Indentation shows nesting, commas separate values
+Generate all classes and functions with exact signatures.""",
     }
 
     max_spec = 5000
