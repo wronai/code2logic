@@ -24,6 +24,7 @@ Usage:
 
 import sys
 import os
+import re
 import json
 import difflib
 import hashlib
@@ -146,7 +147,7 @@ def analyze_to_gherkin(source_path: str, detail: str = 'full') -> str:
 
 
 def generate_file_gherkin(file_path: Path) -> str:
-    """Generate Gherkin specification for a single file."""
+    """Generate detailed Gherkin specification for a single file with types."""
     content = file_path.read_text()
     
     # Extract structure from file
@@ -158,12 +159,15 @@ def generate_file_gherkin(file_path: Path) -> str:
     lines = content.split('\n')
     in_class = None
     in_docstring = False
+    in_class_docstring = False
     docstring_lines = []
+    class_docstring = ""
     
     for i, line in enumerate(lines):
         stripped = line.strip()
+        raw_line = line
         
-        # Module docstring
+        # Module docstring (first few lines)
         if i < 5 and stripped.startswith('"""') and not module_doc:
             if stripped.count('"""') >= 2:
                 module_doc = stripped.strip('"""').strip()
@@ -172,11 +176,22 @@ def generate_file_gherkin(file_path: Path) -> str:
                 docstring_lines = [stripped.lstrip('"""')]
                 continue
         
-        if in_docstring:
+        if in_docstring and not in_class:
             if '"""' in stripped:
                 docstring_lines.append(stripped.rstrip('"""'))
-                module_doc = ' '.join(docstring_lines)[:100]
+                module_doc = ' '.join(docstring_lines)[:200]
                 in_docstring = False
+            else:
+                docstring_lines.append(stripped)
+            continue
+        
+        # Class docstring
+        if in_class_docstring:
+            if '"""' in stripped:
+                docstring_lines.append(stripped.rstrip('"""'))
+                class_docstring = ' '.join(docstring_lines)[:150]
+                classes[-1]['docstring'] = class_docstring
+                in_class_docstring = False
             else:
                 docstring_lines.append(stripped)
             continue
@@ -189,37 +204,81 @@ def generate_file_gherkin(file_path: Path) -> str:
         if stripped.startswith('class '):
             class_name = stripped.split('(')[0].split(':')[0].replace('class ', '')
             in_class = class_name
-            classes.append({'name': class_name, 'attributes': [], 'methods': []})
+            classes.append({'name': class_name, 'attributes': [], 'methods': [], 'docstring': ''})
         
-        # Class attributes (in dataclass) - only actual field definitions
+        # Class docstring start
+        if in_class and stripped.startswith('"""') and not classes[-1]['docstring']:
+            if stripped.count('"""') >= 2:
+                classes[-1]['docstring'] = stripped.strip('"""').strip()[:100]
+            else:
+                in_class_docstring = True
+                docstring_lines = [stripped.lstrip('"""')]
+            continue
+        
+        # Class attributes with FULL type info (only for dataclasses or class-level attributes)
         if in_class and ':' in stripped and not stripped.startswith('def ') and not stripped.startswith('#'):
-            # Skip docstring-like lines and class definitions
-            if stripped.startswith('"""') or stripped.startswith("'''") or 'class ' in stripped:
+            # Skip docstring-like lines and common patterns
+            if stripped.startswith('"""') or stripped.startswith("'''"):
                 continue
-            if stripped.startswith('Attributes') or stripped.startswith('-'):
+            if any(stripped.startswith(x) for x in ['Attributes', '-', 'Args', 'Returns', 'Raises', 'Note', 'Example']):
+                continue
+            # Skip lines that look like docstring content (contain common doc patterns)
+            if any(x in stripped.lower() for x in ['path to', 'the ', 'a ', 'an ', 'this ', 'that ', 'if ', 'when ']):
+                continue
+            # Skip lines starting with lowercase that aren't valid attribute patterns
+            if stripped[0].islower() and not re.match(r'^[a-z_][a-z0-9_]*\s*:', stripped):
                 continue
             
-            attr = stripped.split(':')[0].strip()
-            # Only add valid Python identifiers
-            if attr and attr.isidentifier() and attr not in classes[-1]['attributes']:
-                classes[-1]['attributes'].append(attr)
+            # Parse full attribute definition: name: Type = default
+            attr_full = stripped
+            if attr_full and not attr_full.startswith('return'):
+                attr_name = attr_full.split(':')[0].strip()
+                # Must be valid Python identifier and not a keyword
+                if attr_name and attr_name.isidentifier() and attr_name not in ['try', 'if', 'for', 'while', 'class', 'def', 'return']:
+                    # Check if not already added
+                    existing = [a['name'] for a in classes[-1]['attributes'] if isinstance(a, dict)]
+                    if attr_name not in existing:
+                        classes[-1]['attributes'].append({
+                            'name': attr_name,
+                            'full': attr_full
+                        })
         
-        # Functions/methods
+        # Functions/methods with signatures
         if stripped.startswith('def '):
-            func_match = stripped.split('(')[0].replace('def ', '')
+            # Extract full signature
+            func_line = stripped
+            if func_line.endswith(':'):
+                func_line = func_line[:-1]
+            func_name = func_line.split('(')[0].replace('def ', '')
+            
+            # Get params and return type
+            try:
+                params_part = func_line.split('(', 1)[1].rsplit(')', 1)[0]
+                return_part = func_line.split('->')[-1].strip() if '->' in func_line else 'None'
+            except:
+                params_part = ''
+                return_part = 'None'
+            
+            func_info = {
+                'name': func_name,
+                'params': params_part,
+                'returns': return_part,
+                'full': func_line
+            }
+            
             if in_class:
-                classes[-1]['methods'].append(func_match)
+                classes[-1]['methods'].append(func_info)
             else:
-                functions.append(func_match)
+                functions.append(func_info)
     
-    # Generate Gherkin
+    # Generate detailed Gherkin
     gherkin_lines = [
         f"# Gherkin specification for {file_path.name}",
         f"# {module_doc}" if module_doc else "# Python module",
         "",
         f"@{file_path.stem}",
         f"Feature: {file_path.stem} module",
-        f"  Source file: {file_path.name}",
+        f"  {module_doc[:100]}" if module_doc else f"  Source file: {file_path.name}",
         "",
     ]
     
@@ -230,26 +289,58 @@ def generate_file_gherkin(file_path: Path) -> str:
             gherkin_lines.append(f"      | {imp} |")
         gherkin_lines.append("")
     
+    is_dataclass = '@dataclass' in content
+    
     for cls in classes:
-        gherkin_lines.append(f"  @dataclass" if 'dataclass' in content else f"  @class")
-        gherkin_lines.append(f"  Scenario: Define {cls['name']} class")
-        gherkin_lines.append(f"    Given a {'dataclass' if 'dataclass' in content else 'class'} named \"{cls['name']}\"")
+        gherkin_lines.append(f"  @dataclass" if is_dataclass else f"  @class")
+        gherkin_lines.append(f"  Scenario: Define {cls['name']} {'dataclass' if is_dataclass else 'class'}")
+        
+        if cls['docstring']:
+            gherkin_lines.append(f"    # {cls['docstring'][:80]}")
+        
+        gherkin_lines.append(f"    Given a {'dataclass' if is_dataclass else 'class'} named \"{cls['name']}\"")
         
         if cls['attributes']:
-            gherkin_lines.append("    Then it should have the following attributes:")
+            gherkin_lines.append("    Then it should have the following typed attributes:")
+            gherkin_lines.append("      | name | type | default |")
             for attr in cls['attributes']:
-                gherkin_lines.append(f"      | {attr} |")
+                if isinstance(attr, dict):
+                    full = attr['full']
+                    name = attr['name']
+                    # Parse type and default
+                    type_part = ''
+                    default_part = ''
+                    if ':' in full:
+                        after_colon = full.split(':', 1)[1].strip()
+                        if '=' in after_colon:
+                            type_part = after_colon.split('=')[0].strip()
+                            default_part = after_colon.split('=', 1)[1].strip()
+                        else:
+                            type_part = after_colon
+                    gherkin_lines.append(f"      | {name} | {type_part} | {default_part} |")
+                else:
+                    gherkin_lines.append(f"      | {attr} | | |")
         
         if cls['methods']:
             gherkin_lines.append("    And it should have the following methods:")
+            gherkin_lines.append("      | name | params | returns |")
             for method in cls['methods']:
-                gherkin_lines.append(f"      | {method} |")
+                if isinstance(method, dict):
+                    gherkin_lines.append(f"      | {method['name']} | {method['params'][:50]} | {method['returns']} |")
+                else:
+                    gherkin_lines.append(f"      | {method} | | |")
         
         gherkin_lines.append("")
     
     for func in functions:
-        gherkin_lines.append(f"  Scenario: Define {func} function")
-        gherkin_lines.append(f"    Given a function named \"{func}\"")
+        if isinstance(func, dict):
+            gherkin_lines.append(f"  Scenario: Define {func['name']} function")
+            gherkin_lines.append(f"    Given a function named \"{func['name']}\"")
+            gherkin_lines.append(f"    With parameters: {func['params']}")
+            gherkin_lines.append(f"    And returns: {func['returns']}")
+        else:
+            gherkin_lines.append(f"  Scenario: Define {func} function")
+            gherkin_lines.append(f"    Given a function named \"{func}\"")
         gherkin_lines.append("")
     
     return '\n'.join(gherkin_lines)

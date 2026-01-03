@@ -54,6 +54,31 @@ from .parsers import TreeSitterParser, UniversalParser
 from .dependency import DependencyAnalyzer
 from .similarity import SimilarityDetector
 from .config import Config, load_env, get_api_key, get_model
+from .llm_clients import (
+    BaseLLMClient,
+    OpenRouterClient,
+    OllamaLocalClient,
+    LiteLLMClient,
+    get_client,
+)
+from .reproduction import (
+    generate_file_gherkin,
+    compare_code,
+    extract_code_block,
+    CodeReproducer,
+)
+from .code_review import (
+    analyze_code_quality,
+    check_security_issues,
+    check_performance_issues,
+    CodeReviewer,
+)
+from .benchmark import (
+    ReproductionBenchmark,
+    run_benchmark,
+    FormatResult,
+    BenchmarkResult,
+)
 
 __all__ = [
     # Version
@@ -91,4 +116,25 @@ __all__ = [
     "load_env",
     "get_api_key",
     "get_model",
+    # LLM Clients
+    "BaseLLMClient",
+    "OpenRouterClient",
+    "OllamaLocalClient",
+    "LiteLLMClient",
+    "get_client",
+    # Reproduction
+    "generate_file_gherkin",
+    "compare_code",
+    "extract_code_block",
+    "CodeReproducer",
+    # Code Review
+    "analyze_code_quality",
+    "check_security_issues",
+    "check_performance_issues",
+    "CodeReviewer",
+    # Benchmark
+    "ReproductionBenchmark",
+    "run_benchmark",
+    "FormatResult",
+    "BenchmarkResult",
 ]
