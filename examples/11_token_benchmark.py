@@ -35,12 +35,7 @@ from code2logic.markdown_format import MarkdownHybridGenerator
 from code2logic.logicml import LogicMLGenerator
 from code2logic.reproduction import extract_code_block
 from code2logic.models import ProjectInfo
-
-
-# Token estimation (approx 4 chars per token for English text)
-def estimate_tokens(text: str) -> int:
-    """Estimate token count (approx 4 chars per token)."""
-    return len(text) // 4
+from code2logic.utils import cleanup_generated_root, estimate_tokens, write_text_atomic
 
 
 @dataclass 
@@ -304,14 +299,6 @@ def _looks_like_truncated_or_invalid(code: str) -> bool:
 
     return False
 
-
-def _write_text_atomic(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp_path = path.with_suffix(path.suffix + ".tmp")
-    tmp_path.write_text(content)
-    tmp_path.replace(path)
-
-
 def _generate_code_with_retries(
     client,
     prompt: str,
@@ -391,7 +378,7 @@ def process_file_format(args) -> TokenBenchmarkResult:
         # Save generated
         output_dir = Path('examples/output/generated') / fmt
         output_dir.mkdir(parents=True, exist_ok=True)
-        _write_text_atomic(output_path, generated)
+        write_text_atomic(output_path, generated)
          
     except Exception as e:
         try:
@@ -491,11 +478,7 @@ def run_token_benchmark(
     print(f"{'─'*80}")
 
     # Cleanup: keep only requested format folders
-    allowed = set(formats)
-    if generated_root.exists():
-        for child in generated_root.iterdir():
-            if child.is_dir() and child.name not in allowed:
-                shutil.rmtree(child, ignore_errors=True)
+    cleanup_generated_root(generated_root, set(formats))
     
     return results
 

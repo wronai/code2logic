@@ -17,6 +17,7 @@ from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 
 from .models import ProjectInfo, ModuleInfo, FunctionInfo, ClassInfo
+from .utils import estimate_tokens
 
 
 # LLM context limits (approximate)
@@ -65,11 +66,6 @@ class ChunkedResult:
     merged_code: str
     chunk_codes: List[str]
     errors: List[str]
-
-
-def estimate_tokens(text: str) -> int:
-    """Estimate token count."""
-    return len(text) // 4
 
 
 def get_llm_limit(model_name: str) -> int:
