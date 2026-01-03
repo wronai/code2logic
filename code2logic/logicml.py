@@ -239,11 +239,18 @@ class LogicMLGenerator:
         
         lines.append(f'{prefix}  sig: {sig}')
         
-        # Intent/docstring as "does"
+        # Intent/docstring as "does" - include full context for better semantic reproduction
         if method.docstring:
-            does = method.docstring.split('\n')[0].strip()[:60]
-            does = does.replace('"', "'")
+            doc_lines = method.docstring.split('\n')
+            does = doc_lines[0].strip()[:80].replace('"', "'")
             lines.append(f'{prefix}  does: "{does}"')
+            # Add Args/Returns info if present
+            for doc_line in doc_lines[1:5]:
+                doc_line = doc_line.strip()
+                if doc_line.startswith('Args:') or doc_line.startswith('Returns:'):
+                    lines.append(f'{prefix}  # {doc_line}')
+                elif ':' in doc_line and not doc_line.startswith('#'):
+                    lines.append(f'{prefix}  # {doc_line[:60]}')
         elif method.intent:
             lines.append(f'{prefix}  does: "{method.intent}"')
         

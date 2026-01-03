@@ -16,6 +16,7 @@ import os
 import re
 import sys
 import time
+import shutil
 from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
@@ -256,6 +257,77 @@ def test_code(code: str) -> Tuple[bool, bool]:
     return syntax_ok, runs_ok
 
 
+def _extract_python_code_lenient(text: str) -> str:
+    text = text or ""
+    s = text.strip()
+    if not s:
+        return ""
+
+    fence_markers = ["```python", "```py", "```"]
+    for marker in fence_markers:
+        idx = s.find(marker)
+        if idx == -1:
+            continue
+        start = idx + len(marker)
+        if start < len(s) and s[start] == "\n":
+            start += 1
+        end = s.find("```", start)
+        if end == -1:
+            return s[start:].strip()
+        return s[start:end].strip()
+
+    return s
+
+
+def _looks_like_truncated_or_invalid(code: str) -> bool:
+    c = (code or "").strip()
+    if not c:
+        return True
+
+    if "```" in c:
+        return True
+
+    if "def " not in c and "class " not in c:
+        return True
+
+    last_line = c.splitlines()[-1].strip()
+    if last_line.endswith("\\"):
+        return True
+    if last_line in {"qb2 = QueryBuilder(\"products", "qb2 = QueryBuilder('products"}:
+        return True
+
+    return False
+
+
+def _write_text_atomic(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    tmp_path.write_text(content)
+    tmp_path.replace(path)
+
+
+def _generate_code_with_retries(client, prompt: str, max_tokens: int, attempts: int = 2) -> Tuple[str, str]:
+    last_error = ""
+    for i in range(attempts):
+        try:
+            response = client.generate(prompt, max_tokens=max_tokens)
+            generated = _extract_python_code_lenient(response)
+            if _looks_like_truncated_or_invalid(generated):
+                last_error = "invalid_or_truncated_output"
+                continue
+
+            try:
+                compile(generated, '<string>', 'exec')
+            except Exception:
+                last_error = "syntax_error"
+                continue
+
+            return generated, ""
+        except Exception as e:
+            last_error = str(e)[:200]
+    return "", last_error
+
+
 def process_file_format(args) -> TokenBenchmarkResult:
     """Process single file+format."""
     file_name, fmt, original, single_project, client, verbose = args
@@ -265,6 +337,8 @@ def process_file_format(args) -> TokenBenchmarkResult:
         format=fmt,
         original_size=len(original),
     )
+    
+    output_path = Path('examples/output/generated') / fmt / f"{file_name}_generated.py"
     
     try:
         # Generate spec
@@ -278,15 +352,15 @@ def process_file_format(args) -> TokenBenchmarkResult:
         
         # Reproduce
         start = time.time()
-        response = client.generate(prompt, max_tokens=4000)
+        generated, gen_error = _generate_code_with_retries(client, prompt, max_tokens=4000, attempts=2)
         result.gen_time = time.time() - start
-        
-        result.response_tokens = estimate_tokens(response)
+
+        result.response_tokens = estimate_tokens(generated)
         result.total_tokens = result.prompt_tokens + result.response_tokens
-        
-        # Extract code
-        generated = extract_code_block(response)
+
         result.generated_size = len(generated)
+        if gen_error:
+            raise RuntimeError(gen_error)
         
         # Test
         result.syntax_ok, result.runs_ok = test_code(generated)
@@ -304,9 +378,14 @@ def process_file_format(args) -> TokenBenchmarkResult:
         # Save generated
         output_dir = Path('examples/output/generated') / fmt
         output_dir.mkdir(parents=True, exist_ok=True)
-        (output_dir / f"{file_name}_generated.py").write_text(generated)
-        
+        _write_text_atomic(output_path, generated)
+         
     except Exception as e:
+        try:
+            if output_path.exists():
+                output_path.unlink()
+        except Exception:
+            pass
         result.error = str(e)[:100]
         if verbose:
             print(f"  Error: {e}")
@@ -337,6 +416,10 @@ def run_token_benchmark(
     print(f"Folder: {folder}")
     print(f"Formats: {', '.join(formats)}")
     print(f"Files: {len(py_files)}")
+
+    generated_root = Path('examples/output/generated')
+    if generated_root.exists():
+        shutil.rmtree(generated_root)
     
     # Initialize
     try:

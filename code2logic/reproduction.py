@@ -288,16 +288,27 @@ def extract_code_block(text: str, language: str = 'python') -> str:
     Returns:
         Extracted code
     """
-    markers = [f'```{language}', '```py', '```']
-    
+    s = (text or "").strip()
+    if not s:
+        return ""
+
+    markers = [f"```{language}", "```py", "```"]
     for marker in markers:
-        if marker in text:
-            start = text.find(marker) + len(marker)
-            end = text.find('```', start)
-            if end > start:
-                return text[start:end].strip()
-    
-    return text.strip()
+        idx = s.find(marker)
+        if idx == -1:
+            continue
+
+        start = idx + len(marker)
+        if start < len(s) and s[start] == "\n":
+            start += 1
+
+        end = s.find("```", start)
+        if end == -1:
+            return s[start:].strip()
+        if end > start:
+            return s[start:end].strip()
+
+    return s
 
 
 class CodeReproducer:

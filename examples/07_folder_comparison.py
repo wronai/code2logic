@@ -34,6 +34,7 @@ from code2logic import (
 from code2logic.gherkin import GherkinGenerator
 from code2logic.generators import YAMLGenerator, JSONGenerator
 from code2logic.markdown_format import MarkdownHybridGenerator
+from code2logic.logicml import LogicMLGenerator
 from code2logic.reproduction import extract_code_block
 
 
@@ -82,6 +83,11 @@ def generate_specs(project, formats: List[str]) -> Dict[str, str]:
         spec = gen.generate(project)
         specs['markdown'] = spec.content
     
+    if 'logicml' in formats:
+        gen = LogicMLGenerator()
+        spec = gen.generate(project)
+        specs['logicml'] = spec.content
+    
     return specs
 
 
@@ -93,6 +99,7 @@ def reproduce_from_spec(spec: str, format_name: str, file_name: str, client) -> 
         'yaml': "This is a YAML specification. Generate Python code that matches the structure.",
         'json': "This is a JSON specification. Generate Python code that matches the structure.",
         'markdown': "This is a Markdown specification with embedded Gherkin and YAML. Generate Python code.",
+        'logicml': "This is a LogicML specification. 'sig:' = exact signature, 'does:' = docstring, 'attrs:' = class attributes. Generate Python code with EXACT signatures.",
     }
     
     prompt = f"""{format_instructions.get(format_name, 'Generate code from this specification.')}

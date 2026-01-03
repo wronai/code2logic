@@ -39,6 +39,7 @@ from code2logic import (
 from code2logic.gherkin import GherkinGenerator
 from code2logic.generators import YAMLGenerator, JSONGenerator
 from code2logic.markdown_format import MarkdownHybridGenerator
+from code2logic.logicml import LogicMLGenerator
 from code2logic.reproduction import extract_code_block
 from code2logic.models import ProjectInfo
 
@@ -117,6 +118,10 @@ def generate_spec(project: ProjectInfo, fmt: str) -> str:
     elif fmt == 'json':
         gen = JSONGenerator()
         return gen.generate(project, detail='full')
+    elif fmt == 'logicml':
+        gen = LogicMLGenerator()
+        spec = gen.generate(project)
+        return spec.content
     return ""
 
 
@@ -140,6 +145,14 @@ Generate complete Python code for {file_name}:""",
         
         'markdown': f"""Generate Python code from this Markdown specification.
 It contains embedded Gherkin and YAML sections.
+
+{spec[:5000]}
+
+Generate complete Python code for {file_name}:""",
+
+        'logicml': f"""Generate Python code from this LogicML specification.
+'sig:' = EXACT function signature, 'does:' = docstring, 'attrs:' = class attributes.
+Match signatures EXACTLY.
 
 {spec[:5000]}
 
