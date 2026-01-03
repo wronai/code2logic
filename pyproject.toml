@@ -99,6 +99,7 @@ dev = [
     "pre-commit>=3.0",
     "build>=1.0.0",
     "twine>=4.0.0",
+    "bumpver>=2023.1129",
 ]
 
 # Documentation
@@ -203,3 +204,16 @@ module = [
     "spacy",
 ]
 ignore_missing_imports = true
+
+[tool.bumpver]
+current_version = "1.0.1"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit = false
+tag = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    "version = \"{version}\"",
+    "current_version = \"{version}\"",
+]
+"code2logic/__init__.py" = ["__version__ = \"{version}\""]

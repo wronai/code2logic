@@ -130,8 +130,38 @@ publish-test: build ## Publish to TestPyPI
 	@echo "$(GREEN)Published to TestPyPI!$(NC)"
 	@echo "Install with: pip install -i https://test.pypi.org/simple/ code2logic"
 
-publish: build ## Publish to PyPI (production)
+
+git-clean: ## Ensure git working tree is clean
+	@if [ "$(FORCE)" = "1" ]; then \
+		echo "FORCE=1 set: skipping git clean check."; \
+		exit 0; \
+	fi
+	@git diff --quiet || (echo "Working tree has unstaged changes. Commit or stash before publishing."; exit 1)
+	@git diff --cached --quiet || (echo "Index has staged but uncommitted changes. Commit before publishing."; exit 1)
+
+check-bumpver: ## Ensure bumpver is installed
+	@$(PYTHON) -c "import bumpver" >/dev/null 2>&1 || (echo "Missing bumpver. Install dev deps: pip install -e '.[dev]'"; exit 1)
+
+
+bump-patch: check-bumpver ## Bump patch version (updates pyproject.toml and code2logic/__init__.py)
+	$(PYTHON) -m bumpver update --patch
+
+
+bump-minor: check-bumpver ## Bump minor version
+	$(PYTHON) -m bumpver update --minor
+
+
+bump-major: check-bumpver ## Bump major version
+	$(PYTHON) -m bumpver update --major
+
+publish: bump-patch build ## Publish to PyPI (production)
 	@echo "$(YELLOW)Publishing to PyPI...$(NC)"
+	$(PYTHON) -m twine upload dist/*
+	@echo "$(GREEN)Published to PyPI!$(NC)"
+	@echo "Install with: pip install code2logic"
+
+publish-dirty: bump-patch build ## Publish to PyPI without git-clean (dangerous)
+	@echo "$(YELLOW)Publishing to PyPI (skipping git clean check)...$(NC)"
 	$(PYTHON) -m twine upload dist/*
 	@echo "$(GREEN)Published to PyPI!$(NC)"
 	@echo "Install with: pip install code2logic"
