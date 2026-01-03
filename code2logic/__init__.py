@@ -100,6 +100,12 @@ from .universal import (
     ElementType,
     reproduce_file,
 )
+from .project_reproducer import (
+    ProjectReproducer,
+    ProjectResult,
+    FileResult,
+    reproduce_project,
+)
 
 __all__ = [
     # Version
@@ -176,4 +182,9 @@ __all__ = [
     "Language",
     "ElementType",
     "reproduce_file",
+    # Project
+    "ProjectReproducer",
+    "ProjectResult",
+    "FileResult",
+    "reproduce_project",
 ]

@@ -414,42 +414,165 @@ class UniversalParser:
         )
         
         lines = content.split('\n')
+        current_interface = None
+        current_class = None
+        brace_depth = 0
         
-        for line in lines:
+        for i, line in enumerate(lines):
             stripped = line.strip()
             
+            # Track braces
+            brace_depth += stripped.count('{') - stripped.count('}')
+            
             # Imports
-            if stripped.startswith('import ') or stripped.startswith('const ') and 'require' in stripped:
+            if stripped.startswith('import ') or (stripped.startswith('const ') and 'require' in stripped):
                 logic.imports.append(stripped)
+                continue
+            
+            # Type alias
+            if stripped.startswith('type ') and '=' in stripped:
+                match = re.match(r'type (\w+)', stripped)
+                if match:
+                    logic.elements.append(CodeElement(
+                        type=ElementType.TYPE_ALIAS,
+                        name=match.group(1),
+                    ))
+                continue
             
             # Interface (TypeScript)
             if stripped.startswith('interface '):
-                match = re.match(r'interface (\w+)', stripped)
+                match = re.match(r'interface (\w+)(?:\s+extends\s+(\w+))?', stripped)
                 if match:
-                    logic.elements.append(CodeElement(
+                    elem = CodeElement(
                         type=ElementType.INTERFACE,
                         name=match.group(1),
-                    ))
+                        extends=[match.group(2)] if match.group(2) else [],
+                    )
+                    logic.elements.append(elem)
+                    current_interface = elem
+                    current_class = None
+                continue
+            
+            # Interface properties
+            if current_interface and ':' in stripped and not stripped.startswith('//'):
+                prop_match = re.match(r'(\w+)(?:\?)?:\s*(.+?);?$', stripped)
+                if prop_match:
+                    current_interface.attributes.append({
+                        'name': prop_match.group(1),
+                        'type': prop_match.group(2).rstrip(';'),
+                        'optional': '?' in stripped[:stripped.find(':')],
+                    })
+            
+            # End interface
+            if current_interface and stripped == '}':
+                current_interface = None
             
             # Class
-            if 'class ' in stripped:
-                match = re.match(r'(?:export\s+)?class (\w+)(?:\s+extends\s+(\w+))?', stripped)
+            if 'class ' in stripped and not stripped.startswith('//'):
+                match = re.match(r'(?:export\s+)?class (\w+)(?:<[^>]+>)?(?:\s+extends\s+(\w+))?(?:\s+implements\s+(\w+))?', stripped)
                 if match:
                     elem = CodeElement(
                         type=ElementType.CLASS,
                         name=match.group(1),
                         extends=[match.group(2)] if match.group(2) else [],
+                        implements=[match.group(3)] if match.group(3) else [],
                     )
                     logic.elements.append(elem)
+                    current_class = elem
+                    current_interface = None
+                continue
             
-            # Function
-            if 'function ' in stripped or re.match(r'(?:async\s+)?(\w+)\s*=\s*(?:async\s+)?\(', stripped):
-                match = re.match(r'(?:async\s+)?function\s+(\w+)', stripped)
-                if match:
-                    logic.elements.append(CodeElement(
-                        type=ElementType.FUNCTION,
-                        name=match.group(1),
-                    ))
+            # Class properties and methods
+            if current_class and not stripped.startswith('//'):
+                # Property
+                prop_match = re.match(r'(?:private\s+|public\s+|readonly\s+)?(\w+)(?:\?)?:\s*(.+?);?$', stripped)
+                if prop_match and '(' not in stripped:
+                    current_class.attributes.append({
+                        'name': prop_match.group(1),
+                        'type': prop_match.group(2).rstrip(';'),
+                    })
+                
+                # Method
+                method_match = re.match(r'(?:async\s+)?(?:private\s+|public\s+)?(\w+)\s*\(([^)]*)\)(?:\s*:\s*(.+?))?(?:\s*\{)?', stripped)
+                if method_match and stripped.count('(') > 0:
+                    name = method_match.group(1)
+                    if name not in ['if', 'for', 'while', 'switch']:
+                        params_str = method_match.group(2)
+                        return_type = method_match.group(3) or ""
+                        
+                        params = []
+                        if params_str:
+                            for param in params_str.split(','):
+                                param = param.strip()
+                                if not param:
+                                    continue
+                                pm = re.match(r'(\w+)(?:\?)?(?:\s*:\s*(.+))?', param)
+                                if pm:
+                                    params.append(Parameter(
+                                        name=pm.group(1),
+                                        type=pm.group(2) or "",
+                                    ))
+                        
+                        current_class.children.append(CodeElement(
+                            type=ElementType.METHOD,
+                            name=name,
+                            parameters=params,
+                            return_type=return_type.rstrip(' {'),
+                        ))
+            
+            # Standalone function
+            func_match = re.match(r'(?:export\s+)?(?:async\s+)?function\s+(\w+)(?:<[^>]+>)?\s*\(([^)]*)\)(?:\s*:\s*(.+?))?', stripped)
+            if func_match:
+                name = func_match.group(1)
+                params_str = func_match.group(2)
+                return_type = func_match.group(3) or ""
+                
+                params = []
+                if params_str:
+                    for param in params_str.split(','):
+                        param = param.strip()
+                        if not param:
+                            continue
+                        pm = re.match(r'(\w+)(?:\?)?(?:\s*:\s*(.+))?', param)
+                        if pm:
+                            params.append(Parameter(
+                                name=pm.group(1),
+                                type=pm.group(2) or "",
+                            ))
+                
+                logic.elements.append(CodeElement(
+                    type=ElementType.FUNCTION,
+                    name=name,
+                    parameters=params,
+                    return_type=return_type.rstrip(' {'),
+                ))
+            
+            # Arrow function
+            arrow_match = re.match(r'(?:export\s+)?(?:const|let)\s+(\w+)\s*=\s*(?:async\s+)?\(([^)]*)\)(?:\s*:\s*(.+?))?\s*=>', stripped)
+            if arrow_match:
+                name = arrow_match.group(1)
+                params_str = arrow_match.group(2)
+                return_type = arrow_match.group(3) or ""
+                
+                params = []
+                if params_str:
+                    for param in params_str.split(','):
+                        param = param.strip()
+                        if not param:
+                            continue
+                        pm = re.match(r'(\w+)(?:\?)?(?:\s*:\s*(.+))?', param)
+                        if pm:
+                            params.append(Parameter(
+                                name=pm.group(1),
+                                type=pm.group(2) or "",
+                            ))
+                
+                logic.elements.append(CodeElement(
+                    type=ElementType.FUNCTION,
+                    name=name,
+                    parameters=params,
+                    return_type=return_type,
+                ))
         
         return logic
     
