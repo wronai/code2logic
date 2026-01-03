@@ -106,6 +106,25 @@ from .project_reproducer import (
     FileResult,
     reproduce_project,
 )
+from .refactor import (
+    find_duplicates,
+    analyze_quality,
+    suggest_refactoring,
+    compare_codebases,
+    quick_analyze,
+    RefactoringReport,
+    DuplicateGroup,
+)
+from .metrics import (
+    ReproductionMetrics,
+    ReproductionResult,
+    TextMetrics,
+    StructuralMetrics,
+    SemanticMetrics,
+    FormatMetrics,
+    analyze_reproduction,
+    compare_formats,
+)
 
 __all__ = [
     # Version
@@ -187,4 +206,21 @@ __all__ = [
     "ProjectResult",
     "FileResult",
     "reproduce_project",
+    # Refactoring
+    "find_duplicates",
+    "analyze_quality",
+    "suggest_refactoring",
+    "compare_codebases",
+    "quick_analyze",
+    "RefactoringReport",
+    "DuplicateGroup",
+    # Metrics
+    "ReproductionMetrics",
+    "ReproductionResult",
+    "TextMetrics",
+    "StructuralMetrics",
+    "SemanticMetrics",
+    "FormatMetrics",
+    "analyze_reproduction",
+    "compare_formats",
 ]
