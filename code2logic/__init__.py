@@ -17,6 +17,7 @@ from .generators import (
 )
 from .llm import LLMInterface
 from .intent import IntentAnalyzer
+from .gherkin import GherkinGenerator, CucumberYAMLGenerator, generate_gherkin_from_project
 
 __version__ = "1.0.0"
 __author__ = "code2logic team"
@@ -35,4 +36,7 @@ __all__ = [
     "MarkdownGenerator",
     "LLMInterface",
     "IntentAnalyzer",
+    "GherkinGenerator",
+    "CucumberYAMLGenerator",
+    "generate_gherkin_from_project",
 ]
