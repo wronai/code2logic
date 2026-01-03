@@ -22,7 +22,7 @@ FROM python:3.12-slim
 
 LABEL maintainer="Softreck <info@softreck.dev>"
 LABEL description="Code2Logic - Convert source code to logical representation for LLM analysis"
-LABEL version="1.0.0"
+LABEL version="1.0.1"
 
 WORKDIR /app
 

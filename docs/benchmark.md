@@ -1,5 +1,7 @@
 # Code2Logic Benchmark Guide
 
+[← README](../README.md) | [Docs Index](index.md)
+
 ## Overview
 
 This document provides comprehensive benchmark results comparing different specification formats for code reproduction using LLMs.
@@ -215,11 +217,36 @@ for name, spec in formats.items():
 
 ## Conclusions
 
-1. **YAML is the best for quality** - 70.3% score, 100% syntax OK
-2. **LogicML is the best for compression** - 0.42x, 42% fewer tokens than YAML
-3. **Gherkin should be avoided** - over-engineering, lowest score
-4. **JSON is inefficient** - 1.1x larger than original code
-5. **Markdown is balanced** - good for documentation purposes
+### Latest Benchmark Results (January 2026)
+
+| Format | Score | Success | Text Sim | Structural | Semantic |
+|--------|-------|---------|----------|------------|----------|
+| **YAML** | **74.5%** | 100% | **91.8%** | **80.0%** | **83.0%** |
+| **LogicML** | **65.9%** | 100% | 89.7% | 66.7% | 74.7% |
+| Gherkin | 50.2% | 33% | 64.0% | 6.7% | 78.1% |
+
+### Key Findings
+
+1. **YAML is the best for quality** - 74.5% score, 100% success rate
+2. **LogicML is the best for compression** - 0.51x compression ratio
+3. **LogicML has 100% success rate** - reliable code generation
+4. **Gherkin over-engineers** - only 33% success rate, creates extra classes
+5. **LogicML handles async code well** - 76.2% score on async files
+
+### Format Strengths
+
+| Format | Best For |
+|--------|----------|
+| **YAML** | Overall quality, text similarity |
+| **LogicML** | Compression, token efficiency, async code |
+| **Gherkin** | Semantic descriptions (but low success) |
+
+### Improvements Made
+
+- LogicML prompt improved for async code handling
+- Added explicit instructions for `sig: async (...)` pattern
+- Better dataclass handling with `abstract: true`
+- Improved docstring extraction for semantic reproduction
 
 ## Environment Requirements
 

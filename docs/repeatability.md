@@ -1,4 +1,6 @@
 
+[← README](../README.md) | [Docs Index](index.md)
+
 ## 📊 Podsumowanie - Test Powtarzalności
 
 ### Wyniki Testu (3 uruchomienia)

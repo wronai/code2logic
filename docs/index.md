@@ -2,6 +2,8 @@
 
 > Convert source code to logical representation for LLM analysis
 
+[← README](../README.md)
+
 ## Quick Navigation
 
 - [Getting Started](getting-started.md) - Installation and first steps
@@ -12,6 +14,13 @@
 - [LLM Integration](llm-integration.md) - Using with LLMs (OpenRouter, Ollama, etc.)
 - [Examples](examples.md) - Usage examples and workflows
 - [Architecture](architecture.md) - System design and components
+
+## Repository Links
+
+- [README](../README.md)
+- [Changelog](../CHANGELOG.md)
+- [API Documentation (legacy)](../DOCS.md)
+- [Refactoring Plan](../TODO.md)
 
 ## Overview
 

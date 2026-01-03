@@ -2,7 +2,7 @@
 
 > Command-line interface for Code2Logic
 
-[← Configuration](configuration.md) | [Python API →](python-api.md)
+[← README](../README.md) | [← Configuration](configuration.md) | [Python API →](python-api.md)
 
 ## Basic Usage
 
@@ -128,7 +128,7 @@ code2logic /path/to/project -v
 # Output:
 # CODE2LOGIC
 # ══════════
-#     Version: 1.0.0
+#     Version: 1.0.1
 # [1] Checking dependencies... (0.00s)
 # [2] Analyzing project: /path/to/project (0.01s)
 # ✓ Analysis complete (0.19s)

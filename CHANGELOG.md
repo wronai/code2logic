@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-01-03
+
+### Changed
+- Improved benchmark robustness and artifact hygiene in example scripts.
+- Added packaging tools to development extras.
+
+### Fixed
+- Cleaned and hardened benchmark output generation (atomic writes, cleanup of generated artifacts).
+- Improved error reporting in benchmarking and function reproduction examples.
+
 ### Added
 - Initial release of code2logic
 - Multi-language code analysis support (Python, JavaScript, Java, C/C++)

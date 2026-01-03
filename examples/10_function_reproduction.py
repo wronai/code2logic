@@ -222,7 +222,27 @@ def test_function_reproduction(
     # Get functions to test
     functions = module.functions
     if function_name:
-        functions = [f for f in functions if f.name == function_name]
+        exact = [f for f in functions if f.name == function_name]
+        if not exact:
+            # Convenience: allow prefix match
+            prefix = [f for f in functions if f.name.startswith(function_name)]
+            if prefix:
+                functions = prefix
+            else:
+                available = sorted({f.name for f in functions})
+                from difflib import get_close_matches
+
+                close = get_close_matches(function_name, available, n=5, cutoff=0.2)
+                print(f"Function not found: {function_name}")
+                if close:
+                    print(f"Closest matches: {', '.join(close)}")
+                if available:
+                    print(f"Available functions ({len(available)}): {', '.join(available[:30])}")
+                    if len(available) > 30:
+                        print(f"... and {len(available) - 30} more")
+                return []
+        else:
+            functions = exact
     elif not all_functions:
         functions = functions[:3]  # Limit to first 3
     

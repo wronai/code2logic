@@ -2,7 +2,7 @@
 
 > Programmatic usage of Code2Logic
 
-[← CLI Reference](cli-reference.md) | [Output Formats →](output-formats.md)
+[← README](../README.md) | [← CLI Reference](cli-reference.md) | [Output Formats →](output-formats.md)
 
 ## Core Functions
 

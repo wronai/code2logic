@@ -119,6 +119,28 @@ class LogicMLGenerator:
         header_parts.append(f"{module.lines_total} lines")
         lines.append(' | '.join(header_parts))
         
+        # Handle re-export modules (no classes/functions, only imports)
+        if not module.classes and not module.functions and module.imports:
+            lines.append(f"# Re-export module")
+            lines.append("type: re-export")
+            lines.append("exports:")
+            for imp in module.imports[:20]:
+                # Extract export name from import
+                if '.' in imp:
+                    export_name = imp.split('.')[-1]
+                else:
+                    export_name = imp
+                lines.append(f"  - {export_name}")
+            return '\n'.join(lines)
+        
+        # Handle empty index files (TypeScript export * pattern)
+        if not module.classes and not module.functions and not module.imports:
+            if 'index' in path.name.lower():
+                lines.append("# Index re-export file")
+                lines.append("type: index")
+                lines.append("pattern: 'export * from ./submodules'")
+            return '\n'.join(lines)
+        
         # Imports (compact)
         if module.imports:
             imports_yaml = self._generate_imports(module.imports)
@@ -172,8 +194,11 @@ class LogicMLGenerator:
             first_line = doc_lines[0].strip()[:80].replace('"', "'")
             lines.append(f'  doc: "{first_line}"')
             
-            # Include Attributes section if present
+            # Include Example section if present (important for usage)
             for i, doc_line in enumerate(doc_lines):
+                if 'Example:' in doc_line:
+                    lines.append('  # Example usage in docstring')
+                    break
                 if 'Attributes:' in doc_line or 'Args:' in doc_line:
                     for attr_line in doc_lines[i+1:i+5]:
                         attr_line = attr_line.strip()
@@ -181,9 +206,15 @@ class LogicMLGenerator:
                             lines.append(f'  # {attr_line}')
                     break
         
-        # Bases
+        # Bases - important for Pydantic/dataclass
         if cls.bases:
-            lines.append(f'  bases: [{", ".join(cls.bases)}]')
+            bases_str = ", ".join(cls.bases)
+            lines.append(f'  bases: [{bases_str}]')
+            # Add hint for special base classes
+            if 'BaseModel' in bases_str:
+                lines.append('  # Pydantic model - use Field() for attributes')
+            elif 'Enum' in bases_str:
+                lines.append('  # Enum class')
         
         # Type markers
         if cls.is_abstract:
@@ -229,6 +260,9 @@ class LogicMLGenerator:
         prefix = ' ' * indent
         lines: List[str] = [f'{prefix}{method.name}:']
         
+        # Check for property decorator
+        is_property = 'property' in method.decorators
+        
         # Signature
         params = ', '.join(method.params[:6])
         ret = method.return_type or 'None'
@@ -236,6 +270,8 @@ class LogicMLGenerator:
         sig = f'({params}) -> {ret}'
         if method.is_async:
             sig = f'async {sig}'
+        if is_property:
+            sig = f'@property {sig}'
         
         lines.append(f'{prefix}  sig: {sig}')
         

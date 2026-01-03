@@ -18,15 +18,22 @@ FORMAT_HINTS: Dict[str, str] = {
 - 'functions' with 'signature' and 'intent'
 Implement all classes and functions with exact signatures.""",
 
-    'logicml': """Parse LogicML spec and generate COMPLETE Python code:
-- 'sig: async (...)' = async def function
-- 'sig: (...)' = regular def function  
-- 'attrs:' = instance attributes to set in __init__
-- 'does:' = use as docstring
-- 'abstract: true' = use @dataclass decorator
-- Include ALL imports from 'imports:' section
-- Generate EVERY class and function listed
-CRITICAL: Generate complete working code for ALL elements.""",
+    'logicml': """Generate VALID, RUNNABLE Python code from LogicML spec.
+
+SYNTAX RULES:
+- 'sig: (params) -> Type' = def method(params) -> Type:
+- 'sig: async (params)' = async def method(params):
+- 'sig: @property (self)' = @property decorator above method
+- 'bases: [BaseModel]' = Pydantic: class X(BaseModel): with Field()
+- 'attrs:' = self.attr = value in __init__
+- 'type: re-export' = from .submodule import Name
+
+CRITICAL REQUIREMENTS:
+1. ALL brackets/parentheses MUST be balanced
+2. ALL imports MUST be at file top
+3. NO undefined variables
+4. Proper 4-space indentation
+5. Each class/function MUST be complete""",
 
     'gherkin': """Implement scenarios as SIMPLE, MINIMAL Python code:
 - NO extra error classes or exception hierarchies

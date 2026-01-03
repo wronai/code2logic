@@ -19,6 +19,7 @@ import argparse
 import asyncio
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -45,6 +46,13 @@ from code2logic.models import ProjectInfo
 
 
 FORMATS = ['gherkin', 'yaml', 'markdown']
+
+
+def _write_text_atomic(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    tmp_path.write_text(content)
+    tmp_path.replace(path)
 
 
 @dataclass
@@ -320,6 +328,8 @@ def process_file_format(
         file_size=len(original),
         format=fmt,
     )
+
+    output_path = Path('examples/output/generated') / fmt / f"{file_name}_generated.py"
     
     try:
         # Generate spec
@@ -337,9 +347,7 @@ def process_file_format(
         result.gen_size = len(generated)
         
         # Save generated code
-        output_dir = Path('examples/output/generated') / fmt
-        output_dir.mkdir(parents=True, exist_ok=True)
-        (output_dir / f"{file_name}_generated.py").write_text(generated)
+        _write_text_atomic(output_path, generated)
         
         # Test code quality
         result.syntax_ok, result.runs_ok, error = test_code_quality(generated, file_name)
@@ -359,6 +367,11 @@ def process_file_format(
         result.semantic_score = min(analysis.semantic.intent_score, 100)
         
     except Exception as e:
+        try:
+            if output_path.exists():
+                output_path.unlink()
+        except Exception:
+            pass
         result.error = str(e)[:200]
         if verbose:
             print(f"\n   Error {fmt}/{file_name}: {e}")
@@ -379,6 +392,8 @@ def run_async_benchmark(
     
     if formats is None:
         formats = FORMATS
+
+    formats = [f.strip() for f in formats if f and f.strip()]
     
     path = Path(folder)
     py_files = list(path.glob('*.py'))
@@ -393,6 +408,10 @@ def run_async_benchmark(
     print(f"Files: {len(py_files)}")
     print(f"With tests: {with_tests}")
     print(f"Max workers: {max_workers}")
+
+    generated_root = Path('examples/output/generated')
+    if generated_root.exists():
+        shutil.rmtree(generated_root)
     
     # Initialize LLM
     llm = MultiProviderLLM(providers)
@@ -459,6 +478,13 @@ def run_async_benchmark(
                 print(f"[{completed}/{len(tasks)}] {file_name:<25} {fmt:<10} ERROR: {e}")
     
     print(f"{'─'*70}")
+
+    # Cleanup: keep only requested format folders
+    allowed = set(formats)
+    if generated_root.exists():
+        for child in generated_root.iterdir():
+            if child.is_dir() and child.name not in allowed:
+                shutil.rmtree(child, ignore_errors=True)
     
     return results
 

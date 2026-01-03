@@ -18,7 +18,7 @@ Example:
     >>> print(output)
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "Softreck"
 __email__ = "info@softreck.dev"
 __license__ = "MIT"
@@ -145,6 +145,16 @@ from .prompts import (
     get_reproduction_prompt,
     get_review_prompt,
     get_fix_prompt,
+)
+from .schemas import (
+    validate_yaml,
+    validate_logicml,
+    validate_markdown,
+    validate_json,
+    YAMLSchema,
+    LogicMLSchema,
+    MarkdownSchema,
+    JSONSchema,
 )
 from .chunked_reproduction import (
     ChunkedReproducer,

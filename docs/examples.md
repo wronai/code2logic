@@ -2,7 +2,7 @@
 
 > Usage examples and workflows for Code2Logic
 
-[← LLM Integration](llm-integration.md) | [Architecture →](architecture.md)
+[← README](../README.md) | [← LLM Integration](llm-integration.md) | [Architecture →](architecture.md)
 
 ## Available Examples
 
@@ -10,17 +10,20 @@ All examples are in the `examples/` folder:
 
 | Example | Description |
 |---------|-------------|
-| [quick_start.py](../examples/quick_start.py) | Basic usage guide |
-| [bdd_workflow.py](../examples/bdd_workflow.py) | Complete BDD workflow |
-| [token_efficiency.py](../examples/token_efficiency.py) | Format comparison |
-| [duplicate_detection.py](../examples/duplicate_detection.py) | Find duplicates |
-| [refactor_suggestions.py](../examples/refactor_suggestions.py) | LLM refactoring |
-| [generate_code.py](../examples/generate_code.py) | Code generation |
-| [code_review.py](../examples/code_review.py) | Automated review |
-| [api_documentation.py](../examples/api_documentation.py) | Generate docs |
-| [openrouter_code_reproduction.py](../examples/openrouter_code_reproduction.py) | Code reproduction |
-| [mcp_litellm_refactor.py](../examples/mcp_litellm_refactor.py) | MCP/LiteLLM |
-| [windsurf_mcp_integration.py](../examples/windsurf_mcp_integration.py) | Windsurf setup |
+| [01_quick_start.py](../examples/01_quick_start.py) | Basic usage guide |
+| [02_refactoring.py](../examples/02_refactoring.py) | Duplicate + quality analysis |
+| [03_reproduction.py](../examples/03_reproduction.py) | Reproduce code from specs |
+| [04_project.py](../examples/04_project.py) | Project-level reproduction |
+| [05_llm_integration.py](../examples/05_llm_integration.py) | LLM integration demo |
+| [06_metrics.py](../examples/06_metrics.py) | Detailed reproduction metrics |
+| [07_folder_comparison.py](../examples/07_folder_comparison.py) | Folder-level format comparison |
+| [08_format_benchmark.py](../examples/08_format_benchmark.py) | Benchmark formats across files |
+| [09_async_benchmark.py](../examples/09_async_benchmark.py) | Parallel benchmark with multi-provider LLM |
+| [10_function_reproduction.py](../examples/10_function_reproduction.py) | Function-level reproduction |
+| [11_token_benchmark.py](../examples/11_token_benchmark.py) | Token-aware benchmark |
+| [12_comprehensive_analysis.py](../examples/12_comprehensive_analysis.py) | Post-run analysis of generated outputs |
+| [13_project_benchmark.py](../examples/13_project_benchmark.py) | Whole-project structure benchmark |
+| [14_repeatability_test.py](../examples/14_repeatability_test.py) | Repeatability testing |
 
 ## Quick Start
 

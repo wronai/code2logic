@@ -27,6 +27,8 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+from . import __version__
+
 # MCP protocol implementation
 # Note: This is a simplified implementation. For production, use the official MCP SDK.
 
@@ -45,7 +47,7 @@ def handle_request(request: dict) -> dict:
                 "protocolVersion": "0.1.0",
                 "serverInfo": {
                     "name": "code2logic",
-                    "version": "1.0.0"
+                    "version": __version__
                 },
                 "capabilities": {
                     "tools": {}

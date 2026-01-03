@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "code2logic"
-version = "1.0.0"
+version = "1.0.1"
 description = "Convert source code to logical representation for LLM analysis"
 readme = "README.md"
 license = {text = "MIT"}
@@ -97,6 +97,8 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.0",
     "pre-commit>=3.0",
+    "build>=1.0.0",
+    "twine>=4.0.0",
 ]
 
 # Documentation

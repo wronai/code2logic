@@ -2,7 +2,7 @@
 
 > Setting up API keys, environment variables, and LLM providers
 
-[← Back to Index](index.md) | [CLI Reference →](cli-reference.md)
+[← README](../README.md) | [← Back to Index](index.md) | [CLI Reference →](cli-reference.md)
 
 ## Environment Variables
 

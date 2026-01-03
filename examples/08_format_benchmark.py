@@ -20,6 +20,7 @@ import argparse
 import json
 import time
 import sys
+import shutil
 from pathlib import Path
 from datetime import datetime
 from dataclasses import dataclass, field
@@ -101,6 +102,13 @@ class BenchmarkSummary:
 
 
 FORMATS = ['gherkin', 'yaml', 'markdown']
+
+
+def _write_text_atomic(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    tmp_path.write_text(content)
+    tmp_path.replace(path)
 
 
 def generate_spec(project: ProjectInfo, fmt: str) -> str:
@@ -233,11 +241,11 @@ def save_generated_code(output_dir: Path, file_name: str, fmt: str, spec: str, g
     # Save spec
     spec_ext = {'gherkin': '.feature', 'yaml': '.yaml', 'markdown': '.md', 'json': '.json'}
     spec_path = fmt_dir / f"{file_name}{spec_ext.get(fmt, '.txt')}"
-    spec_path.write_text(spec)
+    _write_text_atomic(spec_path, spec)
     
     # Save generated code
     code_path = fmt_dir / f"{file_name}_generated.py"
-    code_path.write_text(generated)
+    _write_text_atomic(code_path, generated)
 
 
 def create_single_project(module_info, file_path: Path) -> ProjectInfo:
@@ -268,6 +276,12 @@ def run_benchmark(
     
     if formats is None:
         formats = FORMATS
+
+    formats = [f.strip() for f in formats if f and f.strip()]
+
+    generated_root = Path('examples/output/generated')
+    if generated_root.exists():
+        shutil.rmtree(generated_root)
     
     path = Path(folder)
     py_files = list(path.glob('*.py'))
@@ -400,6 +414,13 @@ def run_benchmark(
     
     # Calculate summary
     summary = calculate_summary(results, formats)
+
+    # Cleanup: keep only requested format folders
+    allowed = set(formats)
+    if generated_root.exists():
+        for child in generated_root.iterdir():
+            if child.is_dir() and child.name not in allowed:
+                shutil.rmtree(child, ignore_errors=True)
     
     return results, summary
 

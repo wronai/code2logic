@@ -2,7 +2,7 @@
 
 > Quick installation and first steps with Code2Logic
 
-[← Index](index.md) | [Configuration →](configuration.md)
+[← README](../README.md) | [← Index](index.md) | [Configuration →](configuration.md)
 
 ## Installation
 

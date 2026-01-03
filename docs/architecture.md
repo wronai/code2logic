@@ -2,7 +2,7 @@
 
 > System design and component overview
 
-[← Examples](examples.md) | [Index →](index.md)
+[← README](../README.md) | [← Examples](examples.md) | [Index →](index.md)
 
 ## System Overview
 

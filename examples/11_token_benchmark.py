@@ -205,7 +205,13 @@ def get_reproduction_prompt(spec: str, fmt: str, file_name: str) -> str:
         'yaml': "Parse the YAML structure and implement all classes and functions with exact signatures.",
         'gherkin': "Implement scenarios as SIMPLE, MINIMAL Python code. NO extra error classes, NO over-engineering. Keep code short and direct.",
         'markdown': "Parse embedded Gherkin (behaviors) and YAML (structures).",
-        'logicml': "Parse LogicML spec and generate COMPLETE Python code. 'sig:' with 'async' prefix means async def. 'attrs:' = instance attributes. 'does:' = docstring. Include ALL imports listed. Generate working code for EVERY class and function.",
+        'logicml': """Parse LogicML and generate VALID Python code:
+- 'sig: (params) -> Type' = def func(params) -> Type
+- 'sig: async (params)' = async def func(params)
+- 'sig: @property (self)' = @property decorator
+- 'bases: [BaseModel]' = class X(BaseModel) with Field()
+- 'type: re-export' = from .module import X
+CRITICAL: Ensure valid syntax - balanced brackets, proper indentation, no undefined variables.""",
     }
     
     # Truncate spec for token efficiency

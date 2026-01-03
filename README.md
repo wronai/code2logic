@@ -283,7 +283,20 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 📚 Documentation
 
-- [API Documentation](DOCS.md) - Complete API reference
+- [Docs Index](docs/index.md) - Documentation home (start here)
+- [Getting Started](docs/getting-started.md) - Install and first steps
+- [Configuration](docs/configuration.md) - API keys, environment setup
+- [CLI Reference](docs/cli-reference.md) - Command-line usage
+- [Python API](docs/python-api.md) - Programmatic usage
+- [Output Formats](docs/output-formats.md) - Format comparison and usage
+- [Benchmarking](docs/benchmark.md) - Benchmark methodology and results
+- [Repeatability](docs/repeatability.md) - Repeatability testing
+- [LLM Integration](docs/llm-integration.md) - OpenRouter/Ollama/LiteLLM
+- [LLM Comparison Report](docs/llm-comparison-report.md) - Provider/model comparison
+- [Architecture](docs/architecture.md) - System design and components
+- [Examples](docs/examples.md) - Usage workflows and examples
+- [Format Analysis](docs/FORMAT_ANALYSIS.md) - Deeper format evaluation
+- [API Documentation (legacy)](DOCS.md) - Repo-level API reference
 - [Refactoring Plan](TODO.md) - Development roadmap
 
 ## 🔗 Links

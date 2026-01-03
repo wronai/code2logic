@@ -2,7 +2,7 @@
 
 > Comparison and usage guide for all output formats
 
-[← Python API](python-api.md) | [LLM Integration →](llm-integration.md)
+[← README](../README.md) | [← Python API](python-api.md) | [LLM Integration →](llm-integration.md)
 
 ## Format Overview
 
@@ -253,7 +253,7 @@ Need RAG/embeddings?          → JSON flat
 
 - [CLI Reference](cli-reference.md) - Command-line options
 - [LLM Integration](llm-integration.md) - Using with LLMs
-- [examples/token_efficiency.py](../examples/token_efficiency.py) - Detailed comparison
+- [examples/11_token_benchmark.py](../examples/11_token_benchmark.py) - Token-aware benchmark
 
 ---
 

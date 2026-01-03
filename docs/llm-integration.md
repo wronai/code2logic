@@ -2,7 +2,7 @@
 
 > Using Code2Logic with Large Language Models
 
-[← Output Formats](output-formats.md) | [Examples →](examples.md)
+[← README](../README.md) | [← Output Formats](output-formats.md) | [Examples →](examples.md)
 
 ## Overview
 
