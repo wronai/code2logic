@@ -30,10 +30,11 @@ from code2logic import analyze_project, get_client, ReproductionMetrics
 from code2logic.gherkin import GherkinGenerator
 from code2logic.generators import YAMLGenerator
 from code2logic.markdown_format import MarkdownHybridGenerator
+from code2logic.logicml import LogicMLGenerator
 from code2logic.reproduction import extract_code_block
 
 
-FORMATS = ['yaml', 'markdown', 'json']
+FORMATS = ['yaml', 'markdown', 'json', 'logicml']
 
 
 @dataclass
@@ -133,6 +134,10 @@ def generate_spec(project, fmt: str) -> str:
     elif fmt == 'json':
         gen = JSONGenerator()
         return gen.generate(project)
+    elif fmt == 'logicml':
+        gen = LogicMLGenerator()
+        spec = gen.generate(project)
+        return spec.content
     return ""
 
 
@@ -158,19 +163,29 @@ def reproduce_file(
     module_info,
     fmt: str,
     client,
+    project_root: str,
     verbose: bool = False
 ) -> FileResult:
     """Reproduce a single file."""
     from code2logic.models import ProjectInfo
     
-    path = module_info.path
+    # Build absolute path
+    rel_path = module_info.path
+    if not Path(rel_path).is_absolute():
+        abs_path = Path(project_root) / rel_path
+    else:
+        abs_path = Path(rel_path)
+    
+    path = str(abs_path)
     language = module_info.language
     
     # Read original
     try:
-        original = Path(path).read_text()
-    except:
+        original = abs_path.read_text()
+    except Exception as e:
         original = ""
+        if verbose:
+            print(f"   Cannot read {abs_path}: {e}")
     
     result = FileResult(
         path=path,
@@ -302,7 +317,7 @@ def run_project_benchmark(
         
         # Process files
         for i, module in enumerate(modules):
-            file_result = reproduce_file(module, fmt, client, verbose)
+            file_result = reproduce_file(module, fmt, client, project_path, verbose)
             result.file_results.append(file_result)
             
             # Update stats

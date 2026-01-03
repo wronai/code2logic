@@ -31,6 +31,7 @@ from code2logic import analyze_project, get_client, ReproductionMetrics
 from code2logic.gherkin import GherkinGenerator
 from code2logic.generators import YAMLGenerator
 from code2logic.markdown_format import MarkdownHybridGenerator
+from code2logic.logicml import LogicMLGenerator
 from code2logic.reproduction import extract_code_block
 from code2logic.models import ProjectInfo
 
@@ -170,6 +171,10 @@ def generate_spec(project: ProjectInfo, fmt: str) -> str:
     elif fmt == 'json_compact':
         gen = CompactJSONGenerator()
         return gen.generate(project)
+    elif fmt == 'logicml':
+        gen = LogicMLGenerator()
+        spec = gen.generate(project)
+        return spec.content
     return ""
 
 
@@ -196,9 +201,10 @@ def get_reproduction_prompt(spec: str, fmt: str, file_name: str) -> str:
     format_hints = {
         'json': "Parse the JSON structure and implement all classes and functions.",
         'json_compact': "Parse the compact JSON and implement all elements.",
-        'yaml': "Parse the YAML structure and implement all classes and functions.",
-        'gherkin': "Implement all scenarios as working Python code.",
+        'yaml': "Parse the YAML structure and implement all classes and functions with exact signatures.",
+        'gherkin': "Implement scenarios as SIMPLE, MINIMAL Python code. NO extra error classes, NO over-engineering. Keep code short and direct.",
         'markdown': "Parse embedded Gherkin (behaviors) and YAML (structures).",
+        'logicml': "Parse LogicML precisely: 'sig:' = EXACT signature, 'does:' = docstring, 'attrs:' = instance attributes in __init__, 'edge:' = handle edge cases, 'side:' = implement side effects. Match signatures EXACTLY.",
     }
     
     # Truncate spec for token efficiency

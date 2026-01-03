@@ -135,6 +135,17 @@ from .markdown_format import (
     MarkdownSpec,
     generate_markdown_hybrid,
 )
+from .logicml import (
+    LogicMLGenerator,
+    LogicMLSpec,
+    generate_logicml,
+)
+from .prompts import (
+    FORMAT_HINTS,
+    get_reproduction_prompt,
+    get_review_prompt,
+    get_fix_prompt,
+)
 from .chunked_reproduction import (
     ChunkedReproducer,
     ChunkedResult,
