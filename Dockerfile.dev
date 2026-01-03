@@ -1,83 +1,39 @@
-# Development Dockerfile for code2logic
-FROM python:3.11-slim
+# Development Dockerfile with all tools
+FROM python:3.12-slim
 
-# Set metadata
-LABEL maintainer="team@code2logic.dev"
-LABEL description="code2logic development environment"
-LABEL version="1.0.0-dev"
-
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PYTHONPATH=/app
-
-# Create app directory
 WORKDIR /app
 
-# Install system dependencies for development
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
-    tree \
-    vim \
-    nano \
-    htop \
-    netcat-openbsd \
+    curl \
+    make \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python development tools
-RUN pip install --upgrade pip && \
-    pip install wheel setuptools
+# Install Python dev dependencies
+RUN pip install --no-cache-dir \
+    pytest \
+    pytest-cov \
+    black \
+    ruff \
+    mypy \
+    pre-commit \
+    build \
+    twine \
+    tree-sitter \
+    tree-sitter-python \
+    tree-sitter-javascript \
+    tree-sitter-typescript \
+    networkx \
+    rapidfuzz \
+    pyyaml \
+    litellm \
+    httpx
 
-# Copy configuration files first (for better layer caching)
-COPY pyproject.toml .
-COPY README.md .
-COPY LICENSE .
-COPY CHANGELOG.md .
+# Copy source
+COPY . .
 
-# Install code2logic in development mode with all dependencies
-RUN pip install -e .[dev,all]
+# Install package in editable mode
+RUN pip install -e ".[full,dev]"
 
-# Install additional development tools
-RUN pip install \
-    jupyter \
-    ipython \
-    watchdog \
-    pre-commit
-
-# Create non-root user for development
-RUN groupadd -r code2logic && \
-    useradd -r -g code2logic -d /app -s /bin/bash code2logic && \
-    chown -R code2logic:code2logic /app
-
-# Switch to development user
-USER code2logic
-
-# Create development directories
-RUN mkdir -p /app/workspace /app/output /app/notebooks
-
-# Copy the rest of the application
-COPY --chown=code2logic:code2logic code2logic/ ./code2logic/
-COPY --chown=code2logic:code2logic tests/ ./tests/
-COPY --chown=code2logic:code2logic examples/ ./examples/
-COPY --chown=code2logic:code2logic docs/ ./docs/
-COPY --chown=code2logic:code2logic .pre-commit-config.yaml .
-COPY --chown=code2logic:code2logic Makefile .
-
-# Set up development entrypoint
-COPY --chown=code2logic:code2logic docker/entrypoint-dev.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint-dev.sh
-
-# Expose ports
-EXPOSE 8080 8888
-
-# Set default command for development
-ENTRYPOINT ["entrypoint-dev.sh"]
 CMD ["bash"]
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD code2logic --version || exit 1

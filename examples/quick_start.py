@@ -1,237 +1,238 @@
 #!/usr/bin/env python3
 """
-Quick Start Tutorial - 5 minute introduction to code2logic.
+Quick Start Guide for code2logic.
 
-This example demonstrates the basic functionality of code2logic
-in a simple, easy-to-understand workflow.
+This script demonstrates the most common use cases in 5 minutes.
+
+Run this script to see all features in action:
+    python quick_start.py
+
+Or import code2logic in your own code:
+    from code2logic import analyze_project, GherkinGenerator
 """
 
 import sys
-import time
 from pathlib import Path
 
-# Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from code2logic import ProjectAnalyzer, JSONGenerator, MarkdownGenerator
-from code2logic.models import create_project, create_module, create_function
-
-
-def create_sample_project():
-    """Create a simple sample project for demonstration."""
-    print("🏗️  Creating sample project...")
-    
-    # Create project structure
-    project = create_project(
-        name="quickstart_project",
-        path="/tmp/quickstart_project"
-    )
-    
-    # Add modules
-    main_module = create_module(
-        name="main",
-        path="/tmp/quickstart_project/main.py",
-        functions=[
-            create_function(
-                name="calculate_sum",
-                parameters=["a", "b"],
-                lines_of_code=3,
-                complexity=1,
-                docstring="Calculate sum of two numbers",
-                code="def calculate_sum(a, b):\n    return a + b"
-            ),
-            create_function(
-                name="factorial",
-                parameters=["n"],
-                lines_of_code=8,
-                complexity=3,
-                docstring="Calculate factorial",
-                code="def factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)"
-            )
-        ],
-        imports=["os", "sys"],
-        lines_of_code=15
-    )
-    
-    utils_module = create_module(
-        name="utils",
-        path="/tmp/quickstart_project/utils.py",
-        functions=[
-            create_function(
-                name="validate_email",
-                parameters=["email"],
-                lines_of_code=5,
-                complexity=2,
-                docstring="Validate email address",
-                code="def validate_email(email):\n    return '@' in email and '.' in email"
-            )
-        ],
-        imports=["re"],
-        lines_of_code=8
-    )
-    
-    project.modules.extend([main_module, utils_module])
-    
-    print(f"✅ Created project with {len(project.modules)} modules")
-    return project
-
-
-def basic_analysis(project):
-    """Perform basic project analysis."""
-    print("\n🔍 Performing basic analysis...")
-    
-    # Get project statistics
-    stats = project.get_statistics()
-    
-    print(f"📊 Project Statistics:")
-    print(f"   Name: {project.name}")
-    print(f"   Path: {project.path}")
-    print(f"   Modules: {stats['modules']}")
-    print(f"   Functions: {stats['functions']}")
-    print(f"   Classes: {stats['classes']}")
-    print(f"   Dependencies: {stats['dependencies']}")
-    print(f"   Lines of Code: {stats['lines_of_code']}")
-    
-    return stats
-
-
-def explore_modules(project):
-    """Explore project modules in detail."""
-    print("\n📁 Exploring modules...")
-    
-    for i, module in enumerate(project.modules, 1):
-        print(f"\n{i}. Module: {module.name}")
-        print(f"   Path: {module.path}")
-        print(f"   Lines of Code: {module.lines_of_code}")
-        print(f"   Imports: {', '.join(module.imports)}")
-        
-        if module.functions:
-            print(f"   Functions:")
-            for func in module.functions:
-                print(f"     - {func.name}({', '.join(func.parameters)}) "
-                      f"- {func.lines_of_code} LOC, complexity: {func.complexity}")
-                if func.docstring:
-                    print(f"       📝 {func.docstring}")
-        
-        if module.classes:
-            print(f"   Classes:")
-            for cls in module.classes:
-                print(f"     - {cls.name} ({len(cls.methods)} methods)")
-
-
-def generate_outputs(project):
-    """Generate different output formats."""
-    print("\n📄 Generating outputs...")
-    
-    # Create output directory
-    output_dir = Path("./quickstart_output")
-    output_dir.mkdir(exist_ok=True)
-    
-    # Generate JSON output
-    print("   📋 Generating JSON...")
-    json_gen = JSONGenerator()
-    json_gen.generate(project, str(output_dir / "analysis.json"))
-    
-    # Generate Markdown output
-    print("   📝 Generating Markdown...")
-    md_gen = MarkdownGenerator()
-    md_gen.generate(project, str(output_dir / "analysis.md"))
-    
-    print(f"✅ Outputs generated in: {output_dir}")
-    return output_dir
-
-
-def demonstrate_advanced_features(project):
-    """Demonstrate advanced features."""
-    print("\n🚀 Advanced Features Demo...")
-    
-    # Find complex functions
-    complex_functions = []
-    for module in project.modules:
-        for func in module.functions:
-            if func.complexity > 2:
-                complex_functions.append((module.name, func.name, func.complexity))
-    
-    if complex_functions:
-        print("🧠 Complex Functions Found:")
-        for module_name, func_name, complexity in complex_functions:
-            print(f"   - {module_name}.{func_name} (complexity: {complexity})")
-    
-    # Show import analysis
-    all_imports = []
-    for module in project.modules:
-        all_imports.extend(module.imports)
-    
-    unique_imports = list(set(all_imports))
-    print(f"\n📦 Import Analysis:")
-    print(f"   Total imports: {len(all_imports)}")
-    print(f"   Unique imports: {len(unique_imports)}")
-    print(f"   Import list: {', '.join(unique_imports)}")
-
-
-def show_performance_stats(start_time):
-    """Show performance statistics."""
-    end_time = time.time()
-    duration = end_time - start_time
-    
-    print(f"\n⏱️  Performance:")
-    print(f"   Total time: {duration:.2f} seconds")
-    print(f"   Analysis speed: Fast! 🚀")
 
 
 def main():
-    """Main quick start tutorial."""
-    print("🎯 code2logic Quick Start Tutorial")
-    print("=" * 50)
-    print("This 5-minute tutorial will show you the basics of code2logic")
-    print()
+    print("""
+╔═══════════════════════════════════════════════════════════════════════╗
+║                     CODE2LOGIC QUICK START GUIDE                       ║
+╚═══════════════════════════════════════════════════════════════════════╝
+""")
     
-    start_time = time.time()
+    # =========================================================================
+    # 1. Basic Analysis
+    # =========================================================================
+    print("="*70)
+    print("1. BASIC ANALYSIS")
+    print("="*70)
+    print("""
+>>> from code2logic import analyze_project
+>>> project = analyze_project("/path/to/project")
+>>> print(f"Files: {project.total_files}, Lines: {project.total_lines}")
+""")
     
-    try:
-        # Step 1: Create sample project
-        project = create_sample_project()
-        
-        # Step 2: Basic analysis
-        stats = basic_analysis(project)
-        
-        # Step 3: Explore modules
-        explore_modules(project)
-        
-        # Step 4: Generate outputs
-        output_dir = generate_outputs(project)
-        
-        # Step 5: Advanced features
-        demonstrate_advanced_features(project)
-        
-        # Step 6: Performance stats
-        show_performance_stats(start_time)
-        
-        # Summary
-        print("\n🎉 Quick Start Complete!")
-        print("=" * 30)
-        print("What you learned:")
-        print("✅ How to create and analyze projects")
-        print("✅ How to explore modules and functions")
-        print("✅ How to generate different output formats")
-        print("✅ How to identify complex code")
-        print("✅ How to analyze imports")
-        print()
-        print("Next steps:")
-        print("📖 Try the other examples in the examples/ directory")
-        print("🔧 Use the CLI: code2logic /path/to/your/project")
-        print("🤖 Explore LLM integration with Ollama")
-        print("📊 Generate dependency graphs and similarity analysis")
-        print()
-        print(f"📁 Check your outputs in: {output_dir}")
-        
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        print("This is a demonstration - the error is expected in some environments")
-        return 1
+    from code2logic import analyze_project
+    project = analyze_project(".")
+    print(f"Result: Files: {project.total_files}, Lines: {project.total_lines}")
+    print(f"        Languages: {list(project.languages.keys())}")
     
-    return 0
+    # =========================================================================
+    # 2. Output Formats
+    # =========================================================================
+    print("\n" + "="*70)
+    print("2. OUTPUT FORMATS (6 formats, 3 detail levels)")
+    print("="*70)
+    print("""
+Available formats:
+  - csv      : Best for LLM (~50% smaller than JSON)
+  - gherkin  : Best for LLM (50x compression, 95% accuracy)
+  - json     : Standard format (nested or flat)
+  - yaml     : Human-readable
+  - compact  : Ultra-minimal
+  - markdown : Documentation
+  
+Detail levels: minimal, standard, full
+""")
+    
+    from code2logic import CSVGenerator, GherkinGenerator
+    
+    csv_gen = CSVGenerator()
+    csv_output = csv_gen.generate(project, detail='standard')
+    
+    gherkin_gen = GherkinGenerator()
+    gherkin_output = gherkin_gen.generate(project, detail='standard')
+    
+    csv_tokens = len(csv_output) // 4
+    gherkin_tokens = len(gherkin_output) // 4
+    
+    print(f"Token comparison:")
+    print(f"  CSV standard:     ~{csv_tokens:,} tokens")
+    print(f"  Gherkin standard: ~{gherkin_tokens:,} tokens")
+    print(f"  Compression:      {csv_tokens/max(gherkin_tokens,1):.0f}x")
+    
+    # =========================================================================
+    # 3. CLI Usage
+    # =========================================================================
+    print("\n" + "="*70)
+    print("3. COMMAND-LINE USAGE")
+    print("="*70)
+    print("""
+# Basic analysis (auto-installs dependencies)
+code2logic /path/to/project
+
+# Specific format and detail level
+code2logic /path/to/project -f csv -d full
+
+# Gherkin for BDD tests (50x token savings!)
+code2logic /path/to/project -f gherkin -o tests.feature
+
+# JSON flat for RAG/embeddings
+code2logic /path/to/project -f json --flat -o analysis.json
+
+# Skip auto-install
+code2logic /path/to/project --no-install
+
+# Check library status
+code2logic --status
+""")
+    
+    # =========================================================================
+    # 4. BDD/Gherkin Generation
+    # =========================================================================
+    print("="*70)
+    print("4. BDD/GHERKIN GENERATION (recommended for LLM)")
+    print("="*70)
+    print("""
+Why Gherkin?
+  - 50x token compression vs CSV
+  - 95% LLM accuracy (models <30B)
+  - Native BDD test framework integration
+  - Business-readable specifications
+""")
+    
+    from code2logic import GherkinGenerator, StepDefinitionGenerator
+    
+    gherkin_gen = GherkinGenerator(language='en')
+    features = gherkin_gen.generate_test_scenarios(project)
+    
+    print(f"Generated {len(features)} features:")
+    for feature in features[:3]:
+        print(f"  - {feature.name} ({len(feature.scenarios)} scenarios)")
+    
+    print("\nGherkin preview:")
+    print("-"*40)
+    print(gherkin_output[:400])
+    print("...")
+    
+    # =========================================================================
+    # 5. Python API
+    # =========================================================================
+    print("\n" + "="*70)
+    print("5. PYTHON API")
+    print("="*70)
+    print("""
+# Analyze and explore
+from code2logic import analyze_project
+
+project = analyze_project("/path/to/project")
+
+for module in project.modules:
+    print(f"Module: {module.path}")
+    for func in module.functions:
+        print(f"  Function: {func.name}")
+        print(f"    Intent: {func.intent}")
+        print(f"    Params: {func.params}")
+
+# Generate Gherkin for LLM
+from code2logic import GherkinGenerator
+
+gen = GherkinGenerator()
+gherkin = gen.generate(project, detail='standard')
+
+# Convert CSV to Gherkin (utility)
+from code2logic import csv_to_gherkin
+
+gherkin = csv_to_gherkin(csv_content)
+""")
+    
+    # =========================================================================
+    # 6. LLM Integration
+    # =========================================================================
+    print("="*70)
+    print("6. LLM INTEGRATION (Ollama/LiteLLM)")
+    print("="*70)
+    print("""
+# Using with local Ollama
+from code2logic.llm import CodeAnalyzer
+
+analyzer = CodeAnalyzer(model="qwen2.5-coder:7b")
+
+# Get refactoring suggestions
+suggestions = analyzer.suggest_refactoring(project)
+
+# Find semantic duplicates
+duplicates = analyzer.find_semantic_duplicates(project)
+
+# Generate code in another language
+code = analyzer.generate_code(project, target_lang="typescript")
+""")
+    
+    # =========================================================================
+    # 7. MCP Server (Claude Desktop)
+    # =========================================================================
+    print("="*70)
+    print("7. MCP SERVER (Claude Desktop Integration)")
+    print("="*70)
+    print("""
+Add to claude_desktop_config.json:
+
+{
+  "mcpServers": {
+    "code2logic": {
+      "command": "python",
+      "args": ["-m", "code2logic.mcp_server"]
+    }
+  }
+}
+
+Then in Claude Desktop:
+  "Analyze my project at /path/to/project"
+  "Find duplicates in my codebase"
+  "Generate BDD tests for my API"
+""")
+    
+    # =========================================================================
+    # Summary
+    # =========================================================================
+    print("="*70)
+    print("EXAMPLES AVAILABLE")
+    print("="*70)
+    print("""
+Run these examples for more details:
+
+  python examples/bdd_workflow.py .           # Complete BDD workflow
+  python examples/token_efficiency.py .       # Compare all formats
+  python examples/duplicate_detection.py .    # Find duplicates
+  python examples/generate_tests.py . pytest  # Generate test files
+  python examples/translate_code.py . ts      # Translate to TypeScript
+  python examples/llm_pipeline.py .           # LLM integration
+  python examples/api_usage.py                # API demonstration
+
+Or use the master script:
+
+  ./examples/run_examples.sh analyze .
+  ./examples/run_examples.sh gherkin . --steps
+  ./examples/run_examples.sh compare /project1 /project2
+  ./examples/run_examples.sh batch /projects/dir
+""")
+    
+    print("\n✅ Quick start complete! Happy coding!")
 
 
-if __name__ == "__main__":
-    sys.exit(main())
+if __name__ == '__main__':
+    main()

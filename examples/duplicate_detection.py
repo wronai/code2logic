@@ -1,483 +1,370 @@
 #!/usr/bin/env python3
 """
-Duplicate Detection Example.
+Example: Duplicate Detection and Deduplication Report.
 
-This example demonstrates advanced duplicate code detection
-using code2logic's similarity analysis capabilities.
+Finds duplicates in codebases using multiple strategies:
+1. Hash-based (exact duplicates)
+2. Signature-based (same interface, different names)
+3. Intent-based (semantic duplicates)
+4. Category+Domain (consolidation candidates)
+
+Generates actionable deduplication report for refactoring.
+
+Usage:
+    python duplicate_detection.py /path/to/project
+    python duplicate_detection.py /path/to/project --threshold 0.8
+    python duplicate_detection.py /path/to/project --output report.md
 """
 
 import sys
 import json
+import hashlib
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
-from dataclasses import dataclass
+from collections import defaultdict
+from typing import Dict, List, Tuple, Any
 
-# Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from code2logic import ProjectAnalyzer
-from code2logic.similarity import SimilarityDetector, SimilarityConfig
-from code2logic.models import create_project, create_module, create_function, create_class
+from code2logic import analyze_project, CSVGenerator
 
 
-@dataclass
-class DuplicateReport:
-    """Report for duplicate code detection."""
-    total_duplicates: int
-    high_similarity_pairs: List[Dict[str, Any]]
-    duplicate_clusters: List[List[str]]
-    potential_refactorings: List[Dict[str, Any]]
-    estimated_savings: int  # Lines of code that could be saved
+def compute_signature_hash(params: List[str], return_type: str) -> str:
+    """Compute hash of function signature (ignoring name)."""
+    # Normalize params (remove names, keep types)
+    normalized_params = []
+    for p in params:
+        if ':' in p:
+            normalized_params.append(p.split(':')[1].strip())
+        else:
+            normalized_params.append(p)
+    
+    sig = f"({','.join(normalized_params)})->{return_type or 'void'}"
+    return hashlib.md5(sig.encode()).hexdigest()[:8]
 
 
-class DuplicateDetector:
-    """Advanced duplicate code detector."""
-    
-    def __init__(self, similarity_threshold: float = 0.8):
-        """
-        Initialize duplicate detector.
-        
-        Args:
-            similarity_threshold: Threshold for considering code as duplicate
-        """
-        self.similarity_threshold = similarity_threshold
-        self.config = SimilarityConfig(
-            structural_threshold=similarity_threshold,
-            semantic_threshold=similarity_threshold - 0.1,
-            syntactic_threshold=similarity_threshold + 0.1,
-            min_lines=5
-        )
-        self.detector = SimilarityDetector(self.config)
-    
-    def detect_duplicates(self, project) -> DuplicateReport:
-        """
-        Detect duplicates in the project.
-        
-        Args:
-            project: Project to analyze
-            
-        Returns:
-            Duplicate detection report
-        """
-        print(f"🔍 Detecting duplicates with threshold {self.similarity_threshold}...")
-        
-        # Find all similarities
-        similarities = self.detector.detect_similarities(project.modules)
-        
-        # Filter for high similarity
-        high_similarity = [
-            sim for sim in similarities 
-            if sim.score >= self.similarity_threshold
-        ]
-        
-        # Find duplicate clusters
-        clusters = self.detector.get_similarity_clusters(self.similarity_threshold)
-        
-        # Generate refactoring suggestions
-        refactorings = self._generate_refactoring_suggestions(high_similarity, project)
-        
-        # Calculate potential savings
-        savings = self._calculate_savings(high_similarity, project)
-        
-        return DuplicateReport(
-            total_duplicates=len(high_similarity),
-            high_similarity_pairs=[
-                {
-                    "item1": sim.item1,
-                    "item2": sim.item2,
-                    "score": sim.score,
-                    "type": sim.similarity_type,
-                    "details": sim.details
-                }
-                for sim in high_similarity
-            ],
-            duplicate_clusters=clusters,
-            potential_refactorings=refactorings,
-            estimated_savings=savings
-        )
-    
-    def _generate_refactoring_suggestions(self, similarities: List, project) -> List[Dict[str, Any]]:
-        """Generate refactoring suggestions for duplicates."""
-        suggestions = []
-        
-        # Group by similarity type
-        by_type = {}
-        for sim in similarities:
-            sim_type = sim.similarity_type
-            if sim_type not in by_type:
-                by_type[sim_type] = []
-            by_type[sim_type].append(sim)
-        
-        # Generate suggestions for each type
-        for sim_type, sims in by_type.items():
-            if sim_type == "structural":
-                suggestion = {
-                    "type": "Extract Common Function",
-                    "description": f"Extract common structure from {len(sims)} similar items",
-                    "items": [f"{sim.item1} ↔ {sim.item2}" for sim in sims[:3]],
-                    "effort": "medium",
-                    "impact": "high"
-                }
-            elif sim_type == "semantic":
-                suggestion = {
-                    "type": "Create Shared Utility",
-                    "description": f"Create shared utility for {len(sims)} semantically similar items",
-                    "items": [f"{sim.item1} ↔ {sim.item2}" for sim in sims[:3]],
-                    "effort": "low",
-                    "impact": "medium"
-                }
-            elif sim_type == "syntactic":
-                suggestion = {
-                    "type": "Refactor Similar Patterns",
-                    "description": f"Refactor {len(sims)} syntactically similar items",
-                    "items": [f"{sim.item1} ↔ {sim.item2}" for sim in sims[:3]],
-                    "effort": "medium",
-                    "impact": "medium"
-                }
-            
-            suggestions.append(suggestion)
-        
-        return suggestions
-    
-    def _calculate_savings(self, similarities: List, project) -> int:
-        """Calculate potential lines of code savings."""
-        savings = 0
-        
-        for sim in similarities:
-            # Find the actual code objects
-            item1_obj = self._find_code_object(sim.item1, project)
-            item2_obj = self._find_code_object(sim.item2, project)
-            
-            if item1_obj and item2_obj:
-                # Estimate savings as 70% of the smaller item
-                size1 = getattr(item1_obj, 'lines_of_code', 0)
-                size2 = getattr(item2_obj, 'lines_of_code', 0)
-                smaller_size = min(size1, size2)
-                savings += int(smaller_size * 0.7)
-        
-        return savings
-    
-    def _find_code_object(self, item_name: str, project):
-        """Find code object by name."""
-        parts = item_name.split('.')
-        if len(parts) == 1:
-            # Module
-            return project.get_module_by_name(parts[0])
-        elif len(parts) == 2:
-            # Module.Function or Module.Class
-            module = project.get_module_by_name(parts[0])
-            if module:
-                # Check functions
-                for func in module.functions:
-                    if func.name == parts[1]:
-                        return func
-                # Check classes
-                for cls in module.classes:
-                    if cls.name == parts[1]:
-                        return cls
-        return None
-    
-    def generate_duplicate_report(self, project, output_path: str) -> None:
-        """
-        Generate comprehensive duplicate detection report.
-        
-        Args:
-            project: Project to analyze
-            output_path: Path for output report
-        """
-        print("📊 Generating duplicate detection report...")
-        
-        # Detect duplicates
-        report = self.detect_duplicates(project)
-        
-        # Create comprehensive report
-        full_report = {
-            "project": {
-                "name": project.name,
-                "modules": len(project.modules),
-                "functions": sum(len(m.functions) for m in project.modules),
-                "classes": sum(len(m.classes) for m in project.modules),
-                "total_loc": sum(m.lines_of_code for m in project.modules)
-            },
-            "analysis": {
-                "similarity_threshold": self.similarity_threshold,
-                "total_duplicates": report.total_duplicates,
-                "duplicate_clusters": len(report.duplicate_clusters),
-                "estimated_savings": report.estimated_savings,
-                "savings_percentage": (report.estimated_savings / max(1, sum(m.lines_of_code for m in project.modules))) * 100
-            },
-            "duplicates": report.high_similarity_pairs,
-            "clusters": [
-                {
-                    "cluster_id": i,
-                    "items": cluster,
-                    "size": len(cluster)
-                }
-                for i, cluster in enumerate(report.duplicate_clusters)
-            ],
-            "refactoring_suggestions": report.potential_refactorings,
-            "detailed_analysis": self._generate_detailed_analysis(report, project)
-        }
-        
-        # Save report
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(full_report, f, indent=2, ensure_ascii=False)
-        
-        print(f"✅ Report saved to: {output_path}")
-        return full_report
-    
-    def _generate_detailed_analysis(self, report: DuplicateReport, project) -> Dict[str, Any]:
-        """Generate detailed analysis of duplicates."""
-        analysis = {
-            "duplicate_types": {},
-            "module_analysis": {},
-            "complexity_analysis": {},
-            "recommendations": []
-        }
-        
-        # Analyze by type
-        for duplicate in report.high_similarity_pairs:
-            dup_type = duplicate["type"]
-            if dup_type not in analysis["duplicate_types"]:
-                analysis["duplicate_types"][dup_type] = 0
-            analysis["duplicate_types"][dup_type] += 1
-        
-        # Analyze by module
-        module_counts = {}
-        for duplicate in report.high_similarity_pairs:
-            for item in [duplicate["item1"], duplicate["item2"]]:
-                module = item.split('.')[0]
-                if module not in module_counts:
-                    module_counts[module] = 0
-                module_counts[module] += 1
-        
-        analysis["module_analysis"] = module_counts
-        
-        # Complexity analysis
-        high_complexity_duplicates = []
-        for duplicate in report.high_similarity_pairs:
-            if duplicate.get("details", {}).get("complexity", 0) > 5:
-                high_complexity_duplicates.append(duplicate)
-        
-        analysis["complexity_analysis"] = {
-            "high_complexity_duplicates": len(high_complexity_duplicates),
-            "total_duplicates": len(report.high_similarity_pairs),
-            "high_complexity_percentage": (len(high_complexity_duplicates) / max(1, len(report.high_similarity_pairs))) * 100
-        }
-        
-        return analysis
+def compute_name_hash(name: str, params: List[str]) -> str:
+    """Compute hash for exact duplicate detection."""
+    sig = f"{name}({','.join(params)})"
+    return hashlib.md5(sig.encode()).hexdigest()[:8]
 
 
-def create_project_with_duplicates():
-    """Create a sample project with intentional duplicates."""
-    print("🏗️  Creating project with duplicates...")
+def normalize_intent(intent: str) -> str:
+    """Normalize intent for comparison."""
+    if not intent:
+        return ''
     
-    project = create_project(
-        name="duplicate_demo",
-        path="/tmp/duplicate_demo"
-    )
+    # Lowercase, remove punctuation, normalize whitespace
+    intent = intent.lower().strip()
+    intent = ''.join(c if c.isalnum() or c.isspace() else ' ' for c in intent)
+    intent = ' '.join(intent.split())
     
-    # Module 1: Original functions
-    module1 = create_module(
-        name="utils",
-        path="/tmp/duplicate_demo/utils.py",
-        functions=[
-            create_function(
-                name="calculate_sum",
-                parameters=["numbers"],
-                lines_of_code=8,
-                complexity=2,
-                docstring="Calculate sum of numbers",
-                code="def calculate_sum(numbers):\n    total = 0\n    for num in numbers:\n        total += num\n    return total"
-            ),
-            create_function(
-                name="validate_email",
-                parameters=["email"],
-                lines_of_code=6,
-                complexity=2,
-                docstring="Validate email address",
-                code="def validate_email(email):\n        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'\n        return re.match(pattern, email) is not None"
-            ),
-            create_function(
-                name="process_data",
-                parameters=["data", "options"],
-                lines_of_code=12,
-                complexity=4,
-                docstring="Process data with options",
-                code="def process_data(data, options):\n    if options.get('validate'):\n        return validate_data(data)\n    if options.get('transform'):\n        return transform_data(data)\n    return data"
-            )
-        ],
-        imports=["re", "json"],
-        lines_of_code=30
-    )
+    # Remove common words
+    stop_words = {'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been',
+                  'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will',
+                  'would', 'could', 'should', 'may', 'might', 'must', 'shall'}
     
-    # Module 2: Similar/duplicate functions
-    module2 = create_module(
-        name="helpers",
-        path="/tmp/duplicate_demo/helpers.py",
-        functions=[
-            create_function(
-                name="compute_sum",
-                parameters=["values"],
-                lines_of_code=8,
-                complexity=2,
-                docstring="Compute sum of values",
-                code="def compute_sum(values):\n    total = 0\n    for val in values:\n        total += val\n    return total"
-            ),
-            create_function(
-                name="check_email",
-                parameters=["email_address"],
-                lines_of_code=6,
-                complexity=2,
-                docstring="Check email address format",
-                code="def check_email(email_address):\n        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'\n        return re.match(pattern, email_address) is not None"
-            ),
-            create_function(
-                name="handle_data",
-                parameters=["input_data", "config"],
-                lines_of_code=12,
-                complexity=4,
-                docstring="Handle input data with configuration",
-                code="def handle_data(input_data, config):\n    if config.get('validate'):\n        return validate_input(input_data)\n    if config.get('transform'):\n        return transform_input(input_data)\n    return input_data"
-            )
-        ],
-        imports=["re", "json"],
-        lines_of_code=30
-    )
+    words = [w for w in intent.split() if w not in stop_words]
+    return ' '.join(words[:10])  # Keep first 10 meaningful words
+
+
+def find_duplicates(project) -> Dict[str, Any]:
+    """Find all types of duplicates in project."""
+    results = {
+        'exact_duplicates': [],
+        'signature_duplicates': [],
+        'intent_duplicates': [],
+        'consolidation_candidates': [],
+        'statistics': {},
+    }
     
-    # Module 3: Partial duplicates
-    module3 = create_module(
-        name="processors",
-        path="/tmp/duplicate_demo/processors.py",
-        functions=[
-            create_function(
-                name="calculate_total",
-                parameters=["items"],
-                lines_of_code=6,
-                complexity=1,
-                docstring="Calculate total of items",
-                code="def calculate_total(items):\n    return sum(items)"
-            ),
-            create_function(
-                name="is_valid_email",
-                parameters=["email"],
-                lines_of_code=4,
-                complexity=1,
-                docstring="Check if email is valid",
-                code="def is_valid_email(email):\n    return '@' in email and '.' in email"
-            ),
-            create_function(
-                name="format_data",
-                parameters=["raw_data"],
-                lines_of_code=8,
-                complexity=2,
-                docstring="Format raw data",
-                code="def format_data(raw_data):\n    if isinstance(raw_data, str):\n        return raw_data.strip()\n    return raw_data"
-            )
-        ],
-        imports=["typing"],
-        lines_of_code=20
-    )
+    # Collect all functions with metadata
+    functions = []
     
-    # Module 4: Complex duplicate
-    module4 = create_module(
-        name="analytics",
-        path="/tmp/duplicate_demo/analytics.py",
-        functions=[
-            create_function(
-                name="process_user_data",
-                parameters=["user_data", "options"],
-                lines_of_code=15,
-                complexity=5,
-                docstring="Process user data with options",
-                code="def process_user_data(user_data, options):\n    if options.get('validate'):\n        return validate_user(user_data)\n    if options.get('transform'):\n        return transform_user(user_data)\n    if options.get('enrich'):\n        return enrich_user(user_data)\n    return user_data"
-            )
-        ],
-        imports=["datetime", "json"],
-        lines_of_code=20
-    )
+    for module in project.modules:
+        for func in module.functions:
+            functions.append({
+                'path': module.path,
+                'name': func.name,
+                'full_name': f"{module.path}::{func.name}",
+                'params': func.params,
+                'return_type': func.return_type,
+                'intent': func.intent,
+                'lines': func.lines,
+                'is_async': func.is_async,
+                'category': categorize(func.name),
+                'domain': extract_domain(module.path),
+            })
+        
+        for cls in module.classes:
+            for method in cls.methods:
+                functions.append({
+                    'path': module.path,
+                    'name': method.name,
+                    'full_name': f"{module.path}::{cls.name}.{method.name}",
+                    'class': cls.name,
+                    'params': method.params,
+                    'return_type': method.return_type,
+                    'intent': method.intent,
+                    'lines': method.lines,
+                    'is_async': method.is_async,
+                    'category': categorize(method.name),
+                    'domain': extract_domain(module.path),
+                })
     
-    project.modules.extend([module1, module2, module3, module4])
+    # 1. Exact duplicates (same name + signature)
+    name_hash_groups = defaultdict(list)
+    for f in functions:
+        h = compute_name_hash(f['name'], f['params'])
+        name_hash_groups[h].append(f)
     
-    print(f"✅ Created project with {len(project.modules)} modules and intentional duplicates")
-    return project
+    for h, group in name_hash_groups.items():
+        if len(group) > 1:
+            results['exact_duplicates'].append({
+                'hash': h,
+                'count': len(group),
+                'functions': [f['full_name'] for f in group],
+                'suggestion': 'Extract to shared utility',
+                'effort': 'low',
+            })
+    
+    # 2. Signature duplicates (same signature, different names)
+    sig_hash_groups = defaultdict(list)
+    for f in functions:
+        h = compute_signature_hash(f['params'], f['return_type'])
+        sig_hash_groups[h].append(f)
+    
+    for h, group in sig_hash_groups.items():
+        if len(group) > 2:
+            # Get unique names
+            names = set(f['name'].split('.')[-1] for f in group)
+            if len(names) > 1:  # Different names with same signature
+                results['signature_duplicates'].append({
+                    'signature_hash': h,
+                    'count': len(group),
+                    'names': list(names)[:5],
+                    'functions': [f['full_name'] for f in group[:10]],
+                    'suggestion': 'Consider generic implementation',
+                    'effort': 'medium',
+                })
+    
+    # 3. Intent duplicates (semantic similarity)
+    intent_groups = defaultdict(list)
+    for f in functions:
+        if f['intent']:
+            normalized = normalize_intent(f['intent'])
+            if normalized:
+                intent_groups[normalized].append(f)
+    
+    for intent, group in intent_groups.items():
+        if len(group) > 1:
+            results['intent_duplicates'].append({
+                'intent': intent[:50],
+                'count': len(group),
+                'functions': [f['full_name'] for f in group[:10]],
+                'suggestion': 'Review for consolidation',
+                'effort': 'high',
+            })
+    
+    # 4. Consolidation candidates (same category + domain)
+    cat_domain_groups = defaultdict(list)
+    for f in functions:
+        key = f"{f['category']}:{f['domain']}"
+        cat_domain_groups[key].append(f)
+    
+    for key, group in cat_domain_groups.items():
+        if len(group) > 5:
+            category, domain = key.split(':')
+            results['consolidation_candidates'].append({
+                'category': category,
+                'domain': domain,
+                'count': len(group),
+                'functions': [f['name'] for f in group[:10]],
+                'suggestion': f'Consider {category} service for {domain}',
+                'effort': 'high',
+            })
+    
+    # Statistics
+    results['statistics'] = {
+        'total_functions': len(functions),
+        'exact_duplicate_groups': len(results['exact_duplicates']),
+        'exact_duplicate_functions': sum(d['count'] for d in results['exact_duplicates']),
+        'signature_duplicate_groups': len(results['signature_duplicates']),
+        'intent_duplicate_groups': len(results['intent_duplicates']),
+        'consolidation_areas': len(results['consolidation_candidates']),
+    }
+    
+    return results
+
+
+def categorize(name: str) -> str:
+    """Categorize function by name."""
+    name_lower = name.lower()
+    
+    if any(v in name_lower for v in ('get', 'fetch', 'find', 'load', 'read')):
+        return 'read'
+    if any(v in name_lower for v in ('create', 'add', 'insert', 'new')):
+        return 'create'
+    if any(v in name_lower for v in ('update', 'set', 'modify')):
+        return 'update'
+    if any(v in name_lower for v in ('delete', 'remove', 'clear')):
+        return 'delete'
+    if any(v in name_lower for v in ('validate', 'check', 'verify')):
+        return 'validate'
+    if any(v in name_lower for v in ('convert', 'transform', 'parse')):
+        return 'transform'
+    
+    return 'other'
+
+
+def extract_domain(path: str) -> str:
+    """Extract domain from path."""
+    parts = path.lower().replace('\\', '/').split('/')
+    domains = ['auth', 'user', 'order', 'payment', 'api', 'service',
+               'model', 'validation', 'generator', 'parser', 'test']
+    
+    for part in parts:
+        for domain in domains:
+            if domain in part:
+                return domain
+    
+    return parts[-2] if len(parts) > 1 else 'core'
+
+
+def generate_report(results: Dict[str, Any], project_name: str) -> str:
+    """Generate markdown deduplication report."""
+    lines = [
+        f"# Duplicate Detection Report: {project_name}",
+        "",
+        "## Summary",
+        "",
+        f"- Total functions analyzed: {results['statistics']['total_functions']}",
+        f"- Exact duplicate groups: {results['statistics']['exact_duplicate_groups']}",
+        f"- Exact duplicate functions: {results['statistics']['exact_duplicate_functions']}",
+        f"- Signature duplicate groups: {results['statistics']['signature_duplicate_groups']}",
+        f"- Intent duplicate groups: {results['statistics']['intent_duplicate_groups']}",
+        f"- Consolidation areas: {results['statistics']['consolidation_areas']}",
+        "",
+    ]
+    
+    # Exact duplicates
+    if results['exact_duplicates']:
+        lines.append("## Exact Duplicates (HIGH PRIORITY)")
+        lines.append("")
+        lines.append("These functions have identical names and signatures in multiple locations.")
+        lines.append("")
+        
+        for dup in results['exact_duplicates'][:10]:
+            lines.append(f"### Hash: {dup['hash']} ({dup['count']} occurrences)")
+            lines.append(f"**Suggestion:** {dup['suggestion']} (Effort: {dup['effort']})")
+            lines.append("")
+            for f in dup['functions'][:5]:
+                lines.append(f"- `{f}`")
+            lines.append("")
+    
+    # Signature duplicates
+    if results['signature_duplicates']:
+        lines.append("## Signature Duplicates (MEDIUM PRIORITY)")
+        lines.append("")
+        lines.append("Different function names with identical signatures - potential for generic implementation.")
+        lines.append("")
+        
+        for dup in results['signature_duplicates'][:10]:
+            lines.append(f"### {', '.join(dup['names'])} ({dup['count']} occurrences)")
+            lines.append(f"**Suggestion:** {dup['suggestion']} (Effort: {dup['effort']})")
+            lines.append("")
+            for f in dup['functions'][:5]:
+                lines.append(f"- `{f}`")
+            lines.append("")
+    
+    # Intent duplicates
+    if results['intent_duplicates']:
+        lines.append("## Semantic Duplicates (REVIEW)")
+        lines.append("")
+        lines.append("Functions with similar business intent - may be doing the same thing.")
+        lines.append("")
+        
+        for dup in results['intent_duplicates'][:10]:
+            lines.append(f"### Intent: \"{dup['intent']}...\" ({dup['count']} occurrences)")
+            lines.append(f"**Suggestion:** {dup['suggestion']} (Effort: {dup['effort']})")
+            lines.append("")
+            for f in dup['functions'][:5]:
+                lines.append(f"- `{f}`")
+            lines.append("")
+    
+    # Consolidation candidates
+    if results['consolidation_candidates']:
+        lines.append("## Consolidation Opportunities")
+        lines.append("")
+        lines.append("Areas with many related functions that could be organized better.")
+        lines.append("")
+        
+        for area in sorted(results['consolidation_candidates'], 
+                          key=lambda x: -x['count'])[:10]:
+            lines.append(f"### {area['category'].title()} operations in {area['domain']} ({area['count']} functions)")
+            lines.append(f"**Suggestion:** {area['suggestion']}")
+            lines.append("")
+            lines.append("Functions: " + ', '.join(area['functions'][:5]))
+            lines.append("")
+    
+    # Action items
+    lines.append("## Recommended Actions")
+    lines.append("")
+    lines.append("1. **Immediate:** Fix exact duplicates - extract to shared utilities")
+    lines.append("2. **Short-term:** Review signature duplicates for generic implementations")
+    lines.append("3. **Long-term:** Consolidate related functions into services")
+    lines.append("")
+    
+    return '\n'.join(lines)
 
 
 def main():
-    """Main duplicate detection example."""
-    print("🔍 Duplicate Detection Example")
-    print("=" * 50)
-    print("This example demonstrates advanced duplicate code detection")
-    print("using code2logic's similarity analysis capabilities.")
-    print()
+    """Run duplicate detection."""
+    if len(sys.argv) < 2:
+        print("Usage: python duplicate_detection.py /path/to/project [options]")
+        print("")
+        print("Options:")
+        print("  --output FILE    Output report file (default: stdout)")
+        print("  --json           Output as JSON instead of Markdown")
+        sys.exit(1)
     
-    try:
-        # Create project with duplicates
-        project = create_project_with_duplicates()
-        
-        # Initialize detector
-        detector = DuplicateDetector(similarity_threshold=0.7)
-        
-        # Generate report
-        output_dir = Path("./duplicate_detection_output")
-        output_dir.mkdir(exist_ok=True)
-        
-        report_path = output_dir / "duplicate_report.json"
-        full_report = detector.generate_duplicate_report(project, str(report_path))
-        
-        # Display results
-        print(f"\n📊 Duplicate Detection Results:")
-        print(f"   Project: {full_report['project']['name']}")
-        print(f"   Modules: {full_report['project']['modules']}")
-        print(f"   Functions: {full_report['project']['functions']}")
-        print(f"   Total LOC: {full_report['project']['total_loc']}")
-        print(f"   Similarity threshold: {full_report['analysis']['similarity_threshold']}")
-        print(f"   Duplicates found: {full_report['analysis']['total_duplicates']}")
-        print(f"   Duplicate clusters: {full_report['analysis']['duplicate_clusters']}")
-        print(f"   Estimated savings: {full_report['analysis']['estimated_savings']} LOC")
-        print(f"   Savings percentage: {full_report['analysis']['savings_percentage']:.1f}%")
-        
-        # Show duplicate types
-        print(f"\n📈 Duplicate Types:")
-        for dup_type, count in full_report['analysis']['duplicate_types'].items():
-            print(f"   {dup_type}: {count}")
-        
-        # Show module analysis
-        print(f"\n📁 Modules with Most Duplicates:")
-        module_analysis = full_report['analysis']['module_analysis']
-        sorted_modules = sorted(module_analysis.items(), key=lambda x: x[1], reverse=True)
-        for module, count in sorted_modules[:5]:
-            print(f"   {module}: {count} duplicates")
-        
-        # Show refactoring suggestions
-        print(f"\n🔧 Refactoring Suggestions:")
-        for i, suggestion in enumerate(full_report['refactoring_suggestions'], 1):
-            print(f"   {i}. {suggestion['type']}")
-            print(f"      {suggestion['description']}")
-            print(f"      Effort: {suggestion['effort']}, Impact: {suggestion['impact']}")
-        
-        # Show duplicate clusters
-        if full_report['clusters']:
-            print(f"\n🔗 Duplicate Clusters:")
-            for cluster in full_report['clusters'][:3]:
-                print(f"   Cluster {cluster['cluster_id']} ({cluster['size']} items):")
-                for item in cluster['items'][:3]:
-                    print(f"     - {item}")
-                if len(cluster['items']) > 3:
-                    print(f"     ... and {len(cluster['items']) - 3} more")
-        
-        # Show complexity analysis
-        complexity = full_report['analysis']['complexity_analysis']
-        print(f"\n🧠 Complexity Analysis:")
-        print(f"   High complexity duplicates: {complexity['high_complexity_duplicates']}")
-        print(f"   High complexity percentage: {complexity['high_complexity_percentage']:.1f}%")
-        
-        return 0
-        
-    except Exception as e:
-        print(f"❌ Error: {e}")
-        return 1
+    project_path = sys.argv[1]
+    output_file = None
+    as_json = '--json' in sys.argv
+    
+    if '--output' in sys.argv:
+        idx = sys.argv.index('--output')
+        output_file = sys.argv[idx + 1]
+    
+    print(f"Analyzing: {project_path}", file=sys.stderr)
+    
+    # Analyze project
+    project = analyze_project(project_path)
+    print(f"Found {project.total_files} files, {project.total_lines} lines", file=sys.stderr)
+    
+    # Find duplicates
+    print("Detecting duplicates...", file=sys.stderr)
+    results = find_duplicates(project)
+    
+    # Generate output
+    if as_json:
+        output = json.dumps(results, indent=2)
+    else:
+        output = generate_report(results, project.name)
+    
+    # Write output
+    if output_file:
+        Path(output_file).write_text(output)
+        print(f"Report saved to: {output_file}", file=sys.stderr)
+    else:
+        print(output)
+    
+    # Summary
+    stats = results['statistics']
+    print(f"\nDuplicate Summary:", file=sys.stderr)
+    print(f"  Exact duplicates: {stats['exact_duplicate_functions']}", file=sys.stderr)
+    print(f"  Signature duplicates: {stats['signature_duplicate_groups']} groups", file=sys.stderr)
+    print(f"  Semantic duplicates: {stats['intent_duplicate_groups']} groups", file=sys.stderr)
 
 
-if __name__ == "__main__":
-    sys.exit(main())
+if __name__ == '__main__':
+    main()

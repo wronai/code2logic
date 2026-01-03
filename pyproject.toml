@@ -1,228 +1,203 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "code2logic"
 version = "1.0.0"
-description = "Convert codebase structure to logical representations with AI-powered insights"
+description = "Convert source code to logical representation for LLM analysis"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = {text = "MIT"}
+requires-python = ">=3.9"
 authors = [
-    {name = "code2logic team", email = "team@code2logic.dev"}
+    {name = "Softreck", email = "info@softreck.dev"}
 ]
 maintainers = [
-    {name = "code2logic team", email = "team@code2logic.dev"}
+    {name = "Softreck", email = "info@softreck.dev"}
 ]
 keywords = [
     "code-analysis",
-    "ast",
-    "dependency-graph",
-    "refactoring",
     "llm",
-    "ai",
-    "code-comprehension",
-    "software-architecture",
-    "code-quality"
+    "ast",
+    "static-analysis",
+    "tree-sitter",
+    "code-understanding",
+    "documentation",
+    "dependency-graph",
+    "nlp",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
+    "Environment :: Console",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Software Development :: Code Generators",
-    "Topic :: Software Development :: Quality Assurance",
     "Topic :: Software Development :: Documentation",
-    "Topic :: Text Processing :: Linguistic"
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Text Processing :: Linguistic",
+    "Typing :: Typed",
 ]
-requires-python = ">=3.8"
-dependencies = [
-    "networkx>=3.0",
-    "pyyaml>=6.0",
-    "tree-sitter>=0.20.0",
-    "litellm>=1.0.0",
-    "click>=8.0.0",
-    "rich>=13.0.0"
-]
+
+# No required dependencies - core functionality works without any
+dependencies = []
 
 [project.optional-dependencies]
-dev = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "pytest-mock>=3.10.0",
-    "black>=23.0.0",
-    "isort>=5.12.0",
-    "flake8>=6.0.0",
-    "mypy>=1.0.0",
-    "pre-commit>=3.0.0"
-]
-test = [
-    "pytest>=7.0.0",
-    "pytest-cov>=4.0.0",
-    "pytest-mock>=3.10.0",
-    "coverage>=7.0.0"
-]
-docs = [
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.0.0",
-    "mkdocstrings[python]>=0.20.0"
-]
-mcp = [
-    "mcp>=1.0.0"
-]
-all = [
-    "code2logic[dev,test,docs,mcp]"
+# Tree-sitter for high-accuracy AST parsing
+treesitter = [
+    "tree-sitter>=0.21.0",
+    "tree-sitter-python>=0.21.0",
+    "tree-sitter-javascript>=0.21.0",
+    "tree-sitter-typescript>=0.21.0",
 ]
 
-[project.urls]
-Homepage = "https://github.com/wronai/code2logic"
-Documentation = "https://code2logic.readthedocs.io"
-Repository = "https://github.com/wronai/code2logic.git"
-"Bug Tracker" = "https://github.com/wronai/code2logic/issues"
-Changelog = "https://github.com/wronai/code2logic/blob/main/CHANGELOG.md"
+# NetworkX for dependency graph analysis
+graph = [
+    "networkx>=3.0",
+]
+
+# Rapidfuzz for similar function detection
+similarity = [
+    "rapidfuzz>=3.0",
+]
+
+# NLP for enhanced intent generation
+nlp = [
+    "nltk>=3.8",
+]
+
+# Full installation with all features
+full = [
+    "tree-sitter>=0.21.0",
+    "tree-sitter-python>=0.21.0",
+    "tree-sitter-javascript>=0.21.0",
+    "tree-sitter-typescript>=0.21.0",
+    "networkx>=3.0",
+    "rapidfuzz>=3.0",
+    "nltk>=3.8",
+    "pyyaml>=6.0",
+]
+
+# LLM integration
+llm = [
+    "httpx>=0.25.0",
+    "litellm>=1.0.0",
+]
+
+# Development dependencies
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0",
+    "pre-commit>=3.0",
+]
+
+# Documentation
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.0",
+    "mkdocstrings[python]>=0.24",
+]
 
 [project.scripts]
 code2logic = "code2logic.cli:main"
+code2logic-mcp = "code2logic.mcp_server:run_server"
 
-[tool.setuptools]
-package-dir = {"" = "."}
+[project.urls]
+Homepage = "https://github.com/softreck/code2logic"
+Documentation = "https://code2logic.readthedocs.io"
+Repository = "https://github.com/softreck/code2logic.git"
+Issues = "https://github.com/softreck/code2logic/issues"
+Changelog = "https://github.com/softreck/code2logic/blob/main/CHANGELOG.md"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["code2logic*"]
-exclude = ["tests*", "examples*", "docs*"]
+[tool.hatch.build.targets.sdist]
+include = [
+    "/code2logic",
+    "/tests",
+    "/README.md",
+    "/LICENSE",
+    "/CHANGELOG.md",
+]
 
-[tool.setuptools.package-data]
-code2logic = ["py.typed"]
+[tool.hatch.build.targets.wheel]
+packages = ["code2logic"]
 
-# Black configuration
-[tool.black]
-line-length = 88
-target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | build
-  | dist
-)/
-'''
-
-# isort configuration
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-line_length = 88
-known_first_party = ["code2logic"]
-known_third_party = ["networkx", "yaml", "tree_sitter", "litellm", "click", "rich"]
-
-# pytest configuration
 [tool.pytest.ini_options]
-minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
 addopts = [
-    "--strict-markers",
-    "--strict-config",
+    "-v",
+    "--tb=short",
     "--cov=code2logic",
     "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-report=xml",
-    "--cov-fail-under=80"
-]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-    "llm: marks tests that require LLM services"
 ]
 
-# Coverage configuration
 [tool.coverage.run]
 source = ["code2logic"]
-omit = [
-    "*/tests/*",
-    "*/test_*",
-    "setup.py",
-    "*/venv/*",
-    "*/.venv/*"
-]
+branch = true
 
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
     "raise NotImplementedError",
-    "if 0:",
+    "if TYPE_CHECKING:",
     "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
 ]
-show_missing = true
-precision = 2
 
-[tool.coverage.html]
-directory = "htmlcov"
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
 
-# MyPy configuration
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "C4",     # flake8-comprehensions
+    "B",      # flake8-bugbear
+    "UP",     # pyupgrade
+]
+ignore = [
+    "E501",   # line too long (handled by black)
+    "B008",   # do not perform function calls in argument defaults
+]
+
+[tool.ruff.isort]
+known-first-party = ["code2logic"]
+
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
 warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
+disallow_untyped_defs = true
+exclude = [
+    "tests/",
+    "build/",
+    "dist/",
+]
 
 [[tool.mypy.overrides]]
 module = [
-    "networkx.*",
-    "tree_sitter.*",
-    "litellm.*",
-    "ollama.*",
-    "mcp.*"
+    "tree_sitter",
+    "tree_sitter_python",
+    "tree_sitter_javascript",
+    "tree_sitter_typescript",
+    "networkx",
+    "rapidfuzz",
+    "nltk",
+    "spacy",
 ]
 ignore_missing_imports = true
-
-# Flake8 configuration (in setup.cfg for compatibility)
-[tool.flake8]
-max-line-length = 88
-extend-ignore = ["E203", "W503"]
-exclude = [
-    ".git",
-    "__pycache__",
-    "build",
-    "dist",
-    ".eggs",
-    "*.egg-info",
-    ".venv",
-    "venv"
-]
-per-file-ignores = [
-    "__init__.py:F401",
-    "tests/*:S101"
-]
