@@ -1,4 +1,5 @@
 examples/reproduction/*
+examples/output/*
 bdd_output/*
 .idea
 # Byte-compiled / optimized / DLL files

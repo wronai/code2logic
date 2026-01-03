@@ -134,7 +134,15 @@ from .markdown_format import (
     MarkdownHybridGenerator,
     MarkdownSpec,
     generate_markdown_hybrid,
-    generate_file_markdown,
+)
+from .chunked_reproduction import (
+    ChunkedReproducer,
+    ChunkedResult,
+    ChunkedSpec,
+    Chunk,
+    chunk_spec,
+    auto_chunk_reproduce,
+    get_llm_limit,
 )
 
 __all__ = [

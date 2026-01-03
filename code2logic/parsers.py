@@ -776,18 +776,41 @@ class UniversalParser:
                 bases.append(b.attr)
         
         methods = []
+        properties = []
+        
+        # Check if this is a dataclass
+        is_dataclass = any(
+            (isinstance(d, ast.Name) and d.id == 'dataclass') or
+            (isinstance(d, ast.Attribute) and d.attr == 'dataclass') or
+            (isinstance(d, ast.Call) and (
+                (isinstance(d.func, ast.Name) and d.func.id == 'dataclass') or
+                (isinstance(d.func, ast.Attribute) and d.func.attr == 'dataclass')
+            ))
+            for d in node.decorator_list
+        )
+        
         for item in node.body:
             if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 methods.append(self._extract_ast_function(item))
+            # Extract class attributes (properties) - critical for dataclasses
+            elif isinstance(item, ast.AnnAssign) and isinstance(item.target, ast.Name):
+                prop_name = item.target.id
+                prop_type = self._ann_str(item.annotation) if item.annotation else 'Any'
+                properties.append(f"{prop_name}: {prop_type}")
+            # Also handle simple assignments
+            elif isinstance(item, ast.Assign):
+                for target in item.targets:
+                    if isinstance(target, ast.Name):
+                        properties.append(target.id)
         
         return ClassInfo(
             name=node.name,
             bases=bases,
             docstring=ast.get_docstring(node)[:100] if ast.get_docstring(node) else None,
             methods=methods,
-            properties=[],
+            properties=properties,
             is_interface=False,
-            is_abstract='ABC' in bases,
+            is_abstract='ABC' in bases or is_dataclass,
             generic_params=[]
         )
     

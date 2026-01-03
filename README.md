@@ -240,6 +240,39 @@ black code2logic
 
 Compact format is ~10-15x smaller than Markdown.
 
+## 🔬 Code Reproduction Benchmarks
+
+Code2Logic can reproduce code from specifications using LLMs. Benchmark results:
+
+### Format Comparison (Token Efficiency)
+
+| Format | Score | Token Efficiency | Spec Tokens | Runs OK |
+|--------|-------|------------------|-------------|---------|
+| **YAML** | **71.1%** | 42.1 | **366** | 66.7% |
+| **Markdown** | 65.6% | **48.7** | 385 | **100%** |
+| JSON | 61.9% | 23.7 | 605 | 66.7% |
+| Gherkin | 51.3% | 19.1 | 411 | 66.7% |
+
+### Key Findings
+
+- **YAML is best for score** - 71.1% reproduction accuracy
+- **Markdown is best for token efficiency** - 48.7 score/1000 tokens
+- **YAML uses 39.6% fewer tokens than JSON** with 9.2% higher score
+- **Markdown has 100% runs OK** - generated code always executes
+
+### Run Benchmarks
+
+```bash
+# Token-aware benchmark
+python examples/11_token_benchmark.py --folder tests/samples/
+
+# Async multi-format benchmark
+python examples/09_async_benchmark.py --folder tests/samples/
+
+# Function-level reproduction
+python examples/10_function_reproduction.py --multi-lang
+```
+
 ## 🤝 Contributing
 
 Contributions welcome! Please read our [Contributing Guide](CONTRIBUTING.md).

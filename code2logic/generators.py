@@ -638,7 +638,14 @@ class YAMLGenerator:
             if m.classes:
                 module_data['classes'] = []
                 for c in m.classes:
-                    cls_data = {'name': c.name, 'bases': c.bases}
+                    cls_data = {
+                        'name': c.name,
+                        'bases': c.bases,
+                        'docstring': c.docstring[:80] if c.docstring else '',
+                    }
+                    # Include properties (critical for dataclass reproduction)
+                    if c.properties:
+                        cls_data['properties'] = c.properties[:20]
                     if c.methods:
                         cls_data['methods'] = [
                             self._method_to_dict(method, detail)
@@ -808,12 +815,27 @@ class YAMLGenerator:
             lines.append(f"    lines: {m.lines_code}")
             if m.classes:
                 lines.append("    classes:")
-                for c in m.classes[:5]:
-                    lines.append(f"      - {c.name}")
+                for c in m.classes[:10]:
+                    lines.append(f"      - name: {c.name}")
+                    if c.docstring:
+                        doc = c.docstring.split('\n')[0][:60]
+                        lines.append(f"        docstring: \"{doc}\"")
+                    if c.bases:
+                        lines.append(f"        bases: [{', '.join(c.bases)}]")
+                    if c.properties:
+                        lines.append("        properties:")
+                        for prop in c.properties[:15]:
+                            lines.append(f"          - {prop}")
             if m.functions:
                 lines.append("    functions:")
-                for f in m.functions[:5]:
-                    lines.append(f"      - {f.name}")
+                for f in m.functions[:15]:
+                    sig = self._build_signature(f)
+                    lines.append(f"      - name: {f.name}")
+                    lines.append(f"        signature: {sig}")
+                    if f.intent:
+                        lines.append(f"        intent: {f.intent[:50]}")
+                    lines.append(f"        lines: {f.lines}")
+                    lines.append(f"        is_async: {str(f.is_async).lower()}")
         
         return '\n'.join(lines)
 

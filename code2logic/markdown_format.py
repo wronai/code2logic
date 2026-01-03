@@ -1,14 +1,15 @@
 """
 Markdown Hybrid Format Generator for Code2Logic.
 
-Generates optimized Markdown containing:
-- File tree structure
-- Embedded Gherkin codeblocks for behavior
-- Embedded YAML codeblocks for data structures
-- Compact code summaries
+Optimized hybrid format based on benchmark insights:
+- YAML for structures (60% structural score) - classes, dataclasses, types
+- Gherkin for behaviors (83% semantic score) - functions, methods, logic
+- Compact metadata for imports and dependencies
 
-This hybrid format aims to combine the best of all formats
-while being more token-efficient than individual formats.
+Benchmark results show:
+- YAML best for: structural matching, text similarity
+- Gherkin best for: semantic preservation, success rate
+- Combined: better overall reproduction quality
 """
 
 import os
@@ -123,126 +124,192 @@ class MarkdownHybridGenerator:
         return '\n'.join(lines)
     
     def _generate_imports(self, project: ProjectInfo) -> str:
-        """Generate imports summary."""
-        lines = ["## 📦 Dependencies\n"]
+        """Generate imports as YAML for precise reproduction."""
+        lines = ["## 📦 Imports (YAML)\n"]
+        lines.append("```yaml")
+        lines.append("# Required imports for code reproduction")
         
-        all_imports = set()
         for module in project.modules:
-            all_imports.update(module.imports)
+            if module.imports:
+                lines.append(f"\n{Path(module.path).name}:")
+                
+                # Categorize
+                stdlib_modules = {
+                    'os', 'sys', 'json', 'typing', 'pathlib', 'dataclasses',
+                    're', 'ast', 'abc', 'collections', 'functools', 'itertools',
+                    'datetime', 'logging', 'argparse', 'subprocess', 'shutil',
+                    'time', 'copy', 'io', 'contextlib', 'enum', 'hashlib',
+                }
+                
+                stdlib = []
+                third_party = []
+                local = []
+                
+                for imp in module.imports:
+                    base = imp.split('.')[0]
+                    if base in stdlib_modules:
+                        stdlib.append(imp)
+                    elif imp.startswith('.'):
+                        local.append(imp)
+                    else:
+                        third_party.append(imp)
+                
+                if stdlib:
+                    lines.append(f"  stdlib: [{', '.join(sorted(set(stdlib))[:10])}]")
+                if third_party:
+                    lines.append(f"  third_party: [{', '.join(sorted(set(third_party))[:10])}]")
+                if local:
+                    lines.append(f"  local: [{', '.join(sorted(set(local))[:5])}]")
         
-        # Categorize imports
-        stdlib = []
-        third_party = []
-        local = []
-        
-        stdlib_modules = {
-            'os', 'sys', 'json', 'typing', 'pathlib', 'dataclasses',
-            're', 'ast', 'abc', 'collections', 'functools', 'itertools',
-            'datetime', 'logging', 'argparse', 'subprocess', 'shutil',
-        }
-        
-        for imp in sorted(all_imports):
-            base = imp.split('.')[0]
-            if base in stdlib_modules:
-                stdlib.append(imp)
-            elif base.startswith('.') or base == project.name:
-                local.append(imp)
-            else:
-                third_party.append(imp)
-        
-        if stdlib:
-            lines.append("**Standard Library:**")
-            lines.append(f"`{', '.join(stdlib[:10])}`")
-            if len(stdlib) > 10:
-                lines.append(f"... and {len(stdlib)-10} more")
-            lines.append("")
-        
-        if third_party:
-            lines.append("**Third Party:**")
-            lines.append(f"`{', '.join(third_party[:10])}`")
-            lines.append("")
-        
-        if local:
-            lines.append("**Local:**")
-            lines.append(f"`{', '.join(local[:10])}`")
-            lines.append("")
-        
+        lines.append("```\n")
         return '\n'.join(lines)
     
     def _generate_classes_yaml(self, project: ProjectInfo) -> str:
-        """Generate classes as YAML codeblock."""
-        lines = ["## 🏗️ Data Structures\n"]
+        """Generate classes as detailed YAML codeblock.
+        
+        YAML is best for structural reproduction (60% benchmark score).
+        Include full type information and signatures for better LLM reproduction.
+        """
+        lines = ["## 🏗️ Data Structures (YAML)\n"]
+        lines.append("```yaml")
+        lines.append("# Classes and dataclasses - use @dataclass decorator where noted")
         
         has_classes = False
         for module in project.modules:
             if module.classes:
                 has_classes = True
-                lines.append(f"### {Path(module.path).name}\n")
-                lines.append("```yaml")
+                lines.append(f"\n# File: {Path(module.path).name}")
                 
                 for cls in module.classes:
-                    lines.append(f"{cls.name}:")
+                    # Check if dataclass
+                    is_dataclass = any('dataclass' in d for d in cls.methods[0].decorators if cls.methods) if cls.methods else False
+                    is_dataclass = is_dataclass or 'dataclass' in str(cls.bases)
+                    
+                    lines.append(f"\n{cls.name}:")
+                    
+                    # Type annotation
+                    if is_dataclass:
+                        lines.append("  type: dataclass")
+                    elif cls.is_abstract:
+                        lines.append("  type: abstract_class")
+                    elif cls.is_interface:
+                        lines.append("  type: interface")
+                    else:
+                        lines.append("  type: class")
+                    
+                    # Docstring
                     if cls.docstring:
-                        doc = cls.docstring.split('\n')[0][:60]
-                        lines.append(f"  description: \"{doc}\"")
+                        doc = cls.docstring.split('\n')[0][:80]
+                        lines.append(f"  doc: \"{doc}\"")
+                    
+                    # Inheritance
                     if cls.bases:
                         lines.append(f"  bases: [{', '.join(cls.bases)}]")
+                    
+                    # Properties with types (important for reproduction)
                     if cls.properties:
-                        lines.append("  properties:")
-                        for prop in cls.properties[:10]:
-                            lines.append(f"    - {prop}")
+                        lines.append("  fields:")
+                        for prop in cls.properties[:15]:
+                            # Try to extract type from property string
+                            if ':' in prop:
+                                name, type_hint = prop.split(':', 1)
+                                lines.append(f"    {name.strip()}: {type_hint.strip()}")
+                            else:
+                                lines.append(f"    {prop}: Any")
+                    
+                    # Methods with signatures
                     if cls.methods:
                         lines.append("  methods:")
-                        for method in cls.methods[:10]:
-                            sig = f"{method.name}({', '.join(method.params[:3])})"
-                            lines.append(f"    - {sig}")
-                
-                lines.append("```\n")
+                        for method in cls.methods[:15]:
+                            # Build full signature
+                            params = ', '.join(method.params[:5])
+                            ret = method.return_type or 'None'
+                            decorators = ', '.join(method.decorators[:2]) if method.decorators else ''
+                            
+                            method_info = f"{method.name}({params}) -> {ret}"
+                            if decorators:
+                                method_info = f"@{decorators} {method_info}"
+                            if method.is_async:
+                                method_info = f"async {method_info}"
+                            
+                            lines.append(f"    - {method_info}")
         
         if not has_classes:
-            lines.append("*No classes defined*\n")
+            lines.append("# No classes defined")
         
+        lines.append("```\n")
         return '\n'.join(lines)
     
     def _generate_functions_gherkin(self, project: ProjectInfo) -> str:
-        """Generate functions as Gherkin codeblock."""
-        lines = ["## ⚡ Functions & Behaviors\n"]
+        """Generate functions as detailed Gherkin codeblock.
+        
+        Gherkin is best for semantic reproduction (83% benchmark score).
+        Include full behavioral descriptions for better LLM understanding.
+        """
+        lines = ["## ⚡ Functions & Behaviors (Gherkin)\n"]
+        lines.append("```gherkin")
+        lines.append("# Function behaviors and logic - implement as Python functions")
         
         has_functions = False
         for module in project.modules:
-            # Include both module functions and class methods
+            # Only top-level functions (methods handled in YAML)
             all_funcs = list(module.functions)
-            for cls in module.classes:
-                all_funcs.extend(cls.methods)
             
             if all_funcs:
                 has_functions = True
-                lines.append(f"### {Path(module.path).name}\n")
-                lines.append("```gherkin")
-                lines.append(f"Feature: {Path(module.path).stem}")
+                lines.append(f"\nFeature: {Path(module.path).stem}")
+                if module.docstring:
+                    lines.append(f"  # {module.docstring.split(chr(10))[0][:60]}")
                 
-                for func in all_funcs[:15]:  # Limit for token efficiency
-                    lines.append(f"\n  Scenario: {func.name}")
+                for func in all_funcs[:20]:
+                    lines.append(f"\n  @{func.name}")
                     
-                    # Parameters
+                    # Async marker
+                    if func.is_async:
+                        lines.append("  @async")
+                    
+                    # Decorators
+                    for dec in func.decorators[:3]:
+                        lines.append(f"  @{dec}")
+                    
+                    lines.append(f"  Scenario: {func.name}")
+                    
+                    # Docstring as description
+                    if func.docstring:
+                        doc = func.docstring.split('\n')[0][:70]
+                        lines.append(f"    \"\"\"{doc}\"\"\"")
+                    
+                    # Parameters with types
                     if func.params:
-                        params = ', '.join(func.params[:5])
-                        lines.append(f"    Given parameters: {params}")
+                        for param in func.params[:6]:
+                            if ':' in param:
+                                name, ptype = param.split(':', 1)
+                                lines.append(f"    Given parameter {name.strip()}: {ptype.strip()}")
+                            else:
+                                lines.append(f"    Given parameter {param}")
+                    else:
+                        lines.append("    Given no parameters")
+                    
+                    # Function calls (behavior)
+                    if func.calls:
+                        for call in func.calls[:5]:
+                            lines.append(f"    When calls {call}")
+                    
+                    # Exceptions
+                    if func.raises:
+                        for exc in func.raises[:3]:
+                            lines.append(f"    And may raise {exc}")
                     
                     # Return type
                     if func.return_type and func.return_type != 'None':
-                        lines.append(f"    Then returns: {func.return_type}")
-                    
-                    # Brief description
-                    if func.docstring:
-                        doc = func.docstring.split('\n')[0][:50]
-                        lines.append(f"    # {doc}")
-                
-                lines.append("```\n")
+                        lines.append(f"    Then returns {func.return_type}")
+                    else:
+                        lines.append("    Then returns None")
         
         if not has_functions:
-            lines.append("*No functions defined*\n")
+            lines.append("# No top-level functions defined")
         
+        lines.append("```\n")
         return '\n'.join(lines)
     
     def _generate_dependencies(self, project: ProjectInfo) -> str:

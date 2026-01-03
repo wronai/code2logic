@@ -61,6 +61,14 @@ class BenchmarkResult:
     struct_scores: Dict[str, float] = field(default_factory=dict)
     semantic_scores: Dict[str, float] = field(default_factory=dict)
     
+    # Code detail metrics
+    orig_classes: int = 0
+    orig_functions: int = 0
+    orig_imports: int = 0
+    gen_classes: Dict[str, int] = field(default_factory=dict)
+    gen_functions: Dict[str, int] = field(default_factory=dict)
+    gen_imports: Dict[str, int] = field(default_factory=dict)
+    
     errors: Dict[str, str] = field(default_factory=dict)
 
 
@@ -182,6 +190,43 @@ class {cls}:
     return code
 
 
+def count_code_elements(code: str) -> Dict[str, int]:
+    """Count code elements in generated code."""
+    import re
+    
+    classes = len(re.findall(r'^class \w+', code, re.MULTILINE))
+    functions = len(re.findall(r'^def \w+', code, re.MULTILINE))
+    async_funcs = len(re.findall(r'^async def \w+', code, re.MULTILINE))
+    imports = len(re.findall(r'^(?:from|import) ', code, re.MULTILINE))
+    decorators = len(re.findall(r'^@\w+', code, re.MULTILINE))
+    docstrings = len(re.findall(r'"""[^"]+"""', code))
+    type_hints = len(re.findall(r': \w+[\[\],\s\w]*(?:=|$|\))', code))
+    
+    return {
+        'classes': classes,
+        'functions': functions + async_funcs,
+        'imports': imports,
+        'decorators': decorators,
+        'docstrings': docstrings,
+        'type_hints': type_hints,
+    }
+
+
+def save_generated_code(output_dir: Path, file_name: str, fmt: str, spec: str, generated: str):
+    """Save generated spec and code for inspection."""
+    fmt_dir = output_dir / 'generated' / fmt
+    fmt_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Save spec
+    spec_ext = {'gherkin': '.feature', 'yaml': '.yaml', 'markdown': '.md', 'json': '.json'}
+    spec_path = fmt_dir / f"{file_name}{spec_ext.get(fmt, '.txt')}"
+    spec_path.write_text(spec)
+    
+    # Save generated code
+    code_path = fmt_dir / f"{file_name}_generated.py"
+    code_path.write_text(generated)
+
+
 def create_single_project(module_info, file_path: Path) -> ProjectInfo:
     """Create ProjectInfo for a single file."""
     return ProjectInfo(
@@ -222,9 +267,9 @@ def run_benchmark(
     print(f"Formats: {', '.join(formats)}")
     print(f"Files: {len(py_files)}")
     
-    # Analyze project
+    # Analyze project (use_treesitter=False for better dataclass detection)
     print("\n📊 Analyzing project...")
-    project = analyze_project(str(path))
+    project = analyze_project(str(path), use_treesitter=False)
     
     # Initialize
     client = None
@@ -269,6 +314,12 @@ def run_benchmark(
             language='python',
         )
         
+        # Count original code elements
+        orig_elements = count_code_elements(original)
+        result.orig_classes = orig_elements['classes']
+        result.orig_functions = orig_elements['functions']
+        result.orig_imports = orig_elements['imports']
+        
         # Create single-file project
         single_project = create_single_project(module_info, py_file)
         
@@ -291,6 +342,16 @@ def run_benchmark(
             
             result.gen_sizes[fmt] = len(generated)
             result.gen_times[fmt] = gen_time
+            
+            # Count code elements
+            gen_elements = count_code_elements(generated)
+            result.gen_classes[fmt] = gen_elements['classes']
+            result.gen_functions[fmt] = gen_elements['functions']
+            result.gen_imports[fmt] = gen_elements['imports']
+            
+            # Save generated files for inspection
+            output_dir = Path('examples/output')
+            save_generated_code(output_dir, file_name, fmt, spec, generated)
             
             # Calculate metrics
             try:
@@ -378,7 +439,7 @@ def calculate_summary(results: List[BenchmarkResult], formats: List[str]) -> Ben
     return summary
 
 
-def print_summary(summary: BenchmarkSummary):
+def print_summary(summary: BenchmarkSummary, results: List[BenchmarkResult] = None):
     """Print benchmark summary."""
     print(f"\n{'='*70}")
     print("BENCHMARK SUMMARY")
@@ -399,7 +460,6 @@ def print_summary(summary: BenchmarkSummary):
         ("Min Score", summary.min_scores, "%", 1),
         ("Success Rate", summary.success_rates, "%", 0),
         ("Wins", summary.wins, "", 0),
-        ("Avg Compression", summary.avg_compression, "x", 2),
         ("Avg Gen Time", summary.avg_gen_time, "s", 2),
     ]
     
@@ -415,6 +475,18 @@ def print_summary(summary: BenchmarkSummary):
                 print(f"{val:>14.2f}{suffix}", end="")
         print()
     
+    print(f"{'─'*70}")
+    
+    # Compression section with best indicator
+    print(f"\n📦 Compression (lower = better):")
+    print(f"{'─'*70}")
+    best_compression = min(summary.avg_compression.items(), key=lambda x: x[1])[0] if summary.avg_compression else None
+    print(f"{'Format':<20}", end="")
+    for fmt in summary.formats:
+        comp = summary.avg_compression.get(fmt, 0)
+        marker = " ✓" if fmt == best_compression else ""
+        print(f"{comp:>13.2f}x{marker}", end="")
+    print()
     print(f"{'─'*70}")
     
     # Category breakdown
@@ -440,6 +512,29 @@ def print_summary(summary: BenchmarkSummary):
         print()
     
     print(f"{'─'*70}")
+    
+    # Code element comparison
+    if results:
+        print(f"\n🔍 Code Element Reproduction (classes/functions):")
+        print(f"{'─'*70}")
+        print(f"{'File':<20} {'Original':>10} ", end="")
+        for fmt in summary.formats:
+            print(f"{fmt:>14}", end="")
+        print()
+        print(f"{'─'*70}")
+        
+        for r in results[:8]:  # Limit display
+            orig = f"{r.orig_classes}c/{r.orig_functions}f"
+            print(f"{r.file_name:<20} {orig:>10} ", end="")
+            for fmt in summary.formats:
+                gen_c = r.gen_classes.get(fmt, 0)
+                gen_f = r.gen_functions.get(fmt, 0)
+                # Mark match
+                c_match = "✓" if gen_c == r.orig_classes else ""
+                f_match = "✓" if gen_f == r.orig_functions else ""
+                print(f"{gen_c}c{c_match}/{gen_f}f{f_match}".rjust(14), end="")
+            print()
+        print(f"{'─'*70}")
     
     # Winner
     print(f"\n🏆 Best Format by Category:")
@@ -622,7 +717,7 @@ def main():
         summary = calculate_summary(results, args.formats)
     
     # Print and save
-    print_summary(summary)
+    print_summary(summary, results)
     save_report(results, summary, args.output)
 
 
