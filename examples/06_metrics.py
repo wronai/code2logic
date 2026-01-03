@@ -34,7 +34,67 @@ from code2logic import (
 from code2logic.reproduction import extract_code_block
 
 
-def analyze_single(source_path: str, verbose: bool = False):
+def generate_from_template(spec: str) -> str:
+    """Simple template-based code generation as fallback."""
+    # Extract class names from spec
+    import re
+    
+    # Look for actual class names in the spec
+    classes = []
+    
+    # Pattern 1: Look for class declarations in examples
+    class_matches = re.findall(r'class (\w+)', spec, re.MULTILINE)
+    classes.extend(class_matches)
+    
+    # Pattern 2: Look for dataclass scenarios
+    dataclass_matches = re.findall(r'Scenario: (\w+)', spec, re.MULTILINE)
+    classes.extend(dataclass_matches)
+    
+    # Pattern 3: Look for feature names (often class names)
+    feature_matches = re.findall(r'Feature: (\w+)', spec, re.MULTILINE)
+    classes.extend(feature_matches)
+    
+    # Filter valid class names
+    valid_classes = []
+    for c in classes:
+        if (c.isidentifier() 
+            and c not in ['Given', 'When', 'Then', 'And', 'Background', 'Scenario', 'Feature', 'Core']
+            and not c.lower() in ['test', 'example', 'sample', 'dataclass', 'define']
+            and len(c) > 1):  # Skip single letters
+            valid_classes.append(c)
+    
+    # Remove duplicates and limit
+    valid_classes = list(set(valid_classes))[:5]
+    
+    # Generate code
+    code = '''from dataclasses import dataclass, field
+from typing import Optional, List, Dict
+from datetime import datetime
+
+'''
+    
+    if valid_classes:
+        for class_name in valid_classes:
+            code += f'''@dataclass
+class {class_name}:
+    """Generated from specification."""
+    # TODO: Add fields based on original code
+    
+'''
+    else:
+        # Fallback: generate a generic class
+        code += '''@dataclass
+class GeneratedClass:
+    """Generated class from specification."""
+    name: str = ""
+    description: str = ""
+    
+'''
+    
+    return code
+
+
+def analyze_single(source_path: str, verbose: bool = False, no_llm: bool = False):
     """Analyze single file with detailed metrics."""
     path = Path(source_path)
     original = path.read_text()
@@ -44,16 +104,29 @@ def analyze_single(source_path: str, verbose: bool = False):
     
     # Generate spec and reproduce
     spec = generate_file_gherkin(source_path)
+    print(f"  Generated Gherkin spec: {len(spec)} chars")
     
-    client = get_client()
-    prompt = f"""Generate Python code from this Gherkin specification:
+    if no_llm:
+        print("\nUsing template-based generation (--no-llm flag)...")
+        generated = generate_from_template(spec)
+    else:
+        try:
+            client = get_client()
+            prompt = f"""Generate Python code from this Gherkin specification:
 
 {spec}
 
 Generate complete, working Python code."""
+            
+            response = client.generate(prompt, max_tokens=4000)
+            generated = extract_code_block(response)
+        except Exception as e:
+            print(f"\n⚠️  LLM generation failed: {e}")
+            print("Using template-based generation instead...")
+            # Fallback to template generation
+            generated = generate_from_template(spec)
     
-    response = client.generate(prompt, max_tokens=4000)
-    generated = extract_code_block(response)
+    print(f"  Generated code: {len(generated)} chars")
     
     # Analyze with metrics
     metrics = ReproductionMetrics(verbose=verbose)
@@ -100,7 +173,7 @@ Generate complete, working Python code."""
     return result
 
 
-def compare_all_formats(source_path: str):
+def compare_all_formats(source_path: str, no_llm: bool = False):
     """Compare reproduction across all formats."""
     path = Path(source_path)
     original = path.read_text()
@@ -109,32 +182,44 @@ def compare_all_formats(source_path: str):
     print("="*60)
     
     # Generate specs
-    formats = {
-        'gherkin': generate_file_gherkin(source_path),
-        'yaml': generate_file_yaml(source_path),
-        'json': generate_file_json(source_path),
-    }
+    formats = {}
+    for fmt, generator in [
+        ('gherkin', generate_file_gherkin),
+        ('yaml', generate_file_yaml),
+        ('json', generate_file_json),
+    ]:
+        print(f"  Generating {fmt} spec...", end=" ", flush=True)
+        spec = generator(source_path)
+        formats[fmt] = spec
+        print(f"✓ ({len(spec)} chars)")
     
-    client = get_client()
     results = {}
     
     for fmt, spec in formats.items():
         print(f"\n  Testing {fmt}...", end=" ", flush=True)
         
-        prompt = f"""Generate Python code from this {fmt} specification:
+        if no_llm:
+            generated = generate_from_template(spec)
+            results[fmt] = (spec, generated)
+            print(f"✓ (template, {len(generated)} chars)")
+        else:
+            try:
+                client = get_client()
+                prompt = f"""Generate Python code from this {fmt} specification:
 
 {spec[:4000]}
 
 Generate complete, working Python code."""
-        
-        try:
-            response = client.generate(prompt, max_tokens=4000)
-            generated = extract_code_block(response)
-            results[fmt] = (spec, generated)
-            print(f"✓ ({len(generated)} chars)")
-        except Exception as e:
-            print(f"✗ ({e})")
-            results[fmt] = (spec, "")
+                
+                response = client.generate(prompt, max_tokens=4000)
+                generated = extract_code_block(response)
+                results[fmt] = (spec, generated)
+                print(f"✓ ({len(generated)} chars)")
+            except Exception as e:
+                print(f"✗ ({e})")
+                # Fallback to template
+                generated = generate_from_template(spec)
+                results[fmt] = (spec, generated)
     
     # Compare
     comparison = compare_formats(original, results)
@@ -157,7 +242,7 @@ Generate complete, working Python code."""
     return comparison
 
 
-def batch_analyze(project_path: str):
+def batch_analyze(project_path: str, no_llm: bool = False):
     """Analyze all Python files in a directory."""
     path = Path(project_path)
     files = list(path.glob('*.py'))
@@ -170,7 +255,7 @@ def batch_analyze(project_path: str):
     
     for file_path in files[:5]:  # Limit to 5 for demo
         try:
-            result = analyze_single(str(file_path), verbose=False)
+            result = analyze_single(str(file_path), verbose=False, no_llm=no_llm)
             all_results.append({
                 'file': file_path.name,
                 'score': result.overall_score,
@@ -198,21 +283,25 @@ def main():
     parser.add_argument('--batch', '-b', action='store_true')
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--output', '-o', default='examples/output/metrics_report.md', help='Save report to file')
+    parser.add_argument('--no-llm', action='store_true', help='Skip LLM generation, use templates only')
     args = parser.parse_args()
     
     print("="*60)
     print("CODE2LOGIC - METRICS ANALYSIS")
     print("="*60)
     
+    if args.no_llm:
+        print("\n⚠️  Running in template-only mode (--no-llm)")
+    
     if args.batch:
-        batch_analyze(args.source)
+        batch_analyze(args.source, args.no_llm)
     elif args.compare_formats:
-        result = compare_all_formats(args.source)
+        result = compare_all_formats(args.source, args.no_llm)
         if args.output:
             Path(args.output).write_text(json.dumps(result, indent=2))
             print(f"\nSaved to: {args.output}")
     else:
-        result = analyze_single(args.source, args.verbose)
+        result = analyze_single(args.source, args.verbose, args.no_llm)
         if args.output:
             Path(args.output).write_text(result.to_report())
             print(f"\nReport saved to: {args.output}")
