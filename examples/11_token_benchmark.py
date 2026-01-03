@@ -205,7 +205,7 @@ def get_reproduction_prompt(spec: str, fmt: str, file_name: str) -> str:
         'yaml': "Parse the YAML structure and implement all classes and functions with exact signatures.",
         'gherkin': "Implement scenarios as SIMPLE, MINIMAL Python code. NO extra error classes, NO over-engineering. Keep code short and direct.",
         'markdown': "Parse embedded Gherkin (behaviors) and YAML (structures).",
-        'logicml': "Parse LogicML precisely: 'sig:' = EXACT signature, 'does:' = docstring, 'attrs:' = instance attributes in __init__, 'edge:' = handle edge cases, 'side:' = implement side effects. Match signatures EXACTLY.",
+        'logicml': "Parse LogicML spec and generate COMPLETE Python code. 'sig:' with 'async' prefix means async def. 'attrs:' = instance attributes. 'does:' = docstring. Include ALL imports listed. Generate working code for EVERY class and function.",
     }
     
     # Truncate spec for token efficiency
@@ -306,11 +306,18 @@ def _write_text_atomic(path: Path, content: str) -> None:
     tmp_path.replace(path)
 
 
-def _generate_code_with_retries(client, prompt: str, max_tokens: int, attempts: int = 2) -> Tuple[str, str]:
+def _generate_code_with_retries(
+    client,
+    prompt: str,
+    max_tokens: int,
+    attempts: int = 2,
+) -> Tuple[str, str, str]:
     last_error = ""
-    for i in range(attempts):
+    last_response = ""
+    for _ in range(attempts):
         try:
             response = client.generate(prompt, max_tokens=max_tokens)
+            last_response = response
             generated = _extract_python_code_lenient(response)
             if _looks_like_truncated_or_invalid(generated):
                 last_error = "invalid_or_truncated_output"
@@ -322,10 +329,10 @@ def _generate_code_with_retries(client, prompt: str, max_tokens: int, attempts: 
                 last_error = "syntax_error"
                 continue
 
-            return generated, ""
+            return generated, response, ""
         except Exception as e:
             last_error = str(e)[:200]
-    return "", last_error
+    return "", last_response, last_error
 
 
 def process_file_format(args) -> TokenBenchmarkResult:
@@ -352,10 +359,10 @@ def process_file_format(args) -> TokenBenchmarkResult:
         
         # Reproduce
         start = time.time()
-        generated, gen_error = _generate_code_with_retries(client, prompt, max_tokens=4000, attempts=2)
+        generated, response, gen_error = _generate_code_with_retries(client, prompt, max_tokens=4000, attempts=2)
         result.gen_time = time.time() - start
 
-        result.response_tokens = estimate_tokens(generated)
+        result.response_tokens = estimate_tokens(response)
         result.total_tokens = result.prompt_tokens + result.response_tokens
 
         result.generated_size = len(generated)
@@ -404,6 +411,8 @@ def run_token_benchmark(
     
     if formats is None:
         formats = ['json', 'yaml', 'gherkin', 'markdown']
+
+    formats = [f.strip() for f in formats if f and f.strip()]
     
     path = Path(folder)
     py_files = list(path.glob('*.py'))
@@ -466,11 +475,21 @@ def run_token_benchmark(
         for future in as_completed(futures):
             r = future.result()
             results.append(r)
-            
-            status = "✓" if r.score > 50 else "○"
-            print(f"{r.file_name:<25} {r.format:<12} {r.score:>6.1f}% {r.total_tokens:>7} {r.token_efficiency:>5.1f} {r.gen_time:>5.1f}s")
+
+            if r.error:
+                print(f"{r.file_name:<25} {r.format:<12} {'ERR':>7} {r.total_tokens:>7} {0:>5.1f} {r.gen_time:>5.1f}s")
+            else:
+                status = "✓" if r.score > 50 else "○"
+                print(f"{r.file_name:<25} {r.format:<12} {r.score:>6.1f}% {r.total_tokens:>7} {r.token_efficiency:>5.1f} {r.gen_time:>5.1f}s")
     
     print(f"{'─'*80}")
+
+    # Cleanup: keep only requested format folders
+    allowed = set(formats)
+    if generated_root.exists():
+        for child in generated_root.iterdir():
+            if child.is_dir() and child.name not in allowed:
+                shutil.rmtree(child, ignore_errors=True)
     
     return results
 

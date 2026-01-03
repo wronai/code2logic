@@ -18,14 +18,15 @@ FORMAT_HINTS: Dict[str, str] = {
 - 'functions' with 'signature' and 'intent'
 Implement all classes and functions with exact signatures.""",
 
-    'logicml': """Parse the LogicML spec precisely and reproduce EXACT code:
-- 'sig:' = EXACT function signature with types - copy exactly
+    'logicml': """Parse LogicML spec and generate COMPLETE Python code:
+- 'sig: async (...)' = async def function
+- 'sig: (...)' = regular def function  
+- 'attrs:' = instance attributes to set in __init__
 - 'does:' = use as docstring
-- 'attrs:' = define as class instance attributes in __init__
-- 'edge:' = implement edge case handling (e.g., "b == 0 → return None")
-- 'side:' = implement side effects (e.g., "Modifies list" means append to history)
-- '#' comments describe additional attributes to include
-IMPORTANT: Match signatures exactly, include ALL attributes, implement ALL methods.""",
+- 'abstract: true' = use @dataclass decorator
+- Include ALL imports from 'imports:' section
+- Generate EVERY class and function listed
+CRITICAL: Generate complete working code for ALL elements.""",
 
     'gherkin': """Implement scenarios as SIMPLE, MINIMAL Python code:
 - NO extra error classes or exception hierarchies
