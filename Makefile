@@ -32,7 +32,33 @@ install-docs: ## Install documentation dependencies
 	$(PIP) install -e ".[docs]"
 
 install-llm: ## Install LLM integration dependencies
-	$(PIP) install httpx litellm
+	$(PIP) install httpx litellm python-dotenv
+
+# ============================================================================
+# Configuration
+# ============================================================================
+
+config: ## Show current configuration
+	@$(PYTHON) -c "from code2logic.config import Config; import json; print(json.dumps(Config().to_dict(), indent=2))"
+
+config-env: ## Show shell commands to configure API keys
+	@echo "$(BLUE)API Configuration Commands:$(NC)"
+	@echo ""
+	@echo "# OpenRouter (cloud LLM)"
+	@echo 'export OPENROUTER_API_KEY="sk-or-v1-your-key"'
+	@echo 'export OPENROUTER_MODEL="qwen/qwen-2.5-coder-32b-instruct"'
+	@echo ""
+	@echo "# Ollama (local LLM)"
+	@echo 'export OLLAMA_HOST="http://localhost:11434"'
+	@echo 'export OLLAMA_MODEL="qwen2.5-coder:14b"'
+	@echo ""
+	@echo "# Or create .env file:"
+	@echo "cp .env.example .env"
+	@echo "# Then edit .env with your keys"
+
+config-check: ## Check which providers are configured
+	@echo "$(BLUE)Provider Status:$(NC)"
+	@$(PYTHON) -c "from code2logic.config import Config; c=Config(); [print(f'  {k}: ✓' if v else f'  {k}: ✗') for k,v in c.list_configured_providers().items()]"
 
 # ============================================================================
 # Testing

@@ -53,6 +53,7 @@ from .intent import EnhancedIntentGenerator
 from .parsers import TreeSitterParser, UniversalParser
 from .dependency import DependencyAnalyzer
 from .similarity import SimilarityDetector
+from .config import Config, load_env, get_api_key, get_model
 
 __all__ = [
     # Version
@@ -85,4 +86,9 @@ __all__ = [
     "UniversalParser",
     "DependencyAnalyzer",
     "SimilarityDetector",
+    # Configuration
+    "Config",
+    "load_env",
+    "get_api_key",
+    "get_model",
 ]

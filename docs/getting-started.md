@@ -1,0 +1,157 @@
+# Getting Started
+
+> Quick installation and first steps with Code2Logic
+
+[← Index](index.md) | [Configuration →](configuration.md)
+
+## Installation
+
+### From PyPI
+
+```bash
+pip install code2logic
+```
+
+### From Source
+
+```bash
+git clone https://github.com/wronai/code2logic.git
+cd code2logic
+pip install -e .
+```
+
+### With Optional Dependencies
+
+```bash
+# All optional dependencies (recommended)
+pip install code2logic[all]
+
+# Just development tools
+pip install code2logic[dev]
+```
+
+## Quick Start
+
+### CLI Usage
+
+```bash
+# Basic analysis (Markdown output)
+code2logic /path/to/project
+
+# CSV format (best for data analysis)
+code2logic /path/to/project -f csv -o analysis.csv
+
+# Gherkin format (best for LLM, 95% accuracy)
+code2logic /path/to/project -f gherkin -o analysis.feature
+
+# Verbose mode with timing
+code2logic /path/to/project -v
+```
+
+### Python Usage
+
+```python
+from code2logic import analyze_project
+
+# Analyze a project
+project = analyze_project("/path/to/project")
+
+# Basic info
+print(f"Files: {project.total_files}")
+print(f"Lines: {project.total_lines}")
+print(f"Languages: {list(project.languages.keys())}")
+
+# Iterate modules
+for module in project.modules:
+    print(f"\n{module.path}:")
+    for func in module.functions:
+        print(f"  - {func.name}({', '.join(func.params)})")
+```
+
+## Output Formats
+
+| Format | Command | Best For |
+|--------|---------|----------|
+| Markdown | `-f markdown` | Documentation |
+| CSV | `-f csv` | Data analysis |
+| JSON | `-f json` | RAG/Embeddings |
+| YAML | `-f yaml` | Human + LLM |
+| Gherkin | `-f gherkin` | LLM code gen (95%) |
+| Compact | `-f compact` | Quick overview |
+
+## LLM Integration
+
+### With Ollama (Local, Free)
+
+```bash
+# Install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull a model
+ollama pull qwen2.5-coder:7b
+
+# Use with Code2Logic
+code2logic ./my_project -f gherkin | ollama run qwen2.5-coder:7b "Review this"
+```
+
+### With OpenRouter (Cloud)
+
+```bash
+# Set API key
+export OPENROUTER_API_KEY="sk-or-v1-your-key"
+
+# Run example
+python examples/openrouter_code_reproduction.py --source ./my_project
+```
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# Set in shell
+export OPENROUTER_API_KEY="sk-or-v1-..."
+export OLLAMA_HOST="http://localhost:11434"
+
+# Or create .env file
+cp .env.example .env
+# Edit .env with your keys
+```
+
+### Makefile Commands
+
+```bash
+make llm          # Configure LLM providers
+make llm-list     # List available models
+make test         # Run tests
+make lint         # Check code style
+```
+
+## Examples
+
+Run the included examples:
+
+```bash
+# Quick start guide
+python examples/quick_start.py
+
+# BDD workflow
+python examples/bdd_workflow.py ./my_project
+
+# Token efficiency comparison
+python examples/token_efficiency.py ./my_project
+
+# Code review
+python examples/code_review.py ./my_project
+```
+
+## Next Steps
+
+1. [Configure API keys](configuration.md) for LLM features
+2. Learn [CLI commands](cli-reference.md)
+3. Explore [Python API](python-api.md)
+4. Try [Examples](examples.md)
+
+---
+
+[← Index](index.md) | [Configuration →](configuration.md)
