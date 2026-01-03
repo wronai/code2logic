@@ -1,0 +1,228 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "code2logic"
+version = "1.0.0"
+description = "Convert codebase structure to logical representations with AI-powered insights"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "code2logic team", email = "team@code2logic.dev"}
+]
+maintainers = [
+    {name = "code2logic team", email = "team@code2logic.dev"}
+]
+keywords = [
+    "code-analysis",
+    "ast",
+    "dependency-graph",
+    "refactoring",
+    "llm",
+    "ai",
+    "code-comprehension",
+    "software-architecture",
+    "code-quality"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Text Processing :: Linguistic"
+]
+requires-python = ">=3.8"
+dependencies = [
+    "networkx>=3.0",
+    "pyyaml>=6.0",
+    "tree-sitter>=0.20.0",
+    "litellm>=1.0.0",
+    "click>=8.0.0",
+    "rich>=13.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0"
+]
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "coverage>=7.0.0"
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.20.0"
+]
+mcp = [
+    "mcp>=1.0.0"
+]
+all = [
+    "code2logic[dev,test,docs,mcp]"
+]
+
+[project.urls]
+Homepage = "https://github.com/wronai/code2logic"
+Documentation = "https://code2logic.readthedocs.io"
+Repository = "https://github.com/wronai/code2logic.git"
+"Bug Tracker" = "https://github.com/wronai/code2logic/issues"
+Changelog = "https://github.com/wronai/code2logic/blob/main/CHANGELOG.md"
+
+[project.scripts]
+code2logic = "code2logic.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["code2logic*"]
+exclude = ["tests*", "examples*", "docs*"]
+
+[tool.setuptools.package-data]
+code2logic = ["py.typed"]
+
+# Black configuration
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# isort configuration
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["code2logic"]
+known_third_party = ["networkx", "yaml", "tree_sitter", "litellm", "click", "rich"]
+
+# pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=code2logic",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=80"
+]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "llm: marks tests that require LLM services"
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["code2logic"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "setup.py",
+    "*/venv/*",
+    "*/.venv/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+show_missing = true
+precision = 2
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+# MyPy configuration
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "networkx.*",
+    "tree_sitter.*",
+    "litellm.*",
+    "ollama.*",
+    "mcp.*"
+]
+ignore_missing_imports = true
+
+# Flake8 configuration (in setup.cfg for compatibility)
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".eggs",
+    "*.egg-info",
+    ".venv",
+    "venv"
+]
+per-file-ignores = [
+    "__init__.py:F401",
+    "tests/*:S101"
+]

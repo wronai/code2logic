@@ -1,0 +1,231 @@
+version: '3.8'
+
+services:
+  # Main code2logic service
+  code2logic:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: code2logic-main
+    volumes:
+      - ./workspace:/app/workspace
+      - ./output:/app/output
+      - ./logs:/app/logs
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=INFO
+    ports:
+      - "8080:8080"
+    networks:
+      - code2logic-network
+    depends_on:
+      - ollama
+      - litellm
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "code2logic", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Ollama service for local LLM
+  ollama:
+    image: ollama/ollama:latest
+    container_name: code2logic-ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - code2logic-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # LiteLLM service for multiple LLM providers
+  litellm:
+    image: ghcr.io/berriai/litellm:main
+    container_name: code2logic-litellm
+    volumes:
+      - ./litellm_config.yaml:/app/config.yaml
+      - ./logs:/app/logs
+    ports:
+      - "4000:4000"
+    environment:
+      - LITELLM_PORT=4000
+      - LITELLM_CONFIG_FILE=/app/config.yaml
+    networks:
+      - code2logic-network
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: code2logic-redis
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - code2logic-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: redis-server --appendonly yes
+
+  # PostgreSQL for metadata storage (optional)
+  postgres:
+    image: postgres:15-alpine
+    container_name: code2logic-postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_DB=code2logic
+      - POSTGRES_USER=code2logic
+      - POSTGRES_PASSWORD=code2logic123
+    ports:
+      - "5432:5432"
+    networks:
+      - code2logic-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U code2logic -d code2logic"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx reverse proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: code2logic-nginx
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./logs/nginx:/var/log/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - code2logic-network
+    depends_on:
+      - code2logic
+      - litellm
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Development service (optional)
+  code2logic-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: code2logic-dev
+    volumes:
+      - .:/app
+      - dev_workspace:/app/workspace
+      - dev_output:/app/output
+      - dev_notebooks:/app/notebooks
+    environment:
+      - PYTHONPATH=/app
+      - LOG_LEVEL=DEBUG
+      - FLASK_ENV=development
+    ports:
+      - "8081:8080"  # MCP server
+      - "8888:8888"  # Jupyter notebook
+    networks:
+      - code2logic-network
+    depends_on:
+      - ollama
+      - litellm
+      - redis
+      - postgres
+    profiles:
+      - dev
+    command: ["bash"]
+
+  # Monitoring with Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: code2logic-prometheus
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - code2logic-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+  # Grafana for visualization (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: code2logic-grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    networks:
+      - code2logic-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    profiles:
+      - monitoring
+
+networks:
+  code2logic-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  ollama_data:
+    driver: local
+  redis_data:
+    driver: local
+  postgres_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  dev_workspace:
+    driver: local
+  dev_output:
+    driver: local
+  dev_notebooks:
+    driver: local

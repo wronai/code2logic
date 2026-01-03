@@ -1,0 +1,102 @@
+# LiteLLM Configuration for code2logic
+# This configuration enables multiple LLM providers for code2logic
+
+model_list:
+  # Ollama models (local)
+  - model_name: "ollama/codellama"
+    litellm_params:
+      model: "ollama/codellama"
+      api_base: "http://ollama:11434"
+  
+  - model_name: "ollama/llama2"
+    litellm_params:
+      model: "ollama/llama2"
+      api_base: "http://ollama:11434"
+  
+  - model_name: "ollama/mistral"
+    litellm_params:
+      model: "ollama/mistral"
+      api_base: "http://ollama:11434"
+  
+  - model_name: "ollama/codegemma"
+    litellm_params:
+      model: "ollama/codegemma"
+      api_base: "http://ollama:11434"
+
+  # OpenAI models (if API key provided)
+  - model_name: "openai/gpt-4"
+    litellm_params:
+      model: "gpt-4"
+      api_key: "os.environ/OPENAI_API_KEY"
+  
+  - model_name: "openai/gpt-3.5-turbo"
+    litellm_params:
+      model: "gpt-3.5-turbo"
+      api_key: "os.environ/OPENAI_API_KEY"
+  
+  - model_name: "openai/gpt-4-turbo"
+    litellm_params:
+      model: "gpt-4-turbo-preview"
+      api_key: "os.environ/OPENAI_API_KEY"
+
+  # Anthropic Claude models (if API key provided)
+  - model_name: "anthropic/claude-3-sonnet"
+    litellm_params:
+      model: "claude-3-sonnet-20240229"
+      api_key: "os.environ/ANTHROPIC_API_KEY"
+  
+  - model_name: "anthropic/claude-3-opus"
+    litellm_params:
+      model: "claude-3-opus-20240229"
+      api_key: "os.environ/ANTHROPIC_API_KEY"
+
+  # Google models (if API key provided)
+  - model_name: "google/gemini-pro"
+    litellm_params:
+      model: "gemini-pro"
+      api_key: "os.environ/GOOGLE_API_KEY"
+
+# General settings
+litellm_settings:
+  drop_params: true  # Drop unsupported parameters
+  set_verbose: false  # Disable verbose logging
+  success_callback: ["prometheus"]  # Enable Prometheus metrics
+  
+# Rate limiting
+general_settings:
+  master_key: "os.environ/LITELLM_MASTER_KEY"  # Optional master key for authentication
+  database_url: "os.environ/DATABASE_URL"  # Optional database for logging
+  
+# Router settings (for load balancing)
+router_settings:
+  model_group_alias:
+    "code-analysis": ["ollama/codellama", "ollama/codegemma", "openai/gpt-4"]
+    "chat": ["openai/gpt-3.5-turbo", "ollama/llama2", "anthropic/claude-3-sonnet"]
+    "advanced": ["openai/gpt-4-turbo", "anthropic/claude-3-opus", "google/gemini-pro"]
+
+# Security settings
+security_settings:
+  require_api_key: false  # Set to true to require API keys
+  allowed_api_keys: ["os.environ/ALLOWED_API_KEYS"]  # Comma-separated list of allowed keys
+  
+# Performance settings
+performance_settings:
+  max_parallel_requests: 10
+  request_timeout: 120  # seconds
+  max_tokens: 4000
+  
+# Logging settings
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+# Cache settings
+cache:
+  type: "redis"
+  redis:
+    host: "redis"
+    port: 6379
+    db: 0
+    password: null
+    ssl: false
+    ttl: 3600  # Cache for 1 hour
