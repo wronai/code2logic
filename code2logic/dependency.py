@@ -1,273 +1,246 @@
 """
-Dependency graph analysis using NetworkX.
+Dependency graph analyzer using NetworkX.
 
-This module provides functionality to analyze and visualize
-dependency relationships between modules, classes, and functions.
+Builds and analyzes dependency graphs from module imports,
+computing metrics like PageRank, centrality, and clustering.
 """
 
-import networkx as nx
-from typing import List, Dict, Set, Tuple, Optional
-from dataclasses import dataclass
+from pathlib import Path
+from typing import Dict, List, Optional
 
-from .models import Module, Function, Class, Dependency
+from .models import ModuleInfo, DependencyNode
 
-
-@dataclass
-class DependencyMetrics:
-    """Metrics for dependency analysis."""
-    total_dependencies: int
-    incoming_dependencies: int
-    outgoing_dependencies: int
-    circular_dependencies: int
-    dependency_depth: int
-    fan_in: int
-    fan_out: int
+# Optional NetworkX import
+NETWORKX_AVAILABLE = False
+try:
+    import networkx as nx
+    NETWORKX_AVAILABLE = True
+except ImportError:
+    nx = None
 
 
 class DependencyAnalyzer:
-    """Analyzes dependency graphs using NetworkX."""
+    """
+    Analyzes dependency graphs using NetworkX.
+    
+    Computes:
+    - PageRank: Importance metric for modules
+    - In/Out degree: Number of dependencies
+    - Hub detection: Identifies central modules
+    - Clustering: Groups related modules
+    
+    Example:
+        >>> analyzer = DependencyAnalyzer()
+        >>> graph = analyzer.build_graph(modules)
+        >>> metrics = analyzer.analyze_metrics()
+        >>> hubs = [p for p, n in metrics.items() if n.is_hub]
+    """
     
     def __init__(self):
         """Initialize the dependency analyzer."""
-        self.graph: Optional[nx.DiGraph] = None
-        self.metrics: Dict[str, DependencyMetrics] = {}
+        self.graph = None
+        if NETWORKX_AVAILABLE:
+            self.graph = nx.DiGraph()
     
-    def analyze_dependencies(self, modules: List[Module]) -> List[Dependency]:
+    def build_graph(self, modules: List[ModuleInfo]) -> Dict[str, List[str]]:
         """
-        Analyze dependencies between modules.
+        Build dependency graph from modules.
         
         Args:
-            modules: List of modules to analyze
+            modules: List of ModuleInfo objects
             
         Returns:
-            List of Dependency objects
+            Dict mapping module path to list of dependency paths
         """
-        # Create directed graph
-        self.graph = nx.DiGraph()
+        simple_graph: Dict[str, List[str]] = {}
+        module_names: Dict[str, str] = {}
         
-        # Add nodes for modules, classes, and functions
+        # Build module name mapping
+        for m in modules:
+            name = self._module_name(m.path)
+            stem = Path(m.path).stem
+            module_names[name] = m.path
+            module_names[m.path] = m.path
+            if stem not in module_names:
+                module_names[stem] = m.path
+        
+        # Build graph
         for module in modules:
-            self.graph.add_node(module.name, type='module', obj=module)
-            
-            for cls in module.classes:
-                self.graph.add_node(
-                    f"{module.name}.{cls.name}", 
-                    type='class', 
-                    obj=cls
-                )
-            
-            for func in module.functions:
-                self.graph.add_node(
-                    f"{module.name}.{func.name}",
-                    type='function', 
-                    obj=func
-                )
-        
-        # Extract dependencies from imports and function calls
-        dependencies = []
-        
-        for module in modules:
-            # Module-level dependencies
-            for import_name in module.imports:
-                dep = self._create_dependency(module.name, import_name, 'import')
-                if dep:
-                    dependencies.append(dep)
-                    self.graph.add_edge(dep.source, dep.target, type='import')
-            
-            # Class dependencies
-            for cls in module.classes:
-                for base_class in cls.base_classes:
-                    dep = self._create_dependency(
-                        f"{module.name}.{cls.name}", 
-                        base_class, 
-                        'inheritance'
-                    )
-                    if dep:
-                        dependencies.append(dep)
-                        self.graph.add_edge(dep.source, dep.target, type='inheritance')
+            deps: set = set()
+            for imp in module.imports:
+                imp_clean = imp.replace('/', '.').replace('\\', '.').lstrip('.')
+                parts = imp_clean.split('.')
                 
-                for method in cls.methods:
-                    method_deps = self._extract_function_dependencies(
-                        f"{module.name}.{cls.name}.{method.name}",
-                        method.code
-                    )
-                    dependencies.extend(method_deps)
+                for i in range(len(parts), 0, -1):
+                    candidate = '.'.join(parts[:i])
+                    if candidate in module_names and module_names[candidate] != module.path:
+                        deps.add(module_names[candidate])
+                        break
             
-            # Function dependencies
-            for func in module.functions:
-                func_deps = self._extract_function_dependencies(
-                    f"{module.name}.{func.name}",
-                    func.code
-                )
-                dependencies.extend(func_deps)
+            simple_graph[module.path] = list(deps)
+            
+            # Add to NetworkX if available
+            if self.graph is not None:
+                self.graph.add_node(module.path)
+                for dep in deps:
+                    self.graph.add_edge(module.path, dep)
         
-        # Calculate metrics
-        self._calculate_metrics()
-        
-        return dependencies
+        return simple_graph
     
-    def _create_dependency(
-        self, 
-        source: str, 
-        target: str, 
-        dep_type: str
-    ) -> Optional[Dependency]:
-        """Create a Dependency object if target exists."""
-        if target in self.graph.nodes:
-            return Dependency(
-                source=source,
-                target=target,
-                type=dep_type,
-                strength=self._calculate_strength(source, target, dep_type)
-            )
-        return None
-    
-    def _extract_function_dependencies(
-        self, 
-        func_name: str, 
-        code: str
-    ) -> List[Dependency]:
-        """Extract dependencies from function code."""
-        dependencies = []
+    def analyze_metrics(self) -> Dict[str, DependencyNode]:
+        """
+        Compute metrics for each node in the graph.
         
-        # Simple regex-based extraction (can be enhanced with AST)
-        import re
+        Returns:
+            Dict mapping module path to DependencyNode with metrics
+        """
+        metrics: Dict[str, DependencyNode] = {}
         
-        # Find function calls
-        function_calls = re.findall(r'(\w+)\(', code)
-        for call in function_calls:
-            if call in self.graph.nodes:
-                dep = Dependency(
-                    source=func_name,
-                    target=call,
-                    type='function_call',
-                    strength=self._calculate_strength(func_name, call, 'function_call')
-                )
-                dependencies.append(dep)
-                self.graph.add_edge(func_name, call, type='function_call')
+        if self.graph is None or len(self.graph.nodes) == 0:
+            return metrics
         
-        return dependencies
-    
-    def _calculate_strength(
-        self, 
-        source: str, 
-        target: str, 
-        dep_type: str
-    ) -> float:
-        """Calculate dependency strength based on type and context."""
-        strength_map = {
-            'import': 0.8,
-            'inheritance': 0.9,
-            'function_call': 0.6,
-            'attribute_access': 0.4,
-        }
-        return strength_map.get(dep_type, 0.5)
-    
-    def _calculate_metrics(self) -> None:
-        """Calculate dependency metrics for all nodes."""
-        if not self.graph:
-            return
+        # PageRank
+        try:
+            pagerank = nx.pagerank(self.graph, alpha=0.85)
+        except Exception:
+            pagerank = {n: 0.0 for n in self.graph.nodes}
+        
+        # Degree metrics
+        in_deg = dict(self.graph.in_degree())
+        out_deg = dict(self.graph.out_degree())
+        
+        # Average PageRank for hub detection
+        avg_pr = sum(pagerank.values()) / len(pagerank) if pagerank else 0
+        
+        # Clustering
+        clusters = self._detect_clusters()
         
         for node in self.graph.nodes:
-            # Basic metrics
-            in_degree = self.graph.in_degree(node)
-            out_degree = self.graph.out_degree(node)
-            total_degree = in_degree + out_degree
-            
-            # Circular dependencies
-            try:
-                cycles = list(nx.simple_cycles(self.graph.subgraph(
-                    nx.descendants(self.graph, node) | {node}
-                )))
-                circular_count = len(cycles)
-            except:
-                circular_count = 0
-            
-            # Dependency depth
-            try:
-                depth = nx.single_source_shortest_path_length(
-                    self.graph, node
-                )
-                max_depth = max(depth.values()) if depth else 0
-            except:
-                max_depth = 0
-            
-            self.metrics[node] = DependencyMetrics(
-                total_dependencies=total_degree,
-                incoming_dependencies=in_degree,
-                outgoing_dependencies=out_degree,
-                circular_dependencies=circular_count,
-                dependency_depth=max_depth,
-                fan_in=in_degree,
-                fan_out=out_degree
+            metrics[node] = DependencyNode(
+                path=node,
+                in_degree=in_deg.get(node, 0),
+                out_degree=out_deg.get(node, 0),
+                pagerank=pagerank.get(node, 0.0),
+                is_hub=pagerank.get(node, 0) > avg_pr * 2,
+                cluster=clusters.get(node, 0)
             )
+        
+        return metrics
     
-    def get_circular_dependencies(self) -> List[List[str]]:
-        """Get all circular dependencies in the graph."""
-        if not self.graph:
+    def get_entrypoints(self) -> List[str]:
+        """
+        Get entry points (nodes with no incoming edges).
+        
+        Returns:
+            List of module paths that are entry points
+        """
+        if self.graph is None:
+            return []
+        return [n for n in self.graph.nodes if self.graph.in_degree(n) == 0]
+    
+    def get_hubs(self) -> List[str]:
+        """
+        Get hub modules (high centrality).
+        
+        Returns:
+            List of module paths that are hubs
+        """
+        metrics = self.analyze_metrics()
+        return [path for path, node in metrics.items() if node.is_hub]
+    
+    def detect_cycles(self) -> List[List[str]]:
+        """
+        Detect dependency cycles.
+        
+        Returns:
+            List of cycles (each cycle is a list of paths)
+        """
+        if self.graph is None:
             return []
         
-        return list(nx.simple_cycles(self.graph))
+        try:
+            cycles = list(nx.simple_cycles(self.graph))
+            return cycles[:10]  # Limit to top 10
+        except Exception:
+            return []
     
-    def get_strongly_connected_components(self) -> List[Set[str]]:
-        """Get strongly connected components (potential circular dependencies)."""
-        if not self.graph:
+    def get_strongly_connected_components(self) -> List[List[str]]:
+        """
+        Get strongly connected components.
+        
+        Returns:
+            List of components (each component is a list of paths)
+        """
+        if self.graph is None:
             return []
         
-        return list(nx.strongly_connected_components(self.graph))
+        try:
+            components = list(nx.strongly_connected_components(self.graph))
+            return [list(c) for c in components if len(c) > 1]
+        except Exception:
+            return []
     
-    def get_dependency_layers(self) -> Dict[int, Set[str]]:
-        """Get dependency layers (topological levels)."""
-        if not self.graph:
+    def _detect_clusters(self) -> Dict[str, int]:
+        """Detect clusters using connected components."""
+        if self.graph is None:
             return {}
         
         try:
-            layers = {}
-            for i, layer in enumerate(nx.topological_generations(self.graph)):
-                layers[i] = set(layer)
-            return layers
-        except nx.NetworkXError:
-            # Graph has cycles
+            undirected = self.graph.to_undirected()
+            components = list(nx.connected_components(undirected))
+            
+            clusters = {}
+            for i, component in enumerate(components):
+                for node in component:
+                    clusters[node] = i
+            
+            return clusters
+        except Exception:
             return {}
     
-    def get_critical_path(self) -> List[str]:
-        """Get the critical path (longest dependency chain)."""
-        if not self.graph:
-            return []
+    def _module_name(self, path: str) -> str:
+        """Convert file path to module name."""
+        name = path.replace('/', '.').replace('\\', '.')
+        for ext in ['.py', '.js', '.ts', '.jsx', '.tsx']:
+            if name.endswith(ext):
+                name = name[:-len(ext)]
+        return name
+    
+    def get_dependency_depth(self, module_path: str) -> int:
+        """
+        Get the maximum depth of dependencies for a module.
+        
+        Args:
+            module_path: Path to the module
+            
+        Returns:
+            Maximum dependency depth
+        """
+        if self.graph is None or module_path not in self.graph:
+            return 0
         
         try:
-            # Find longest path in DAG
-            longest_path = nx.dag_longest_path(self.graph)
-            return longest_path
-        except nx.NetworkXError:
-            # Graph has cycles
-            return []
-    
-    def export_graph(self, format: str = 'dot') -> str:
-        """Export the dependency graph in specified format."""
-        if not self.graph:
-            return ""
-        
-        if format == 'dot':
-            return nx.nx_agraph.to_agraph(self.graph).to_string()
-        elif format == 'gexf':
-            return '\n'.join(nx.generate_gexf(self.graph))
-        else:
-            raise ValueError(f"Unsupported export format: {format}")
-    
-    def visualize_metrics(self) -> Dict[str, Dict[str, float]]:
-        """Get visualization-ready metrics."""
-        if not self.metrics:
-            return {}
-        
-        viz_metrics = {}
-        for node, metrics in self.metrics.items():
-            viz_metrics[node] = {
-                'total_deps': metrics.total_dependencies,
-                'fan_in': metrics.fan_in,
-                'fan_out': metrics.fan_out,
-                'depth': metrics.dependency_depth,
-                'circular': metrics.circular_dependencies,
-            }
-        
-        return viz_metrics
+            # BFS to find max depth
+            visited = {module_path}
+            current_level = [module_path]
+            depth = 0
+            
+            while current_level:
+                next_level = []
+                for node in current_level:
+                    for neighbor in self.graph.successors(node):
+                        if neighbor not in visited:
+                            visited.add(neighbor)
+                            next_level.append(neighbor)
+                if next_level:
+                    depth += 1
+                current_level = next_level
+            
+            return depth
+        except Exception:
+            return 0
+
+
+def is_networkx_available() -> bool:
+    """Check if NetworkX is available."""
+    return NETWORKX_AVAILABLE

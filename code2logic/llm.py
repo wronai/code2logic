@@ -1,454 +1,449 @@
 """
-LLM integration for code2logic using Ollama and LiteLLM.
+LLM Integration for Code2Logic
 
-This module provides integration with Large Language Models for
-intelligent code analysis, refactoring suggestions, and documentation generation.
+Provides integration with local Ollama and LiteLLM for:
+- Code generation from CSV analysis
+- Refactoring suggestions
+- Duplicate detection with semantic analysis
+- Code translation between languages
+
+Usage:
+    from code2logic.llm import CodeAnalyzer
+    
+    analyzer = CodeAnalyzer(model="qwen2.5-coder:7b")
+    suggestions = analyzer.suggest_refactoring(project_info)
 """
 
 import json
-import logging
-from typing import Dict, List, Any, Optional, Union
+from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 
+# Optional imports
 try:
-    import litellm
+    import httpx
+    HTTPX_AVAILABLE = True
+except ImportError:
+    HTTPX_AVAILABLE = False
+
+try:
     from litellm import completion
     LITELLM_AVAILABLE = True
 except ImportError:
     LITELLM_AVAILABLE = False
 
-try:
-    import ollama
-    OLLAMA_AVAILABLE = True
-except ImportError:
-    OLLAMA_AVAILABLE = False
-
-from .models import Project, Module, Function, Class
-
-logger = logging.getLogger(__name__)
-
 
 @dataclass
 class LLMConfig:
-    """Configuration for LLM integration."""
+    """Configuration for LLM backend."""
     provider: str = "ollama"  # "ollama" or "litellm"
-    model: str = "codellama"
+    model: str = "qwen2.5-coder:7b"
+    base_url: str = "http://localhost:11434"
     api_key: Optional[str] = None
-    base_url: Optional[str] = None
+    timeout: int = 120
     temperature: float = 0.7
     max_tokens: int = 2000
 
 
-class LLMInterface:
-    """Interface for Large Language Model integration."""
+class OllamaClient:
+    """Direct Ollama API client."""
     
-    def __init__(self, config: Optional[LLMConfig] = None):
-        """
-        Initialize LLM interface.
-        
-        Args:
-            config: LLM configuration
-        """
-        self.config = config or LLMConfig()
-        self._validate_dependencies()
-        
-        if self.config.provider == "litellm" and LITELLM_AVAILABLE:
-            litellm.set_verbose = False
-            if self.config.api_key:
-                litellm.api_key = self.config.api_key
+    def __init__(self, config: LLMConfig):
+        if not HTTPX_AVAILABLE:
+            raise ImportError("httpx required: pip install httpx")
+        self.config = config
+        self.client = httpx.Client(timeout=config.timeout)
     
-    def _validate_dependencies(self) -> None:
-        """Validate that required dependencies are available."""
-        if self.config.provider == "ollama" and not OLLAMA_AVAILABLE:
-            raise ImportError("ollama package is required for Ollama provider")
-        elif self.config.provider == "litellm" and not LITELLM_AVAILABLE:
-            raise ImportError("litellm package is required for LiteLLM provider")
-    
-    def analyze_code(
-        self, 
-        code: str, 
-        context: str = ""
-    ) -> Dict[str, Any]:
-        """
-        Analyze code using LLM.
-        
-        Args:
-            code: Code to analyze
-            context: Additional context
-            
-        Returns:
-            Analysis results
-        """
-        prompt = self._build_analysis_prompt(code, context)
-        response = self._call_llm(prompt)
-        return self._parse_analysis_response(response)
-    
-    def suggest_refactoring(
-        self, 
-        target: Union[Module, Class, Function], 
-        project: Project
-    ) -> List[str]:
-        """
-        Suggest refactoring options using LLM.
-        
-        Args:
-            target: Target to refactor
-            project: Project context
-            
-        Returns:
-            List of refactoring suggestions
-        """
-        prompt = self._build_refactoring_prompt(target, project)
-        response = self._call_llm(prompt)
-        return self._parse_suggestions(response)
-    
-    def generate_documentation(
-        self, 
-        target: Union[Module, Class, Function], 
-        style: str = "google"
-    ) -> str:
-        """
-        Generate documentation using LLM.
-        
-        Args:
-            target: Target to document
-            style: Documentation style
-            
-        Returns:
-            Generated documentation
-        """
-        prompt = self._build_documentation_prompt(target, style)
-        response = self._call_llm(prompt)
-        return response.strip()
-    
-    def explain_code(
-        self, 
-        code: str, 
-        detail_level: str = "medium"
-    ) -> str:
-        """
-        Explain code using LLM.
-        
-        Args:
-            code: Code to explain
-            detail_level: Level of detail ("low", "medium", "high")
-            
-        Returns:
-            Code explanation
-        """
-        prompt = self._build_explanation_prompt(code, detail_level)
-        response = self._call_llm(prompt)
-        return response.strip()
-    
-    def generate_tests(
-        self, 
-        function: Function, 
-        test_framework: str = "pytest"
-    ) -> str:
-        """
-        Generate unit tests using LLM.
-        
-        Args:
-            function: Function to test
-            test_framework: Test framework to use
-            
-        Returns:
-            Generated test code
-        """
-        prompt = self._build_test_generation_prompt(function, test_framework)
-        response = self._call_llm(prompt)
-        return response.strip()
-    
-    def _call_llm(self, prompt: str) -> str:
-        """Call the LLM with the given prompt."""
-        try:
-            if self.config.provider == "ollama":
-                return self._call_ollama(prompt)
-            elif self.config.provider == "litellm":
-                return self._call_litellm(prompt)
-            else:
-                raise ValueError(f"Unsupported provider: {self.config.provider}")
-        except Exception as e:
-            logger.error(f"LLM call failed: {e}")
-            return f"Error: Failed to get LLM response - {e}"
-    
-    def _call_ollama(self, prompt: str) -> str:
-        """Call Ollama API."""
-        try:
-            response = ollama.generate(
-                model=self.config.model,
-                prompt=prompt,
-                options={
-                    'temperature': self.config.temperature,
-                    'num_predict': self.config.max_tokens
-                }
-            )
-            return response['response']
-        except Exception as e:
-            logger.error(f"Ollama call failed: {e}")
-            raise
-    
-    def _call_litellm(self, prompt: str) -> str:
-        """Call LiteLLM."""
-        try:
-            response = completion(
-                model=self.config.model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=self.config.temperature,
-                max_tokens=self.config.max_tokens
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            logger.error(f"LiteLLM call failed: {e}")
-            raise
-    
-    def _build_analysis_prompt(self, code: str, context: str) -> str:
-        """Build prompt for code analysis."""
-        return f"""Analyze the following code and provide insights:
-
-Context: {context}
-
-Code:
-```python
-{code}
-```
-
-Please provide:
-1. Code quality assessment
-2. Potential issues or bugs
-3. Performance considerations
-4. Security concerns
-5. Best practices violations
-6. Suggestions for improvement
-
-Format your response as JSON with the following structure:
-{{
-    "quality_score": <0-100>,
-    "issues": [<list of issues>],
-    "suggestions": [<list of suggestions>],
-    "complexity": <low/medium/high>,
-    "maintainability": <low/medium/high>
-}}"""
-    
-    def _build_refactoring_prompt(
-        self, 
-        target: Union[Module, Class, Function], 
-        project: Project
-    ) -> str:
-        """Build prompt for refactoring suggestions."""
-        target_info = self._get_target_info(target)
-        project_context = self._get_project_context(project)
-        
-        return f"""Provide refactoring suggestions for the following {type(target).__name__.lower()}:
-
-Project Context:
-{project_context}
-
-Target Information:
-{target_info}
-
-Please suggest specific refactoring actions that would improve:
-1. Code readability
-2. Maintainability
-3. Performance
-4. Testability
-5. Design patterns
-
-Format your response as a numbered list of actionable suggestions."""
-    
-    def _build_documentation_prompt(
-        self, 
-        target: Union[Module, Class, Function], 
-        style: str
-    ) -> str:
-        """Build prompt for documentation generation."""
-        target_info = self._get_target_info(target)
-        
-        return f"""Generate {style} style documentation for the following {type(target).__name__.lower()}:
-
-{target_info}
-
-Please provide comprehensive documentation that includes:
-1. Purpose and functionality
-2. Parameters and return values (if applicable)
-3. Usage examples
-4. Important notes or warnings
-5. Related components
-
-Format the documentation appropriately for {style} style."""
-    
-    def _build_explanation_prompt(self, code: str, detail_level: str) -> str:
-        """Build prompt for code explanation."""
-        detail_instructions = {
-            "low": "Provide a brief, high-level explanation",
-            "medium": "Provide a detailed explanation with key concepts",
-            "high": "Provide an in-depth explanation covering all aspects"
-        }
-        
-        return f"""Explain the following code. {detail_instructions.get(detail_level, detail_instructions["medium"])}:
-
-```python
-{code}
-```
-
-Focus on:
-1. What the code does
-2. How it works
-3. Key algorithms or patterns used
-4. Any important considerations"""
-    
-    def _build_test_generation_prompt(
-        self, 
-        function: Function, 
-        test_framework: str
-    ) -> str:
-        """Build prompt for test generation."""
-        func_info = f"""
-Function: {function.name}
-Parameters: {function.parameters}
-Code:
-```python
-{function.code}
-```"""
-        
-        return f"""Generate comprehensive unit tests for the following function using {test_framework}:
-
-{func_info}
-
-Please include:
-1. Test cases for normal operation
-2. Edge cases and boundary conditions
-3. Error handling scenarios
-4. Mock usage if external dependencies exist
-5. Clear test descriptions
-
-Generate complete, runnable test code."""
-    
-    def _get_target_info(self, target: Union[Module, Class, Function]) -> str:
-        """Get formatted information about the target."""
-        if isinstance(target, Module):
-            return f"""Module: {target.name}
-Path: {target.path}
-Lines of Code: {target.lines_of_code}
-Imports: {', '.join(target.imports[:5])}
-Functions: {len(target.functions)}
-Classes: {len(target.classes)}"""
-        
-        elif isinstance(target, Class):
-            methods_info = "\n".join([
-                f"  - {method.name}({', '.join(method.parameters)})"
-                for method in target.methods[:5]
-            ])
-            
-            return f"""Class: {target.name}
-Base Classes: {', '.join(target.base_classes)}
-Methods: {len(target.methods)}
-Lines of Code: {target.lines_of_code}
-
-Methods:
-{methods_info}"""
-        
-        elif isinstance(target, Function):
-            return f"""Function: {target.name}
-Parameters: {', '.join(function.parameters)}
-Lines of Code: {function.lines_of_code}
-Complexity: {function.complexity}
-Has Docstring: {function.docstring is not None}
-
-Code:
-```python
-{function.code}
-```"""
-        
-        return ""
-    
-    def _get_project_context(self, project: Project) -> str:
-        """Get project context information."""
-        return f"""Project: {project.name}
-Modules: {len(project.modules)}
-Total Functions: {sum(len(m.functions) for m in project.modules)}
-Total Classes: {sum(len(m.classes) for m in project.modules)}
-Dependencies: {len(project.dependencies)}"""
-    
-    def _parse_analysis_response(self, response: str) -> Dict[str, Any]:
-        """Parse LLM analysis response."""
-        try:
-            # Try to parse as JSON
-            return json.loads(response)
-        except json.JSONDecodeError:
-            # Fallback to simple structure
-            return {
-                "quality_score": 75,
-                "issues": ["Could not parse detailed analysis"],
-                "suggestions": ["Review code manually"],
-                "complexity": "medium",
-                "maintainability": "medium",
-                "raw_response": response
-            }
-    
-    def _parse_suggestions(self, response: str) -> List[str]:
-        """Parse suggestions from LLM response."""
-        suggestions = []
-        
-        # Try to extract numbered list
-        import re
-        numbered_items = re.findall(r'^\d+\.\s*(.+)$', response, re.MULTILINE)
-        if numbered_items:
-            suggestions = numbered_items
-        else:
-            # Split by newlines and clean up
-            lines = response.split('\n')
-            suggestions = [line.strip() for line in lines if line.strip() and not line.startswith('#')]
-        
-        return suggestions[:10]  # Limit to 10 suggestions
-    
-    def list_available_models(self) -> List[str]:
-        """List available models for the current provider."""
-        if self.config.provider == "ollama":
-            try:
-                models = ollama.list()
-                return [model['name'] for model in models.get('models', [])]
-            except Exception as e:
-                logger.error(f"Failed to list Ollama models: {e}")
-                return []
-        
-        elif self.config.provider == "litellm":
-            # Common LiteLLM models
-            return [
-                "gpt-3.5-turbo",
-                "gpt-4",
-                "claude-3-sonnet",
-                "gemini-pro",
-                "codellama/CodeLlama-34b-Instruct-hf"
-            ]
-        
-        return []
-    
-    def health_check(self) -> Dict[str, Any]:
-        """Check if LLM service is healthy."""
-        status = {
-            "provider": self.config.provider,
+    def generate(self, prompt: str, system: Optional[str] = None) -> str:
+        """Generate completion from Ollama."""
+        payload = {
             "model": self.config.model,
-            "available": False,
-            "error": None
+            "prompt": prompt,
+            "stream": False,
+            "options": {
+                "temperature": self.config.temperature,
+                "num_predict": self.config.max_tokens,
+            }
         }
         
+        if system:
+            payload["system"] = system
+        
+        response = self.client.post(
+            f"{self.config.base_url}/api/generate",
+            json=payload
+        )
+        response.raise_for_status()
+        return response.json().get("response", "")
+    
+    def chat(self, messages: List[Dict[str, str]]) -> str:
+        """Chat completion from Ollama."""
+        payload = {
+            "model": self.config.model,
+            "messages": messages,
+            "stream": False,
+            "options": {
+                "temperature": self.config.temperature,
+                "num_predict": self.config.max_tokens,
+            }
+        }
+        
+        response = self.client.post(
+            f"{self.config.base_url}/api/chat",
+            json=payload
+        )
+        response.raise_for_status()
+        return response.json().get("message", {}).get("content", "")
+    
+    def is_available(self) -> bool:
+        """Check if Ollama is running."""
         try:
-            if self.config.provider == "ollama":
-                models = ollama.list()
-                status["available"] = True
-                status["models"] = [model['name'] for model in models.get('models', [])]
+            response = self.client.get(f"{self.config.base_url}/api/tags")
+            return response.status_code == 200
+        except Exception:
+            return False
+    
+    def list_models(self) -> List[str]:
+        """List available models."""
+        try:
+            response = self.client.get(f"{self.config.base_url}/api/tags")
+            data = response.json()
+            return [m["name"] for m in data.get("models", [])]
+        except Exception:
+            return []
+
+
+class LiteLLMClient:
+    """LiteLLM client for unified API access."""
+    
+    def __init__(self, config: LLMConfig):
+        if not LITELLM_AVAILABLE:
+            raise ImportError("litellm required: pip install litellm")
+        self.config = config
+    
+    def generate(self, prompt: str, system: Optional[str] = None) -> str:
+        """Generate completion via LiteLLM."""
+        messages = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.append({"role": "user", "content": prompt})
+        
+        return self.chat(messages)
+    
+    def chat(self, messages: List[Dict[str, str]]) -> str:
+        """Chat completion via LiteLLM."""
+        model = f"ollama/{self.config.model}"
+        if self.config.provider == "litellm":
+            model = self.config.model
+        
+        response = completion(
+            model=model,
+            messages=messages,
+            api_base=self.config.base_url,
+            temperature=self.config.temperature,
+            max_tokens=self.config.max_tokens,
+        )
+        return response.choices[0].message.content
+    
+    def is_available(self) -> bool:
+        """Check if LiteLLM backend is available."""
+        try:
+            self.chat([{"role": "user", "content": "test"}])
+            return True
+        except Exception:
+            return False
+
+
+class CodeAnalyzer:
+    """
+    LLM-powered code analysis for Code2Logic.
+    
+    Example:
+        >>> from code2logic import analyze_project
+        >>> from code2logic.llm import CodeAnalyzer
+        >>> 
+        >>> project = analyze_project("/path/to/project")
+        >>> analyzer = CodeAnalyzer()
+        >>> 
+        >>> # Get refactoring suggestions
+        >>> suggestions = analyzer.suggest_refactoring(project)
+        >>> 
+        >>> # Generate code in another language
+        >>> code = analyzer.generate_code(project, target_lang="typescript")
+    """
+    
+    SYSTEM_PROMPT = """You are an expert software architect and code analyst.
+You analyze code structure and provide actionable suggestions for:
+- Refactoring and code improvement
+- Duplicate detection and consolidation
+- Code generation and translation
+- Architecture optimization
+
+Be specific, practical, and provide code examples when helpful."""
+    
+    def __init__(
+        self,
+        model: str = "qwen2.5-coder:7b",
+        provider: str = "ollama",
+        base_url: str = "http://localhost:11434",
+        **kwargs
+    ):
+        """
+        Initialize CodeAnalyzer.
+        
+        Args:
+            model: Model name (e.g., "qwen2.5-coder:7b")
+            provider: "ollama" or "litellm"
+            base_url: API base URL
+        """
+        self.config = LLMConfig(
+            provider=provider,
+            model=model,
+            base_url=base_url,
+            **kwargs
+        )
+        
+        if provider == "ollama":
+            self.client = OllamaClient(self.config)
+        else:
+            self.client = LiteLLMClient(self.config)
+    
+    def is_available(self) -> bool:
+        """Check if LLM backend is available."""
+        return self.client.is_available()
+    
+    def suggest_refactoring(self, project) -> List[Dict[str, Any]]:
+        """
+        Analyze project and suggest refactoring improvements.
+        
+        Args:
+            project: ProjectInfo from code2logic analysis
             
-            elif self.config.provider == "litellm":
-                # Simple test call
-                response = completion(
-                    model=self.config.model,
-                    messages=[{"role": "user", "content": "test"}],
-                    max_tokens=10
-                )
-                status["available"] = True
+        Returns:
+            List of refactoring suggestions with details
+        """
+        from .generators import CSVGenerator
         
-        except Exception as e:
-            status["error"] = str(e)
+        # Generate compact representation
+        csv_gen = CSVGenerator()
+        csv_data = csv_gen.generate(project, detail='full')
         
-        return status
+        # Truncate if too long
+        if len(csv_data) > 8000:
+            lines = csv_data.split('\n')
+            csv_data = '\n'.join(lines[:100]) + f"\n... ({len(lines)-100} more lines)"
+        
+        prompt = f"""Analyze this codebase and suggest refactoring improvements:
+
+```csv
+{csv_data}
+```
+
+For each suggestion, provide:
+1. Issue type (complexity, duplication, naming, structure)
+2. Specific location (path, function name)
+3. Problem description
+4. Recommended fix with code example if applicable
+5. Priority (high/medium/low)
+
+Format as JSON array."""
+        
+        response = self.client.generate(prompt, system=self.SYSTEM_PROMPT)
+        
+        # Try to parse JSON from response
+        try:
+            # Find JSON in response
+            start = response.find('[')
+            end = response.rfind(']') + 1
+            if start >= 0 and end > start:
+                return json.loads(response[start:end])
+        except json.JSONDecodeError:
+            pass
+        
+        # Return raw response if JSON parsing fails
+        return [{"raw_response": response}]
+    
+    def find_semantic_duplicates(self, project) -> List[Dict[str, Any]]:
+        """
+        Find semantically similar functions using LLM.
+        
+        Args:
+            project: ProjectInfo from code2logic analysis
+            
+        Returns:
+            List of duplicate groups with similarity analysis
+        """
+        # Collect all functions with intents
+        functions = []
+        for m in project.modules:
+            for f in m.functions:
+                functions.append({
+                    'path': m.path,
+                    'name': f.name,
+                    'signature': self._build_signature(f),
+                    'intent': f.intent or '',
+                })
+            for c in m.classes:
+                for method in c.methods:
+                    functions.append({
+                        'path': m.path,
+                        'name': f"{c.name}.{method.name}",
+                        'signature': self._build_signature(method),
+                        'intent': method.intent or '',
+                    })
+        
+        if len(functions) > 50:
+            functions = functions[:50]
+        
+        prompt = f"""Analyze these functions and find semantic duplicates:
+
+{json.dumps(functions, indent=2)}
+
+Group functions that:
+1. Do the same thing (even with different names)
+2. Have similar logic patterns
+3. Could be consolidated into shared utilities
+
+For each group, explain:
+- Why they are duplicates
+- How to consolidate them
+- Suggested shared function name
+
+Format as JSON array of groups."""
+        
+        response = self.client.generate(prompt, system=self.SYSTEM_PROMPT)
+        
+        try:
+            start = response.find('[')
+            end = response.rfind(']') + 1
+            if start >= 0 and end > start:
+                return json.loads(response[start:end])
+        except json.JSONDecodeError:
+            pass
+        
+        return [{"raw_response": response}]
+    
+    def generate_code(
+        self,
+        project,
+        target_lang: str,
+        module_filter: Optional[str] = None
+    ) -> Dict[str, str]:
+        """
+        Generate code in target language from project analysis.
+        
+        Args:
+            project: ProjectInfo from code2logic analysis
+            target_lang: Target language (typescript, python, go, rust, etc.)
+            module_filter: Optional filter for specific module paths
+            
+        Returns:
+            Dict mapping original path to generated code
+        """
+        results = {}
+        
+        modules = project.modules
+        if module_filter:
+            modules = [m for m in modules if module_filter in m.path]
+        
+        for module in modules[:5]:  # Limit to 5 modules
+            # Build specification
+            spec_lines = [f"Module: {module.path}"]
+            spec_lines.append(f"Language: {module.language}")
+            spec_lines.append(f"Lines: {module.lines_code}")
+            
+            if module.imports:
+                spec_lines.append(f"Imports: {', '.join(module.imports[:10])}")
+            
+            if module.classes:
+                spec_lines.append("\nClasses:")
+                for c in module.classes[:5]:
+                    spec_lines.append(f"  class {c.name}({', '.join(c.bases)})")
+                    for m in c.methods[:10]:
+                        spec_lines.append(f"    - {m.name}{self._build_signature(m)}: {m.intent}")
+            
+            if module.functions:
+                spec_lines.append("\nFunctions:")
+                for f in module.functions[:10]:
+                    spec_lines.append(f"  - {f.name}{self._build_signature(f)}: {f.intent}")
+            
+            spec = '\n'.join(spec_lines)
+            
+            prompt = f"""Generate {target_lang} code from this specification:
+
+{spec}
+
+Requirements:
+1. Idiomatic {target_lang} code
+2. Full type annotations
+3. Docstrings/comments
+4. Error handling
+5. Maintain the same public API
+
+Output only the code."""
+            
+            response = self.client.generate(prompt, system=self.SYSTEM_PROMPT)
+            results[module.path] = response
+        
+        return results
+    
+    def translate_function(
+        self,
+        name: str,
+        signature: str,
+        intent: str,
+        source_lang: str,
+        target_lang: str
+    ) -> str:
+        """
+        Translate a single function to another language.
+        
+        Args:
+            name: Function name
+            signature: Function signature
+            intent: What the function does
+            source_lang: Source language
+            target_lang: Target language
+            
+        Returns:
+            Generated code in target language
+        """
+        prompt = f"""Translate this {source_lang} function to {target_lang}:
+
+Function: {name}
+Signature: {signature}
+Purpose: {intent}
+
+Generate idiomatic {target_lang} code with:
+1. Proper type annotations
+2. Error handling
+3. Documentation
+
+Output only the code."""
+        
+        return self.client.generate(prompt, system=self.SYSTEM_PROMPT)
+    
+    def _build_signature(self, f) -> str:
+        """Build compact signature."""
+        params = ','.join(f.params[:4])
+        if len(f.params) > 4:
+            params += '...'
+        ret = f"->{f.return_type}" if f.return_type else ""
+        return f"({params}){ret}"
+
+
+def get_available_backends() -> Dict[str, bool]:
+    """Get availability status of LLM backends."""
+    status = {
+        'httpx': HTTPX_AVAILABLE,
+        'litellm': LITELLM_AVAILABLE,
+        'ollama': False,
+    }
+    
+    if HTTPX_AVAILABLE:
+        try:
+            client = OllamaClient(LLMConfig())
+            status['ollama'] = client.is_available()
+        except Exception:
+            pass
+    
+    return status

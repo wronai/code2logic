@@ -1,547 +1,354 @@
 """
-MCP (Model Context Protocol) server for Claude Desktop integration.
+MCP (Model Context Protocol) Server for Code2Logic
 
-This module provides an MCP server that allows Claude Desktop
-to interact with code2logic for intelligent code analysis.
+Provides Code2Logic functionality as an MCP server for integration
+with Claude Desktop and other MCP-compatible clients.
+
+Usage:
+    # Start server
+    python -m code2logic.mcp_server
+    
+    # Or via CLI
+    code2logic-mcp
+    
+Configuration for Claude Desktop (claude_desktop_config.json):
+{
+  "mcpServers": {
+    "code2logic": {
+      "command": "python",
+      "args": ["-m", "code2logic.mcp_server"]
+    }
+  }
+}
 """
 
 import json
-import logging
-from typing import Dict, List, Any, Optional
-from dataclasses import asdict
+import sys
 from pathlib import Path
+from typing import Optional
 
-try:
-    from mcp.server import Server
-    from mcp.server.stdio import stdio_server
-    from mcp.types import Tool, TextContent
-    MCP_AVAILABLE = True
-except ImportError:
-    MCP_AVAILABLE = False
-
-from .analyzer import ProjectAnalyzer
-from .models import Project, Module, Function, Class
-from .llm import LLMInterface, LLMConfig
-from .intent import IntentAnalyzer
-
-logger = logging.getLogger(__name__)
+# MCP protocol implementation
+# Note: This is a simplified implementation. For production, use the official MCP SDK.
 
 
-class MCPServer:
-    """MCP server for Claude Desktop integration."""
+def handle_request(request: dict) -> dict:
+    """Handle incoming MCP request."""
+    method = request.get("method", "")
+    params = request.get("params", {})
+    request_id = request.get("id")
     
-    def __init__(self, port: int = 8080):
-        """
-        Initialize MCP server.
-        
-        Args:
-            port: Port to run the server on
-        """
-        if not MCP_AVAILABLE:
-            raise ImportError("MCP package is required. Install with: pip install mcp")
-        
-        self.port = port
-        self.server = Server("code2logic")
-        self.analyzer: Optional[ProjectAnalyzer] = None
-        self.llm: Optional[LLMInterface] = None
-        self.intent_analyzer = IntentAnalyzer()
-        
-        # Register tools
-        self._register_tools()
-    
-    def _register_tools(self) -> None:
-        """Register MCP tools."""
-        
-        @self.server.list_tools()
-        async def list_tools() -> List[Tool]:
-            """List available tools."""
-            return [
-                Tool(
-                    name="analyze_project",
-                    description="Analyze a code project and extract structure",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "project_path": {
-                                "type": "string",
-                                "description": "Path to the project directory"
-                            }
-                        },
-                        "required": ["project_path"]
-                    }
-                ),
-                Tool(
-                    name="get_project_summary",
-                    description="Get a summary of the analyzed project",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {},
-                        "required": []
-                    }
-                ),
-                Tool(
-                    name="list_modules",
-                    description="List all modules in the analyzed project",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {},
-                        "required": []
-                    }
-                ),
-                Tool(
-                    name="get_module_details",
-                    description="Get detailed information about a specific module",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "module_name": {
-                                "type": "string",
-                                "description": "Name of the module"
-                            }
-                        },
-                        "required": ["module_name"]
-                    }
-                ),
-                Tool(
-                    name="analyze_dependencies",
-                    description="Analyze project dependencies",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {},
-                        "required": []
-                    }
-                ),
-                Tool(
-                    name="detect_code_smells",
-                    description="Detect code smells and issues",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {},
-                        "required": []
-                    }
-                ),
-                Tool(
-                    name="suggest_refactoring",
-                    description="Get refactoring suggestions for a target",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "target": {
-                                "type": "string",
-                                "description": "Target module, class, or function name"
-                            }
-                        },
-                        "required": ["target"]
-                    }
-                ),
-                Tool(
-                    name="generate_documentation",
-                    description="Generate documentation for a target",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "target": {
-                                "type": "string",
-                                "description": "Target module, class, or function name"
-                            },
-                            "style": {
-                                "type": "string",
-                                "enum": ["google", "numpy", "sphinx"],
-                                "default": "google"
-                            }
-                        },
-                        "required": ["target"]
-                    }
-                ),
-                Tool(
-                    name="explain_code",
-                    description="Explain code functionality",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "target": {
-                                "type": "string",
-                                "description": "Target module, class, or function name"
-                            },
-                            "detail_level": {
-                                "type": "string",
-                                "enum": ["low", "medium", "high"],
-                                "default": "medium"
-                            }
-                        },
-                        "required": ["target"]
-                    }
-                ),
-                Tool(
-                    name="analyze_intent",
-                    description="Analyze user intent from natural language query",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "query": {
-                                "type": "string",
-                                "description": "Natural language query"
-                            }
-                        },
-                        "required": ["query"]
-                    }
-                ),
-                Tool(
-                    name="export_project",
-                    description="Export project analysis to various formats",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "format": {
-                                "type": "string",
-                                "enum": ["json", "yaml", "csv", "markdown"],
-                                "default": "json"
-                            },
-                            "output_path": {
-                                "type": "string",
-                                "description": "Output file path"
-                            }
-                        },
-                        "required": []
-                    }
-                )
-            ]
-        
-        @self.server.call_tool()
-        async def call_tool(name: str, arguments: Dict[str, Any]) -> List[TextContent]:
-            """Handle tool calls."""
-            try:
-                if name == "analyze_project":
-                    result = await self._analyze_project(arguments)
-                elif name == "get_project_summary":
-                    result = await self._get_project_summary()
-                elif name == "list_modules":
-                    result = await self._list_modules()
-                elif name == "get_module_details":
-                    result = await self._get_module_details(arguments)
-                elif name == "analyze_dependencies":
-                    result = await self._analyze_dependencies()
-                elif name == "detect_code_smells":
-                    result = await self._detect_code_smells()
-                elif name == "suggest_refactoring":
-                    result = await self._suggest_refactoring(arguments)
-                elif name == "generate_documentation":
-                    result = await self._generate_documentation(arguments)
-                elif name == "explain_code":
-                    result = await self._explain_code(arguments)
-                elif name == "analyze_intent":
-                    result = await self._analyze_intent(arguments)
-                elif name == "export_project":
-                    result = await self._export_project(arguments)
-                else:
-                    result = {"error": f"Unknown tool: {name}"}
-                
-                return [TextContent(type="text", text=json.dumps(result, indent=2))]
-            
-            except Exception as e:
-                logger.error(f"Tool call failed: {e}")
-                return [TextContent(type="text", text=json.dumps({
-                    "error": str(e)
-                }))]
-    
-    async def _analyze_project(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze a project."""
-        project_path = arguments["project_path"]
-        
-        # Validate path
-        path = Path(project_path)
-        if not path.exists():
-            raise ValueError(f"Project path does not exist: {project_path}")
-        
-        # Create analyzer
-        self.analyzer = ProjectAnalyzer(str(path))
-        
-        # Analyze project
-        project = self.analyzer.analyze()
-        
-        # Initialize LLM if available
-        try:
-            self.llm = LLMInterface()
-        except Exception:
-            logger.warning("LLM not available")
-        
+    if method == "initialize":
         return {
-            "status": "success",
-            "project": {
-                "name": project.name,
-                "path": project.path,
-                "modules": len(project.modules),
-                "functions": sum(len(m.functions) for m in project.modules),
-                "classes": sum(len(m.classes) for m in project.modules),
-                "dependencies": len(project.dependencies)
+            "jsonrpc": "2.0",
+            "id": request_id,
+            "result": {
+                "protocolVersion": "0.1.0",
+                "serverInfo": {
+                    "name": "code2logic",
+                    "version": "1.0.0"
+                },
+                "capabilities": {
+                    "tools": {}
+                }
             }
         }
     
-    async def _get_project_summary(self) -> Dict[str, Any]:
-        """Get project summary."""
-        if not self.analyzer or not self.analyzer.project:
-            raise ValueError("No project analyzed yet")
-        
-        project = self.analyzer.project
-        
+    elif method == "tools/list":
         return {
-            "name": project.name,
-            "path": project.path,
-            "statistics": {
-                "modules": len(project.modules),
-                "functions": sum(len(m.functions) for m in project.modules),
-                "classes": sum(len(m.classes) for m in project.modules),
-                "dependencies": len(project.dependencies),
-                "lines_of_code": sum(m.lines_of_code for m in project.modules)
-            },
-            "metadata": project.metadata
+            "jsonrpc": "2.0",
+            "id": request_id,
+            "result": {
+                "tools": [
+                    {
+                        "name": "analyze_project",
+                        "description": "Analyze a codebase and generate logical representation",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "path": {
+                                    "type": "string",
+                                    "description": "Path to the project directory"
+                                },
+                                "format": {
+                                    "type": "string",
+                                    "enum": ["csv", "json", "yaml", "compact", "markdown"],
+                                    "default": "csv",
+                                    "description": "Output format"
+                                },
+                                "detail": {
+                                    "type": "string",
+                                    "enum": ["minimal", "standard", "full"],
+                                    "default": "standard",
+                                    "description": "Detail level"
+                                }
+                            },
+                            "required": ["path"]
+                        }
+                    },
+                    {
+                        "name": "find_duplicates",
+                        "description": "Find duplicate functions in a codebase",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "path": {
+                                    "type": "string",
+                                    "description": "Path to the project directory"
+                                }
+                            },
+                            "required": ["path"]
+                        }
+                    },
+                    {
+                        "name": "compare_projects",
+                        "description": "Compare two projects for similarities",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "path1": {
+                                    "type": "string",
+                                    "description": "Path to first project"
+                                },
+                                "path2": {
+                                    "type": "string",
+                                    "description": "Path to second project"
+                                }
+                            },
+                            "required": ["path1", "path2"]
+                        }
+                    },
+                    {
+                        "name": "suggest_refactoring",
+                        "description": "Analyze project and suggest refactoring improvements",
+                        "inputSchema": {
+                            "type": "object",
+                            "properties": {
+                                "path": {
+                                    "type": "string",
+                                    "description": "Path to the project directory"
+                                }
+                            },
+                            "required": ["path"]
+                        }
+                    }
+                ]
+            }
         }
     
-    async def _list_modules(self) -> Dict[str, Any]:
-        """List all modules."""
-        if not self.analyzer or not self.analyzer.project:
-            raise ValueError("No project analyzed yet")
+    elif method == "tools/call":
+        tool_name = params.get("name")
+        arguments = params.get("arguments", {})
         
-        modules = []
-        for module in self.analyzer.project.modules:
-            modules.append({
-                "name": module.name,
-                "path": module.path,
-                "lines_of_code": module.lines_of_code,
-                "functions": len(module.functions),
-                "classes": len(module.classes),
-                "imports": len(module.imports)
-            })
-        
-        return {"modules": modules}
-    
-    async def _get_module_details(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Get module details."""
-        if not self.analyzer or not self.analyzer.project:
-            raise ValueError("No project analyzed yet")
-        
-        module_name = arguments["module_name"]
-        
-        for module in self.analyzer.project.modules:
-            if module.name == module_name:
-                return {
-                    "name": module.name,
-                    "path": module.path,
-                    "lines_of_code": module.lines_of_code,
-                    "imports": module.imports,
-                    "functions": [
+        try:
+            result = call_tool(tool_name, arguments)
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "result": {
+                    "content": [
                         {
-                            "name": func.name,
-                            "lines_of_code": func.lines_of_code,
-                            "complexity": func.complexity,
-                            "parameters": func.parameters,
-                            "has_docstring": func.docstring is not None
+                            "type": "text",
+                            "text": result
                         }
-                        for func in module.functions
-                    ],
-                    "classes": [
-                        {
-                            "name": cls.name,
-                            "lines_of_code": cls.lines_of_code,
-                            "base_classes": cls.base_classes,
-                            "methods": len(cls.methods)
-                        }
-                        for cls in module.classes
                     ]
                 }
-        
-        raise ValueError(f"Module not found: {module_name}")
-    
-    async def _analyze_dependencies(self) -> Dict[str, Any]:
-        """Analyze dependencies."""
-        if not self.analyzer or not self.analyzer.project:
-            raise ValueError("No project analyzed yet")
-        
-        dependencies = []
-        for dep in self.analyzer.project.dependencies:
-            dependencies.append({
-                "source": dep.source,
-                "target": dep.target,
-                "type": dep.type,
-                "strength": dep.strength
-            })
-        
-        return {"dependencies": dependencies}
-    
-    async def _detect_code_smells(self) -> Dict[str, Any]:
-        """Detect code smells."""
-        if not self.analyzer or not self.analyzer.project:
-            raise ValueError("No project analyzed yet")
-        
-        smells = self.intent_analyzer.detect_code_smells(self.analyzer.project)
-        
-        return {"code_smells": smells}
-    
-    async def _suggest_refactoring(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Suggest refactoring."""
-        if not self.analyzer or not self.analyzer.project:
-            raise ValueError("No project analyzed yet")
-        
-        target = arguments["target"]
-        
-        # Get basic suggestions
-        suggestions = self.intent_analyzer.suggest_refactoring(
-            target, self.analyzer.project
-        )
-        
-        result = {"suggestions": suggestions}
-        
-        # Try to get LLM suggestions if available
-        if self.llm:
-            try:
-                target_obj = self._find_target_object(target)
-                if target_obj:
-                    llm_suggestions = self.llm.suggest_refactoring(
-                        target_obj, self.analyzer.project
-                    )
-                    result["llm_suggestions"] = llm_suggestions
-            except Exception as e:
-                logger.warning(f"LLM suggestions failed: {e}")
-        
-        return result
-    
-    async def _generate_documentation(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate documentation."""
-        if not self.analyzer or not self.analyzer.project:
-            raise ValueError("No project analyzed yet")
-        
-        target = arguments["target"]
-        style = arguments.get("style", "google")
-        
-        if not self.llm:
-            raise ValueError("LLM not available for documentation generation")
-        
-        target_obj = self._find_target_object(target)
-        if not target_obj:
-            raise ValueError(f"Target not found: {target}")
-        
-        documentation = self.llm.generate_documentation(target_obj, style)
-        
-        return {"documentation": documentation}
-    
-    async def _explain_code(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Explain code."""
-        if not self.analyzer or not self.analyzer.project:
-            raise ValueError("No project analyzed yet")
-        
-        target = arguments["target"]
-        detail_level = arguments.get("detail_level", "medium")
-        
-        if not self.llm:
-            raise ValueError("LLM not available for code explanation")
-        
-        target_obj = self._find_target_object(target)
-        if not target_obj:
-            raise ValueError(f"Target not found: {target}")
-        
-        if isinstance(target_obj, (Function, Class)):
-            code = target_obj.code if hasattr(target_obj, 'code') else str(target_obj)
-        else:
-            code = f"Module: {target_obj.name}"
-        
-        explanation = self.llm.explain_code(code, detail_level)
-        
-        return {"explanation": explanation}
-    
-    async def _analyze_intent(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Analyze user intent."""
-        if not self.analyzer or not self.analyzer.project:
-            raise ValueError("No project analyzed yet")
-        
-        query = arguments["query"]
-        
-        intents = self.intent_analyzer.analyze_intent(query, self.analyzer.project)
-        
-        return {
-            "intents": [
-                {
-                    "type": intent.type.value,
-                    "confidence": intent.confidence,
-                    "target": intent.target,
-                    "description": intent.description,
-                    "suggestions": intent.suggestions
+            }
+        except Exception as e:
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "error": {
+                    "code": -32000,
+                    "message": str(e)
                 }
-                for intent in intents
-            ]
+            }
+    
+    return {
+        "jsonrpc": "2.0",
+        "id": request_id,
+        "error": {
+            "code": -32601,
+            "message": f"Method not found: {method}"
         }
-    
-    async def _export_project(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Export project."""
-        if not self.analyzer or not self.analyzer.project:
-            raise ValueError("No project analyzed yet")
-        
-        format_type = arguments.get("format", "json")
-        output_path = arguments.get("output_path", f"output.{format_type}")
-        
-        from .generators import get_generator
-        
-        generator = get_generator(format_type)
-        self.analyzer.generate_output(generator, output_path)
-        
-        return {
-            "status": "success",
-            "format": format_type,
-            "output_path": output_path
-        }
-    
-    def _find_target_object(self, target: str) -> Optional[Any]:
-        """Find target object in the project."""
-        if not self.analyzer or not self.analyzer.project:
-            return None
-        
-        parts = target.split('.')
-        if len(parts) == 1:
-            # Module name
-            for module in self.analyzer.project.modules:
-                if module.name == parts[0]:
-                    return module
-        elif len(parts) == 2:
-            # Module.Class or Module.Function
-            module_name, item_name = parts
-            for module in self.analyzer.project.modules:
-                if module.name == module_name:
-                    for cls in module.classes:
-                        if cls.name == item_name:
-                            return cls
-                    for func in module.functions:
-                        if func.name == item_name:
-                            return func
-        
-        return None
-    
-    def start(self) -> None:
-        """Start the MCP server."""
-        logger.info(f"Starting MCP server on port {self.port}")
-        
-        # Run the server
-        import asyncio
-        
-        async def run_server():
-            async with stdio_server() as (read_stream, write_stream):
-                await self.server.run(
-                    read_stream,
-                    write_stream,
-                    self.server.create_initialization_options()
-                )
-        
-        asyncio.run(run_server())
-    
-    def stop(self) -> None:
-        """Stop the MCP server."""
-        logger.info("Stopping MCP server")
+    }
 
 
-def create_server(port: int = 8080) -> MCPServer:
-    """Create and return an MCP server instance."""
-    return MCPServer(port)
+def call_tool(tool_name: str, arguments: dict) -> str:
+    """Execute a tool and return result."""
+    from .analyzer import ProjectAnalyzer
+    from .generators import CSVGenerator, JSONGenerator, YAMLGenerator, CompactGenerator, MarkdownGenerator
+    
+    if tool_name == "analyze_project":
+        path = arguments.get("path")
+        format_type = arguments.get("format", "csv")
+        detail = arguments.get("detail", "standard")
+        
+        analyzer = ProjectAnalyzer(path)
+        project = analyzer.analyze()
+        
+        generators = {
+            "csv": CSVGenerator(),
+            "json": JSONGenerator(),
+            "yaml": YAMLGenerator(),
+            "compact": CompactGenerator(),
+            "markdown": MarkdownGenerator(),
+        }
+        
+        gen = generators.get(format_type, CSVGenerator())
+        
+        if format_type in ("csv", "yaml"):
+            return gen.generate(project, detail=detail)
+        elif format_type == "json":
+            return gen.generate(project, flat=True, detail=detail)
+        elif format_type == "compact":
+            return gen.generate(project)
+        else:
+            return gen.generate(project, detail)
+    
+    elif tool_name == "find_duplicates":
+        path = arguments.get("path")
+        
+        analyzer = ProjectAnalyzer(path)
+        project = analyzer.analyze()
+        
+        # Find duplicates by hash
+        from collections import defaultdict
+        hash_groups = defaultdict(list)
+        
+        for m in project.modules:
+            for f in m.functions:
+                sig = f"({','.join(f.params)})->{f.return_type or ''}"
+                import hashlib
+                h = hashlib.md5(f"{f.name}:{sig}".encode()).hexdigest()[:8]
+                hash_groups[h].append(f"{m.path}::{f.name}")
+            
+            for c in m.classes:
+                for method in c.methods:
+                    sig = f"({','.join(method.params)})->{method.return_type or ''}"
+                    import hashlib
+                    h = hashlib.md5(f"{method.name}:{sig}".encode()).hexdigest()[:8]
+                    hash_groups[h].append(f"{m.path}::{c.name}.{method.name}")
+        
+        duplicates = {h: paths for h, paths in hash_groups.items() if len(paths) > 1}
+        
+        result = ["# Duplicate Detection Results\n"]
+        result.append(f"Total unique elements: {len(hash_groups)}")
+        result.append(f"Duplicate groups: {len(duplicates)}\n")
+        
+        for h, paths in list(duplicates.items())[:20]:
+            result.append(f"\n## Hash: {h}")
+            for p in paths:
+                result.append(f"  - {p}")
+        
+        return '\n'.join(result)
+    
+    elif tool_name == "compare_projects":
+        path1 = arguments.get("path1")
+        path2 = arguments.get("path2")
+        
+        analyzer1 = ProjectAnalyzer(path1)
+        analyzer2 = ProjectAnalyzer(path2)
+        
+        project1 = analyzer1.analyze()
+        project2 = analyzer2.analyze()
+        
+        # Compare
+        def get_hashes(project):
+            hashes = {}
+            for m in project.modules:
+                for f in m.functions:
+                    sig = f"({','.join(f.params)})->{f.return_type or ''}"
+                    import hashlib
+                    h = hashlib.md5(f"{f.name}:{sig}".encode()).hexdigest()[:8]
+                    hashes[h] = f"{m.path}::{f.name}"
+            return hashes
+        
+        h1 = get_hashes(project1)
+        h2 = get_hashes(project2)
+        
+        common = set(h1.keys()) & set(h2.keys())
+        only1 = set(h1.keys()) - set(h2.keys())
+        only2 = set(h2.keys()) - set(h1.keys())
+        
+        result = ["# Project Comparison Results\n"]
+        result.append(f"Project 1: {project1.name} ({project1.total_files} files)")
+        result.append(f"Project 2: {project2.name} ({project2.total_files} files)\n")
+        result.append(f"Identical elements: {len(common)}")
+        result.append(f"Only in Project 1: {len(only1)}")
+        result.append(f"Only in Project 2: {len(only2)}")
+        
+        if common:
+            result.append("\n## Identical Elements (first 10)")
+            for h in list(common)[:10]:
+                result.append(f"  - {h1[h]} <-> {h2[h]}")
+        
+        return '\n'.join(result)
+    
+    elif tool_name == "suggest_refactoring":
+        path = arguments.get("path")
+        
+        analyzer = ProjectAnalyzer(path)
+        project = analyzer.analyze()
+        
+        issues = []
+        
+        # Find high complexity (approximation based on lines)
+        for m in project.modules:
+            for f in m.functions:
+                if f.lines > 50:
+                    issues.append({
+                        'type': 'long_function',
+                        'path': m.path,
+                        'name': f.name,
+                        'lines': f.lines,
+                        'suggestion': 'Consider breaking into smaller functions'
+                    })
+            
+            if m.lines_code > 500:
+                issues.append({
+                    'type': 'long_file',
+                    'path': m.path,
+                    'lines': m.lines_code,
+                    'suggestion': 'Consider splitting into multiple modules'
+                })
+        
+        result = ["# Refactoring Suggestions\n"]
+        result.append(f"Issues found: {len(issues)}\n")
+        
+        for issue in issues[:20]:
+            result.append(f"\n## [{issue['type'].upper()}] {issue.get('path', '')}")
+            if 'name' in issue:
+                result.append(f"Function: {issue['name']}")
+            if 'lines' in issue:
+                result.append(f"Lines: {issue['lines']}")
+            result.append(f"Suggestion: {issue['suggestion']}")
+        
+        return '\n'.join(result)
+    
+    raise ValueError(f"Unknown tool: {tool_name}")
+
+
+def run_server():
+    """Run the MCP server."""
+    print("Code2Logic MCP Server started", file=sys.stderr)
+    
+    while True:
+        try:
+            line = sys.stdin.readline()
+            if not line:
+                break
+            
+            request = json.loads(line)
+            response = handle_request(request)
+            
+            sys.stdout.write(json.dumps(response) + "\n")
+            sys.stdout.flush()
+            
+        except json.JSONDecodeError as e:
+            print(f"JSON error: {e}", file=sys.stderr)
+        except Exception as e:
+            print(f"Error: {e}", file=sys.stderr)
 
 
 if __name__ == "__main__":
-    # Run server directly
-    server = create_server()
-    server.start()
+    run_server()

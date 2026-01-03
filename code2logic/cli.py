@@ -1,193 +1,221 @@
 """
-Command-line interface for code2logic with auto-dependency installation.
+Command-line interface for Code2Logic.
+
+Usage:
+    code2logic /path/to/project
+    code2logic /path/to/project -f csv -o output.csv
+    code2logic /path/to/project -f yaml
+    code2logic /path/to/project -f json --flat
 """
 
 import argparse
-import logging
+import os
 import sys
 import subprocess
-from pathlib import Path
-from typing import List, Optional
 
-from .analyzer import ProjectAnalyzer
-from .generators import (
-    CSVGenerator,
-    YAMLGenerator,
-    JSONGenerator,
-    CompactGenerator,
-    MarkdownGenerator,
-)
-from .mcp_server import MCPServer
-
-logger = logging.getLogger(__name__)
+from . import __version__
 
 
-class DependencyManager:
-    """Manages automatic dependency installation."""
+def ensure_dependencies():
+    """Auto-install optional dependencies for best results."""
+    packages = {
+        'tree-sitter': 'tree_sitter',
+        'tree-sitter-python': 'tree_sitter_python', 
+        'tree-sitter-javascript': 'tree_sitter_javascript',
+        'tree-sitter-typescript': 'tree_sitter_typescript',
+        'networkx': 'networkx',
+        'rapidfuzz': 'rapidfuzz',
+        'pyyaml': 'yaml',
+    }
     
-    REQUIRED_PACKAGES = [
-        'networkx',
-        'tree-sitter', 
-        'tree-sitter-python',
-        'tree-sitter-javascript',
-        'tree-sitter-java',
-        'pyyaml',
-        'litellm',
-        'ollama',
-    ]
+    missing = []
+    for pkg_name, import_name in packages.items():
+        try:
+            __import__(import_name)
+        except ImportError:
+            missing.append(pkg_name)
     
-    @classmethod
-    def check_and_install_dependencies(cls) -> None:
-        """Check if required packages are installed and install them if needed."""
-        missing_packages = []
-        
-        for package in cls.REQUIRED_PACKAGES:
-            try:
-                __import__(package.replace('-', '_'))
-            except ImportError:
-                missing_packages.append(package)
-        
-        if missing_packages:
-            print(f"Installing missing dependencies: {', '.join(missing_packages)}")
+    if missing:
+        print(f"Installing dependencies for best results: {', '.join(missing)}", file=sys.stderr)
+        try:
+            subprocess.check_call([
+                sys.executable, '-m', 'pip', 'install', '-q',
+                '--break-system-packages', *missing
+            ], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+            print("Dependencies installed successfully!", file=sys.stderr)
+        except subprocess.CalledProcessError:
+            # Try without --break-system-packages
             try:
                 subprocess.check_call([
-                    sys.executable, '-m', 'pip', 'install'
-                ] + missing_packages)
-                print("Dependencies installed successfully!")
-            except subprocess.CalledProcessError as e:
-                print(f"Failed to install dependencies: {e}")
-                sys.exit(1)
+                    sys.executable, '-m', 'pip', 'install', '-q', *missing
+                ], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+                print("Dependencies installed successfully!", file=sys.stderr)
+            except subprocess.CalledProcessError:
+                print(f"Warning: Could not install some dependencies. "
+                      f"Install manually: pip install {' '.join(missing)}", file=sys.stderr)
 
 
-def setup_logging(verbose: bool = False) -> None:
-    """Setup logging configuration."""
-    level = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(
-        level=level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-
-
-def create_parser() -> argparse.ArgumentParser:
-    """Create the command-line argument parser."""
+def main():
+    """Main CLI entry point."""
     parser = argparse.ArgumentParser(
-        description='Analyze code projects and generate logical representations'
+        prog='code2logic',
+        description='Convert source code to logical representation for LLM analysis',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='''
+Examples:
+  code2logic /path/to/project                    # Standard Markdown
+  code2logic /path/to/project -f csv             # CSV (best for LLM, ~50%% smaller)
+  code2logic /path/to/project -f yaml            # YAML (human-readable)
+  code2logic /path/to/project -f json --flat     # Flat JSON (for comparisons)
+  code2logic /path/to/project -f compact         # Ultra-compact text
+
+Output formats (token efficiency):
+  csv      - Best for LLM (~20K tokens/100 files) - flat table
+  compact  - Good for LLM (~25K tokens/100 files) - minimal text
+  json     - Standard (~35K tokens/100 files) - nested/flat
+  yaml     - Readable (~35K tokens/100 files) - nested/flat  
+  markdown - Documentation (~55K tokens/100 files)
+
+Detail levels (columns in csv/json/yaml):
+  minimal  - path, type, name, signature (4 columns)
+  standard - + intent, category, domain, imports (8 columns)
+  full     - + calls, lines, complexity, hash (16 columns)
+'''
     )
     
     parser.add_argument(
-        'project_path',
-        help='Path to the project directory to analyze'
+        'path',
+        nargs='?',
+        default=None,
+        help='Path to the project directory'
     )
-    
     parser.add_argument(
-        '--output', '-o',
-        default='output',
-        help='Output directory or file (default: output)'
+        '-f', '--format',
+        choices=['markdown', 'compact', 'json', 'yaml', 'csv', 'gherkin'],
+        default='markdown',
+        help='Output format (default: markdown)'
     )
-    
     parser.add_argument(
-        '--format', '-f',
-        choices=['csv', 'yaml', 'json', 'compact', 'markdown', 'all'],
-        default='json',
-        help='Output format (default: json)'
+        '-d', '--detail',
+        choices=['minimal', 'standard', 'full'],
+        default='standard',
+        help='Detail level - columns to include (default: standard)'
     )
-    
     parser.add_argument(
-        '--verbose', '-v',
+        '-o', '--output',
+        help='Output file path (default: stdout)'
+    )
+    parser.add_argument(
+        '--flat',
         action='store_true',
-        help='Enable verbose logging'
+        help='Use flat structure (for json/yaml) - better for comparisons'
     )
-    
-    parser.add_argument(
-        '--mcp',
-        action='store_true',
-        help='Start MCP server for Claude Desktop integration'
-    )
-    
-    parser.add_argument(
-        '--mcp-port',
-        type=int,
-        default=8080,
-        help='Port for MCP server (default: 8080)'
-    )
-    
     parser.add_argument(
         '--no-install',
         action='store_true',
-        help='Skip automatic dependency installation'
+        help='Skip auto-installation of dependencies'
+    )
+    parser.add_argument(
+        '--no-treesitter',
+        action='store_true',
+        help='Disable Tree-sitter (use fallback parser)'
+    )
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help='Verbose output'
+    )
+    parser.add_argument(
+        '--version',
+        action='version',
+        version=f'%(prog)s {__version__}'
+    )
+    parser.add_argument(
+        '--status',
+        action='store_true',
+        help='Show library availability status and exit'
     )
     
-    return parser
-
-
-def get_generator(format_name: str) -> 'BaseGenerator':
-    """Get the appropriate generator for the format."""
-    generators = {
-        'csv': CSVGenerator(),
-        'yaml': YAMLGenerator(),
-        'json': JSONGenerator(),
-        'compact': CompactGenerator(),
-        'markdown': MarkdownGenerator(),
-    }
-    
-    if format_name not in generators:
-        raise ValueError(f"Unsupported format: {format_name}")
-    
-    return generators[format_name]
-
-
-def main() -> None:
-    """Main CLI entry point."""
-    parser = create_parser()
     args = parser.parse_args()
     
-    # Setup logging
-    setup_logging(args.verbose)
+    # Auto-install dependencies unless disabled
+    if not args.no_install and not args.status:
+        ensure_dependencies()
     
-    # Install dependencies if needed
-    if not args.no_install:
-        DependencyManager.check_and_install_dependencies()
+    # Import after potential installation
+    from .analyzer import ProjectAnalyzer, get_library_status
+    from .generators import (
+        MarkdownGenerator, CompactGenerator, JSONGenerator,
+        YAMLGenerator, CSVGenerator
+    )
+    from .gherkin import GherkinGenerator
     
-    # Start MCP server if requested
-    if args.mcp:
-        server = MCPServer(port=args.mcp_port)
-        print(f"Starting MCP server on port {args.mcp_port}")
-        server.start()
-        return
+    # Status check
+    if args.status:
+        status = get_library_status()
+        print("Library Status:")
+        for lib, available in status.items():
+            symbol = "✓" if available else "✗"
+            print(f"  {lib}: {symbol}")
+        sys.exit(0)
     
-    # Validate project path
-    project_path = Path(args.project_path)
-    if not project_path.exists():
-        print(f"Error: Project path '{project_path}' does not exist")
+    # Path is required for analysis
+    if args.path is None:
+        print("Error: path is required", file=sys.stderr)
+        parser.print_help()
         sys.exit(1)
     
-    try:
-        # Analyze project
-        analyzer = ProjectAnalyzer(str(project_path))
-        project = analyzer.analyze()
-        
-        # Generate output
-        if args.format == 'all':
-            formats = ['csv', 'yaml', 'json', 'compact', 'markdown']
-            for fmt in formats:
-                generator = get_generator(fmt)
-                output_path = f"{args.output}.{fmt}"
-                analyzer.generate_output(generator, output_path)
-                print(f"Generated {fmt} output: {output_path}")
-        else:
-            generator = get_generator(args.format)
-            output_path = args.output
-            if not output_path.endswith(f'.{args.format}'):
-                output_path = f"{output_path}.{args.format}"
-            analyzer.generate_output(generator, output_path)
-            print(f"Generated {args.format} output: {output_path}")
-        
-        print(f"Analysis complete! Analyzed {len(project.modules)} modules")
-        
-    except Exception as e:
-        logger.error(f"Analysis failed: {e}")
-        print(f"Error: {e}")
+    # Validate path
+    if not os.path.exists(args.path):
+        print(f"Error: Path does not exist: {args.path}", file=sys.stderr)
         sys.exit(1)
+    
+    if not os.path.isdir(args.path):
+        print(f"Error: Path is not a directory: {args.path}", file=sys.stderr)
+        sys.exit(1)
+    
+    # Analyze
+    if args.verbose:
+        print(f"Analyzing project: {args.path}", file=sys.stderr)
+    
+    analyzer = ProjectAnalyzer(
+        args.path,
+        use_treesitter=not args.no_treesitter,
+        verbose=args.verbose
+    )
+    project = analyzer.analyze()
+    
+    if args.verbose:
+        print(f"Found {project.total_files} files, {project.total_lines} lines", file=sys.stderr)
+    
+    # Generate output
+    if args.format == 'markdown':
+        generator = MarkdownGenerator()
+        output = generator.generate(project, args.detail)
+    elif args.format == 'compact':
+        generator = CompactGenerator()
+        output = generator.generate(project)
+    elif args.format == 'json':
+        generator = JSONGenerator()
+        output = generator.generate(project, flat=args.flat, detail=args.detail)
+    elif args.format == 'yaml':
+        generator = YAMLGenerator()
+        output = generator.generate(project, flat=args.flat, detail=args.detail)
+    elif args.format == 'csv':
+        generator = CSVGenerator()
+        output = generator.generate(project, detail=args.detail)
+    elif args.format == 'gherkin':
+        generator = GherkinGenerator()
+        output = generator.generate(project, detail=args.detail)
+    
+    # Write output
+    if args.output:
+        with open(args.output, 'w', encoding='utf-8') as f:
+            f.write(output)
+        if args.verbose:
+            print(f"Output written to: {args.output}", file=sys.stderr)
+    else:
+        print(output)
 
 
 if __name__ == '__main__':

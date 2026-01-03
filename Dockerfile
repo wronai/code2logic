@@ -1,64 +1,44 @@
-# Production Dockerfile for code2logic
-FROM python:3.11-slim
+# Code2Logic Docker Image
+# Multi-stage build for smaller image
 
-# Set metadata
-LABEL maintainer="team@code2logic.dev"
-LABEL description="code2logic - Convert codebase structure to logical representations"
-LABEL version="1.0.0"
+FROM python:3.12-slim AS builder
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
-
-# Create app directory
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    git \
-    tree \
-    && rm -rf /var/lib/apt/lists/*
+# Install build dependencies
+RUN pip install --no-cache-dir build
 
-# Install Python dependencies
-COPY pyproject.toml .
-COPY README.md .
-COPY LICENSE .
-COPY CHANGELOG.md .
+# Copy source code
+COPY pyproject.toml README.md LICENSE CHANGELOG.md ./
+COPY code2logic/ ./code2logic/
 
-# Install code2logic and dependencies
-RUN pip install --upgrade pip && \
-    pip install -e .[all]
+# Build wheel
+RUN python -m build --wheel
 
-# Create non-root user for security
-RUN groupadd -r code2logic && \
-    useradd -r -g code2logic -d /app -s /bin/bash code2logic && \
-    chown -R code2logic:code2logic /app
+# ============================================================================
+# Final image
+# ============================================================================
+FROM python:3.12-slim
 
-USER code2logic
+LABEL maintainer="Softreck <info@softreck.dev>"
+LABEL description="Code2Logic - Convert source code to logical representation for LLM analysis"
+LABEL version="1.0.0"
 
-# Create directories for work
-RUN mkdir -p /app/workspace /app/output
+WORKDIR /app
 
-# Copy the rest of the application
-COPY --chown=code2logic:code2logic code2logic/ ./code2logic/
-COPY --chown=code2logic:code2logic examples/ ./examples/
-COPY --chown=code2logic:code2logic docs/ ./docs/
+# Install the wheel with all dependencies
+COPY --from=builder /app/dist/*.whl /tmp/
+RUN pip install --no-cache-dir /tmp/*.whl[full] && \
+    rm /tmp/*.whl
 
-# Set up entrypoint
-COPY --chown=code2logic:code2logic docker/entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
+# Create volume mount points
+VOLUME ["/project", "/output"]
 
-# Expose port for MCP server
-EXPOSE 8080
+# Default command
+ENTRYPOINT ["code2logic"]
+CMD ["--help"]
 
-# Set default command
-ENTRYPOINT ["entrypoint.sh"]
-CMD ["code2logic", "--help"]
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD code2logic --version || exit 1
+# Usage examples:
+# docker build -t code2logic .
+# docker run -v /path/to/project:/project -v /path/to/output:/output code2logic /project -f csv -o /output/analysis.csv
+# docker run -v $(pwd):/project code2logic /project -f json --flat

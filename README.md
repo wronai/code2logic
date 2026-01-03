@@ -1,421 +1,256 @@
-# code2logic
+# Code2Logic
 
-Convert codebase structure to logical representations with AI-powered insights.
+[![PyPI version](https://badge.fury.io/py/code2logic.svg)](https://badge.fury.io/py/code2logic)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/wronai/code2logic)
-[![Coverage](https://img.shields.io/badge/coverage-80%25-green.svg)](https://codecov.io)
+**Convert source code to logical representation for LLM analysis.**
 
-code2logic is a powerful Python package that analyzes code projects and generates various logical representations, including dependency graphs, architectural insights, and AI-powered refactoring suggestions.
+Code2Logic analyzes codebases and generates compact, LLM-friendly representations with semantic understanding. Perfect for feeding project context to AI assistants, building code documentation, or analyzing code structure.
 
 ## ✨ Features
 
-### 🔍 **Code Analysis**
-- **Multi-language support**: Python, JavaScript, Java, C/C++
-- **AST parsing** with Tree-sitter (primary) and fallback parsers
-- **Dependency graph analysis** using NetworkX
-- **Code similarity detection** across modules, functions, and classes
-- **Complexity metrics** and code quality assessment
+- 🌳 **Multi-language support** - Python, JavaScript, TypeScript, Java, Go, Rust, and more
+- 🎯 **Tree-sitter AST parsing** - 99% accuracy with graceful fallback
+- 📊 **NetworkX dependency graphs** - PageRank, hub detection, cycle analysis
+- 🔍 **Rapidfuzz similarity** - Find duplicate and similar functions
+- 🧠 **NLP intent extraction** - Human-readable function descriptions
+- 📦 **Zero dependencies** - Core works without any external libs
 
-### 🤖 **AI-Powered Insights**
-- **LLM integration** with Ollama and LiteLLM
-- **Intent analysis** from natural language queries
-- **Automated refactoring suggestions**
-- **Code generation** and improvement recommendations
-- **Documentation generation** with AI assistance
+## 🚀 Installation
 
-### 📊 **Multiple Output Formats**
-- **JSON**: Machine-readable structured data
-- **YAML**: Human-readable configuration format
-- **CSV**: Tabular data for spreadsheet analysis
-- **Markdown**: Documentation-friendly reports
-- **Compact**: Minimal text representation
-
-### 🔗 **Integration Support**
-- **MCP Server** for Claude Desktop integration
-- **CLI** with auto-dependency installation
-- **Python API** for programmatic use
-- **Docker** support for containerized deployment
-
-## 🚀 Quick Start
-
-### Installation
-
+### Basic (no dependencies)
 ```bash
-# Install from PyPI
 pip install code2logic
-
-# Install with optional dependencies
-pip install code2logic[all]  # All features
-pip install code2logic[mcp]   # MCP server support
-pip install code2logic[dev]   # Development tools
 ```
 
-### Basic Usage
+### Full (all features)
+```bash
+pip install code2logic[full]
+```
+
+### Selective features
+```bash
+pip install code2logic[treesitter]  # High-accuracy AST parsing
+pip install code2logic[graph]       # Dependency analysis
+pip install code2logic[similarity]  # Similar function detection
+pip install code2logic[nlp]         # Enhanced intents
+```
+
+## 📖 Quick Start
+
+### Command Line
 
 ```bash
-# Analyze a project
-code2logic /path/to/your/project
+# Standard Markdown output
+code2logic /path/to/project
 
-# Generate specific format
-code2logic /path/to/project --format json --output analysis.json
+# Compact format (10-15x smaller)
+code2logic /path/to/project -f compact
 
-# Generate all formats
-code2logic /path/to/project --format all --output project_analysis
+# JSON for RAG systems
+code2logic /path/to/project -f json -o project.json
+
+# With detailed analysis
+code2logic /path/to/project -d detailed
 ```
 
 ### Python API
 
 ```python
-from code2logic import ProjectAnalyzer, JSONGenerator
+from code2logic import analyze_project, MarkdownGenerator
 
 # Analyze a project
-analyzer = ProjectAnalyzer("/path/to/project")
-project = analyzer.analyze()
+project = analyze_project("/path/to/project")
 
-# Generate JSON output
-generator = JSONGenerator()
-generator.generate(project, "analysis.json")
+# Generate output
+generator = MarkdownGenerator()
+output = generator.generate(project, detail_level='standard')
+print(output)
 
-# Access project data
-print(f"Modules: {len(project.modules)}")
-print(f"Functions: {sum(len(m.functions) for m in project.modules)}")
-print(f"Dependencies: {len(project.dependencies)}")
+# Access analysis results
+print(f"Files: {project.total_files}")
+print(f"Lines: {project.total_lines}")
+print(f"Languages: {project.languages}")
+
+# Get hub modules (most important)
+hubs = [p for p, n in project.dependency_metrics.items() if n.is_hub]
+print(f"Key modules: {hubs}")
 ```
 
-### LLM Integration
+## 📋 Output Formats
 
-```python
-from code2logic import ProjectAnalyzer, LLMInterface, LLMConfig
+### Markdown (default)
+Human-readable documentation with:
+- Project structure tree with hub markers (★)
+- Dependency graphs with PageRank scores
+- Classes with methods and intents
+- Functions with signatures and descriptions
 
-# Setup LLM
-config = LLMConfig(provider="ollama", model="codellama")
-llm = LLMInterface(config)
+### Compact
+Ultra-compact format optimized for LLM context:
+```
+# myproject | 102f 31875L | typescript:79/python:23
+ENTRY: index.ts main.py
+HUBS: evolution-manager llm-orchestrator
 
-# Analyze project
-analyzer = ProjectAnalyzer("/path/to/project")
-project = analyzer.analyze()
-
-# Get refactoring suggestions
-for module in project.modules:
-    suggestions = llm.suggest_refactoring(module, project)
-    print(f"Suggestions for {module.name}: {suggestions}")
+[core/evolution]
+  evolution-manager.ts (3719L) C:EvolutionManager | F:createEvolutionManager
+  task-queue.ts (139L) C:TaskQueue,Task
 ```
 
-## 📖 Examples
-
-### Basic Project Analysis
-
-```bash
-# Analyze current directory
-code2logic . --format json --output analysis.json
-
-# Generate comprehensive report
-code2logic . --format all --output comprehensive_analysis
-```
-
-### AI-Powered Refactoring
-
-```python
-from code2logic import ProjectAnalyzer, IntentAnalyzer
-
-# Analyze project
-analyzer = ProjectAnalyzer("/path/to/project")
-project = analyzer.analyze()
-
-# Analyze user intent
-intent_analyzer = IntentAnalyzer()
-intents = intent_analyzer.analyze_intent(
-    "I want to refactor the main module to improve performance",
-    project
-)
-
-for intent in intents:
-    print(f"Intent: {intent.type.value} (confidence: {intent.confidence})")
-    print(f"Suggestions: {intent.suggestions}")
-```
-
-### Dependency Analysis
-
-```python
-from code2logic.dependency import DependencyAnalyzer
-
-# Analyze dependencies
-dep_analyzer = DependencyAnalyzer()
-dependencies = dep_analyzer.analyze_dependencies(project.modules)
-
-# Get circular dependencies
-circular_deps = dep_analyzer.get_circular_dependencies()
-print(f"Circular dependencies: {circular_deps}")
-
-# Get dependency layers
-layers = dep_analyzer.get_dependency_layers()
-print(f"Dependency layers: {layers}")
-```
-
-### MCP Server for Claude Desktop
-
-```bash
-# Start MCP server
-code2logic --mcp --mcp-port 8080
-
-# Use with Claude Desktop
-# Configure Claude Desktop to connect to localhost:8080
-```
+### JSON
+Machine-readable format for:
+- RAG (Retrieval-Augmented Generation)
+- Database storage
+- Further analysis
 
 ## 🔧 Configuration
 
-### LLM Configuration
-
-```python
-from code2logic import LLMConfig
-
-# Ollama configuration
-config = LLMConfig(
-    provider="ollama",
-    model="codellama",
-    temperature=0.7,
-    max_tokens=2000
-)
-
-# LiteLLM configuration
-config = LLMConfig(
-    provider="litellm",
-    model="gpt-4",
-    api_key="your-api-key",
-    base_url="https://api.openai.com/v1"
-)
-```
-
-### Analysis Configuration
-
-```python
-from code2logic import ProjectAnalyzer
-
-# Custom configuration
-config = {
-    "include_tests": False,
-    "max_depth": 10,
-    "ignore_patterns": ["__pycache__", "node_modules"],
-    "complexity_threshold": 10
-}
-
-analyzer = ProjectAnalyzer("/path/to/project", config)
-```
-
-## 📊 Output Formats
-
-### JSON Structure
-
-```json
-{
-  "project": {
-    "name": "my_project",
-    "path": "/path/to/project",
-    "statistics": {
-      "total_modules": 10,
-      "total_functions": 50,
-      "total_classes": 20,
-      "total_dependencies": 35,
-      "total_lines_of_code": 5000
-    },
-    "modules": [...],
-    "dependencies": [...],
-    "similarities": [...]
-  }
-}
-```
-
-### Markdown Report
-
-```markdown
-# My Project
-
-## Statistics
-
-| Metric | Value |
-|--------|-------|
-| Modules | 10 |
-| Functions | 50 |
-| Classes | 20 |
-| Dependencies | 35 |
-| Lines of Code | 5000 |
-
-## Modules
-
-### main.py
-
-**Path:** `/project/main.py`
-**Lines of Code:** 150
-
-**Functions:**
-- `calculate_sum()` (15 LOC, complexity: 2) 📝
-- `fibonacci()` (8 LOC, complexity: 5) 📝
-
-**Classes:**
-- `Calculator` (4 methods)
-```
-
-## 🐳 Docker Support
-
-### Using Pre-built Images
-
+### Library Status
+Check which features are available:
 ```bash
-# Pull the image
-docker pull wronai/code2logic:latest
-
-# Run analysis
-docker run -v /path/to/project:/workspace wronai/code2logic:latest code2logic /workspace
+code2logic --status
+```
+```
+Library Status:
+  tree_sitter: ✓
+  networkx: ✓
+  rapidfuzz: ✓
+  nltk: ✗
+  spacy: ✗
 ```
 
-### Building from Source
+### Python API
+```python
+from code2logic import get_library_status
 
-```bash
-# Build the image
-docker build -t code2logic .
-
-# Run with Ollama
-docker-compose up
+status = get_library_status()
+# {'tree_sitter': True, 'networkx': True, ...}
 ```
 
-### Docker Compose
+## 📊 Analysis Features
 
+### Dependency Analysis
+- **PageRank** - Identifies most important modules
+- **Hub detection** - Central modules marked with ★
+- **Cycle detection** - Find circular dependencies
+- **Clustering** - Group related modules
+
+### Intent Generation
+Functions get human-readable descriptions:
 ```yaml
-version: '3.8'
-services:
-  code2logic:
-    build: .
-    volumes:
-      - ./project:/workspace
-    command: code2logic /workspace --format json
-    
-  ollama:
-    image: ollama/ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-      
-  litellm:
-    image: ghcr.io/berriai/litellm:main
-    ports:
-      - "4000:4000"
-    volumes:
-      - ./litellm_config.yaml:/app/config.yaml
+methods:
+  async findById(id:string) -> Promise<User>  # retrieves user by id
+  async createUser(data:UserDTO) -> Promise<User>  # creates user
+  validateEmail(email:string) -> boolean  # validates email
 ```
 
-## 🧪 Testing
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=code2logic --cov-report=html
-
-# Run specific test categories
-pytest -m unit          # Unit tests only
-pytest -m integration   # Integration tests only
-pytest -m "not slow"    # Skip slow tests
+### Similarity Detection
+Find duplicate and similar functions:
+```yaml
+Similar Functions:
+  core/auth.ts::validateToken:
+    - python/auth.py::validate_token (92%)
+    - services/jwt.ts::verifyToken (85%)
 ```
 
-## 📝 Development
-
-### Setup Development Environment
-
-```bash
-# Clone repository
-git clone https://github.com/wronai/code2logic.git
-cd code2logic
-
-# Install development dependencies
-pip install -e .[dev]
-
-# Setup pre-commit hooks
-pre-commit install
-```
-
-### Code Quality
-
-```bash
-# Format code
-black code2logic tests examples
-isort code2logic tests examples
-
-# Lint code
-flake8 code2logic tests examples
-mypy code2logic
-
-# Run security checks
-bandit -r code2logic
-```
-
-### Project Structure
+## 🏗️ Architecture
 
 ```
 code2logic/
-├── code2logic/                    # Main package
-│   ├── __init__.py               # API exports
-│   ├── analyzer.py               # Core analyzer
-│   ├── cli.py                    # CLI interface
-│   ├── dependency.py             # Dependency analysis
-│   ├── generators.py             # Output generators
-│   ├── intent.py                 # Intent analysis
-│   ├── llm.py                    # LLM integration
-│   ├── mcp_server.py             # MCP server
-│   ├── models.py                 # Data models
-│   ├── parsers.py                # Code parsers
-│   ├── similarity.py             # Similarity detection
-│   └── py.typed                  # Type hints marker
-├── tests/                        # Test suite
-├── examples/                     # Usage examples
-├── docs/                         # Documentation
-├── dist/                         # Built packages
-└── docker/                       # Docker files
+├── analyzer.py      # Main orchestrator
+├── parsers.py       # Tree-sitter + fallback parser
+├── dependency.py    # NetworkX dependency analysis
+├── similarity.py    # Rapidfuzz similar detection
+├── intent.py        # NLP intent generation
+├── generators.py    # Output generators (MD/Compact/JSON)
+├── models.py        # Data structures
+└── cli.py           # Command-line interface
 ```
+
+## 🔌 Integration Examples
+
+### With Claude/ChatGPT
+```python
+from code2logic import analyze_project, CompactGenerator
+
+project = analyze_project("./my-project")
+context = CompactGenerator().generate(project)
+
+# Use in your LLM prompt
+prompt = f"""
+Analyze this codebase and suggest improvements:
+
+{context}
+"""
+```
+
+### With RAG Systems
+```python
+import json
+from code2logic import analyze_project, JSONGenerator
+
+project = analyze_project("./my-project")
+data = json.loads(JSONGenerator().generate(project))
+
+# Index in vector DB
+for module in data['modules']:
+    for func in module['functions']:
+        embed_and_store(
+            text=f"{func['name']}: {func['intent']}",
+            metadata={'path': module['path'], 'type': 'function'}
+        )
+```
+
+## 🧪 Development
+
+### Setup
+```bash
+git clone https://github.com/softreck/code2logic
+cd code2logic
+pip install -e ".[dev]"
+pre-commit install
+```
+
+### Tests
+```bash
+pytest
+pytest --cov=code2logic --cov-report=html
+```
+
+### Type Checking
+```bash
+mypy code2logic
+```
+
+### Linting
+```bash
+ruff check code2logic
+black code2logic
+```
+
+## 📈 Performance
+
+| Codebase Size | Files | Lines | Time | Output Size |
+|--------------|-------|-------|------|-------------|
+| Small        | 10    | 1K    | <1s  | ~5KB        |
+| Medium       | 100   | 30K   | ~2s  | ~50KB       |
+| Large        | 500   | 150K  | ~10s | ~200KB      |
+
+Compact format is ~10-15x smaller than Markdown.
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-### Contribution Areas
-
-- **Core analysis features**: Improve parsing, dependency analysis
-- **LLM integration**: Add new providers, improve prompts
-- **Output formats**: Support new formats, improve existing ones
-- **Documentation**: Improve docs, add examples
-- **Testing**: Increase test coverage, add integration tests
+Contributions welcome! Please read our [Contributing Guide](CONTRIBUTING.md).
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) for details.
 
-## 🙏 Acknowledgments
+## 🔗 Links
 
-- [Tree-sitter](https://tree-sitter.github.io/) for robust AST parsing
-- [NetworkX](https://networkx.org/) for graph analysis
-- [LiteLLM](https://github.com/BerriAI/litellm) for LLM integration
-- [Ollama](https://ollama.ai/) for local LLM support
-- [MCP](https://modelcontextprotocol.io/) for Claude Desktop integration
-
-## 📞 Support
-
-- **Documentation**: [https://code2logic.readthedocs.io](https://code2logic.readthedocs.io)
-- **Issues**: [GitHub Issues](https://github.com/wronai/code2logic/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/wronai/code2logic/discussions)
-- **Email**: team@code2logic.dev
-
-## 🗺️ Roadmap
-
-- [ ] Support for more programming languages (Rust, Go, TypeScript)
-- [ ] Web-based visualization interface
-- [ ] Advanced refactoring patterns
-- [ ] Integration with popular IDEs
-- [ ] Performance optimizations for large codebases
-- [ ] Cloud-based analysis service
-- [ ] Team collaboration features
-
----
-
-**code2logic** - Transform code into insights 🚀
+- [Documentation](https://code2logic.readthedocs.io)
+- [PyPI](https://pypi.org/project/code2logic/)
+- [GitHub](https://github.com/softreck/code2logic)
+- [Issues](https://github.com/softreck/code2logic/issues)

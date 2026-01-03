@@ -1,437 +1,768 @@
 #!/bin/bash
-
-# Main script to run all code2logic examples
-# This script demonstrates various features of the code2logic package
+# =============================================================================
+# Code2Logic Examples Runner
+# =============================================================================
+# Usage: ./run_examples.sh <command> [options]
+#
+# Commands:
+#   analyze      - Analyze a project and generate output
+#   compare      - Compare two projects for duplicates
+#   generate     - Generate code from CSV in another language
+#   refactor     - Suggest refactoring using LLM
+#   deduplicate  - Find and suggest duplicate removal
+#   translate    - Translate code logic to another language
+#   document     - Generate documentation from analysis
+#   gherkin      - Generate Gherkin/BDD test features
+#   tests        - Generate test files for various frameworks
+#   batch        - Batch analyze multiple projects
+#   pipeline     - Run full LLM pipeline
+#   api-demo     - Demonstrate Python API usage
+#
+# Examples:
+#   ./run_examples.sh analyze /path/to/project -f csv
+#   ./run_examples.sh compare /project1 /project2
+#   ./run_examples.sh generate analysis.csv --lang typescript
+#   ./run_examples.sh refactor /path/to/project
+# =============================================================================
 
 set -e
 
-echo "=== code2logic Examples ==="
-echo ""
-
-# Colors for output
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Function to print colored output
-print_status() {
+# Default settings
+OLLAMA_HOST="${OLLAMA_HOST:-http://localhost:11434}"
+LITELLM_HOST="${LITELLM_HOST:-http://localhost:4000}"
+OUTPUT_DIR="${OUTPUT_DIR:-./output}"
+MODEL="${MODEL:-qwen2.5-coder:7b}"
+
+# =============================================================================
+# Helper Functions
+# =============================================================================
+
+log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
 }
 
-print_success() {
+log_success() {
     echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
 
-print_warning() {
+log_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
-print_error() {
+log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Check if code2logic is installed
-check_installation() {
-    print_status "Checking code2logic installation..."
-    
-    if python -c "import code2logic" 2>/dev/null; then
-        print_success "code2logic is installed"
-    else
-        print_error "code2logic is not installed. Please install it first:"
-        echo "pip install -e ."
+check_ollama() {
+    if ! curl -s "$OLLAMA_HOST/api/tags" > /dev/null 2>&1; then
+        log_error "Ollama not running at $OLLAMA_HOST"
+        log_info "Start Ollama: ollama serve"
         exit 1
     fi
+    log_info "Ollama connected at $OLLAMA_HOST"
 }
 
-# Create sample project directory
-create_sample_project() {
-    print_status "Creating sample project..."
-    
-    SAMPLE_DIR="./sample_project"
-    rm -rf "$SAMPLE_DIR"
-    mkdir -p "$SAMPLE_DIR"
-    
-    # Create sample Python files
-    cat > "$SAMPLE_DIR/main.py" << 'EOF'
-import os
-import sys
-from typing import List, Dict
-from utils import helper_function
-
-class Calculator:
-    """A simple calculator class."""
-    
-    def __init__(self):
-        self.history = []
-    
-    def add(self, a: float, b: float) -> float:
-        """Add two numbers."""
-        result = a + b
-        self.history.append(f"{a} + {b} = {result}")
-        return result
-    
-    def subtract(self, a: float, b: float) -> float:
-        """Subtract two numbers."""
-        result = a - b
-        self.history.append(f"{a} - {b} = {result}")
-        return result
-    
-    def multiply(self, a: float, b: float) -> float:
-        """Multiply two numbers."""
-        result = a * b
-        self.history.append(f"{a} * {b} = {result}")
-        return result
-    
-    def divide(self, a: float, b: float) -> float:
-        """Divide two numbers."""
-        if b == 0:
-            raise ValueError("Cannot divide by zero")
-        result = a / b
-        self.history.append(f"{a} / {b} = {result}")
-        return result
-    
-    def get_history(self) -> List[str]:
-        """Get calculation history."""
-        return self.history.copy()
-
-def fibonacci(n: int) -> int:
-    """Calculate the nth Fibonacci number."""
-    if n <= 1:
-        return n
-    return fibonacci(n - 1) + fibonacci(n - 2)
-
-def factorial(n: int) -> int:
-    """Calculate factorial of n."""
-    if n <= 1:
-        return 1
-    return n * factorial(n - 1)
-
-def main():
-    """Main function."""
-    calc = Calculator()
-    
-    # Perform some calculations
-    result1 = calc.add(10, 5)
-    result2 = calc.multiply(result1, 2)
-    result3 = calc.subtract(result2, 3)
-    
-    print(f"Results: {result1}, {result2}, {result3}")
-    print("History:", calc.get_history())
-    
-    # Test helper function
-    helper_result = helper_function("test")
-    print(f"Helper result: {helper_result}")
-
-if __name__ == "__main__":
-    main()
-EOF
-
-    cat > "$SAMPLE_DIR/utils.py" << 'EOF'
-import json
-import re
-from typing import Any, Dict, List
-
-def helper_function(data: str) -> Dict[str, Any]:
-    """A helper function that processes data."""
-    processed_data = {
-        "original": data,
-        "length": len(data),
-        "uppercase": data.upper(),
-        "lowercase": data.lower(),
-        "words": data.split()
-    }
-    return processed_data
-
-class DataProcessor:
-    """A class for processing various data types."""
-    
-    def __init__(self):
-        self.processed_items = []
-    
-    def process_text(self, text: str) -> Dict[str, Any]:
-        """Process text data."""
-        result = {
-            "text": text,
-            "char_count": len(text),
-            "word_count": len(text.split()),
-            "has_numbers": bool(re.search(r'\d', text)),
-            "has_special_chars": bool(re.search(r'[^a-zA-Z0-9\s]', text))
-        }
-        self.processed_items.append(result)
-        return result
-    
-    def process_numbers(self, numbers: List[float]) -> Dict[str, float]:
-        """Process numeric data."""
-        if not numbers:
-            return {}
-        
-        result = {
-            "count": len(numbers),
-            "sum": sum(numbers),
-            "average": sum(numbers) / len(numbers),
-            "min": min(numbers),
-            "max": max(numbers)
-        }
-        self.processed_items.append(result)
-        return result
-    
-    def get_summary(self) -> Dict[str, Any]:
-        """Get processing summary."""
-        return {
-            "total_items": len(self.processed_items),
-            "item_types": list(set(type(item).__name__ for item in self.processed_items))
-        }
-
-def validate_email(email: str) -> bool:
-    """Validate email address."""
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return bool(re.match(pattern, email))
-
-def format_json(data: Dict[str, Any]) -> str:
-    """Format data as JSON string."""
-    return json.dumps(data, indent=2)
-EOF
-
-    cat > "$SAMPLE_DIR/__init__.py" << 'EOF'
-"""Sample project package."""
-
-__version__ = "1.0.0"
-__author__ = "Sample Author"
-EOF
-
-    print_success "Sample project created in $SAMPLE_DIR"
+check_model() {
+    local model="$1"
+    if ! curl -s "$OLLAMA_HOST/api/tags" | grep -q "$model"; then
+        log_warning "Model $model not found. Pulling..."
+        ollama pull "$model"
+    fi
 }
 
-# Run basic analysis example
-run_basic_analysis() {
-    print_status "Running basic analysis example..."
-    
-    OUTPUT_DIR="./examples_output"
+ensure_output_dir() {
     mkdir -p "$OUTPUT_DIR"
-    
-    # Analyze sample project
-    python -m code2logic.cli ./sample_project --output "$OUTPUT_DIR/basic_analysis" --format json
-    
-    if [ -f "$OUTPUT_DIR/basic_analysis.json" ]; then
-        print_success "Basic analysis completed: $OUTPUT_DIR/basic_analysis.json"
-        
-        # Show summary
-        print_status "Analysis summary:"
-        python -c "
-import json
-with open('$OUTPUT_DIR/basic_analysis.json', 'r') as f:
-    data = json.load(f)
-stats = data['project']['statistics']
-print(f'Modules: {stats[\"total_modules\"]}')
-print(f'Functions: {stats[\"total_functions\"]}')
-print(f'Classes: {stats[\"total_classes\"]}')
-print(f'Dependencies: {stats[\"total_dependencies\"]}')
-print(f'Lines of Code: {stats[\"total_lines_of_code\"]}')
-"
-    else
-        print_error "Basic analysis failed"
-    fi
 }
 
-# Run multiple formats example
-run_multiple_formats() {
-    print_status "Running multiple formats example..."
+# =============================================================================
+# Commands
+# =============================================================================
+
+cmd_analyze() {
+    local project_path="$1"
+    shift
     
-    OUTPUT_DIR="./examples_output"
+    if [ -z "$project_path" ]; then
+        log_error "Project path required"
+        echo "Usage: $0 analyze /path/to/project [-f format] [-d detail] [-o output]"
+        exit 1
+    fi
     
-    # Generate all formats
-    python -m code2logic.cli ./sample_project --output "$OUTPUT_DIR/multi_format" --format all
+    log_info "Analyzing project: $project_path"
+    ensure_output_dir
     
-    # Check generated files
-    formats=("json" "yaml" "csv" "markdown" "compact")
+    # Default options
+    local format="csv"
+    local detail="standard"
+    local output="$OUTPUT_DIR/analysis.csv"
     
-    for format in "${formats[@]}"; do
-        if [ "$format" = "csv" ]; then
-            # CSV generates multiple files
-            if ls "$OUTPUT_DIR/multi_format."*".csv" 1> /dev/null 2>&1; then
-                print_success "$format format generated"
-            else
-                print_warning "$format format not found"
-            fi
-        else
-            if [ -f "$OUTPUT_DIR/multi_format.$format" ]; then
-                print_success "$format format generated"
-            else
-                print_warning "$format format not found"
-            fi
-        fi
+    # Parse options
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -f|--format) format="$2"; shift 2 ;;
+            -d|--detail) detail="$2"; shift 2 ;;
+            -o|--output) output="$2"; shift 2 ;;
+            *) shift ;;
+        esac
     done
-}
-
-# Run dependency analysis
-run_dependency_analysis() {
-    print_status "Running dependency analysis example..."
     
-    python examples/compare_projects.py ./sample_project ./sample_project --output "$OUTPUT_DIR/dependency_analysis.json"
+    # Update output extension based on format
+    case $format in
+        json) output="${output%.csv}.json" ;;
+        yaml) output="${output%.csv}.yaml" ;;
+        csv) output="${output%.json}.csv" ;;
+    esac
     
-    if [ -f "$OUTPUT_DIR/dependency_analysis.json" ]; then
-        print_success "Dependency analysis completed"
-    else
-        print_warning "Dependency analysis failed"
-    fi
-}
-
-# Run LLM examples (if available)
-run_llm_examples() {
-    print_status "Running LLM examples..."
+    code2logic "$project_path" -f "$format" -d "$detail" -o "$output"
     
-    # Check if Ollama is available
-    if command -v ollama &> /dev/null; then
-        print_status "Ollama found, running LLM examples..."
-        
-        # Run code generation example
-        python examples/generate_code.py --prompt "Create a function that validates email addresses" --output "$OUTPUT_DIR/generated_code.py"
-        
-        if [ -f "$OUTPUT_DIR/generated_code.py" ]; then
-            print_success "Code generation example completed"
-        else
-            print_warning "Code generation example failed"
-        fi
-        
-        # Run refactoring suggestions
-        python examples/refactor_suggestions.py --target ./sample_project/main.py --output "$OUTPUT_DIR/refactor_suggestions.json"
-        
-        if [ -f "$OUTPUT_DIR/refactor_suggestions.json" ]; then
-            print_success "Refactoring suggestions completed"
-        else
-            print_warning "Refactoring suggestions failed"
-        fi
-    else
-        print_warning "Ollama not found. Skipping LLM examples."
-        print_status "To run LLM examples, install Ollama:"
-        echo "curl -fsSL https://ollama.ai/install.sh | sh"
-    fi
-}
-
-# Run MCP server example
-run_mcp_example() {
-    print_status "Running MCP server example..."
-    
-    # Check if MCP is available
-    if python -c "import mcp" 2>/dev/null; then
-        print_status "Starting MCP server for 10 seconds..."
-        
-        # Start server in background
-        python -m code2logic.mcp_server --mcp --mcp-port 8080 &
-        SERVER_PID=$!
-        
-        # Wait a bit
-        sleep 2
-        
-        # Test server (simple curl test)
-        if command -v curl &> /dev/null; then
-            print_status "Testing MCP server..."
-            # Note: This is a basic test - actual MCP protocol would be more complex
-            if curl -s http://localhost:8080 > /dev/null; then
-                print_success "MCP server is responding"
-            else
-                print_warning "MCP server test failed"
-            fi
-        fi
-        
-        # Stop server
-        kill $SERVER_PID 2>/dev/null || true
-        print_success "MCP server example completed"
-    else
-        print_warning "MCP not installed. Skipping MCP server example."
-        print_status "To run MCP examples, install MCP:"
-        echo "pip install mcp"
-    fi
-}
-
-# Clean up function
-cleanup() {
-    print_status "Cleaning up..."
-    rm -rf ./sample_project
-    print_success "Cleanup completed"
-}
-
-# Show help
-show_help() {
-    echo "Usage: $0 [OPTIONS]"
+    log_success "Analysis saved to: $output"
     echo ""
-    echo "Options:"
-    echo "  --all          Run all examples"
-    echo "  --basic        Run basic analysis only"
-    echo "  --formats      Run multiple formats example"
-    echo "  --dependencies Run dependency analysis"
-    echo "  --llm          Run LLM examples (requires Ollama)"
-    echo "  --mcp          Run MCP server example"
-    echo "  --cleanup      Clean up sample files"
-    echo "  --help         Show this help message"
+    echo "Statistics:"
+    wc -l "$output" | awk '{print "  Lines: "$1}'
+    du -h "$output" | awk '{print "  Size: "$1}'
+}
+
+cmd_compare() {
+    local project1="$1"
+    local project2="$2"
+    
+    if [ -z "$project1" ] || [ -z "$project2" ]; then
+        log_error "Two project paths required"
+        echo "Usage: $0 compare /path/to/project1 /path/to/project2"
+        exit 1
+    fi
+    
+    log_info "Comparing projects..."
+    ensure_output_dir
+    
+    # Analyze both projects
+    code2logic "$project1" -f csv -d full -o "$OUTPUT_DIR/project1.csv"
+    code2logic "$project2" -f csv -d full -o "$OUTPUT_DIR/project2.csv"
+    
+    log_info "Running comparison..."
+    
+    # Use Python script for comparison
+    python3 - "$OUTPUT_DIR/project1.csv" "$OUTPUT_DIR/project2.csv" << 'PYTHON_COMPARE'
+import sys
+import csv
+
+def load_csv(path):
+    with open(path, 'r') as f:
+        return list(csv.DictReader(f))
+
+def compare_projects(file1, file2):
+    data1 = load_csv(file1)
+    data2 = load_csv(file2)
+    
+    # Extract hashes
+    hashes1 = {r.get('hash', ''): r for r in data1 if r.get('hash')}
+    hashes2 = {r.get('hash', ''): r for r in data2 if r.get('hash')}
+    
+    # Find matches
+    common = set(hashes1.keys()) & set(hashes2.keys())
+    only1 = set(hashes1.keys()) - set(hashes2.keys())
+    only2 = set(hashes2.keys()) - set(hashes1.keys())
+    
+    print(f"\n{'='*60}")
+    print("COMPARISON RESULTS")
+    print(f"{'='*60}")
+    print(f"Project 1 elements: {len(data1)}")
+    print(f"Project 2 elements: {len(data2)}")
+    print(f"\nIdentical elements: {len(common)}")
+    print(f"Only in Project 1: {len(only1)}")
+    print(f"Only in Project 2: {len(only2)}")
+    
+    if common:
+        print(f"\n--- Identical Elements (top 10) ---")
+        for i, h in enumerate(list(common)[:10]):
+            r = hashes1[h]
+            print(f"  {r['type']}: {r['name']} ({r['path']})")
+    
+    # Find similar by signature
+    sigs1 = {r.get('signature', ''): r for r in data1 if r.get('signature')}
+    sigs2 = {r.get('signature', ''): r for r in data2 if r.get('signature')}
+    similar_sigs = set(sigs1.keys()) & set(sigs2.keys())
+    
+    print(f"\nSimilar signatures: {len(similar_sigs)}")
+    
+    return {
+        'identical': len(common),
+        'only_project1': len(only1),
+        'only_project2': len(only2),
+        'similar_signatures': len(similar_sigs)
+    }
+
+if __name__ == '__main__':
+    compare_projects(sys.argv[1], sys.argv[2])
+PYTHON_COMPARE
+    
+    log_success "Comparison complete"
+}
+
+cmd_generate() {
+    local csv_file="$1"
+    local target_lang="${2:-typescript}"
+    
+    if [ -z "$csv_file" ]; then
+        log_error "CSV file required"
+        echo "Usage: $0 generate analysis.csv [--lang typescript|python|go|rust]"
+        exit 1
+    fi
+    
+    check_ollama
+    check_model "$MODEL"
+    
+    log_info "Generating $target_lang code from: $csv_file"
+    ensure_output_dir
+    
+    # Parse options
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --lang) target_lang="$2"; shift 2 ;;
+            *) shift ;;
+        esac
+    done
+    
+    python3 - "$csv_file" "$target_lang" "$OLLAMA_HOST" "$MODEL" << 'PYTHON_GENERATE'
+import sys
+import csv
+import json
+import httpx
+
+def generate_code(csv_file, target_lang, ollama_host, model):
+    # Load CSV
+    with open(csv_file, 'r') as f:
+        data = list(csv.DictReader(f))
+    
+    # Group by path/class
+    groups = {}
+    for row in data:
+        key = row.get('path', 'unknown')
+        if key not in groups:
+            groups[key] = []
+        groups[key].append(row)
+    
+    print(f"Generating {target_lang} code for {len(groups)} modules...")
+    
+    results = []
+    for path, elements in list(groups.items())[:5]:  # Limit to 5 modules
+        # Build context
+        context = f"Module: {path}\n\nElements:\n"
+        for e in elements[:10]:
+            context += f"- {e.get('type', 'unknown')}: {e.get('name', '')} {e.get('signature', '')}\n"
+            if e.get('intent'):
+                context += f"  Intent: {e['intent']}\n"
+        
+        prompt = f"""Generate {target_lang} code based on this specification:
+
+{context}
+
+Generate clean, idiomatic {target_lang} code with:
+1. Type annotations
+2. Docstrings/comments
+3. Error handling
+
+Output only the code, no explanations."""
+
+        # Call Ollama
+        try:
+            response = httpx.post(
+                f"{ollama_host}/api/generate",
+                json={"model": model, "prompt": prompt, "stream": False},
+                timeout=120.0
+            )
+            result = response.json()
+            code = result.get('response', '')
+            
+            print(f"\n{'='*60}")
+            print(f"Generated: {path} -> {target_lang}")
+            print('='*60)
+            print(code[:500] + "..." if len(code) > 500 else code)
+            
+            results.append({
+                'source': path,
+                'target_lang': target_lang,
+                'code': code
+            })
+        except Exception as e:
+            print(f"Error generating {path}: {e}")
+    
+    # Save results
+    output_file = csv_file.replace('.csv', f'_{target_lang}_generated.json')
+    with open(output_file, 'w') as f:
+        json.dump(results, f, indent=2)
+    
+    print(f"\nResults saved to: {output_file}")
+
+if __name__ == '__main__':
+    generate_code(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+PYTHON_GENERATE
+    
+    log_success "Code generation complete"
+}
+
+cmd_refactor() {
+    local project_path="$1"
+    
+    if [ -z "$project_path" ]; then
+        log_error "Project path required"
+        echo "Usage: $0 refactor /path/to/project"
+        exit 1
+    fi
+    
+    check_ollama
+    check_model "$MODEL"
+    
+    log_info "Analyzing project for refactoring suggestions..."
+    ensure_output_dir
+    
+    # First analyze
+    code2logic "$project_path" -f csv -d full -o "$OUTPUT_DIR/refactor_analysis.csv"
+    
+    python3 - "$OUTPUT_DIR/refactor_analysis.csv" "$OLLAMA_HOST" "$MODEL" << 'PYTHON_REFACTOR'
+import sys
+import csv
+import httpx
+from collections import defaultdict
+
+def analyze_for_refactoring(csv_file, ollama_host, model):
+    with open(csv_file, 'r') as f:
+        data = list(csv.DictReader(f))
+    
+    issues = []
+    
+    # 1. Find high complexity
+    high_complexity = [r for r in data if int(r.get('complexity', 0)) > 10]
+    for r in high_complexity:
+        issues.append({
+            'type': 'high_complexity',
+            'path': r['path'],
+            'name': r['name'],
+            'complexity': r['complexity'],
+            'suggestion': 'Consider breaking down into smaller functions'
+        })
+    
+    # 2. Find duplicates by hash
+    hash_counts = defaultdict(list)
+    for r in data:
+        if r.get('hash'):
+            hash_counts[r['hash']].append(r)
+    
+    duplicates = {h: rs for h, rs in hash_counts.items() if len(rs) > 1}
+    for h, rs in duplicates.items():
+        issues.append({
+            'type': 'duplicate',
+            'elements': [f"{r['path']}::{r['name']}" for r in rs],
+            'suggestion': 'Consider extracting to shared utility'
+        })
+    
+    # 3. Find similar signatures (potential DRY violations)
+    sig_counts = defaultdict(list)
+    for r in data:
+        if r.get('signature') and r.get('type') in ('function', 'method'):
+            sig_counts[r['signature']].append(r)
+    
+    similar = {s: rs for s, rs in sig_counts.items() if len(rs) > 2}
+    for s, rs in list(similar.items())[:5]:
+        issues.append({
+            'type': 'similar_signature',
+            'signature': s,
+            'count': len(rs),
+            'suggestion': 'Consider creating generic implementation'
+        })
+    
+    # 4. Find long files
+    path_lines = defaultdict(int)
+    for r in data:
+        path_lines[r['path']] += int(r.get('lines', 0))
+    
+    long_files = [(p, l) for p, l in path_lines.items() if l > 500]
+    for p, l in long_files:
+        issues.append({
+            'type': 'long_file',
+            'path': p,
+            'lines': l,
+            'suggestion': 'Consider splitting into multiple modules'
+        })
+    
+    print(f"\n{'='*60}")
+    print("REFACTORING ANALYSIS")
+    print(f"{'='*60}")
+    print(f"Total elements analyzed: {len(data)}")
+    print(f"Issues found: {len(issues)}")
+    
+    for issue in issues[:20]:
+        print(f"\n[{issue['type'].upper()}]")
+        for k, v in issue.items():
+            if k != 'type':
+                print(f"  {k}: {v}")
+    
+    # Get LLM suggestions for top issues
+    if issues[:3]:
+        print(f"\n{'='*60}")
+        print("LLM SUGGESTIONS")
+        print(f"{'='*60}")
+        
+        context = "\n".join([
+            f"Issue {i+1}: {issue['type']} - {issue.get('suggestion', '')}"
+            for i, issue in enumerate(issues[:5])
+        ])
+        
+        prompt = f"""Analyze these code issues and provide specific refactoring suggestions:
+
+{context}
+
+Provide concrete, actionable suggestions for each issue. Be specific about:
+1. What pattern to apply
+2. How to implement the change
+3. Potential risks"""
+
+        try:
+            response = httpx.post(
+                f"{ollama_host}/api/generate",
+                json={"model": model, "prompt": prompt, "stream": False},
+                timeout=120.0
+            )
+            result = response.json()
+            print(result.get('response', 'No response'))
+        except Exception as e:
+            print(f"LLM error: {e}")
+
+if __name__ == '__main__':
+    analyze_for_refactoring(sys.argv[1], sys.argv[2], sys.argv[3])
+PYTHON_REFACTOR
+    
+    log_success "Refactoring analysis complete"
+}
+
+cmd_deduplicate() {
+    local project_path="$1"
+    
+    if [ -z "$project_path" ]; then
+        log_error "Project path required"
+        echo "Usage: $0 deduplicate /path/to/project"
+        exit 1
+    fi
+    
+    log_info "Finding duplicates in: $project_path"
+    ensure_output_dir
+    
+    code2logic "$project_path" -f csv -d full -o "$OUTPUT_DIR/dedup_analysis.csv"
+    
+    python3 - "$OUTPUT_DIR/dedup_analysis.csv" << 'PYTHON_DEDUP'
+import sys
+import csv
+from collections import defaultdict
+
+def find_duplicates(csv_file):
+    with open(csv_file, 'r') as f:
+        data = list(csv.DictReader(f))
+    
+    print(f"\n{'='*60}")
+    print("DUPLICATE DETECTION")
+    print(f"{'='*60}")
+    
+    # By hash (exact duplicates)
+    hash_groups = defaultdict(list)
+    for r in data:
+        if r.get('hash'):
+            hash_groups[r['hash']].append(r)
+    
+    exact_dups = {h: rs for h, rs in hash_groups.items() if len(rs) > 1}
+    
+    print(f"\n1. EXACT DUPLICATES (same signature): {len(exact_dups)}")
+    for h, rs in list(exact_dups.items())[:10]:
+        print(f"\n  Hash: {h}")
+        for r in rs:
+            print(f"    - {r['path']}::{r['name']}")
+    
+    # By intent (semantic duplicates)
+    intent_groups = defaultdict(list)
+    for r in data:
+        if r.get('intent'):
+            # Normalize intent
+            intent_key = r['intent'].lower().strip()[:50]
+            intent_groups[intent_key].append(r)
+    
+    semantic_dups = {i: rs for i, rs in intent_groups.items() if len(rs) > 1}
+    
+    print(f"\n2. SEMANTIC DUPLICATES (similar intent): {len(semantic_dups)}")
+    for intent, rs in list(semantic_dups.items())[:10]:
+        print(f"\n  Intent: {intent}...")
+        for r in rs:
+            print(f"    - {r['path']}::{r['name']}")
+    
+    # By category+domain (potential consolidation)
+    cat_domain_groups = defaultdict(list)
+    for r in data:
+        key = f"{r.get('category', '')}:{r.get('domain', '')}"
+        if key != ':':
+            cat_domain_groups[key].append(r)
+    
+    consolidation = [(k, rs) for k, rs in cat_domain_groups.items() if len(rs) > 5]
+    
+    print(f"\n3. CONSOLIDATION CANDIDATES (same category+domain):")
+    for key, rs in sorted(consolidation, key=lambda x: -len(x[1]))[:10]:
+        print(f"\n  {key}: {len(rs)} functions")
+    
+    # Summary
+    total_dups = sum(len(rs) - 1 for rs in exact_dups.values())
+    print(f"\n{'='*60}")
+    print("SUMMARY")
+    print(f"{'='*60}")
+    print(f"Total elements: {len(data)}")
+    print(f"Exact duplicate functions: {total_dups}")
+    print(f"Semantic duplicate groups: {len(semantic_dups)}")
+    print(f"Potential consolidation areas: {len(consolidation)}")
+    
+if __name__ == '__main__':
+    find_duplicates(sys.argv[1])
+PYTHON_DEDUP
+    
+    log_success "Duplicate detection complete"
+}
+
+cmd_translate() {
+    local csv_file="$1"
+    local source_lang="$2"
+    local target_lang="$3"
+    
+    if [ -z "$csv_file" ] || [ -z "$target_lang" ]; then
+        log_error "CSV file and target language required"
+        echo "Usage: $0 translate analysis.csv python typescript"
+        exit 1
+    fi
+    
+    check_ollama
+    check_model "$MODEL"
+    
+    log_info "Translating from $source_lang to $target_lang..."
+    
+    python3 - "$csv_file" "$source_lang" "$target_lang" "$OLLAMA_HOST" "$MODEL" << 'PYTHON_TRANSLATE'
+import sys
+import csv
+import httpx
+
+def translate_code(csv_file, source_lang, target_lang, ollama_host, model):
+    with open(csv_file, 'r') as f:
+        data = list(csv.DictReader(f))
+    
+    # Filter by source language
+    source_elements = [r for r in data if r.get('language', '').lower() == source_lang.lower()]
+    
+    print(f"Found {len(source_elements)} {source_lang} elements")
+    print(f"Translating to {target_lang}...\n")
+    
+    for r in source_elements[:5]:
+        prompt = f"""Translate this {source_lang} function specification to {target_lang}:
+
+Function: {r.get('name', '')}
+Signature: {r.get('signature', '')}
+Intent: {r.get('intent', '')}
+Category: {r.get('category', '')}
+
+Generate idiomatic {target_lang} code with proper:
+1. Type annotations
+2. Error handling
+3. Documentation
+
+Output only code."""
+
+        try:
+            response = httpx.post(
+                f"{ollama_host}/api/generate",
+                json={"model": model, "prompt": prompt, "stream": False},
+                timeout=60.0
+            )
+            result = response.json()
+            code = result.get('response', '')
+            
+            print(f"{'='*40}")
+            print(f"{r['name']} ({source_lang} -> {target_lang})")
+            print('='*40)
+            print(code[:400])
+            print()
+        except Exception as e:
+            print(f"Error: {e}")
+
+if __name__ == '__main__':
+    translate_code(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+PYTHON_TRANSLATE
+    
+    log_success "Translation complete"
+}
+
+cmd_document() {
+    local project_path="$1"
+    
+    if [ -z "$project_path" ]; then
+        log_error "Project path required"
+        echo "Usage: $0 document /path/to/project"
+        exit 1
+    fi
+    
+    log_info "Generating documentation for: $project_path"
+    ensure_output_dir
+    
+    mkdir -p "$OUTPUT_DIR/docs"
+    
+    # Generate in multiple formats
+    code2logic "$project_path" -f markdown -d standard -o "$OUTPUT_DIR/docs/README.md"
+    code2logic "$project_path" -f yaml -d standard -o "$OUTPUT_DIR/docs/api.yaml"
+    code2logic "$project_path" -f json --flat -d full -o "$OUTPUT_DIR/docs/api.json"
+    code2logic "$project_path" -f gherkin -d standard -o "$OUTPUT_DIR/docs/tests.feature"
+    
+    log_success "Documentation generated in $OUTPUT_DIR/docs/"
+    ls -la "$OUTPUT_DIR/docs/"
+}
+
+cmd_gherkin() {
+    local project_path="$1"
+    shift || true
+    
+    if [ -z "$project_path" ]; then
+        log_error "Project path required"
+        echo "Usage: $0 gherkin /path/to/project [--steps] [--lang en|pl]"
+        exit 1
+    fi
+    
+    log_info "Generating Gherkin features for: $project_path"
+    ensure_output_dir
+    
+    local extra_args=""
+    if [[ "$*" == *"--steps"* ]]; then
+        extra_args="$extra_args --steps"
+    fi
+    
+    local lang="en"
+    if [[ "$*" == *"--lang"* ]]; then
+        lang=$(echo "$*" | sed -n 's/.*--lang \([^ ]*\).*/\1/p')
+        extra_args="$extra_args --lang $lang"
+    fi
+    
+    python3 "$(dirname "$0")/generate_gherkin.py" "$project_path" --output "$OUTPUT_DIR" --compare $extra_args
+    
+    log_success "Gherkin generation complete"
+}
+
+cmd_tests() {
+    local project_path="$1"
+    local framework="${2:-pytest}"
+    
+    if [ -z "$project_path" ]; then
+        log_error "Project path required"
+        echo "Usage: $0 tests /path/to/project [framework]"
+        echo "Frameworks: pytest, bdd, jest, go"
+        exit 1
+    fi
+    
+    log_info "Generating $framework tests for: $project_path"
+    ensure_output_dir
+    
+    python3 "$(dirname "$0")/generate_tests.py" "$project_path" --framework "$framework" --output "$OUTPUT_DIR/tests"
+    
+    log_success "Test generation complete"
+}
+
+cmd_batch() {
+    log_info "Running batch analysis..."
+    
+    bash "$(dirname "$0")/batch_analysis.sh" "$@"
+}
+
+cmd_pipeline() {
+    local project_path="$1"
+    
+    if [ -z "$project_path" ]; then
+        log_error "Project path required"
+        echo "Usage: $0 pipeline /path/to/project"
+        exit 1
+    fi
+    
+    log_info "Running full LLM pipeline for: $project_path"
+    ensure_output_dir
+    
+    python3 "$(dirname "$0")/llm_pipeline.py" "$project_path" --output "$OUTPUT_DIR"
+    
+    log_success "Pipeline complete"
+}
+
+cmd_api_demo() {
+    log_info "Running API usage demonstration..."
+    
+    python3 "$(dirname "$0")/api_usage.py"
+    
+    log_success "API demo complete"
+}
+
+# =============================================================================
+# Main
+# =============================================================================
+
+show_help() {
+    echo "Code2Logic Examples Runner"
+    echo ""
+    echo "Usage: $0 <command> [options]"
+    echo ""
+    echo "Commands:"
+    echo "  analyze      Analyze a project and generate output"
+    echo "  compare      Compare two projects for duplicates"
+    echo "  generate     Generate code from CSV in another language"
+    echo "  refactor     Suggest refactoring using LLM"
+    echo "  deduplicate  Find and suggest duplicate removal"
+    echo "  translate    Translate code logic to another language"
+    echo "  document     Generate documentation from analysis"
+    echo "  gherkin      Generate Gherkin/BDD test features (50x token savings)"
+    echo "  tests        Generate test files (pytest, jest, go)"
+    echo "  batch        Batch analyze multiple projects"
+    echo "  pipeline     Run full LLM pipeline"
+    echo "  api-demo     Demonstrate Python API usage"
+    echo ""
+    echo "Environment variables:"
+    echo "  OLLAMA_HOST  Ollama server (default: http://localhost:11434)"
+    echo "  MODEL        Model to use (default: qwen2.5-coder:7b)"
+    echo "  OUTPUT_DIR   Output directory (default: ./output)"
     echo ""
     echo "Examples:"
-    echo "  $0 --all              # Run all examples"
-    echo "  $0 --basic            # Run basic analysis only"
-    echo "  $0 --llm              # Run LLM examples"
-    echo "  $0 --cleanup          # Clean up"
+    echo "  $0 analyze /path/to/project -f csv"
+    echo "  $0 compare /project1 /project2"
+    echo "  $0 gherkin /path/to/project --steps"
+    echo "  $0 tests /path/to/project pytest"
+    echo "  $0 pipeline /path/to/project"
+    echo "  $0 batch /projects/dir"
 }
 
-# Main execution
 main() {
-    echo ""
+    local cmd="${1:-help}"
+    shift || true
     
-    case "${1:-all}" in
-        --all)
-            check_installation
-            create_sample_project
-            run_basic_analysis
-            run_multiple_formats
-            run_dependency_analysis
-            run_llm_examples
-            run_mcp_example
-            ;;
-        --basic)
-            check_installation
-            create_sample_project
-            run_basic_analysis
-            ;;
-        --formats)
-            check_installation
-            create_sample_project
-            run_multiple_formats
-            ;;
-        --dependencies)
-            check_installation
-            create_sample_project
-            run_dependency_analysis
-            ;;
-        --llm)
-            check_installation
-            create_sample_project
-            run_llm_examples
-            ;;
-        --mcp)
-            check_installation
-            run_mcp_example
-            ;;
-        --cleanup)
-            cleanup
-            ;;
-        --help)
-            show_help
-            ;;
+    case "$cmd" in
+        analyze)     cmd_analyze "$@" ;;
+        compare)     cmd_compare "$@" ;;
+        generate)    cmd_generate "$@" ;;
+        refactor)    cmd_refactor "$@" ;;
+        deduplicate) cmd_deduplicate "$@" ;;
+        translate)   cmd_translate "$@" ;;
+        document)    cmd_document "$@" ;;
+        gherkin)     cmd_gherkin "$@" ;;
+        tests)       cmd_tests "$@" ;;
+        batch)       cmd_batch "$@" ;;
+        pipeline)    cmd_pipeline "$@" ;;
+        api-demo)    cmd_api_demo "$@" ;;
+        help|--help|-h) show_help ;;
         *)
-            print_error "Unknown option: $1"
+            log_error "Unknown command: $cmd"
             show_help
             exit 1
             ;;
     esac
-    
-    echo ""
-    print_success "Examples completed!"
-    echo "Output files are in: ./examples_output/"
-    echo ""
-    echo "To clean up sample files, run:"
-    echo "$0 --cleanup"
 }
 
-# Run main function with all arguments
 main "$@"
