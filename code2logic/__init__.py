@@ -18,7 +18,7 @@ Example:
     >>> print(output)
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __author__ = "Softreck"
 __email__ = "info@softreck.dev"
 __license__ = "MIT"
@@ -164,6 +164,14 @@ from .quality import (
     get_quality_summary,
 )
 from .similarity import get_refactoring_suggestions
+from .errors import (
+    ErrorHandler,
+    ErrorType,
+    ErrorSeverity,
+    AnalysisError,
+    AnalysisResult,
+    create_error_handler,
+)
 from .chunked_reproduction import (
     ChunkedReproducer,
     ChunkedResult,

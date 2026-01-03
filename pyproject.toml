@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "code2logic"
-version = "1.0.1"
+version = "1.0.2"
 description = "Convert source code to logical representation for LLM analysis"
 readme = "README.md"
 license = {text = "MIT"}
@@ -206,14 +206,14 @@ module = [
 ignore_missing_imports = true
 
 [tool.bumpver]
-current_version = "1.0.1"
+current_version = "1.0.2"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit = false
 tag = false
 
 [tool.bumpver.file_patterns]
 "pyproject.toml" = [
-    "version = \"{version}\"",
-    "current_version = \"{version}\"",
+    "^version = \"{version}\"",
+    "^current_version = \"{version}\"",
 ]
 "code2logic/__init__.py" = ["__version__ = \"{version}\""]
