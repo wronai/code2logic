@@ -7,7 +7,7 @@ import tempfile
 from pathlib import Path
 from typing import Dict, Any
 
-from code2logic.models import Project, Module, Function, Class
+from code2logic.models import ProjectInfo, ModuleInfo, FunctionInfo, ClassInfo
 
 
 @pytest.fixture
@@ -182,74 +182,150 @@ class HelperClass:
 def sample_module():
     """Create a sample module for testing."""
     functions = [
-        Function(
+        FunctionInfo(
             name="test_func",
-            parameters=["arg1", "arg2"],
-            lines_of_code=10,
-            complexity=2,
+            params=["arg1", "arg2"],
+            return_type=None,
             docstring="Test function",
-            code="def test_func(arg1, arg2):\n    return arg1 + arg2"
+            calls=[],
+            raises=[],
+            complexity=2,
+            lines=10,
+            decorators=[],
+            is_async=False,
+            is_static=False,
+            is_private=False,
+            intent="Test function",
+            start_line=1,
+            end_line=10
         )
     ]
     
     classes = [
-        Class(
+        ClassInfo(
             name="TestClass",
+            bases=[],
+            docstring="Test class",
             methods=[
-                Function(
+                FunctionInfo(
                     name="method1",
-                    parameters=[],
-                    lines_of_code=5,
+                    params=[],
+                    return_type=None,
+                    docstring="Method 1",
+                    calls=[],
+                    raises=[],
                     complexity=1,
-                    docstring="Method 1"
+                    lines=5,
+                    decorators=[],
+                    is_async=False,
+                    is_static=False,
+                    is_private=False,
+                    intent="Method 1",
+                    start_line=1,
+                    end_line=5
                 )
             ],
-            lines_of_code=20,
-            docstring="Test class"
+            properties=[],
+            is_interface=False,
+            is_abstract=False,
+            generic_params=[]
         )
     ]
     
-    return Module(
-        name="test_module",
+    return ModuleInfo(
         path="/test/test_module.py",
-        functions=functions,
-        classes=classes,
+        language="python",
         imports=["os", "sys"],
-        lines_of_code=50
+        exports=[],
+        classes=classes,
+        functions=functions,
+        types=[],
+        constants=[],
+        docstring=None,
+        lines_total=50,
+        lines_code=40
     )
 
 
 @pytest.fixture
 def sample_project_model():
     """Create a sample project model for testing."""
-    module1 = Module(
-        name="module1",
+    module1 = ModuleInfo(
         path="/test/module1.py",
-        functions=[
-            Function(name="func1", parameters=[], lines_of_code=5, complexity=1)
-        ],
-        classes=[],
+        language="python",
         imports=["os"],
-        lines_of_code=10
-    )
-    
-    module2 = Module(
-        name="module2", 
-        path="/test/module2.py",
-        functions=[
-            Function(name="func2", parameters=["arg"], lines_of_code=8, complexity=2)
-        ],
+        exports=[],
         classes=[],
-        imports=["sys", "module1"],
-        lines_of_code=15
+        functions=[
+            FunctionInfo(
+                name="func1",
+                params=[],
+                return_type=None,
+                docstring=None,
+                calls=[],
+                raises=[],
+                complexity=1,
+                lines=5,
+                decorators=[],
+                is_async=False,
+                is_static=False,
+                is_private=False,
+                intent="",
+                start_line=1,
+                end_line=5
+            )
+        ],
+        types=[],
+        constants=[],
+        docstring=None,
+        lines_total=10,
+        lines_code=8
     )
     
-    return Project(
+    module2 = ModuleInfo(
+        path="/test/module2.py",
+        language="python",
+        imports=["sys", "module1"],
+        exports=[],
+        classes=[],
+        functions=[
+            FunctionInfo(
+                name="func2",
+                params=["arg"],
+                return_type=None,
+                docstring=None,
+                calls=[],
+                raises=[],
+                complexity=2,
+                lines=8,
+                decorators=[],
+                is_async=False,
+                is_static=False,
+                is_private=False,
+                intent="",
+                start_line=1,
+                end_line=8
+            )
+        ],
+        types=[],
+        constants=[],
+        docstring=None,
+        lines_total=15,
+        lines_code=12
+    )
+    
+    return ProjectInfo(
         name="test_project",
-        path="/test",
+        root_path="/test",
+        languages={"python": 2},
         modules=[module1, module2],
-        dependencies=[],
-        similarities=[]
+        dependency_graph={},
+        dependency_metrics={},
+        entrypoints=[],
+        similar_functions={},
+        total_files=2,
+        total_lines=25,
+        generated_at="2026-01-03T12:00:00Z"
     )
 
 
@@ -268,20 +344,24 @@ def mock_llm_config():
 @pytest.fixture
 def sample_analysis_result():
     """Sample analysis result for testing."""
-    project = Project(
+    project = ProjectInfo(
         name="test_project",
-        path="/test",
+        root_path="/test",
+        languages={},
         modules=[],
-        dependencies=[],
-        similarities=[]
+        dependency_graph={},
+        dependency_metrics={},
+        entrypoints=[],
+        similar_functions={},
+        total_files=0,
+        total_lines=0,
+        generated_at="2026-01-03T12:00:00Z"
     )
     
-    from code2logic.models import AnalysisResult
-    
-    return AnalysisResult(
-        project=project,
-        analysis_time=1.5,
-        parser_used="tree_sitter",
-        errors=[],
-        warnings=["Minor warning"]
-    )
+    return {
+        "project": project,
+        "analysis_time": 1.5,
+        "parser_used": "tree_sitter",
+        "errors": [],
+        "warnings": ["Minor warning"]
+    }

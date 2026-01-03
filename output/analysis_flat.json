@@ -1,0 +1,3589 @@
+{
+  "project": "code2logic",
+  "files": 24,
+  "lines": 8219,
+  "elements": [
+    {
+      "path": "code2logic/cli.py",
+      "type": "function",
+      "name": "ensure_dependencies",
+      "signature": "()",
+      "language": "python",
+      "intent": "Auto-install optional dependencies for best results.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "argparse",
+        "os",
+        "sys",
+        "subprocess"
+      ]
+    },
+    {
+      "path": "code2logic/cli.py",
+      "type": "function",
+      "name": "main",
+      "signature": "()",
+      "language": "python",
+      "intent": "Main CLI entry point.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "argparse",
+        "os",
+        "sys",
+        "subprocess"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "class",
+      "name": "OllamaClient",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "OllamaClient.__init__",
+      "signature": "(self,config:LLMConfig)",
+      "language": "python",
+      "intent": "creates",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "OllamaClient.generate",
+      "signature": "(self,prompt:str,system:Optional[str])->str",
+      "language": "python",
+      "intent": "Generate completion from Ollama.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "OllamaClient.chat",
+      "signature": "(self,messages:List[Dict[str, str]])->str",
+      "language": "python",
+      "intent": "Chat completion from Ollama.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "OllamaClient.is_available",
+      "signature": "(self)->bool",
+      "language": "python",
+      "intent": "Check if Ollama is running.",
+      "category": "validate",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "OllamaClient.list_models",
+      "signature": "(self)->List[str]",
+      "language": "python",
+      "intent": "List available models.",
+      "category": "validate",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "class",
+      "name": "LiteLLMClient",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "LiteLLMClient.__init__",
+      "signature": "(self,config:LLMConfig)",
+      "language": "python",
+      "intent": "creates",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "LiteLLMClient.generate",
+      "signature": "(self,prompt:str,system:Optional[str])->str",
+      "language": "python",
+      "intent": "Generate completion via LiteLLM.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "LiteLLMClient.chat",
+      "signature": "(self,messages:List[Dict[str, str]])->str",
+      "language": "python",
+      "intent": "Chat completion via LiteLLM.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "LiteLLMClient.is_available",
+      "signature": "(self)->bool",
+      "language": "python",
+      "intent": "Check if LiteLLM backend is available.",
+      "category": "validate",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "class",
+      "name": "CodeAnalyzer",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "CodeAnalyzer.__init__",
+      "signature": "(self,model:str,provider:str,base_url:str)",
+      "language": "python",
+      "intent": "Initialize CodeAnalyzer.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "CodeAnalyzer.is_available",
+      "signature": "(self)->bool",
+      "language": "python",
+      "intent": "Check if LLM backend is available.",
+      "category": "validate",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "CodeAnalyzer.suggest_refactoring",
+      "signature": "(self,project)->List[Dict[str, Any]]",
+      "language": "python",
+      "intent": "Analyze project and suggest refactoring improvements.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "CodeAnalyzer.find_semantic_duplicates",
+      "signature": "(self,project)->List[Dict[str, Any]]",
+      "language": "python",
+      "intent": "Find semantically similar functions using LLM.",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "CodeAnalyzer.generate_code",
+      "signature": "(self,project,target_lang:str,module_filter:Optional[str])->Dict[str, str]",
+      "language": "python",
+      "intent": "Generate code in target language from project analysis.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "CodeAnalyzer.translate_function",
+      "signature": "(self,name:str,signature:str,intent:str...+2)->str",
+      "language": "python",
+      "intent": "Translate a single function to another language.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "method",
+      "name": "CodeAnalyzer._build_signature",
+      "signature": "(self,f)->str",
+      "language": "python",
+      "intent": "Build compact signature.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/llm.py",
+      "type": "function",
+      "name": "get_available_backends",
+      "signature": "()->Dict[str, bool]",
+      "language": "python",
+      "intent": "availability status of LLM backends.",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/analyzer.py",
+      "type": "class",
+      "name": "ProjectAnalyzer",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/analyzer.py",
+      "type": "method",
+      "name": "ProjectAnalyzer.__init__",
+      "signature": "(self,root_path:str,use_treesitter:bool,verbose:bool...+1)",
+      "language": "python",
+      "intent": "Initialize the project analyzer.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/analyzer.py",
+      "type": "method",
+      "name": "ProjectAnalyzer._print_status",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Print library availability status.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/analyzer.py",
+      "type": "method",
+      "name": "ProjectAnalyzer. Projec",
+      "signature": "(Info)->     \"\"\"\n  ",
+      "language": "python",
+      "intent": "yze the project.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/analyzer.py",
+      "type": "method",
+      "name": "ProjectAnalyzer.):\n        ",
+      "signature": "(\"\"Sc)",
+      "language": "python",
+      "intent": "e all source files.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/analyzer.py",
+      "type": "method",
+      "name": "ProjectAnalyzer.nts(self) -> List[s",
+      "signature": "(r]:\n)->   \"\"\"Det",
+      "language": "python",
+      "intent": "t entry points.\"\"\"",
+      "category": "validate",
+      "domain": "code2logic",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/analyzer.py",
+      "type": "method",
+      "name": "ProjectAnalyzer.elf) -> Dict:\n",
+      "signature": "(    )->\"\n  ",
+      "language": "python",
+      "intent": "analysis statistics.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/analyzer.py",
+      "type": "function",
+      "name": "\n    path: str,",
+      "signature": "(se_t:esi,bool = True,\n : ver,False,\n:-> P)-> \"\"\"\n    Co",
+      "language": "python",
+      "intent": "nce function to analyze a project.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/analyzer.py",
+      "type": "function",
+      "name": "us() -> Dict[str, ",
+      "signature": "()->\n    \"\"\"\n    Ge",
+      "language": "python",
+      "intent": "lability status of optional libraries.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "class",
+      "name": "TreeSitterParser",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "transform",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser.__init__",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Initialize Tree-sitter parsers for available languages.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._init_parsers",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Initialize parsers for each supported language.",
+      "category": "transform",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser.is_available",
+      "signature": "(self,language:str)->bool",
+      "language": "python",
+      "intent": "Check if Tree-sitter parser is available for a language.",
+      "category": "validate",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser.get_supported_languages",
+      "signature": "(cls)->List[str]",
+      "language": "python",
+      "intent": "list of potentially supported languages.",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser.parse",
+      "signature": "(self,filepath:str,content:str,language:str)->Optional[ModuleInfo]",
+      "language": "python",
+      "intent": "Parse a source file using Tree-sitter.",
+      "category": "transform",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._parse_python",
+      "signature": "(self,filepath:str,content:str,tree)->ModuleInfo",
+      "language": "python",
+      "intent": "Parse Python source using Tree-sitter AST.",
+      "category": "transform",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_py_function",
+      "signature": "(self,node,content:str,decorated_node)->Optional[FunctionInfo]",
+      "language": "python",
+      "intent": "Extract Python function from AST node.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_py_class",
+      "signature": "(self,node,content:str)->Optional[ClassInfo]",
+      "language": "python",
+      "intent": "Extract Python class from AST node.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_py_import",
+      "signature": "(self,node,content:str)->List[str]",
+      "language": "python",
+      "intent": "Extract import statement.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_py_from_import",
+      "signature": "(self,node,content:str)->List[str]",
+      "language": "python",
+      "intent": "Extract from ... import ... statement.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_py_constant",
+      "signature": "(self,node,content:str)->Optional[str]",
+      "language": "python",
+      "intent": "Extract constant (UPPERCASE assignment).",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._parse_js_ts",
+      "signature": "(self,filepath:str,content:str,tree...+1)->ModuleInfo",
+      "language": "python",
+      "intent": "Parse JavaScript/TypeScript source using Tree-sitter AST.",
+      "category": "transform",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_js_class",
+      "signature": "(self,node,content:str)->Optional[ClassInfo]",
+      "language": "python",
+      "intent": "Extract JS/TS class from AST node.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_js_method",
+      "signature": "(self,node,content:str)->Optional[FunctionInfo]",
+      "language": "python",
+      "intent": "Extract JS/TS method from AST node.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_js_function",
+      "signature": "(self,node,content:str)->Optional[FunctionInfo]",
+      "language": "python",
+      "intent": "Extract JS/TS function from AST node.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_js_arrow_fn",
+      "signature": "(self,node,content:str)->Optional[FunctionInfo]",
+      "language": "python",
+      "intent": "Extract arrow function assigned to const.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_js_params",
+      "signature": "(self,params_node,content:str)->List[str]",
+      "language": "python",
+      "intent": "Extract JS/TS function parameters.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_ts_type",
+      "signature": "(self,node,content:str)->Optional[TypeInfo]",
+      "language": "python",
+      "intent": "Extract TypeScript interface or type alias.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_ts_enum",
+      "signature": "(self,node,content:str)->Optional[TypeInfo]",
+      "language": "python",
+      "intent": "Extract TypeScript enum.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_js_constant",
+      "signature": "(self,node,content:str)->Optional[str]",
+      "language": "python",
+      "intent": "Extract constant (UPPERCASE const).",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_js_comment",
+      "signature": "(self,node,content:str)->Optional[str]",
+      "language": "python",
+      "intent": "Extract JS comment content.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._find_child",
+      "signature": "(self,node,type_name:str)",
+      "language": "python",
+      "intent": "Find first child of given type.",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._text",
+      "signature": "(self,node,content:str)->str",
+      "language": "python",
+      "intent": "text content of node.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "TreeSitterParser._extract_string",
+      "signature": "(self,node,content:str)->str",
+      "language": "python",
+      "intent": "Extract string content without quotes.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "class",
+      "name": "UniversalParser",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "transform",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "UniversalParser.__init__",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Initialize the universal parser.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "UniversalParser.parse",
+      "signature": "(self,filepath:str,content:str,language:str)->Optional[ModuleInfo]",
+      "language": "python",
+      "intent": "Parse a source file using AST or regex.",
+      "category": "transform",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "UniversalParser._parse_python",
+      "signature": "(self,filepath:str,content:str)->Optional[ModuleInfo]",
+      "language": "python",
+      "intent": "Parse Python using built-in AST.",
+      "category": "transform",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "UniversalParser._extract_ast_function",
+      "signature": "(self,node)->FunctionInfo",
+      "language": "python",
+      "intent": "Extract function from Python AST node.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "UniversalParser._extract_ast_class",
+      "signature": "(self,node:ast.ClassDef)->ClassInfo",
+      "language": "python",
+      "intent": "Extract class from Python AST node.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "UniversalParser._ann_str",
+      "signature": "(self,node)->str",
+      "language": "python",
+      "intent": "Convert AST annotation to string.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "method",
+      "name": "UniversalParser._parse_js_ts",
+      "signature": "(self,filepath:str,content:str,language:str)->ModuleInfo",
+      "language": "python",
+      "intent": "Parse JS/TS using regex patterns.",
+      "category": "transform",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/parsers.py",
+      "type": "function",
+      "name": "is_tree_sitter_available",
+      "signature": "()->bool",
+      "language": "python",
+      "intent": "Check if Tree-sitter is available.",
+      "category": "validate",
+      "domain": "code2logic",
+      "imports": [
+        "ast",
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/intent.py",
+      "type": "class",
+      "name": "EnhancedIntentGenerator",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/intent.py",
+      "type": "method",
+      "name": "EnhancedIntentGenerator.__(self,",
+      "signature": "(lang,str :'en)",
+      "language": "python",
+      "intent": "Initialize the intent generator.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/intent.py",
+      "type": "method",
+      "name": "EnhancedIntentGenerator.te(self,",
+      "signature": "(name,str,:ocs,ing: Opti:al[str] = Non)->   ",
+      "language": "python",
+      "intent": "Generate intent from function name and optional docstring.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/intent.py",
+      "type": "method",
+      "name": "EnhancedIntentGenerator.ct_from_docstring(self,",
+      "signature": "(docs,ing: str):> O)->al[str]:\n    ",
+      "language": "python",
+      "intent": "ract intent from docstring's first line.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/intent.py",
+      "type": "method",
+      "name": "EnhancedIntentGenerator._name(self,",
+      "signature": "(name,str):> L)->tr]:\n    ",
+      "language": "python",
+      "intent": "Split function name into words.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/intent.py",
+      "type": "method",
+      "name": "EnhancedIntentGenerator.ailable_features(cls) ",
+      "signature": "(> d)->tr, bool]:\n    ",
+      "language": "python",
+      "intent": "dictionary of available NLP features.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "class",
+      "name": "MarkdownGenerator",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "MarkdownGenerator.generate",
+      "signature": "(self,project:ProjectInfo,detail_level:str)->str",
+      "language": "python",
+      "intent": "Generate Markdown output.",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "MarkdownGenerator.: List[st",
+      "signature": "(], p,ject::rojectInf,:\n     : \"\"\"Generat)",
+      "language": "python",
+      "intent": "tructure tree.\"\"\"",
+      "category": "validate",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "MarkdownGenerator.: List[str]",
+      "signature": "( tre, dict:prefix: s,, de:h: i, = 0)::   ...+1)",
+      "language": "python",
+      "intent": "ee structure.\"\"\"",
+      "category": "validate",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "MarkdownGenerator.: ModuleInf",
+      "signature": "(, \n ,     :         ,e:il: str, p,    \"\":ene...+1)",
+      "language": "python",
+      "intent": "fn = Path(m.path).name",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "MarkdownGenerator.lassInfo, ",
+      "signature": "(etai, str):        \",Gen:ate class,ocumen:tio)",
+      "language": "python",
+      "intent": "kind = \"interface\" if cls.is_int",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "MarkdownGenerator.   \"",
+      "signature": "(\"Gen,a: function si)->re.",
+      "language": "python",
+      "intent": "\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "class",
+      "name": "ltra-compact out",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "ltra-compact out.tr:\n    ",
+      "signature": "(   \",\n      :Generate co)-> ou",
+      "language": "python",
+      "intent": "tr:",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "class",
+      "name": " output for m",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for m.: bool =",
+      "signature": "(Fals, \n     :          d,ail::tr =, \"\"\"\n :   )->tpu",
+      "language": "python",
+      "intent": ": bool =",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for m.fo, detail: str)",
+      "signature": "(-> s,:\n     : \"\"\"Generat,nested:SON)->ctu",
+      "language": "python",
+      "intent": "def ser_func(f: FunctionInfo) ->",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for m., detail: str)",
+      "signature": "(-> s,:\n     : \"\"\"Generat,flat J:N l)->or ",
+      "language": "python",
+      "intent": ", detail: str)",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for m.lem_type: str, nam",
+      "signature": "(: st,\n:          ,         : si,atur: st...+4)->ow f",
+      "language": "python",
+      "intent": "lem type: str, nam",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for m.> str:\n        \"",
+      "signature": "(\"Bui, :mpact signat)->\"\"\n",
+      "language": "python",
+      "intent": "rams = ','.join(f.params[:4])",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for m.    \"\"\"Cate",
+      "signature": "(oriz,by n:e p)->n.\"",
+      "language": "python",
+      "intent": "name_lower = name.lower().split(",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for m.        \"\"\"Extr",
+      "signature": "(ct d,ain :om )->\"\"\"",
+      "language": "python",
+      "intent": "arts = path.lower().replace('\\\\",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for m. str) -> str:",
+      "signature": "(    ,  \"\":omp,e short h:h.\")->   ",
+      "language": "python",
+      "intent": " str)  > str:",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "class",
+      "name": " output for h",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.: bool =",
+      "signature": "(Fals, \n     :          d,ail::tr =, \"\"\"\n :   )->tpu",
+      "language": "python",
+      "intent": ": bool =",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.fo, detail: str)",
+      "signature": "(-> d,t:\n    :  \"\"\"Build ,at dat:str)->e op",
+      "language": "python",
+      "intent": "r comparisons.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.Info, detail: str)",
+      "signature": "(-> d,t:\n    :  \"\"\"Build ,sted h:rar)->l da",
+      "language": "python",
+      "intent": "info, detail: str)",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.r, name: s",
+      "signature": "(r, s,natu:: s,,\n       :   ,    :ang...+4)->lat ",
+      "language": "python",
+      "intent": "r, name: s",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.unctionInfo, langua",
+      "signature": "(e: s,,\n  :   , :            , detail::tr,...+3)-> fun",
+      "language": "python",
+      "intent": "sig = self._build_signature(f)",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.name: str, f: Fun",
+      "signature": "(tion,fo,\n:   ,          :   , :nguage: str,...+4)->od.\"",
+      "language": "python",
+      "intent": "sig = self._build_signature(f)",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.detail: str) -> d",
+      "signature": "(ct:\n, :   \"\"\"Conver,functi: to)-> for",
+      "language": "python",
+      "intent": "detail: str)  > d",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.tail: str) -> d",
+      "signature": "(ct:\n, :   \"\"\"Conver,method:o d)->or n",
+      "language": "python",
+      "intent": "tail: str)  > d",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.> str:\n        \"",
+      "signature": "(\"Bui, :mpact signat)->tri",
+      "language": "python",
+      "intent": "params = ','.join(f.params[:4])",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.    \"\"\"Cate",
+      "signature": "(oriz,func:on )->me ",
+      "language": "python",
+      "intent": "name_lower = name.lower()",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.        \"\"\"Extr",
+      "signature": "(ct d,ain :om )->pat",
+      "language": "python",
+      "intent": "parts = path.lower().replace('\\\\",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h. str) -> str:",
+      "signature": "(    ,  \"\":omp,e short h:h f)->ick",
+      "language": "python",
+      "intent": " str)  > str:",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": " output for h.ectInfo, flat: bool, ",
+      "signature": "(    ,       :           ,  de:il: ,YAML g:era)->wit",
+      "language": "python",
+      "intent": "ect info, flat: bool,",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "class",
+      "name": "utput optimi",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "utput optimi.il: str ",
+      "signature": "( 'st,dard') : str:\n     , \"\"\"\n :   )->put",
+      "language": "python",
+      "intent": "il: str",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "utput optimi.: str, nam",
+      "signature": "(: st, :          ,      sig:tur, str:cal...+4)->\"\"\n ",
+      "language": "python",
+      "intent": ": str, nam",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "utput optimi.elem_type: str, nam",
+      "signature": "(: st,\n:          ,         :  f,Func:onI...+4)->on/m",
+      "language": "python",
+      "intent": "sig = self._build_signature(f)",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "utput optimi.> str:\n        \"",
+      "signature": "(\"Bui, :mpact signat)->\"\"\n",
+      "language": "python",
+      "intent": "rams = ','.join(p.split(':')[0",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "utput optimi.    \"\"\"Cate",
+      "signature": "(oriz,func:on )->me ",
+      "language": "python",
+      "intent": "name_lower = name.lower().split",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "utput optimi.        \"\"\"Extr",
+      "signature": "(ct d,ain :om )->pat",
+      "language": "python",
+      "intent": "parts = path.lower().replace('\\\\",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "utput optimi. str) -> str:",
+      "signature": "(    ,  \"\":omp,e short h:h f)->ick",
+      "language": "python",
+      "intent": " str)  > str:",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/generators.py",
+      "type": "method",
+      "name": "utput optimi.    \"\"\"Esca",
+      "signature": "(e te, for:SV )->ve ",
+      "language": "python",
+      "intent": "limit commas).\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json"
+      ]
+    },
+    {
+      "path": "code2logic/similarity.py",
+      "type": "class",
+      "name": "SimilarityDetector",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/similarity.py",
+      "type": "method",
+      "name": "SimilarityDetector.__init__",
+      "signature": "(self,threshold:float)",
+      "language": "python",
+      "intent": "Initialize the similarity detector.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/similarity.py",
+      "type": "method",
+      "name": "SimilarityDetector.find_similar_functions",
+      "signature": "(self,modules:List[ModuleInfo])->Dict[str, List[str]]",
+      "language": "python",
+      "intent": "Find similar functions across all modules.",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/similarity.py",
+      "type": "method",
+      "name": "SimilarityDetector.find_duplicate_signatures",
+      "signature": "(self,modules:List[ModuleInfo])->Dict[str, List[str]]",
+      "language": "python",
+      "intent": "Find functions with identical signatures.",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/similarity.py",
+      "type": "method",
+      "name": "SimilarityDetector._build_signature",
+      "signature": "(self,name:str,params:List[str],return_type:str)->str",
+      "language": "python",
+      "intent": "Build a normalized signature string.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/similarity.py",
+      "type": "function",
+      "name": "is_rapidfuzz_available",
+      "signature": "()->bool",
+      "language": "python",
+      "intent": "Check if Rapidfuzz is available.",
+      "category": "validate",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "class",
+      "name": "DependencyAnalyzer",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "method",
+      "name": "DependencyAnalyzer.__init__",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Initialize the dependency analyzer.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "method",
+      "name": "DependencyAnalyzer.build_graph",
+      "signature": "(self,modules:List[ModuleInfo])->Dict[str, List[str]]",
+      "language": "python",
+      "intent": "Build dependency graph from modules.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "method",
+      "name": "DependencyAnalyzer.analyze_metrics",
+      "signature": "(self)->Dict[str, DependencyNode]",
+      "language": "python",
+      "intent": "Compute metrics for each node in the graph.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "method",
+      "name": "DependencyAnalyzer.get_entrypoints",
+      "signature": "(self)->List[str]",
+      "language": "python",
+      "intent": "entry points (nodes with no incoming edges).",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "method",
+      "name": "DependencyAnalyzer.get_hubs",
+      "signature": "(self)->List[str]",
+      "language": "python",
+      "intent": "hub modules (high centrality).",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "method",
+      "name": "DependencyAnalyzer.detect_cycles",
+      "signature": "(self)->List[List[str]]",
+      "language": "python",
+      "intent": "Detect dependency cycles.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "method",
+      "name": "DependencyAnalyzer.get_strongly_connected_components",
+      "signature": "(self)->List[List[str]]",
+      "language": "python",
+      "intent": "strongly connected components.",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "method",
+      "name": "DependencyAnalyzer._detect_clusters",
+      "signature": "(self)->Dict[str, int]",
+      "language": "python",
+      "intent": "Detect clusters using connected components.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "method",
+      "name": "DependencyAnalyzer._module_name",
+      "signature": "(self,path:str)->str",
+      "language": "python",
+      "intent": "Convert file path to module name.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "method",
+      "name": "DependencyAnalyzer.get_dependency_depth",
+      "signature": "(self,module_path:str)->int",
+      "language": "python",
+      "intent": "the maximum depth of dependencies for a module.",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/dependency.py",
+      "type": "function",
+      "name": "is_networkx_available",
+      "signature": "()->bool",
+      "language": "python",
+      "intent": "Check if NetworkX is available.",
+      "category": "validate",
+      "domain": "code2logic",
+      "imports": []
+    },
+    {
+      "path": "code2logic/mcp_server.py",
+      "type": "function",
+      "name": "handle_request",
+      "signature": "(request:dict)->dict",
+      "language": "python",
+      "intent": "Handle incoming MCP request.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json",
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/mcp_server.py",
+      "type": "function",
+      "name": "call_tool",
+      "signature": "(tool_name:str,arguments:dict)->str",
+      "language": "python",
+      "intent": "Execute a tool and return result.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json",
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/mcp_server.py",
+      "type": "function",
+      "name": "run_server",
+      "signature": "()",
+      "language": "python",
+      "intent": "Run the MCP server.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "json",
+        "sys"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "class",
+      "name": "GherkinGenerator",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.(self, l",
+      "signature": "(ngua,: str = :n'))",
+      "language": "python",
+      "intent": "Initialize GherkinGenerator.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.(self, p",
+      "signature": "(ojec, Projec:nfo, detail,str = :tan,: str = :oma)->   ",
+      "language": "python",
+      "intent": "Generate Gherkin feature files from project analysis.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator._test_scenarios(self, p",
+      "signature": "(ojec, Projec:nfo,\n      ,: str = :oma)->rkinFeature]:\n      ",
+      "language": "python",
+      "intent": "Generate structured test scenarios for programmatic use.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator._definitions(self) -",
+      "signature": "( Lis)->pDefinition]:\n      ",
+      "language": "python",
+      "intent": "ll unique step definitions from generated features.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator._features(self, p",
+      "signature": "(ojec, Projec:nfo, \n     ,: str) -:Lis)->rkinFeature]:\n      ",
+      "language": "python",
+      "intent": "ct Gherkin features from project.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.feature(self, g",
+      "signature": "(oup_,me: str, i:ms:,ist[d:t], \n     , Projec:nfo, group_...+1)->eature:\n      ",
+      "language": "python",
+      "intent": "e a Gherkin feature from grouped items.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.scenario(self, c",
+      "signature": "(tego,: str, i:ms:,ist[d:t], \n     ,str) -:Ghe)->cenario:\n      ",
+      "language": "python",
+      "intent": "e a scenario from category items.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.edge_case_scenarios(self, c",
+      "signature": "(tego,: str, \n:   ,ist[d:t]) -> Lis)->rkinScenario]:\n      ",
+      "language": "python",
+      "intent": "e edge case scenarios for thorough testing.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.when_step(self, f",
+      "signature": "(nc: ,ncti:Info, verb: ,r) -:str)->   ",
+      "language": "python",
+      "intent": "e a When step from function info.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.background(self, d",
+      "signature": "(main,str, \n:   ,ist[d:t]) -> Opt)->[List[str]]:\n      ",
+      "language": "python",
+      "intent": "e background steps for common setup.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.examples_table(self, i",
+      "signature": "(ems:,ist[d:t]) -> Lis)->t[str, str]]:\n      ",
+      "language": "python",
+      "intent": "e Examples table for Scenario Outline.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator._param_placeholders(self, f",
+      "signature": "(nc: ,ncti:Info) -> str)->   ",
+      "language": "python",
+      "intent": "ct parameter placeholders for Gherkin steps.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.r_step(self, s",
+      "signature": "(ep_t,e: str, p:ter, str, f:c: ,ncti:Info):\n     )",
+      "language": "python",
+      "intent": "ter a step definition for later generation.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.features(self, f",
+      "signature": "(atur,: List[G:rkinFeature], \n     ,str) -:str)->   ",
+      "language": "python",
+      "intent": "r features to Gherkin text.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.feature(self, f",
+      "signature": "(atur, Gherki:eature, detail,str) -:str)->   ",
+      "language": "python",
+      "intent": "r a single feature.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.scenario(self, s",
+      "signature": "(enar,: Gherki:cenario, detail,str) -:str)->   ",
+      "language": "python",
+      "intent": "r a single scenario.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator.ize(self, n",
+      "signature": "(me: ,r) -:str)->   ",
+      "language": "python",
+      "intent": "orize function by name pattern.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator._domain(self, p",
+      "signature": "(th: ,r) -:str)->   ",
+      "language": "python",
+      "intent": "ct domain from file path.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator._readable(self, n",
+      "signature": "(me: ,r) -:str)->   ",
+      "language": "python",
+      "intent": "rt function name to readable text.\"\"\"",
+      "category": "read",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "GherkinGenerator._func_name(self, s",
+      "signature": "(ep: ,r) -:str)->   ",
+      "language": "python",
+      "intent": "rt step text to valid function name.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "class",
+      "name": "nitionGenerator:\n    \"\"",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "nitionGenerator:\n    \"\"._pytest_bdd(self, f",
+      "signature": "(atur,: List[G:rkinFeature]) -> str)->   ",
+      "language": "python",
+      "intent": "ate pytest-bdd step definitions.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "nitionGenerator:\n    \"\"._behave(self, f",
+      "signature": "(atur,: List[G:rkinFeature]) -> str)->   ",
+      "language": "python",
+      "intent": "ate behave step definitions.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "nitionGenerator:\n    \"\"._cucumber_js(self, f",
+      "signature": "(atur,: List[G:rkinFeature]) -> str)->   ",
+      "language": "python",
+      "intent": "ate Cucumber.js step definitions.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "nitionGenerator:\n    \"\"._func_name(self, s",
+      "signature": "(ep: ,r) -:str)->   ",
+      "language": "python",
+      "intent": "rt step text to valid function name.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "class",
+      "name": "YAMLGenerator:\n    \"\"",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "YAMLGenerator:\n    \"\".(self, p",
+      "signature": "(ojec, Projec:nfo, detail,str = :tan)->   ",
+      "language": "python",
+      "intent": "ate Cucumber YAML configuration.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "YAMLGenerator:\n    \"\"._domain(self, p",
+      "signature": "(th: ,r) -:str)->   ",
+      "language": "python",
+      "intent": "ct domain from path.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "method",
+      "name": "YAMLGenerator:\n    \"\".ize(self, n",
+      "signature": "(me: ,r) -:str)->   ",
+      "language": "python",
+      "intent": "orize by name pattern.\"\"\"",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "function",
+      "name": "herkin(csv_con",
+      "signature": "(ent: str, l:gua,: str = :n'))-> \"\"",
+      "language": "python",
+      "intent": "Convert CSV analysis directly to Gherkin.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "code2logic/gherkin.py",
+      "type": "function",
+      "name": "_test_data(gherkin_c",
+      "signature": "(ntent: str) -> :ct[)->Any]:\n    \"\"\"\n",
+      "language": "python",
+      "intent": "tract structured test data from Gherkin for LLM processing.",
+      "category": "other",
+      "domain": "code2logic",
+      "imports": [
+        "re",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "examples/refactor_suggestions.py",
+      "type": "function",
+      "name": "check_ollama",
+      "signature": "()->bool",
+      "language": "python",
+      "intent": "Check if Ollama is running.",
+      "category": "validate",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/refactor_suggestions.py",
+      "type": "function",
+      "name": "generate_with_ollama",
+      "signature": "(prompt:str,system:str)->str",
+      "language": "python",
+      "intent": "Generate text using Ollama.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/refactor_suggestions.py",
+      "type": "function",
+      "name": "find_issues",
+      "signature": "(project)->list",
+      "language": "python",
+      "intent": "Find potential code issues.",
+      "category": "read",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/refactor_suggestions.py",
+      "type": "function",
+      "name": "get_llm_suggestions",
+      "signature": "(issues:list,project)->str",
+      "language": "python",
+      "intent": "detailed suggestions from LLM.",
+      "category": "read",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/refactor_suggestions.py",
+      "type": "function",
+      "name": "main",
+      "signature": "()",
+      "language": "python",
+      "intent": "Main refactoring analysis.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/token_efficiency.py",
+      "type": "function",
+      "name": "count_tokens",
+      "signature": "(text:str)->int",
+      "language": "python",
+      "intent": "Approximate token count (~4 chars per token for English).",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "examples/token_efficiency.py",
+      "type": "function",
+      "name": "estimate_cost",
+      "signature": "(tokens:int,model:str)->float",
+      "language": "python",
+      "intent": "Estimate API cost based on token count.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "examples/token_efficiency.py",
+      "type": "function",
+      "name": "analyze_format",
+      "signature": "(name:str,content:str,baseline_tokens:int)->Dict[str, Any]",
+      "language": "python",
+      "intent": "Analyze a single format's efficiency.",
+      "category": "transform",
+      "domain": "examples",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "examples/token_efficiency.py",
+      "type": "function",
+      "name": "main",
+      "signature": "()",
+      "language": "python",
+      "intent": "Run token efficiency analysis.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "examples/bdd_workflow.py",
+      "type": "function",
+      "name": "lculate_token_savings(c",
+      "signature": "(v_content: :r, ,erkin_content: :r) )->ct:\n",
+      "language": "python",
+      "intent": "Calculate token savings between formats.\"\"\"",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "s\ni",
+        "on\nf"
+      ]
+    },
+    {
+      "path": "examples/bdd_workflow.py",
+      "type": "function",
+      "name": "in()",
+      "signature": "()",
+      "language": "python",
+      "intent": "Run BDD workflow.\"\"\"",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "s\ni",
+        "on\nf"
+      ]
+    },
+    {
+      "path": "examples/compare_projects.py",
+      "type": "function",
+      "name": "compute_hash",
+      "signature": "(name:str,signature:str)->str",
+      "language": "python",
+      "intent": "Compute hash for function comparison.",
+      "category": "validate",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/compare_projects.py",
+      "type": "function",
+      "name": "extract_elements",
+      "signature": "(project)->dict",
+      "language": "python",
+      "intent": "Extract all elements from project with hashes.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/compare_projects.py",
+      "type": "function",
+      "name": "compare_projects",
+      "signature": "(project1,project2)->dict",
+      "language": "python",
+      "intent": "Compare two projects.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/compare_projects.py",
+      "type": "function",
+      "name": "print_comparison",
+      "signature": "(result:dict)",
+      "language": "python",
+      "intent": "Print comparison results.",
+      "category": "validate",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/compare_projects.py",
+      "type": "function",
+      "name": "\"Mai",
+      "signature": "()",
+      "language": "python",
+      "intent": "\"mai",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/quick_start.py",
+      "type": "function",
+      "name": "main",
+      "signature": "()",
+      "language": "python",
+      "intent": "main",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys"
+      ]
+    },
+    {
+      "path": "examples/generate_code.py",
+      "type": "function",
+      "name": "check_ollama",
+      "signature": "()",
+      "language": "python",
+      "intent": "Check if Ollama is running.",
+      "category": "validate",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/generate_code.py",
+      "type": "function",
+      "name": "generate_with_ollama",
+      "signature": "(prompt:str,system:str)->str",
+      "language": "python",
+      "intent": "Generate text using Ollama API.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/generate_code.py",
+      "type": "function",
+      "name": "generate_code_from_csv",
+      "signature": "(csv_content:str,target_lang:str)->dict",
+      "language": "python",
+      "intent": "Generate code from CSV analysis.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/generate_code.py",
+      "type": "function",
+      "name": "main",
+      "signature": "()",
+      "language": "python",
+      "intent": "Main example.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json"
+      ]
+    },
+    {
+      "path": "examples/duplicate_detection.py",
+      "type": "function",
+      "name": "compute_signature_hash",
+      "signature": "(params:List[str],return_type:str)->str",
+      "language": "python",
+      "intent": "Compute hash of function signature (ignoring name).",
+      "category": "validate",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "examples/duplicate_detection.py",
+      "type": "function",
+      "name": "compute_name_hash",
+      "signature": "(name:str,params:List[str])->str",
+      "language": "python",
+      "intent": "Compute hash for exact duplicate detection.",
+      "category": "validate",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "examples/duplicate_detection.py",
+      "type": "function",
+      "name": "normalize_intent",
+      "signature": "(intent:str)->str",
+      "language": "python",
+      "intent": "Normalize intent for comparison.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "examples/duplicate_detection.py",
+      "type": "function",
+      "name": "find_duplicates",
+      "signature": "(project)->Dict[str, Any]",
+      "language": "python",
+      "intent": "Find all types of duplicates in project.",
+      "category": "read",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "examples/duplicate_detection.py",
+      "type": "function",
+      "name": "categorize",
+      "signature": "(name:str)->str",
+      "language": "python",
+      "intent": "Categorize function by name.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "examples/duplicate_detection.py",
+      "type": "function",
+      "name": "extract_domain",
+      "signature": "(path:str)->str",
+      "language": "python",
+      "intent": "Extract domain from path.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "examples/duplicate_detection.py",
+      "type": "function",
+      "name": "generate_report",
+      "signature": "(results:Dict[str, Any],project_name:str)->str",
+      "language": "python",
+      "intent": "Generate markdown deduplication report.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "examples/duplicate_detection.py",
+      "type": "function",
+      "name": "main",
+      "signature": "()",
+      "language": "python",
+      "intent": "Run duplicate detection.",
+      "category": "other",
+      "domain": "examples",
+      "imports": [
+        "sys",
+        "json",
+        "hashlib"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "type": "function",
+      "name": "sample_python_code",
+      "signature": "()->str",
+      "language": "python",
+      "intent": "Sample Python code for testing.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest",
+        "tempfile"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "type": "function",
+      "name": "sample_javascript_code",
+      "signature": "()->str",
+      "language": "python",
+      "intent": "Sample JavaScript code for testing.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest",
+        "tempfile"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "type": "function",
+      "name": "sample_java_code",
+      "signature": "()->str",
+      "language": "python",
+      "intent": "Sample Java code for testing.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest",
+        "tempfile"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "type": "function",
+      "name": "temp_project_dir",
+      "signature": "()",
+      "language": "python",
+      "intent": "a temporary project directory.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest",
+        "tempfile"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "type": "function",
+      "name": "sample_project",
+      "signature": "(temp_project_dir,sample_python_code)",
+      "language": "python",
+      "intent": "a sample project with Python files.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest",
+        "tempfile"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "type": "function",
+      "name": "sample_module",
+      "signature": "()",
+      "language": "python",
+      "intent": "a sample module for testing.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest",
+        "tempfile"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "type": "function",
+      "name": "sample_project_model",
+      "signature": "()",
+      "language": "python",
+      "intent": "a sample project model for testing.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest",
+        "tempfile"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "type": "function",
+      "name": "mock_llm_config",
+      "signature": "()",
+      "language": "python",
+      "intent": "Mock LLM configuration for testing.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest",
+        "tempfile"
+      ]
+    },
+    {
+      "path": "tests/conftest.py",
+      "type": "function",
+      "name": "sample_analysis_result",
+      "signature": "()",
+      "language": "python",
+      "intent": "Sample analysis result for testing.",
+      "category": "validate",
+      "domain": "tests",
+      "imports": [
+        "pytest",
+        "tempfile"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "class",
+      "name": "TestMarkdownGenerator",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "TestMarkdownGenerator.test_generate_basic",
+      "signature": "(self,sample_project)",
+      "language": "python",
+      "intent": "Test basic Markdown generation.",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "TestMarkdownGenerator.t_generate_includes_modules(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test that modules are included.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "TestMarkdownGenerator.t_generate_includes_classes(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test that classes are included.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "TestMarkdownGenerator.t_generate_includes_functions(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test that functions are included.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "TestMarkdownGenerator.t_generate_includes_entrypoints(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test that entrypoints are included.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "TestMarkdownGenerator.t_detail_levels(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test different detail levels.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "class",
+      "name": "tCompactGenerator:\n ",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "tCompactGenerator:\n .t_generate_basic(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test basic compact generation.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "tCompactGenerator:\n .t_generate_includes_hubs(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test that ENTRY is included.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "tCompactGenerator:\n .t_compact_is_smaller(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test that compact output is smaller than markdown.\"\"\"",
+      "category": "validate",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "class",
+      "name": "tJSONGenerator:\n ",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "tJSONGenerator:\n .t_generate_valid_json(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test that output is valid JSON.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "tJSONGenerator:\n .t_generate_structure(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test JSON structure.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "tJSONGenerator:\n .t_generate_modules(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test module structure in JSON.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "tJSONGenerator:\n .t_generate_functions(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test function structure in JSON.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "method",
+      "name": "tJSONGenerator:\n .t_generate_classes(se",
+      "signature": "(f, s,ple_project):\n)",
+      "language": "python",
+      "intent": "Test class structure in JSON.\"\"\"",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_generators.py",
+      "type": "function",
+      "name": "sample_project",
+      "signature": "()",
+      "language": "python",
+      "intent": "a sample project for testing generators.",
+      "category": "other",
+      "domain": "generator",
+      "imports": [
+        "json",
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "class",
+      "name": "TestIntentAnalyzer",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_init",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test IntentAnalyzer initialization.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_extract_keywords",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test keyword extraction from queries.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_calculate_intent_confidence",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test intent confidence calculation.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_identify_target_module",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test target identification for modules.",
+      "category": "read",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_identify_target_function",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test target identification for functions.",
+      "category": "read",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_identify_target_class",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test target identification for classes.",
+      "category": "read",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_identify_target_project",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test target identification for project-level queries.",
+      "category": "read",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_generate_description",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test description generation for intents.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_generate_suggestions_refactor",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test suggestion generation for refactor intent.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_generate_suggestions_analyze",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test suggestion generation for analyze intent.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_generate_suggestions_optimize",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test suggestion generation for optimize intent.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_analyze_intent_refactor",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test intent analysis for refactoring.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_analyze_intent_analyze",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test intent analysis for analysis.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_analyze_intent_optimize",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test intent analysis for optimization.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_analyze_intent_multiple",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test intent analysis with multiple possible intents.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_analyze_intent_sorting",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test that intents are sorted by confidence.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_detect_code_smells_long_module",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test code smell detection for long modules.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_detect_code_smells_complex_function",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test code smell detection for complex functions.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_detect_code_smells_large_class",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test code smell detection for large classes.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_detect_code_smells_too_many_imports",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test code smell detection for too many imports.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_suggest_refactoring_module",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test refactoring suggestions for modules.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_suggest_refactoring_class",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test refactoring suggestions for classes.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_suggest_refactoring_function",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test refactoring suggestions for functions.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_find_target_object_module",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test finding target object for module.",
+      "category": "read",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_find_target_object_function",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test finding target object for function.",
+      "category": "read",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_find_target_object_class",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test finding target object for class.",
+      "category": "read",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_find_target_object_not_found",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test finding non-existent target object.",
+      "category": "read",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_suggest_module_refactoring",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test module-specific refactoring suggestions.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_suggest_class_refactoring",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test class-specific refactoring suggestions.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_intent.py",
+      "type": "method",
+      "name": "TestIntentAnalyzer.test_suggest_function_refactoring",
+      "signature": "(self)",
+      "language": "python",
+      "intent": "Test function-specific refactoring suggestions.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "class",
+      "name": "TestProjectAnalyzer",
+      "signature": "()",
+      "language": "python",
+      "intent": "",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_init",
+      "signature": "(self,temp_project_dir)",
+      "language": "python",
+      "intent": "Test ProjectAnalyzer initialization.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_init_with_config",
+      "signature": "(self,temp_project_dir)",
+      "language": "python",
+      "intent": "Test ProjectAnalyzer initialization with config.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_discover_source_files",
+      "signature": "(self,sample_project)",
+      "language": "python",
+      "intent": "Test source file discovery.",
+      "category": "validate",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_discover_source_files_filters_non_source",
+      "signature": "(self,temp_project_dir)",
+      "language": "python",
+      "intent": "Test that non-source files are filtered out.",
+      "category": "validate",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_discover_source_files_ignores_common_dirs",
+      "signature": "(self,temp_project_dir)",
+      "language": "python",
+      "intent": "Test that common directories are ignored.",
+      "category": "validate",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_parse_file_tree_sitter_success",
+      "signature": "(self,mock_fallback,mock_tree_sitter,sample_project)",
+      "language": "python",
+      "intent": "Test successful parsing with Tree-sitter.",
+      "category": "transform",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_parse_file_fallback_success",
+      "signature": "(self,mock_fallback,mock_tree_sitter,sample_project)",
+      "language": "python",
+      "intent": "Test fallback parsing when Tree-sitter fails.",
+      "category": "transform",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_parse_file_both_fail",
+      "signature": "(self,mock_fallback,mock_tree_sitter,sample_project)",
+      "language": "python",
+      "intent": "Test when both parsers fail.",
+      "category": "transform",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_extract_metadata",
+      "signature": "(self,sample_project)",
+      "language": "python",
+      "intent": "Test metadata extraction.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_analyze_complete",
+      "signature": "(self,mock_similarity,mock_dependency,sample_project)",
+      "language": "python",
+      "intent": "Test complete analysis process.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_analyze_without_files",
+      "signature": "(self,temp_project_dir)",
+      "language": "python",
+      "intent": "Test analysis with no source files.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_generate_output",
+      "signature": "(self,mock_generator_class,sample_project_model)",
+      "language": "python",
+      "intent": "Test output generation.",
+      "category": "other",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_generate_output_without_analysis",
+      "signature": "(self,sample_project_model)",
+      "language": "python",
+      "intent": "Test output generation without prior analysis.",
+      "category": "validate",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_read_project_file_error",
+      "signature": "(self,temp_project_dir)",
+      "language": "python",
+      "intent": "Test error handling in _read_project_file.",
+      "category": "read",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    },
+    {
+      "path": "tests/test_analyzer.py",
+      "type": "method",
+      "name": "TestProjectAnalyzer.test_analysis_with_config",
+      "signature": "(self,sample_project)",
+      "language": "python",
+      "intent": "Test analysis with custom configuration.",
+      "category": "validate",
+      "domain": "tests",
+      "imports": [
+        "pytest"
+      ]
+    }
+  ]
+}

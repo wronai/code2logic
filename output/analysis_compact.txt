@@ -1,0 +1,39 @@
+# code2logic | 24f 8219L | python:24
+
+ENTRY: code2logic/cli.py code2logic/llm.py code2logic/analyzer.py
+
+
+[code2logic]
+  __init__.py (76L) -
+  analyzer.py (221L) C:ProjectAnalyzer | F:
+    path: str,,us() -> Dict[str, 
+  cli.py (187L) F:ensure_dependencies,main
+  dependency.py (187L) C:DependencyAnalyzer | F:is_networkx_available
+  generators.py (827L) C:MarkdownGenerator,ltra-compact out, output for m
+  gherkin.py (766L) C:GherkinGenerator,nitionGenerator:
+    "",YAMLGenerator:
+    "" | F:herkin(csv_con
+  intent.py (180L) C:EnhancedIntentGenerator
+  llm.py (355L) C:OllamaClient,LiteLLMClient,CodeAnalyzer | F:get_available_backends
+  mcp_server.py (292L) F:handle_request,call_tool,run_server
+  models.py (150L) -
+  parsers.py (772L) C:TreeSitterParser,UniversalParser | F:is_tree_sitter_available
+  similarity.py (123L) C:SimilarityDetector | F:is_rapidfuzz_available
+
+[examples]
+  bdd_workflow.py (169L) F:lculate_token_savings(c,in()
+  compare_projects.py (176L) F:compute_hash,extract_elements,compare_projects,print_comparison
+  duplicate_detection.py (286L) F:compute_signature_hash,compute_name_hash,normalize_intent,find_duplicates
+  generate_code.py (111L) F:check_ollama,generate_with_ollama,generate_code_from_csv,main
+  quick_start.py (151L) F:main
+  refactor_suggestions.py (203L) F:check_ollama,generate_with_ollama,find_issues,get_llm_suggestions
+  token_efficiency.py (168L) F:count_tokens,estimate_cost,analyze_format,main
+
+[tests]
+  __init__.py (3L) -
+  conftest.py (233L) F:sample_python_code,sample_javascript_code,sample_java_code,temp_project_dir
+  test_analyzer.py (193L) C:TestProjectAnalyzer
+  test_generators.py (207L) C:TestMarkdownGenerator,tCompactGenerator:
+ ,tJSONGenerator:
+  | F:sample_project
+  test_intent.py (356L) C:TestIntentAnalyzer
