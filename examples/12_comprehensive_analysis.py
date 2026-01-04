@@ -31,7 +31,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from dotenv import load_dotenv
 load_dotenv()
 
-from code2logic import analyze_project, get_client
+from code2logic import analyze_project
+from code2logic.llm import get_client
 from code2logic.benchmarks.common import generate_spec, create_single_project, get_token_reproduction_prompt
 from code2logic.reproduction import extract_code_block
 from code2logic.utils import estimate_tokens

@@ -138,6 +138,48 @@ Library Status:
   rapidfuzz: ✓
   nltk: ✗
   spacy: ✗
+
+### LLM Configuration
+
+Manage LLM providers, models, API keys, and routing priorities:
+
+```bash
+code2logic llm status
+code2logic llm set-provider auto
+code2logic llm set-model openrouter nvidia/nemotron-3-nano-30b-a3b:free
+code2logic llm key set openrouter <OPENROUTER_API_KEY>
+code2logic llm priority set-provider openrouter 10
+code2logic llm priority set-mode provider-first
+code2logic llm priority set-llm-model nvidia/nemotron-3-nano-30b-a3b:free 5
+code2logic llm priority set-llm-family nvidia/ 5
+code2logic llm config list
+```
+
+Notes:
+
+- `code2logic llm set-provider auto` enables automatic fallback selection: providers are tried in priority order.
+- API keys should be stored in `.env` (or environment variables), not in `litellm_config.yaml`.
+
+#### Priority modes
+
+You can choose how automatic fallback ordering is computed:
+
+- `provider-first`
+  providers are ordered by provider priority (defaults + overrides)
+- `model-first`
+  providers are ordered by priority rules for the provider's configured model (exact/prefix)
+- `mixed`
+  providers are ordered by the best (lowest) priority from either provider priority or model rules
+
+Configure the mode:
+
+```bash
+code2logic llm priority set-mode provider-first
+code2logic llm priority set-mode model-first
+code2logic llm priority set-mode mixed
+```
+
+Model priority rules are stored in `~/.code2logic/llm_config.json`.
 ```
 
 ### Python API

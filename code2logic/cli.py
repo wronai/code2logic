@@ -14,6 +14,7 @@ import sys
 import subprocess
 import time
 import logging
+import json
 from datetime import datetime
 
 from . import __version__
@@ -133,9 +134,384 @@ def ensure_dependencies():
                       f"Install manually: pip install {' '.join(missing)}", file=sys.stderr)
 
 
+def _get_env_file_path() -> str:
+    return os.path.join(os.getcwd(), '.env')
+
+
+def _read_text_file(path: str) -> str:
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return f.read()
+    except FileNotFoundError:
+        return ""
+
+
+def _write_text_file(path: str, content: str) -> None:
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+
+def _set_env_var(var_name: str, value: str) -> str:
+    env_path = _get_env_file_path()
+    content = _read_text_file(env_path)
+
+    import re
+    if re.search(rf'^{re.escape(var_name)}=', content, re.MULTILINE):
+        content = re.sub(
+            rf'^{re.escape(var_name)}=.*$',
+            f'{var_name}={value}',
+            content,
+            flags=re.MULTILINE,
+        )
+    elif re.search(rf'^#\s*{re.escape(var_name)}=', content, re.MULTILINE):
+        content = re.sub(
+            rf'^#\s*{re.escape(var_name)}=.*$',
+            f'{var_name}={value}',
+            content,
+            flags=re.MULTILINE,
+        )
+    else:
+        if content and not content.endswith("\n"):
+            content += "\n"
+        content += f"{var_name}={value}\n"
+
+    _write_text_file(env_path, content)
+    return env_path
+
+
+def _unset_env_var(var_name: str) -> str:
+    env_path = _get_env_file_path()
+    content = _read_text_file(env_path)
+    if not content:
+        return env_path
+
+    lines = content.splitlines(True)
+    new_lines = [ln for ln in lines if not ln.startswith(f"{var_name}=")]
+    _write_text_file(env_path, "".join(new_lines))
+    return env_path
+
+
+def _get_litellm_config_path() -> str:
+    return os.path.join(os.getcwd(), 'litellm_config.yaml')
+
+
+def _get_user_llm_config_path() -> str:
+    return os.path.join(os.path.expanduser('~'), '.code2logic', 'llm_config.json')
+
+
+def _load_user_llm_config() -> dict:
+    path = _get_user_llm_config_path()
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f) or {}
+    except Exception:
+        return {}
+
+
+def _save_user_llm_config(data: dict) -> str:
+    path = _get_user_llm_config_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2, sort_keys=False)
+    return path
+
+
+def _load_litellm_yaml() -> dict:
+    try:
+        import yaml
+    except ImportError as e:
+        raise RuntimeError("pyyaml is required for this command. Install: pip install pyyaml") from e
+
+    path = _get_litellm_config_path()
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"litellm_config.yaml not found at {path}")
+
+    with open(path, 'r', encoding='utf-8') as f:
+        data = yaml.safe_load(f) or {}
+    if data.get('model_list') is None:
+        data['model_list'] = []
+    if data.get('router_settings') is None:
+        data['router_settings'] = {}
+    return data
+
+
+def _save_litellm_yaml(data: dict) -> str:
+    try:
+        import yaml
+    except ImportError as e:
+        raise RuntimeError("pyyaml is required for this command. Install: pip install pyyaml") from e
+
+    path = _get_litellm_config_path()
+    with open(path, 'w', encoding='utf-8') as f:
+        yaml.safe_dump(data, f, sort_keys=False)
+    return path
+
+
+def _infer_provider_from_litellm_model(litellm_model: str) -> str:
+    if not litellm_model:
+        return ""
+    if '/' not in litellm_model:
+        return 'openai'
+    return litellm_model.split('/', 1)[0]
+
+
+def _code2logic_llm_cli(argv: list[str]) -> None:
+    parser = argparse.ArgumentParser(
+        prog='code2logic llm',
+        description='Manage Code2Logic LLM configuration (providers, keys, priorities)'
+    )
+    sub = parser.add_subparsers(dest='cmd', required=True)
+
+    sub.add_parser('status', help='Show LLM provider status and effective priorities')
+
+    p_config = sub.add_parser('config', help='Manage litellm_config.yaml')
+    config_sub = p_config.add_subparsers(dest='config_cmd', required=True)
+    config_sub.add_parser('list', help='Print litellm_config.yaml as JSON')
+
+    p_set_provider = sub.add_parser('set-provider', help='Set default provider')
+    p_set_provider.add_argument('provider', choices=[
+        'openrouter', 'ollama', 'litellm', 'openai', 'anthropic', 'groq', 'together', 'auto'
+    ])
+
+    p_set_model = sub.add_parser('set-model', help='Set model for a provider')
+    p_set_model.add_argument('provider', choices=[
+        'openrouter', 'ollama', 'litellm', 'openai', 'anthropic', 'groq', 'together'
+    ])
+    p_set_model.add_argument('model')
+
+    p_key = sub.add_parser('key', help='Manage provider API keys (.env)')
+    key_sub = p_key.add_subparsers(dest='key_cmd', required=True)
+    p_key_set = key_sub.add_parser('set', help='Set provider API key in .env')
+    p_key_set.add_argument('provider', choices=[
+        'openrouter', 'openai', 'anthropic', 'groq', 'together'
+    ])
+    p_key_set.add_argument('api_key')
+    p_key_unset = key_sub.add_parser('unset', help='Remove provider API key from .env')
+    p_key_unset.add_argument('provider', choices=[
+        'openrouter', 'openai', 'anthropic', 'groq', 'together'
+    ])
+
+    p_priority = sub.add_parser('priority', help='Manage routing priorities in litellm_config.yaml')
+    pr_sub = p_priority.add_subparsers(dest='priority_cmd', required=True)
+
+    p_pr_mode = pr_sub.add_parser('set-mode', help='Set priority mode (provider-first, model-first, mixed)')
+    p_pr_mode.add_argument('mode', choices=['provider-first', 'model-first', 'mixed'])
+
+    p_pr_provider = pr_sub.add_parser('set-provider', help='Set priority for all models of a provider')
+    p_pr_provider.add_argument('provider', choices=[
+        'ollama', 'openrouter', 'openai', 'anthropic', 'groq', 'together', 'litellm'
+    ])
+    p_pr_provider.add_argument('priority', type=int)
+    p_pr_provider.add_argument('--preserve-order', action='store_true')
+    p_pr_provider.add_argument('--step', type=int, default=5)
+
+    p_pr_model = pr_sub.add_parser('set-model', help='Set priority for one model_name entry')
+    p_pr_model.add_argument('model_name')
+    p_pr_model.add_argument('priority', type=int)
+
+    p_pr_llm_model = pr_sub.add_parser('set-llm-model', help='Set priority for a specific LLM model string (independent of provider)')
+    p_pr_llm_model.add_argument('model')
+    p_pr_llm_model.add_argument('priority', type=int)
+
+    p_pr_llm_family = pr_sub.add_parser('set-llm-family', help='Set priority for a family/prefix of LLM models (independent of provider)')
+    p_pr_llm_family.add_argument('prefix')
+    p_pr_llm_family.add_argument('priority', type=int)
+
+    args = parser.parse_args(argv)
+
+    if args.cmd == 'set-provider':
+        env_path = _set_env_var('CODE2LOGIC_DEFAULT_PROVIDER', args.provider)
+        print(f"✓ Default provider set to: {args.provider}")
+        print(f"Updated: {env_path}")
+        return
+
+    if args.cmd == 'set-model':
+        var_map = {
+            'openrouter': 'OPENROUTER_MODEL',
+            'openai': 'OPENAI_MODEL',
+            'anthropic': 'ANTHROPIC_MODEL',
+            'groq': 'GROQ_MODEL',
+            'together': 'TOGETHER_MODEL',
+            'ollama': 'OLLAMA_MODEL',
+            'litellm': 'LITELLM_MODEL',
+        }
+        env_path = _set_env_var(var_map[args.provider], args.model)
+        print(f"✓ {args.provider} model set to: {args.model}")
+        print(f"Updated: {env_path}")
+        return
+
+    if args.cmd == 'key':
+        key_var_map = {
+            'openrouter': 'OPENROUTER_API_KEY',
+            'openai': 'OPENAI_API_KEY',
+            'anthropic': 'ANTHROPIC_API_KEY',
+            'groq': 'GROQ_API_KEY',
+            'together': 'TOGETHER_API_KEY',
+        }
+        var_name = key_var_map[args.provider]
+        if args.key_cmd == 'set':
+            env_path = _set_env_var(var_name, args.api_key)
+            print(f"✓ API key set for: {args.provider}")
+            print(f"Updated: {env_path}")
+            return
+        if args.key_cmd == 'unset':
+            env_path = _unset_env_var(var_name)
+            print(f"✓ API key removed for: {args.provider}")
+            print(f"Updated: {env_path}")
+            return
+
+    if args.cmd == 'config' and args.config_cmd == 'list':
+        data = _load_litellm_yaml()
+        print(json.dumps(data, indent=2, sort_keys=False))
+        return
+
+    if args.cmd == 'priority':
+        data = _load_litellm_yaml()
+        model_list = data.get('model_list', [])
+
+        if args.priority_cmd == 'set-mode':
+            cfg = _load_user_llm_config()
+            cfg['priority_mode'] = args.mode
+            path = _save_user_llm_config(cfg)
+            print(f"✓ Priority mode set to: {args.mode}")
+            print(f"Updated: {path}")
+            return
+
+        if args.priority_cmd == 'set-provider':
+            matched = []
+            for entry in model_list:
+                litellm_model = ((entry.get('litellm_params') or {}).get('model') or '')
+                entry_provider = _infer_provider_from_litellm_model(litellm_model)
+                if entry_provider == args.provider:
+                    matched.append(entry)
+
+            # Always persist provider-level priority, even if YAML has no entries for that provider.
+            user_cfg = _load_user_llm_config()
+            user_cfg.setdefault('provider_priorities', {})
+            user_cfg['provider_priorities'][args.provider] = int(args.priority)
+            user_cfg_path = _save_user_llm_config(user_cfg)
+
+            if args.preserve_order:
+                matched_sorted = sorted(matched, key=lambda e: int(e.get('priority', 100)))
+                for idx, entry in enumerate(matched_sorted):
+                    entry['priority'] = int(args.priority) + idx * int(args.step)
+            else:
+                for entry in matched:
+                    entry['priority'] = int(args.priority)
+
+            if matched:
+                path = _save_litellm_yaml(data)
+                print(f"✓ Set provider priority: {args.provider} -> {args.priority} ({len(matched)} model(s))")
+                print(f"Updated: {path}")
+            else:
+                print(f"✓ Set provider priority: {args.provider} -> {args.priority} (no YAML models matched)")
+            print(f"Updated: {user_cfg_path}")
+            return
+
+        if args.priority_cmd == 'set-model':
+            matched = False
+            for entry in model_list:
+                if entry.get('model_name') == args.model_name:
+                    entry['priority'] = int(args.priority)
+                    matched = True
+                    break
+            if not matched:
+                print(f"⚠ model_name not found: {args.model_name}")
+                return
+            path = _save_litellm_yaml(data)
+            print(f"✓ Set model priority: {args.model_name} -> {args.priority}")
+            print(f"Updated: {path}")
+            return
+
+        if args.priority_cmd == 'set-llm-model':
+            cfg = _load_user_llm_config()
+            cfg.setdefault('model_priorities', {})
+            cfg['model_priorities'].setdefault('exact', {})
+            cfg['model_priorities']['exact'][args.model] = int(args.priority)
+            path = _save_user_llm_config(cfg)
+            print(f"✓ Set LLM model priority: {args.model} -> {args.priority}")
+            print(f"Updated: {path}")
+            return
+
+        if args.priority_cmd == 'set-llm-family':
+            cfg = _load_user_llm_config()
+            cfg.setdefault('model_priorities', {})
+            cfg['model_priorities'].setdefault('prefix', {})
+            cfg['model_priorities']['prefix'][args.prefix] = int(args.priority)
+            path = _save_user_llm_config(cfg)
+            print(f"✓ Set LLM family priority: {args.prefix} -> {args.priority}")
+            print(f"Updated: {path}")
+            return
+
+    if args.cmd == 'status':
+        from .config import Config
+        from .llm_clients import (
+            get_effective_provider_priorities,
+            get_priority_mode,
+            OpenRouterClient,
+            OllamaLocalClient,
+        )
+
+        cfg = Config()
+        default_provider = cfg.get_default_provider()
+        configured = cfg.list_configured_providers()
+
+        priority_mode = get_priority_mode()
+        priorities = get_effective_provider_priorities()
+
+        available = {}
+        try:
+            available['ollama'] = OllamaLocalClient().is_available()
+        except Exception:
+            available['ollama'] = False
+
+        try:
+            available['openrouter'] = OpenRouterClient().is_available()
+        except Exception:
+            available['openrouter'] = False
+
+        try:
+            from .llm_clients import LiteLLMClient
+            available['litellm'] = LiteLLMClient().is_available()
+        except Exception:
+            available['litellm'] = False
+
+        for p in ['openai', 'anthropic', 'groq', 'together']:
+            available[p] = bool(cfg.get_api_key(p))
+
+        print("LLM Provider Status")
+        print("")
+        print(f"Default Provider: {default_provider}")
+        print(f"Priority Mode: {priority_mode}")
+        print("")
+        print("Providers:")
+        for provider in sorted(priorities.keys(), key=lambda x: int(priorities[x])):
+            is_configured = bool(configured.get(provider, False))
+            is_available = bool(available.get(provider, False))
+            if not is_configured:
+                status = "✗ Not configured"
+            elif is_available:
+                status = "✓ Available"
+            else:
+                status = "⚠ Configured but unreachable"
+
+            model = cfg.get_model(provider) if hasattr(cfg, 'get_model') else ''
+            pr = int(priorities.get(provider, 100))
+            print(f"  [{pr:2d}] {provider:10s} {status}  Model: {model}")
+        print("")
+        print("Priority: lower number = tried first")
+        return
+
+
 def main():
     """Main CLI entry point."""
     cli_start = time.time()
+
+    if len(sys.argv) > 1 and sys.argv[1] == 'llm':
+        _code2logic_llm_cli(sys.argv[2:])
+        return
     
     parser = argparse.ArgumentParser(
         prog='code2logic',

@@ -30,9 +30,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from dotenv import load_dotenv
 load_dotenv()
 
-from code2logic import analyze_project, get_client
+from code2logic import analyze_project
+from code2logic.llm import get_client
 from code2logic.parsers import UniversalParser
-from code2logic.models import FunctionInfo
+from code2logic.core import FunctionInfo
 
 
 @dataclass

@@ -188,12 +188,24 @@ def get_token_reproduction_prompt(spec: str, fmt: str, file_name: str) -> str:
 - 'bases: [BaseModel]' = class X(BaseModel) with Field()
 - 'type: re-export' = from .module import X
 CRITICAL: Ensure valid syntax - balanced brackets, proper indentation, no undefined variables.""",
-        "toon": """Parse TOON (Token-Oriented Object Notation) format:
-- 'modules[N]{field1,field2}:' = tabular array with N items
-- 'classes[N]{name,bases,methods}:' = class definitions
-- 'methods[N]{name,sig,async,lines}:' = method list
-- Indentation shows nesting, commas separate values
-Generate all classes and functions with exact signatures.""",
+        "toon": """Parse TOON (Token-Oriented Object Notation) format carefully:
+
+STRUCTURE:
+- 'imports[N]: mod1,mod2' = import statements to include
+- 'classes[N]{name,bases,decorators,props,methods}:' = class definitions
+- 'functions[N]{name,sig,decorators,async,category,lines}:' = function definitions
+- 'function_docs:' section = docstrings/intent for each function
+
+SIGNATURE FORMAT '(params)->ReturnType':
+- 'sig: (self;x: int;y: str)->bool' = def func(self, x: int, y: str) -> bool
+- 'sig: (self)->None' = def func(self) -> None
+- Semicolons separate params, '->' indicates return type
+
+DECORATORS:
+- 'decorators: @property' = add @property decorator
+- 'decorators: @staticmethod|@cache' = multiple decorators
+
+CRITICAL: Use imports[], function_docs, and exact signatures to reproduce code accurately.""",
     }
 
     max_spec = 5000

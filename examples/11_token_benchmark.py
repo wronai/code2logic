@@ -28,9 +28,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from dotenv import load_dotenv
 load_dotenv()
 
-from code2logic import analyze_project, get_client, ReproductionMetrics
+from code2logic import analyze_project, ReproductionMetrics
+from code2logic.llm import get_client
+from code2logic.core import ProjectInfo
 from code2logic.reproduction import extract_code_block
-from code2logic.models import ProjectInfo
 from code2logic.utils import cleanup_generated_root, estimate_tokens, write_text_atomic
 from code2logic.benchmarks.common import (
     create_single_project,

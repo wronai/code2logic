@@ -93,16 +93,25 @@ class TOONGenerator:
             lines.append("module_details:")
             
             for m in modules:
-                if m.classes or m.functions:
-                    lines.append(f"  {self._quote(m.path)}:")
-                    
-                    # Classes
-                    if m.classes:
-                        lines.extend(self._generate_classes(m.classes, detail, indent=4))
-                    
-                    # Functions
-                    if m.functions:
-                        lines.extend(self._generate_functions(m.functions, detail, indent=4))
+                lines.append(f"  {self._quote(m.path)}:")
+                
+                # ENHANCED: Add imports for better reproduction
+                if m.imports:
+                    imports_str = self.delimiter.join(m.imports[:15])
+                    lines.append(f"    imports[{len(m.imports)}]: {imports_str}")
+                
+                # ENHANCED: Add exports
+                if m.exports:
+                    exports_str = self.delimiter.join(m.exports[:10])
+                    lines.append(f"    exports[{len(m.exports)}]: {exports_str}")
+                
+                # Classes
+                if m.classes:
+                    lines.extend(self._generate_classes(m.classes, detail, indent=4))
+                
+                # Functions
+                if m.functions:
+                    lines.extend(self._generate_functions(m.functions, detail, indent=4))
         
         return lines
     
@@ -111,40 +120,67 @@ class TOONGenerator:
         lines = []
         ind = ' ' * indent
         
-        # Tabular format for class list
-        header_fields = f"name{self.delim_marker}bases{self.delim_marker}methods"
+        # ENHANCED: Richer tabular format with decorators
+        header_fields = f"name{self.delim_marker}bases{self.delim_marker}decorators{self.delim_marker}props{self.delim_marker}methods"
         lines.append(f"{ind}classes[{len(classes)}]{{{header_fields}}}:")
         
         for c in classes:
             name = self._quote(c.name)
             bases = '|'.join(c.bases) if c.bases else '-'
+            # ClassInfo may not have decorators attribute
+            class_decorators = getattr(c, 'decorators', []) or []
+            decorators = '|'.join(class_decorators[:3]) if class_decorators else '-'
+            props = len(c.properties) if c.properties else 0
             method_count = len(c.methods)
-            lines.append(f"{ind}  {name}{self.delimiter}{bases}{self.delimiter}{method_count}")
+            lines.append(f"{ind}  {name}{self.delimiter}{bases}{self.delimiter}{decorators}{self.delimiter}{props}{self.delimiter}{method_count}")
         
-        # Detailed class info with methods
-        if detail == 'full':
+        # Detailed class info with methods (for standard and full)
+        if detail in ('standard', 'full'):
             lines.append(f"{ind}class_details:")
             for c in classes:
+                lines.append(f"{ind}  {self._quote(c.name)}:")
+                
+                # ENHANCED: Add docstring
+                if c.docstring:
+                    doc = c.docstring[:100].replace('\n', ' ').strip()
+                    lines.append(f"{ind}    doc: {self._quote(doc)}")
+                
+                # ENHANCED: Add properties with types
+                if c.properties:
+                    props_str = self.delimiter.join(c.properties[:10])
+                    lines.append(f"{ind}    properties[{len(c.properties)}]: {props_str}")
+                
+                # Methods with full details
                 if c.methods:
-                    lines.append(f"{ind}  {self._quote(c.name)}:")
-                    lines.extend(self._generate_methods(c.methods, indent + 4))
+                    lines.extend(self._generate_methods(c.methods, detail, indent + 4))
         
         return lines
     
-    def _generate_methods(self, methods: List[FunctionInfo], indent: int = 0) -> List[str]:
+    def _generate_methods(self, methods: List[FunctionInfo], detail: str = 'standard', indent: int = 0) -> List[str]:
         """Generate methods in tabular TOON format."""
         lines = []
         ind = ' ' * indent
         
-        # Tabular array for methods
-        header = f"name{self.delim_marker}sig{self.delim_marker}async{self.delim_marker}lines"
+        # ENHANCED: Richer tabular array for methods
+        header = f"name{self.delim_marker}sig{self.delim_marker}decorators{self.delim_marker}async{self.delim_marker}lines"
         lines.append(f"{ind}methods[{len(methods)}]{{{header}}}:")
         
         for m in methods:
             name = self._quote(m.name)
             sig = self._quote(self._build_signature(m))
-            is_async = 'true' if m.is_async else 'false'
-            lines.append(f"{ind}  {name}{self.delimiter}{sig}{self.delimiter}{is_async}{self.delimiter}{m.lines}")
+            method_decorators = getattr(m, 'decorators', []) or []
+            decorators = '|'.join(method_decorators[:2]) if method_decorators else '-'
+            is_async = 'true' if getattr(m, 'is_async', False) else 'false'
+            lines.append(f"{ind}  {name}{self.delimiter}{sig}{self.delimiter}{decorators}{self.delimiter}{is_async}{self.delimiter}{m.lines}")
+        
+        # ENHANCED: Add intent/docstring for full detail
+        if detail == 'full':
+            lines.append(f"{ind}method_docs:")
+            for m in methods:
+                if m.intent or m.docstring:
+                    doc = (m.intent or m.docstring or '')[:80].replace('\n', ' ').strip()
+                    if doc:
+                        lines.append(f"{ind}  {self._quote(m.name)}: {self._quote(doc)}")
         
         return lines
     
@@ -153,32 +189,48 @@ class TOONGenerator:
         lines = []
         ind = ' ' * indent
         
-        # Tabular array
-        header = f"name{self.delim_marker}sig{self.delim_marker}async{self.delim_marker}lines"
+        # ENHANCED: Richer tabular array with decorators and category
+        header = f"name{self.delim_marker}sig{self.delim_marker}decorators{self.delim_marker}async{self.delim_marker}category{self.delim_marker}lines"
         lines.append(f"{ind}functions[{len(functions)}]{{{header}}}:")
         
         for f in functions:
             name = self._quote(f.name)
             sig = self._quote(self._build_signature(f))
-            is_async = 'true' if f.is_async else 'false'
-            lines.append(f"{ind}  {name}{self.delimiter}{sig}{self.delimiter}{is_async}{self.delimiter}{f.lines}")
+            func_decorators = getattr(f, 'decorators', []) or []
+            decorators = '|'.join(func_decorators[:2]) if func_decorators else '-'
+            is_async = 'true' if getattr(f, 'is_async', False) else 'false'
+            # category may not exist on FunctionInfo
+            category = getattr(f, 'category', None) or '-'
+            lines.append(f"{ind}  {name}{self.delimiter}{sig}{self.delimiter}{decorators}{self.delimiter}{is_async}{self.delimiter}{category}{self.delimiter}{f.lines}")
+        
+        # ENHANCED: Add intent/docstring for standard and full detail
+        if detail in ('standard', 'full'):
+            has_docs = any(f.intent or f.docstring for f in functions)
+            if has_docs:
+                lines.append(f"{ind}function_docs:")
+                for f in functions:
+                    doc = (f.intent or f.docstring or '')[:100].replace('\n', ' ').strip()
+                    if doc:
+                        lines.append(f"{ind}  {self._quote(f.name)}: {self._quote(doc)}")
         
         return lines
     
     def _build_signature(self, f: FunctionInfo) -> str:
-        """Build compact signature string."""
+        """Build compact but complete signature string."""
         params = []
-        for p in f.params[:4]:
+        # ENHANCED: Include more params and preserve type hints
+        for p in f.params[:6]:
             p_clean = p.replace('\n', ' ').replace(',', ';').strip()
             if p_clean:
                 params.append(p_clean)
         
         param_str = ';'.join(params)
-        if len(f.params) > 4:
-            param_str += f'...+{len(f.params)-4}'
+        if len(f.params) > 6:
+            param_str += f'...+{len(f.params)-6}'
         
-        ret = f"->{f.return_type}" if f.return_type else ""
-        return f"({param_str}){ret}"
+        # ENHANCED: Always include return type even if None
+        ret = f.return_type if f.return_type else 'None'
+        return f"({param_str})->{ret}"
     
     def _quote(self, value: Any) -> str:
         """Quote a value if necessary for TOON format."""
