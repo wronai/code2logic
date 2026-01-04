@@ -11,6 +11,7 @@ See: https://github.com/toon-format/toon
 import re
 from typing import List, Dict, Any, Optional
 from .models import ProjectInfo, ModuleInfo, ClassInfo, FunctionInfo
+from .shared_utils import compact_imports, truncate_docstring
 
 
 class TOONGenerator:
@@ -218,19 +219,27 @@ class TOONGenerator:
         return lines
     
     def _build_signature(self, f: FunctionInfo) -> str:
-        """Build compact but complete signature string."""
+        """Build compact signature string without self/cls."""
         params = []
-        # ENHANCED: Include more params and preserve type hints
-        for p in f.params[:6]:
+        for p in f.params[:7]:  # +1 to account for self
             p_clean = p.replace('\n', ' ').replace(',', ';').strip()
+            # Skip self/cls - obvious for methods
+            if p_clean in ('self', 'cls'):
+                continue
+            if p_clean.startswith('self:'):
+                continue
             if p_clean:
                 params.append(p_clean)
         
-        param_str = ';'.join(params)
-        if len(f.params) > 6:
-            param_str += f'...+{len(f.params)-6}'
+        # Limit to 6 actual params
+        if len(params) > 6:
+            overflow = len(params) - 6
+            params = params[:6]
+            params.append(f'...+{overflow}')
         
-        # ENHANCED: Always include return type even if None
+        param_str = ';'.join(params)
+        
+        # Include return type
         ret = f.return_type if f.return_type else 'None'
         return f"({param_str})->{ret}"
     
@@ -268,6 +277,64 @@ class TOONGenerator:
     def generate_full(self, project: ProjectInfo) -> str:
         """Generate detailed TOON output."""
         return self.generate(project, detail='full')
+    
+    def generate_ultra_compact(self, project: ProjectInfo) -> str:
+        """
+        Generate minimal TOON with abbreviated keys.
+        
+        Ultra-compact format for maximum token efficiency:
+        - Single-letter keys (M=modules, D=details, i=imports, c=classes, f=functions)
+        - No self in signatures
+        - Inline method definitions
+        - Grouped imports
+        """
+        lines = []
+        
+        # Header in one line
+        langs = '/'.join(f"{k}:{v}" for k, v in project.languages.items())
+        lines.append(f"# {project.name} | {project.total_files}f {project.total_lines}L | {langs}")
+        lines.append("# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods")
+        
+        # Modules as compact list
+        lines.append(f"M[{len(project.modules)}]:")
+        for m in project.modules:
+            lines.append(f"  {m.path},{m.lines_code}")
+        
+        # Details only for modules with content
+        lines.append("D:")
+        for m in project.modules:
+            if not m.classes and not m.functions:
+                continue
+            
+            lines.append(f"  {m.path}:")
+            
+            # Compact imports
+            if m.imports:
+                compact = compact_imports(m.imports[:10])
+                lines.append(f"    i: {','.join(compact)}")
+            
+            # Compact exports
+            if m.exports:
+                lines.append(f"    e: {','.join(m.exports[:8])}")
+            
+            # Classes inline
+            for c in m.classes[:5]:
+                methods_str = ','.join(
+                    f"{meth.name}({len([p for p in meth.params if p not in ('self','cls')])})"
+                    for meth in c.methods[:5]
+                )
+                doc = truncate_docstring(c.docstring, 40) if c.docstring else ''
+                if doc:
+                    lines.append(f"    {c.name}: {methods_str}  # {doc}")
+                else:
+                    lines.append(f"    {c.name}: {methods_str}")
+            
+            # Functions inline
+            for f in m.functions[:8]:
+                sig = self._build_signature(f)
+                lines.append(f"    {f.name}{sig}")
+        
+        return '\n'.join(lines)
 
 
 class TOONParser:

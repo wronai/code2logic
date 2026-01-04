@@ -910,6 +910,157 @@ class YAMLGenerator:
                     lines.append(f"        is_async: {str(f.is_async).lower()}")
         
         return '\n'.join(lines)
+    
+    def _build_compact_header(self, project: ProjectInfo) -> str:
+        """Build header comment with key legend for LLM transparency."""
+        lang_summary = ','.join(f"{k}:{v}" for k, v in list(project.languages.items())[:3])
+        lines = [
+            f"# {project.name} | {project.total_files} files | {project.total_lines} lines | {lang_summary}",
+            "# Key legend: p=path, l=lines, i=imports, e=exports, c=classes, f=functions",
+            "#             n=name, d=docstring, b=bases, m=methods, props=properties",
+            "#             sig=signature (without self), ret=return_type, async=is_async",
+            "# Empty fields (bases:[], decorators:[]) are omitted for brevity",
+            "",
+        ]
+        return '\n'.join(lines)
+    
+    def _build_compact_data(self, project: ProjectInfo, detail: str) -> dict:
+        """Build compact data structure with short keys."""
+        # Detect default language
+        default_lang = max(project.languages.items(), key=lambda x: x[1])[0] if project.languages else 'python'
+        
+        modules = []
+        for m in project.modules:
+            mod_data = {
+                'p': m.path,  # path
+            }
+            
+            # Only add language if different from default
+            if m.language != default_lang:
+                mod_data['lang'] = m.language
+            
+            # Add line count as comment in path
+            mod_data['l'] = m.lines_code  # lines
+            
+            if detail in ('standard', 'full'):
+                # Deduplicate and compact imports
+                compact_imports = self._compact_imports(m.imports[:15])
+                if compact_imports:
+                    mod_data['i'] = compact_imports  # imports
+                if m.exports:
+                    mod_data['e'] = m.exports[:10]  # exports
+            
+            # Classes with compact format
+            if m.classes:
+                mod_data['c'] = [self._compact_class(c, detail) for c in m.classes[:10]]
+            
+            # Functions with compact format
+            if m.functions:
+                mod_data['f'] = [self._compact_function(f, detail) for f in m.functions[:15]]
+            
+            modules.append(mod_data)
+        
+        return {
+            'defaults': {'lang': default_lang},
+            'modules': modules
+        }
+    
+    def _compact_imports(self, imports: list) -> list:
+        """Deduplicate and compact imports (typing.Dict, typing.List -> typing.{Dict,List})."""
+        if not imports:
+            return []
+        
+        # Group by module
+        modules = {}
+        standalone = []
+        for imp in imports:
+            if '.' in imp:
+                parts = imp.rsplit('.', 1)
+                if len(parts) == 2:
+                    mod, name = parts
+                    # Skip duplicates like module.module
+                    if mod != name:
+                        modules.setdefault(mod, set()).add(name)
+                else:
+                    standalone.append(imp)
+            else:
+                standalone.append(imp)
+        
+        result = list(set(standalone))  # Dedupe standalone
+        for mod, names in sorted(modules.items()):
+            if len(names) == 1:
+                result.append(f"{mod}.{list(names)[0]}")
+            elif len(names) > 1:
+                result.append(f"{mod}.{{{','.join(sorted(names))}}}")
+        
+        return result
+    
+    def _compact_class(self, cls: ClassInfo, detail: str) -> dict:
+        """Generate compact class representation."""
+        data = {
+            'n': cls.name,  # name
+        }
+        
+        # Only add bases if non-empty
+        if cls.bases:
+            data['b'] = cls.bases  # bases
+        
+        # Truncated docstring
+        if cls.docstring:
+            doc = cls.docstring.split('\n')[0][:60].strip()
+            if doc:
+                data['d'] = doc  # docstring
+        
+        # Properties (important for dataclasses)
+        if cls.properties:
+            data['props'] = cls.properties[:15]
+        
+        # Methods in compact format
+        if cls.methods:
+            data['m'] = [self._compact_method(m, detail) for m in cls.methods[:12]]
+        
+        return data
+    
+    def _compact_function(self, f: FunctionInfo, detail: str) -> dict:
+        """Generate compact function representation."""
+        data = {
+            'n': f.name,  # name
+            'sig': self._build_compact_signature(f),  # signature without self
+        }
+        
+        if f.return_type:
+            data['ret'] = f.return_type
+        
+        if detail in ('standard', 'full') and f.intent:
+            intent = f.intent.replace('\n', ' ')[:50].strip()
+            if intent:
+                data['d'] = intent  # docstring/intent
+        
+        if detail == 'full':
+            data['l'] = f.lines  # lines
+            if f.is_async:
+                data['async'] = True
+        
+        return data
+    
+    def _compact_method(self, f: FunctionInfo, detail: str) -> dict:
+        """Generate compact method representation (same as function)."""
+        return self._compact_function(f, detail)
+    
+    def _build_compact_signature(self, f: FunctionInfo) -> str:
+        """Build compact signature without 'self' and with clean formatting."""
+        clean_params = []
+        for p in f.params[:6]:
+            p_clean = p.replace('\n', ' ').replace('  ', ' ').strip()
+            # Skip 'self' parameter
+            if p_clean and p_clean != 'self' and not p_clean.startswith('self:'):
+                clean_params.append(p_clean)
+        
+        params = ', '.join(clean_params)
+        if len(f.params) > 6:
+            params += f', ...+{len(f.params)-6}'
+        
+        return params if params else ''
 
 
 # ============================================================================

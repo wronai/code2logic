@@ -34,6 +34,7 @@ from typing import Dict, List, Optional, Set, Any
 from dataclasses import dataclass
 
 from .models import ProjectInfo, ModuleInfo, FunctionInfo, ClassInfo
+from .shared_utils import truncate_docstring, compact_imports, remove_self_from_params
 
 
 @dataclass
@@ -180,9 +181,12 @@ class LogicMLGenerator:
         
         lines = ['\nimports:']
         if stdlib:
-            lines.append(f"  stdlib: [{', '.join(sorted(stdlib)[:10])}]")
+            # Use compact_imports for grouped format
+            grouped = compact_imports(sorted(stdlib)[:15], max_items=10)
+            lines.append(f"  stdlib: [{', '.join(grouped)}]")
         if third_party:
-            lines.append(f"  third_party: [{', '.join(sorted(third_party)[:10])}]")
+            grouped = compact_imports(sorted(third_party)[:10], max_items=8)
+            lines.append(f"  third_party: [{', '.join(grouped)}]")
         if local:
             lines.append(f"  local: [{', '.join(sorted(local)[:5])}]")
         
@@ -192,33 +196,16 @@ class LogicMLGenerator:
         """Generate LogicML for a class."""
         lines: List[str] = [f'\n{cls.name}:']
         
-        # Docstring (full for better reproduction)
+        # Docstring - truncated for efficiency
         if cls.docstring:
-            doc_lines = cls.docstring.split('\n')
-            first_line = doc_lines[0].strip()[:80].replace('"', "'")
-            lines.append(f'  doc: "{first_line}"')
-            
-            # Include Example section if present (important for usage)
-            for i, doc_line in enumerate(doc_lines):
-                if 'Example:' in doc_line:
-                    lines.append('  # Example usage in docstring')
-                    break
-                if 'Attributes:' in doc_line or 'Args:' in doc_line:
-                    for attr_line in doc_lines[i+1:i+5]:
-                        attr_line = attr_line.strip()
-                        if attr_line and not attr_line.startswith('"""'):
-                            lines.append(f'  # {attr_line}')
-                    break
+            doc = truncate_docstring(cls.docstring, max_length=60)
+            if doc:
+                lines.append(f'  doc: "{doc}"')
         
-        # Bases - important for Pydantic/dataclass
+        # Bases - only if non-empty
         if cls.bases:
             bases_str = ", ".join(cls.bases)
             lines.append(f'  bases: [{bases_str}]')
-            # Add hint for special base classes
-            if 'BaseModel' in bases_str:
-                lines.append('  # Pydantic model - use Field() for attributes')
-            elif 'Enum' in bases_str:
-                lines.append('  # Enum class')
         
         # Type markers
         if cls.is_abstract:
@@ -267,8 +254,9 @@ class LogicMLGenerator:
         # Check for property decorator
         is_property = 'property' in method.decorators
         
-        # Signature
-        params = ', '.join(method.params[:6])
+        # Signature - remove self/cls for compactness
+        clean_params = remove_self_from_params(method.params[:7])
+        params = ', '.join(clean_params[:6])
         ret = method.return_type or 'None'
         
         sig = f'({params}) -> {ret}'
@@ -279,20 +267,14 @@ class LogicMLGenerator:
         
         lines.append(f'{prefix}  sig: {sig}')
         
-        # Intent/docstring as "does" - include full context for better semantic reproduction
+        # Intent/docstring as "does" - truncated for efficiency
         if method.docstring:
-            doc_lines = method.docstring.split('\n')
-            does = doc_lines[0].strip()[:80].replace('"', "'")
-            lines.append(f'{prefix}  does: "{does}"')
-            # Add Args/Returns info if present
-            for doc_line in doc_lines[1:5]:
-                doc_line = doc_line.strip()
-                if doc_line.startswith('Args:') or doc_line.startswith('Returns:'):
-                    lines.append(f'{prefix}  # {doc_line}')
-                elif ':' in doc_line and not doc_line.startswith('#'):
-                    lines.append(f'{prefix}  # {doc_line[:60]}')
+            does = truncate_docstring(method.docstring, max_length=60)
+            if does:
+                lines.append(f'{prefix}  does: "{does}"')
         elif method.intent:
-            lines.append(f'{prefix}  does: "{method.intent}"')
+            intent = method.intent[:60].replace('\n', ' ').replace('"', "'")
+            lines.append(f'{prefix}  does: "{intent}"')
         
         # Edge cases (from raises)
         if method.raises and detail in ('standard', 'full'):

@@ -128,52 +128,66 @@ def validate_yaml(spec: str) -> Tuple[bool, List[str]]:
 
 
 def _validate_module(module: Dict, index: int) -> List[str]:
-    """Validate a module definition."""
+    """Validate a module definition.
+    
+    Supports both full keys (path, classes, functions) and 
+    compact keys (p, c, f) for optimized YAML output.
+    """
     errors: List[str] = []
     prefix = f"modules[{index}]"
     
     if not isinstance(module, dict):
         return [f"{prefix}: must be a dictionary"]
     
-    if 'path' not in module:
-        errors.append(f"{prefix}: missing 'path'")
+    # Support both 'path' and 'p' (compact key)
+    if 'path' not in module and 'p' not in module:
+        errors.append(f"{prefix}: missing 'path' or 'p'")
     
-    # Validate classes
-    if 'classes' in module:
-        if not isinstance(module['classes'], list):
-            errors.append(f"{prefix}.classes: must be a list")
+    # Validate classes - support both 'classes' and 'c' (compact key)
+    classes_key = 'classes' if 'classes' in module else 'c' if 'c' in module else None
+    if classes_key:
+        if not isinstance(module[classes_key], list):
+            errors.append(f"{prefix}.{classes_key}: must be a list")
         else:
-            for j, cls in enumerate(module['classes']):
-                cls_errors = _validate_class(cls, f"{prefix}.classes[{j}]")
+            for j, cls in enumerate(module[classes_key]):
+                cls_errors = _validate_class(cls, f"{prefix}.{classes_key}[{j}]")
                 errors.extend(cls_errors)
     
-    # Validate functions
-    if 'functions' in module:
-        if not isinstance(module['functions'], list):
-            errors.append(f"{prefix}.functions: must be a list")
+    # Validate functions - support both 'functions' and 'f' (compact key)
+    functions_key = 'functions' if 'functions' in module else 'f' if 'f' in module else None
+    if functions_key:
+        if not isinstance(module[functions_key], list):
+            errors.append(f"{prefix}.{functions_key}: must be a list")
     
     return errors
 
 
 def _validate_class(cls: Dict, prefix: str) -> List[str]:
-    """Validate a class definition."""
+    """Validate a class definition.
+    
+    Supports both full keys (name, methods) and 
+    compact keys (n, m) for optimized YAML output.
+    """
     errors: List[str] = []
     
     if not isinstance(cls, dict):
         return [f"{prefix}: must be a dictionary"]
     
-    if 'name' not in cls:
-        errors.append(f"{prefix}: missing 'name'")
+    # Support both 'name' and 'n' (compact key)
+    if 'name' not in cls and 'n' not in cls:
+        errors.append(f"{prefix}: missing 'name' or 'n'")
     
-    # Validate methods
-    if 'methods' in cls:
-        if not isinstance(cls['methods'], list):
-            errors.append(f"{prefix}.methods: must be a list")
+    # Validate methods - support both 'methods' and 'm' (compact key)
+    methods_key = 'methods' if 'methods' in cls else 'm' if 'm' in cls else None
+    if methods_key:
+        if not isinstance(cls[methods_key], list):
+            errors.append(f"{prefix}.{methods_key}: must be a list")
         else:
-            for i, method in enumerate(cls['methods']):
+            for i, method in enumerate(cls[methods_key]):
                 if not isinstance(method, dict):
-                    errors.append(f"{prefix}.methods[{i}]: must be a dictionary")
-                elif 'name' not in method:
-                    errors.append(f"{prefix}.methods[{i}]: missing 'name'")
+                    errors.append(f"{prefix}.{methods_key}[{i}]: must be a dictionary")
+                # Support both 'name' and 'n' for method names
+                elif 'name' not in method and 'n' not in method:
+                    errors.append(f"{prefix}.{methods_key}[{i}]: missing 'name' or 'n'")
     
     return errors
