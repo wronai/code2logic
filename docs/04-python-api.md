@@ -4,6 +4,29 @@
 
 [← README](../README.md) | [← CLI Reference](03-cli-reference.md) | [Output Formats →](05-output-formats.md)
 
+## Package Structure
+
+Code2Logic is organized into subpackages for cleaner imports:
+
+| Package | Contents |
+|---------|----------|
+| `code2logic.core` | Models, Analyzer, Errors |
+| `code2logic.formats` | All generators (YAML, JSON, TOON, etc.) |
+| `code2logic.llm` | LLM clients and intent extraction |
+| `code2logic.tools` | Benchmark, Review, Refactor |
+| `code2logic.integrations` | MCP server |
+
+```python
+# Traditional imports (still work)
+from code2logic import analyze_project, YAMLGenerator
+
+# Organized imports
+from code2logic.core import ProjectInfo, ProjectAnalyzer
+from code2logic.formats import TOONGenerator, LogicMLGenerator
+from code2logic.llm import get_client
+from code2logic.tools import run_benchmark
+```
+
 ## Core Functions
 
 ### analyze_project
@@ -88,10 +111,20 @@ class ClassInfo:
 
 ## Generators
 
+All generators are available from `code2logic.formats`:
+
+```python
+from code2logic.formats import (
+    MarkdownGenerator, JSONGenerator, YAMLGenerator,
+    CSVGenerator, CompactGenerator, GherkinGenerator,
+    TOONGenerator, LogicMLGenerator
+)
+```
+
 ### MarkdownGenerator
 
 ```python
-from code2logic.generators import MarkdownGenerator
+from code2logic.formats import MarkdownGenerator
 
 gen = MarkdownGenerator()
 output = gen.generate(project, detail='standard')
@@ -101,7 +134,7 @@ output = gen.generate(project, detail='standard')
 ### JSONGenerator
 
 ```python
-from code2logic.generators import JSONGenerator
+from code2logic.formats import JSONGenerator
 
 gen = JSONGenerator()
 output = gen.generate(project, flat=False, detail='standard')
@@ -111,16 +144,36 @@ output = gen.generate(project, flat=False, detail='standard')
 ### YAMLGenerator
 
 ```python
-from code2logic.generators import YAMLGenerator
+from code2logic.formats import YAMLGenerator
 
 gen = YAMLGenerator()
 output = gen.generate(project, flat=False, detail='standard')
 ```
 
+### TOONGenerator
+
+```python
+from code2logic.formats import TOONGenerator
+
+gen = TOONGenerator(use_tabs=False)
+output = gen.generate(project, detail='standard')
+# TOON: Token-Oriented Object Notation (6x smaller than JSON)
+```
+
+### LogicMLGenerator
+
+```python
+from code2logic.formats import LogicMLGenerator
+
+gen = LogicMLGenerator()
+spec = gen.generate(project)
+output = spec.content  # LogicMLSpec has .content attribute
+```
+
 ### CSVGenerator
 
 ```python
-from code2logic.generators import CSVGenerator
+from code2logic.formats import CSVGenerator
 
 gen = CSVGenerator()
 output = gen.generate(project, detail='standard')
@@ -129,7 +182,7 @@ output = gen.generate(project, detail='standard')
 ### CompactGenerator
 
 ```python
-from code2logic.generators import CompactGenerator
+from code2logic.formats import CompactGenerator
 
 gen = CompactGenerator()
 output = gen.generate(project)
@@ -139,7 +192,7 @@ output = gen.generate(project)
 ### GherkinGenerator
 
 ```python
-from code2logic.gherkin import GherkinGenerator
+from code2logic.formats import GherkinGenerator
 
 gen = GherkinGenerator()
 output = gen.generate(project, detail='standard')
@@ -157,12 +210,33 @@ output = gen.generate(project)
 
 ## LLM Clients
 
-### OllamaClient
+All LLM clients are available from `code2logic.llm`:
 
 ```python
-from code2logic.llm import OllamaClient
+from code2logic.llm import (
+    get_client, BaseLLMClient,
+    OpenRouterClient, OllamaLocalClient, LiteLLMClient
+)
+```
 
-client = OllamaClient(
+### get_client (Recommended)
+
+```python
+from code2logic.llm import get_client
+
+# Auto-detect best available client
+client = get_client()
+
+# Or specify provider
+client = get_client(provider='ollama', model='qwen2.5-coder:7b')
+```
+
+### OllamaLocalClient
+
+```python
+from code2logic.llm import OllamaLocalClient
+
+client = OllamaLocalClient(
     model="qwen2.5-coder:7b",
     host="http://localhost:11434"
 )

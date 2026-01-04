@@ -127,10 +127,11 @@ class TestFormatGeneration:
     def test_logicml_generation(self, analyzed_project):
         """Test LogicML format generation."""
         gen = LogicMLGenerator()
-        output = gen.generate(analyzed_project)
+        spec = gen.generate(analyzed_project)
+        output = spec.content  # LogicMLSpec has .content attribute
         
         assert len(output) > 0
-        assert "<project" in output or "<module" in output
+        assert "imports:" in output or "methods:" in output or "functions:" in output
     
     def test_markdown_generation(self, analyzed_project):
         """Test Markdown format generation."""
@@ -178,7 +179,8 @@ class TestTokenEfficiency:
         """Compare output sizes across formats."""
         yaml_out = YAMLGenerator().generate(analyzed_project)
         json_out = JSONGenerator().generate(analyzed_project)
-        logicml_out = LogicMLGenerator().generate(analyzed_project)
+        logicml_spec = LogicMLGenerator().generate(analyzed_project)
+        logicml_out = logicml_spec.content  # LogicMLSpec has .content attribute
         markdown_out = MarkdownGenerator().generate(analyzed_project)
         toon_out = TOONGenerator().generate(analyzed_project)
         toon_tabs = TOONGenerator(use_tabs=True).generate(analyzed_project)
@@ -194,7 +196,7 @@ class TestTokenEfficiency:
         
         print("\n=== Format Size Comparison ===")
         for fmt, size in sorted(sizes.items(), key=lambda x: x[1]):
-            tokens = self._estimate_tokens(size)
+            tokens = size // 4  # ~4 chars per token
             print(f"  {fmt}: {size} chars, ~{tokens} tokens")
         
         # TOON should be smaller than JSON
@@ -202,10 +204,11 @@ class TestTokenEfficiency:
     
     def test_token_estimates(self, analyzed_project):
         """Estimate token counts for each format."""
+        logicml_spec = LogicMLGenerator().generate(analyzed_project)
         formats = {
             'YAML': YAMLGenerator().generate(analyzed_project),
             'JSON': JSONGenerator().generate(analyzed_project),
-            'LogicML': LogicMLGenerator().generate(analyzed_project),
+            'LogicML': logicml_spec.content,  # LogicMLSpec has .content attribute
             'Markdown': MarkdownGenerator().generate(analyzed_project),
             'TOON': TOONGenerator().generate(analyzed_project),
             'TOON(tabs)': TOONGenerator(use_tabs=True).generate(analyzed_project),
@@ -351,10 +354,11 @@ class TestBenchmarkSummary:
     
     def test_print_benchmark(self, analyzed_project):
         """Print comprehensive benchmark."""
+        logicml_spec = LogicMLGenerator().generate(analyzed_project)
         formats = {
             'YAML': YAMLGenerator().generate(analyzed_project, detail='full'),
             'JSON': JSONGenerator().generate(analyzed_project),
-            'LogicML': LogicMLGenerator().generate(analyzed_project),
+            'LogicML': logicml_spec.content,  # LogicMLSpec has .content attribute
             'Markdown': MarkdownGenerator().generate(analyzed_project),
             'TOON': TOONGenerator().generate(analyzed_project, detail='full'),
             'TOON(tabs)': TOONGenerator(use_tabs=True).generate(analyzed_project, detail='full'),

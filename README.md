@@ -78,6 +78,25 @@ hubs = [p for p, n in project.dependency_metrics.items() if n.is_hub]
 print(f"Key modules: {hubs}")
 ```
 
+### Organized Imports
+
+```python
+# Core analysis
+from code2logic.core import ProjectInfo, ProjectAnalyzer, analyze_project
+
+# Format generators
+from code2logic.formats import (
+    YAMLGenerator, JSONGenerator, TOONGenerator,
+    LogicMLGenerator, GherkinGenerator
+)
+
+# LLM clients
+from code2logic.llm import get_client, BaseLLMClient
+
+# Development tools
+from code2logic.tools import run_benchmark, CodeReviewer
+```
+
 ## 📋 Output Formats
 
 ### Markdown (default)

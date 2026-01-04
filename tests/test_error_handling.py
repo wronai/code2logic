@@ -116,9 +116,9 @@ class TestFilesystemErrors:
     
     def test_encoding_fallback(self, error_handler, tmp_path):
         """Test encoding fallback for non-UTF8 files."""
-        # Create file with Latin-1 encoding
+        # Create file with Latin-1 encoding (using chars valid in latin-1)
         latin1_file = tmp_path / "latin1.py"
-        latin1_file.write_bytes("# Cześć świat\ndef hello(): pass".encode('latin-1'))
+        latin1_file.write_bytes("# Caf\xe9 cr\xe8me\ndef hello(): pass".encode('latin-1'))
         
         result = error_handler.safe_read_file(latin1_file)
         
