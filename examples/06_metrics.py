@@ -49,6 +49,9 @@ def analyze_file(source_path: str, verbose: bool = False, no_llm: bool = False):
     else:
         try:
             client = get_client()
+            provider_name = getattr(client, 'provider', None) or client.__class__.__name__
+            print(f"Selected: {provider_name}")
+            print(f"Model: {getattr(client, 'model', 'default')}")
             prompt = f"Generate Python code from this Gherkin spec:\n\n{spec}\n\nOutput only code."
             response = client.generate(prompt, max_tokens=4000)
             generated = extract_code_block(response)

@@ -15,6 +15,7 @@ Usage:
 """
 
 import json
+import os
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 
@@ -30,6 +31,15 @@ try:
     LITELLM_AVAILABLE = True
 except ImportError:
     LITELLM_AVAILABLE = False
+
+
+from .llm_clients import (
+    BaseLLMClient,
+    OpenRouterClient,
+    OllamaLocalClient,
+    LiteLLMClient,
+    get_client,
+)
 
 
 @dataclass
@@ -182,9 +192,10 @@ Be specific, practical, and provide code examples when helpful."""
     
     def __init__(
         self,
-        model: str = "qwen2.5-coder:7b",
-        provider: str = "ollama",
-        base_url: str = "http://localhost:11434",
+        model: str = None,
+        provider: str = None,
+        base_url: str = None,
+        api_key: str = None,
         **kwargs
     ):
         """
@@ -195,21 +206,39 @@ Be specific, practical, and provide code examples when helpful."""
             provider: "ollama" or "litellm"
             base_url: API base URL
         """
+        selected_provider = provider or os.environ.get('CODE2LOGIC_DEFAULT_PROVIDER', 'ollama')
+
+        # Keep legacy defaults for local usage
+        if model is None:
+            model = os.environ.get('OLLAMA_MODEL', 'qwen2.5-coder:7b')
+        if base_url is None:
+            base_url = os.environ.get('OLLAMA_HOST', 'http://localhost:11434')
+
+        # Prefer unified clients + allow optional overrides
+        if selected_provider in ("auto", "AUTO"):
+            # In auto mode, model/base_url/api_key may not apply uniformly; let get_client decide.
+            self.client = get_client('auto')
+        elif selected_provider == "openrouter":
+            self.client = OpenRouterClient(api_key=api_key, model=model)
+        elif selected_provider == "ollama":
+            self.client = OllamaLocalClient(model=model, host=base_url)
+        elif selected_provider == "litellm":
+            self.client = LiteLLMClient(model=model)
+        else:
+            # Fallback to environment-based selection (may raise if unsupported)
+            self.client = get_client(selected_provider, model=model)
+
         self.config = LLMConfig(
-            provider=provider,
+            provider=selected_provider,
             model=model,
             base_url=base_url,
+            api_key=api_key,
             **kwargs
         )
-        
-        if provider == "ollama":
-            self.client = OllamaClient(self.config)
-        else:
-            self.client = LiteLLMClient(self.config)
     
     def is_available(self) -> bool:
         """Check if LLM backend is available."""
-        return self.client.is_available()
+        return bool(getattr(self.client, "is_available", lambda: False)())
     
     def suggest_refactoring(self, project) -> List[Dict[str, Any]]:
         """

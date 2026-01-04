@@ -33,6 +33,8 @@ def print_format_results(result):
     print(f"\n{'='*60}")
     print("FORMAT COMPARISON RESULTS")
     print(f"{'='*60}")
+    print(f"Provider: {result.provider}")
+    print(f"Model: {result.model}")
     print(f"Files: {result.total_files}")
     print(f"Time: {result.total_time:.1f}s")
     
@@ -56,6 +58,8 @@ def print_function_results(result):
     print(f"\n{'='*60}")
     print("FUNCTION REPRODUCTION RESULTS")
     print(f"{'='*60}")
+    print(f"Provider: {result.provider}")
+    print(f"Model: {result.model}")
     print(f"Functions: {result.total_functions}")
     print(f"Avg Similarity: {result.avg_similarity:.1f}%")
     
@@ -72,6 +76,8 @@ def print_project_results(result):
     print(f"\n{'='*60}")
     print("PROJECT BENCHMARK RESULTS")
     print(f"{'='*60}")
+    print(f"Provider: {result.provider}")
+    print(f"Model: {result.model}")
     print(f"Files: {result.total_files}")
     print(f"Avg Score: {result.avg_score:.1f}%")
     print(f"Time: {result.total_time:.1f}s")

@@ -219,6 +219,9 @@ class BenchmarkConfig:
     
     # Verbosity
     verbose: bool = False
+
+    # Execution mode
+    use_llm: bool = True
     
     # LLM settings
     max_tokens: int = 4000

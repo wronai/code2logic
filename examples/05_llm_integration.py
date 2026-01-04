@@ -10,6 +10,7 @@ Usage:
 
 import sys
 import argparse
+import os
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -32,8 +33,12 @@ from code2logic import (
 def main():
     parser = argparse.ArgumentParser(description='LLM integration')
     parser.add_argument('project', nargs='?', default='code2logic/')
-    parser.add_argument('--provider', '-p', default='openrouter', 
-                        choices=['openrouter', 'ollama'])
+    parser.add_argument(
+        '--provider',
+        '-p',
+        default=os.environ.get('CODE2LOGIC_DEFAULT_PROVIDER', 'auto'),
+        choices=['auto', 'openrouter', 'ollama', 'litellm'],
+    )
     parser.add_argument('--model', '-m', help='Model name')
     parser.add_argument('--list-models', action='store_true')
     args = parser.parse_args()
@@ -58,7 +63,15 @@ def main():
     print(f"\nProvider: {args.provider}")
     
     try:
-        client = get_client(args.provider, args.model)
+        if args.provider == 'auto':
+            if args.model:
+                print("Note: --model is ignored when --provider=auto")
+            client = get_client('auto')
+        else:
+            client = get_client(args.provider, args.model)
+
+        provider_name = getattr(client, 'provider', None) or client.__class__.__name__
+        print(f"Selected: {provider_name}")
         print(f"Model: {getattr(client, 'model', 'default')}")
         print(f"Available: {client.is_available()}")
     except Exception as e:

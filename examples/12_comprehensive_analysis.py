@@ -29,6 +29,8 @@ def print_comprehensive_analysis(result):
     print("COMPREHENSIVE FORMAT ANALYSIS")
     print(f"{'='*70}")
     print(f"Files: {result.total_files}")
+    print(f"Provider: {result.provider}")
+    print(f"Model: {result.model}")
     print(f"Formats tested: {len(result.format_scores)}")
     print(f"Total time: {result.total_time:.1f}s")
     

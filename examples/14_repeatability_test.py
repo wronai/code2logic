@@ -161,7 +161,9 @@ def run_repeatability_test(
     # Initialize LLM
     try:
         client = get_client()
-        print(f"LLM: {client.__class__.__name__}")
+        provider_name = getattr(client, 'provider', None) or client.__class__.__name__
+        print(f"Selected: {provider_name}")
+        print(f"Model: {getattr(client, 'model', 'default')}")
     except Exception as e:
         print(f"LLM not available: {e}")
         return {}

@@ -28,6 +28,8 @@ def print_results(result):
     print(f"{'='*60}")
     print(f"Files: {result.total_files}")
     print(f"Time: {result.total_time:.1f}s")
+    print(f"Provider: {result.provider}")
+    print(f"Model: {result.model}")
     print(f"Avg Score: {result.avg_score:.1f}%")
     print(f"Syntax OK: {result.syntax_ok_rate:.0f}%")
     

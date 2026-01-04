@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "code2logic"
-version = "1.0.2"
+version = "1.0.5"
 description = "Convert source code to logical representation for LLM analysis"
 readme = "README.md"
 license = {text = "MIT"}
@@ -114,11 +114,11 @@ code2logic = "code2logic.cli:main"
 code2logic-mcp = "code2logic.mcp_server:run_server"
 
 [project.urls]
-Homepage = "https://github.com/softreck/code2logic"
+Homepage = "https://github.com/wronai/code2logic"
 Documentation = "https://code2logic.readthedocs.io"
-Repository = "https://github.com/softreck/code2logic.git"
-Issues = "https://github.com/softreck/code2logic/issues"
-Changelog = "https://github.com/softreck/code2logic/blob/main/CHANGELOG.md"
+Repository = "https://github.com/wronai/code2logic.git"
+Issues = "https://github.com/wronai/code2logic/issues"
+Changelog = "https://github.com/wronai/code2logic/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -206,7 +206,7 @@ module = [
 ignore_missing_imports = true
 
 [tool.bumpver]
-current_version = "1.0.2"
+current_version = "1.0.5"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit = false
 tag = false

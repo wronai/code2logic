@@ -28,6 +28,7 @@ from ..llm_clients import get_client, BaseLLMClient
 from ..reproduction import extract_code_block
 from ..utils import estimate_tokens
 from ..metrics import ReproductionMetrics
+from ..terminal import render, ShellRenderer
 
 from .results import (
     BenchmarkResult, BenchmarkConfig, FileResult, 
@@ -108,12 +109,77 @@ class BenchmarkRunner:
         self.client = client
         self.config = config or BenchmarkConfig()
         self._metrics = ReproductionMetrics()
+
+    def _should_use_llm(self) -> bool:
+        """Return whether this runner should call an LLM."""
+        return bool(getattr(self.config, "use_llm", True))
     
     def _get_client(self) -> BaseLLMClient:
         """Get or create LLM client."""
+        if not self._should_use_llm():
+            raise RuntimeError("LLM usage disabled (BenchmarkConfig.use_llm=False)")
         if self.client is None:
             self.client = get_client()
         return self.client
+
+    def _template_generate_code(self, spec: str, fmt: str, file_name: str) -> str:
+        """Generate minimal Python code without an LLM (fallback mode)."""
+        import re
+
+        # Try to infer class/function names from spec
+        classes: List[str] = []
+        functions: List[str] = []
+
+        # Common patterns
+        classes.extend(re.findall(r"\bclass\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
+        classes.extend(re.findall(r"^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*$", spec, re.MULTILINE))
+        functions.extend(re.findall(r"\bdef\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", spec))
+        functions.extend(re.findall(r"\bFunction:\s*([A-Za-z_][A-Za-z0-9_]*)", spec))
+        functions.extend(re.findall(r"\bScenario:\s*([A-Za-z_][A-Za-z0-9_]*)", spec))
+
+        # Deduplicate while preserving order
+        def uniq(items: List[str]) -> List[str]:
+            seen = set()
+            out: List[str] = []
+            for it in items:
+                if it and it not in seen:
+                    seen.add(it)
+                    out.append(it)
+            return out
+
+        classes = [c for c in uniq(classes) if c.isidentifier()][:5]
+        functions = [f for f in uniq(functions) if f.isidentifier() and f not in classes][:10]
+
+        code = """from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Optional, List, Dict
+
+"""
+
+        if not classes and not functions:
+            # Always emit something valid
+            safe_name = Path(file_name).stem.replace('-', '_').replace('.', '_')
+            safe_name = safe_name if safe_name.isidentifier() else "GeneratedModule"
+            classes = ["GeneratedClass"]
+            functions = ["generated_function"]
+
+        for cls in classes:
+            code += f"""@dataclass
+class {cls}:
+    \"\"\"Generated placeholder for {file_name} ({fmt}).\"\"\"
+    value: Any = None
+
+"""
+
+        for fn in functions:
+            code += f"""def {fn}(*args: Any, **kwargs: Any) -> Any:
+    \"\"\"Generated placeholder for {file_name} ({fmt}).\"\"\"
+    return None
+
+"""
+
+        return code
     
     def run_format_benchmark(
         self,
@@ -137,13 +203,18 @@ class BenchmarkRunner:
             BenchmarkResult with format comparison data
         """
         formats = formats or self.config.formats
-        client = self._get_client()
+
+        client: Optional[BaseLLMClient]
+        if self._should_use_llm():
+            client = self._get_client()
+        else:
+            client = None
         
         result = BenchmarkResult(
             benchmark_type='format',
             source_path=folder,
-            provider=getattr(client, 'provider', 'unknown'),
-            model=getattr(client, 'model', 'unknown'),
+            provider=getattr(client, 'provider', 'none') if client else 'none',
+            model=getattr(client, 'model', 'none') if client else 'none',
         )
         
         # Analyze project
@@ -155,8 +226,8 @@ class BenchmarkRunner:
         result.total_files = len(py_files)
         
         if verbose:
-            print(f"Format Benchmark: {folder}")
-            print(f"Files: {len(py_files)}, Formats: {', '.join(formats)}")
+            render.heading(2, "Format Benchmark")
+            render.codeblock("yaml", f"folder: {folder}\nfiles: {len(py_files)}\nformats: [{', '.join(formats)}]")
         
         project = analyze_project(str(path), use_treesitter=False)
         
@@ -221,7 +292,7 @@ class BenchmarkRunner:
         original: str,
         fmt: str,
         file_name: str,
-        client: BaseLLMClient,
+        client: Optional[BaseLLMClient],
         verbose: bool = False,
     ) -> FormatResult:
         """Test a single format."""
@@ -238,10 +309,13 @@ class BenchmarkRunner:
             
             # Reproduce
             start = time.time()
-            response = client.generate(prompt, max_tokens=self.config.max_tokens)
-            result.gen_time = time.time() - start
-            
-            generated = _extract_code(response)
+            if client is None:
+                generated = self._template_generate_code(spec, fmt, file_name)
+                result.gen_time = 0.0
+            else:
+                response = client.generate(prompt, max_tokens=self.config.max_tokens)
+                result.gen_time = time.time() - start
+                generated = _extract_code(response)
             result.generated_size = len(generated)
             
             # Test quality
@@ -262,13 +336,15 @@ class BenchmarkRunner:
                 result.token_efficiency = result.score / result.spec_tokens * 100
             
             if verbose:
-                status = "✓" if result.score > 50 else "○"
-                print(f"  {fmt}: {result.score:.1f}% {status}")
+                if result.score > 50:
+                    render.task(f"{fmt}: {result.score:.1f}%", "done")
+                else:
+                    render.task(f"{fmt}: {result.score:.1f}%", "pending")
                 
         except Exception as e:
             result.error = str(e)[:100]
             if verbose:
-                print(f"  {fmt}: ERROR - {e}")
+                render.task(f"{fmt}: {str(e)[:50]}", "failed")
         
         return result
     
@@ -290,14 +366,19 @@ class BenchmarkRunner:
             BenchmarkResult
         """
         formats = formats or self.config.formats
-        client = self._get_client()
+
+        client: Optional[BaseLLMClient]
+        if self._should_use_llm():
+            client = self._get_client()
+        else:
+            client = None
         
         result = BenchmarkResult(
             benchmark_type='file',
             source_path=file_path,
             total_files=1,
-            provider=getattr(client, 'provider', 'unknown'),
-            model=getattr(client, 'model', 'unknown'),
+            provider=getattr(client, 'provider', 'none') if client else 'none',
+            model=getattr(client, 'model', 'none') if client else 'none',
         )
         
         path = Path(file_path)
@@ -332,7 +413,7 @@ class BenchmarkRunner:
         
         for fmt in formats:
             if verbose:
-                print(f"Testing {fmt}...", end=" ", flush=True)
+                render.task(f"Testing {fmt}", "running")
             
             fmt_result = self._test_format(
                 single_project, original, fmt, path.name, client, verbose=False
@@ -341,9 +422,11 @@ class BenchmarkRunner:
             
             if verbose:
                 if fmt_result.error:
-                    print(f"ERROR")
+                    render.task(f"{fmt}: {fmt_result.error[:30]}", "failed")
+                elif fmt_result.score > 50:
+                    render.task(f"{fmt}: {fmt_result.score:.1f}%", "done")
                 else:
-                    print(f"{fmt_result.score:.1f}%")
+                    render.task(f"{fmt}: {fmt_result.score:.1f}%", "pending")
         
         result.total_time = time.time() - start_time
         
@@ -380,14 +463,18 @@ class BenchmarkRunner:
             BenchmarkResult with function results
         """
         from ..parsers import UniversalParser
-        
-        client = self._get_client()
+
+        client: Optional[BaseLLMClient]
+        if self._should_use_llm():
+            client = self._get_client()
+        else:
+            client = None
         
         result = BenchmarkResult(
             benchmark_type='function',
             source_path=file_path,
-            provider=getattr(client, 'provider', 'unknown'),
-            model=getattr(client, 'model', 'unknown'),
+            provider=getattr(client, 'provider', 'none') if client else 'none',
+            model=getattr(client, 'model', 'none') if client else 'none',
         )
         
         path = Path(file_path)
@@ -430,7 +517,7 @@ class BenchmarkRunner:
         content: str,
         language: str,
         file_path: Path,
-        client: BaseLLMClient,
+        client: Optional[BaseLLMClient],
         verbose: bool = False,
     ) -> FunctionResult:
         """Test reproduction of a single function."""
@@ -477,11 +564,18 @@ Requirements:
 ```{language}
 """
             
-            start_time = time.time()
-            response = client.generate(prompt, max_tokens=2000)
-            result.gen_time = time.time() - start_time
-            
-            result.reproduced_code = _extract_code(response)
+            if client is None:
+                # Offline fallback: emit a skeleton function with matching name/params.
+                params = ", ".join(func.params) if getattr(func, "params", None) else "*args, **kwargs"
+                rt = func.return_type or "Any"
+                async_kw = "async " if getattr(func, "is_async", False) else ""
+                result.reproduced_code = f"{async_kw}def {func.name}({params}) -> {rt}:\n    return None\n"
+                result.gen_time = 0.0
+            else:
+                start_time = time.time()
+                response = client.generate(prompt, max_tokens=2000)
+                result.gen_time = time.time() - start_time
+                result.reproduced_code = _extract_code(response)
             
             # Test syntax
             if language == 'python':
@@ -527,13 +621,18 @@ Requirements:
             BenchmarkResult with project-level data
         """
         formats = formats or self.config.formats
-        client = self._get_client()
+
+        client: Optional[BaseLLMClient]
+        if self._should_use_llm():
+            client = self._get_client()
+        else:
+            client = None
         
         result = BenchmarkResult(
             benchmark_type='project',
             source_path=project_path,
-            provider=getattr(client, 'provider', 'unknown'),
-            model=getattr(client, 'model', 'unknown'),
+            provider=getattr(client, 'provider', 'none') if client else 'none',
+            model=getattr(client, 'model', 'none') if client else 'none',
         )
         
         # Analyze
@@ -601,7 +700,7 @@ Requirements:
         module_info,
         fmt: str,
         project_root: str,
-        client: BaseLLMClient,
+        client: Optional[BaseLLMClient],
         verbose: bool = False,
     ) -> FileResult:
         """Reproduce a single module."""

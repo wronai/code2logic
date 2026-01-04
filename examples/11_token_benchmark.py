@@ -28,6 +28,8 @@ def print_token_efficiency(result):
     print(f"{'='*70}")
     print(f"Files: {result.total_files}")
     print(f"Total Time: {result.total_time:.1f}s")
+    print(f"Provider: {result.provider}")
+    print(f"Model: {result.model}")
     
     # Calculate token efficiency per format
     print(f"\n{'Format':<12} {'Score':>10} {'Avg Tokens':>12} {'Efficiency':>12}")

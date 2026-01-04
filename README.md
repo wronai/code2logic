@@ -6,7 +6,7 @@
 
 **Convert source code to logical representation for LLM analysis.**
 
-Code2Logic analyzes codebases and generates compact, LLM-friendly representations with semantic understanding. 
+Code2Logic analyzes codebases and generates compact, LLM-friendly representations with semantic understanding.
 Perfect for feeding project context to AI assistants, building code documentation, or analyzing code structure.
 
 ## ✨ Features
@@ -21,16 +21,19 @@ Perfect for feeding project context to AI assistants, building code documentatio
 ## 🚀 Installation
 
 ### Basic (no dependencies)
+
 ```bash
 pip install code2logic
 ```
 
 ### Full (all features)
+
 ```bash
 pip install code2logic[full]
 ```
 
 ### Selective features
+
 ```bash
 pip install code2logic[treesitter]  # High-accuracy AST parsing
 pip install code2logic[graph]       # Dependency analysis
@@ -109,7 +112,8 @@ Human-readable documentation with:
 
 ### Compact
 Ultra-compact format optimized for LLM context:
-```
+
+```text
 # myproject | 102f 31875L | typescript:79/python:23
 ENTRY: index.ts main.py
 HUBS: evolution-manager llm-orchestrator
@@ -129,16 +133,19 @@ Machine-readable format for:
 
 ### Library Status
 Check which features are available:
+
 ```bash
 code2logic --status
 ```
-```
+
+```text
 Library Status:
   tree_sitter: ✓
   networkx: ✓
   rapidfuzz: ✓
   nltk: ✗
   spacy: ✗
+```
 
 ### LLM Configuration
 
@@ -181,9 +188,9 @@ code2logic llm priority set-mode mixed
 ```
 
 Model priority rules are stored in `~/.code2logic/llm_config.json`.
-```
 
 ### Python API
+
 ```python
 from code2logic import get_library_status
 
@@ -201,6 +208,7 @@ status = get_library_status()
 
 ### Intent Generation
 Functions get human-readable descriptions:
+
 ```yaml
 methods:
   async findById(id:string) -> Promise<User>  # retrieves user by id
@@ -210,6 +218,7 @@ methods:
 
 ### Similarity Detection
 Find duplicate and similar functions:
+
 ```yaml
 Similar Functions:
   core/auth.ts::validateToken:
@@ -219,7 +228,7 @@ Similar Functions:
 
 ## 🏗️ Architecture
 
-```
+```text
 code2logic/
 ├── analyzer.py      # Main orchestrator
 ├── parsers.py       # Tree-sitter + fallback parser
@@ -234,6 +243,7 @@ code2logic/
 ## 🔌 Integration Examples
 
 ### With Claude/ChatGPT
+
 ```python
 from code2logic import analyze_project, CompactGenerator
 
@@ -249,6 +259,7 @@ Analyze this codebase and suggest improvements:
 ```
 
 ### With RAG Systems
+
 ```python
 import json
 from code2logic import analyze_project, JSONGenerator
@@ -268,25 +279,29 @@ for module in data['modules']:
 ## 🧪 Development
 
 ### Setup
+
 ```bash
-git clone https://github.com/softreck/code2logic
+git clone https://github.com/wronai/code2logic
 cd code2logic
 pip install -e ".[dev]"
 pre-commit install
 ```
 
 ### Tests
+
 ```bash
 pytest
 pytest --cov=code2logic --cov-report=html
 ```
 
 ### Type Checking
+
 ```bash
 mypy code2logic
 ```
 
 ### Linting
+
 ```bash
 ruff check code2logic
 black code2logic
@@ -343,7 +358,7 @@ Contributions welcome! Please read our [Contributing Guide](CONTRIBUTING.md).
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+Apache 2 License - see [LICENSE](LICENSE) for details.
 
 ## 📚 Documentation
 
@@ -367,5 +382,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 - [Documentation](https://code2logic.readthedocs.io)
 - [PyPI](https://pypi.org/project/code2logic/)
-- [GitHub](https://github.com/softreck/code2logic)
-- [Issues](https://github.com/softreck/code2logic/issues)
+- [GitHub](https://github.com/wronai/code2logic)
+- [Issues](https://github.com/wronai/code2logic/issues)

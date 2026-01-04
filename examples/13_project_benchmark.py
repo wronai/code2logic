@@ -27,6 +27,8 @@ def print_project_results(result):
     print("PROJECT BENCHMARK RESULTS")
     print(f"{'='*70}")
     print(f"Project: {result.source_path}")
+    print(f"Provider: {result.provider}")
+    print(f"Model: {result.model}")
     print(f"Files: {result.total_files}")
     print(f"Avg Score: {result.avg_score:.1f}%")
     print(f"Syntax OK: {result.syntax_ok_rate:.0f}%")

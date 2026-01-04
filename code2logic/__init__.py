@@ -18,7 +18,7 @@ Example:
     >>> print(output)
 """
 
-__version__ = "1.0.2"
+__version__ = "1.0.5"
 __author__ = "Softreck"
 __email__ = "info@softreck.dev"
 __license__ = "MIT"
@@ -206,6 +206,12 @@ from .llm_profiler import (
     load_profiles,
     save_profile,
 )
+from .terminal import (
+    ShellRenderer,
+    render,
+    get_renderer,
+    set_renderer,
+)
 
 __all__ = [
     # Version
@@ -323,4 +329,9 @@ __all__ = [
     "get_adaptive_chunker",
     "load_profiles",
     "save_profile",
+    # Terminal Rendering
+    "ShellRenderer",
+    "render",
+    "get_renderer",
+    "set_renderer",
 ]

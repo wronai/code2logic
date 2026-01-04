@@ -26,6 +26,8 @@ def print_results(result):
     print(f"\n{'='*60}")
     print("FUNCTION REPRODUCTION RESULTS")
     print(f"{'='*60}")
+    print(f"Provider: {result.provider}")
+    print(f"Model: {result.model}")
     print(f"Functions: {result.total_functions}")
     print(f"Avg Similarity: {result.avg_similarity:.1f}%")
     print(f"Time: {result.total_time:.1f}s")
