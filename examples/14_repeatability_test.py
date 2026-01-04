@@ -27,8 +27,10 @@ load_dotenv()
 
 from code2logic import analyze_project, get_client, ReproductionMetrics
 from code2logic.gherkin import GherkinGenerator
-from code2logic.generators import YAMLGenerator
+from code2logic.generators import YAMLGenerator, JSONGenerator
 from code2logic.logicml import LogicMLGenerator
+from code2logic.toon_format import TOONGenerator
+from code2logic.markdown_format import MarkdownHybridGenerator
 from code2logic.reproduction import extract_code_block
 from code2logic.models import ProjectInfo, ModuleInfo
 
@@ -71,19 +73,32 @@ def generate_spec(project: ProjectInfo, fmt: str) -> str:
     elif fmt == 'yaml':
         gen = YAMLGenerator()
         return gen.generate(project, detail='full')
+    elif fmt == 'json':
+        gen = JSONGenerator()
+        return gen.generate(project, detail='full')
+    elif fmt == 'markdown':
+        gen = MarkdownHybridGenerator()
+        spec = gen.generate(project)
+        return spec.content
     elif fmt == 'logicml':
         gen = LogicMLGenerator()
         spec = gen.generate(project)
         return spec.content
+    elif fmt == 'toon':
+        gen = TOONGenerator()
+        return gen.generate(project, detail='full')
     return ""
 
 
 def get_reproduction_prompt(spec: str, fmt: str, file_name: str) -> str:
     """Generate reproduction prompt."""
     format_hints = {
+        'json': "Parse the JSON structure and implement all classes and functions.",
         'yaml': "Parse the YAML structure and implement all classes and functions with exact signatures.",
         'gherkin': "Implement scenarios as SIMPLE, MINIMAL Python code. NO extra error classes.",
+        'markdown': "Parse embedded Gherkin (behaviors) and YAML (structures).",
         'logicml': "Parse the LogicML spec precisely. 'sig' = exact signature, 'does' = docstring.",
+        'toon': "Parse TOON tabular format. 'modules[N]{fields}:' = array of N items with fields. Match signatures exactly.",
     }
     
     return f"""Generate Python code from this {fmt.upper()} specification.
@@ -340,7 +355,7 @@ def save_repeatability_report(results: Dict[str, RepeatabilityResult], output: s
 def main():
     parser = argparse.ArgumentParser(description='Repeatability Test')
     parser.add_argument('--file', '-f', required=True, help='File to test')
-    parser.add_argument('--formats', nargs='+', default=['yaml', 'toon', 'logicml', 'gherkin'])
+    parser.add_argument('--formats', nargs='+', default=['json', 'yaml', 'toon', 'gherkin', 'markdown', 'logicml'])
     parser.add_argument('--runs', '-r', type=int, default=3, help='Number of runs per format')
     parser.add_argument('--output', '-o', default='examples/output/repeatability_test.json')
     parser.add_argument('--verbose', '-v', action='store_true')

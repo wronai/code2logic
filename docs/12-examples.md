@@ -2,7 +2,7 @@
 
 > Usage examples and workflows for Code2Logic
 
-[← README](../README.md) | [← LLM Integration](llm-integration.md) | [Architecture →](architecture.md)
+[← README](../README.md) | [← LLM Integration](08-llm-integration.md) | [Architecture →](13-architecture.md)
 
 ## Available Examples
 
@@ -254,10 +254,10 @@ python examples/openrouter_code_reproduction.py --source code2logic/models.py
 
 ## See Also
 
-- [CLI Reference](cli-reference.md) - Command-line options
-- [Python API](python-api.md) - Programmatic interface
-- [LLM Integration](llm-integration.md) - LLM provider setup
+- [CLI Reference](03-cli-reference.md) - Command-line options
+- [Python API](04-python-api.md) - Programmatic interface
+- [LLM Integration](08-llm-integration.md) - LLM provider setup
 
 ---
 
-[← LLM Integration](llm-integration.md) | [Architecture →](architecture.md)
+[← LLM Integration](08-llm-integration.md) | [Architecture →](13-architecture.md)

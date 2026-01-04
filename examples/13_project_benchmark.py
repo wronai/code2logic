@@ -139,6 +139,9 @@ def generate_spec(project, fmt: str) -> str:
         gen = LogicMLGenerator()
         spec = gen.generate(project)
         return spec.content
+    elif fmt == 'toon':
+        gen = TOONGenerator()
+        return gen.generate(project, detail='full')
     return ""
 
 

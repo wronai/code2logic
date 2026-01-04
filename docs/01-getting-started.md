@@ -2,7 +2,7 @@
 
 > Quick installation and first steps with Code2Logic
 
-[← README](../README.md) | [← Index](index.md) | [Configuration →](configuration.md)
+[← README](../README.md) | [← Index](00-index.md) | [Configuration →](02-configuration.md)
 
 ## Installation
 
@@ -147,11 +147,11 @@ python examples/code_review.py ./my_project
 
 ## Next Steps
 
-1. [Configure API keys](configuration.md) for LLM features
-2. Learn [CLI commands](cli-reference.md)
-3. Explore [Python API](python-api.md)
-4. Try [Examples](examples.md)
+1. [Configure API keys](02-configuration.md) for LLM features
+2. Learn [CLI commands](03-cli-reference.md)
+3. Explore [Python API](04-python-api.md)
+4. Try [Examples](12-examples.md)
 
 ---
 
-[← Index](index.md) | [Configuration →](configuration.md)
+[← Index](00-index.md) | [Configuration →](02-configuration.md)

@@ -17,6 +17,7 @@ import ast
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -29,6 +30,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dotenv import load_dotenv
 load_dotenv()
+
+from code2logic import analyze_project, get_client
+from code2logic.benchmarks.common import generate_spec, create_single_project, get_token_reproduction_prompt
+from code2logic.reproduction import extract_code_block
+from code2logic.utils import estimate_tokens
+
+# All formats to compare
+ALL_FORMATS = ['json', 'yaml', 'toon', 'gherkin', 'markdown', 'logicml']
 
 
 @dataclass
@@ -450,14 +459,86 @@ def draw_conclusions(results: List[CodeAnalysis]):
     print("• Use **JSON** only when structured data output is needed")
 
 
+def generate_all_formats(sample_folder: str, output_dir: str, formats: List[str], limit: int = 4):
+    """Generate code for all formats to enable comparison."""
+    
+    print(f"\n{'='*80}")
+    print("GENERATING TEST DATA FOR ALL FORMATS")
+    print(f"{'='*80}")
+    print(f"Formats: {', '.join(formats)}")
+    
+    # Clean output
+    output_path = Path(output_dir)
+    if output_path.exists():
+        shutil.rmtree(output_path)
+    
+    # Initialize LLM
+    try:
+        client = get_client()
+        print(f"LLM: {client.__class__.__name__}")
+    except Exception as e:
+        print(f"LLM not available: {e}")
+        return False
+    
+    # Analyze samples
+    project = analyze_project(sample_folder, use_treesitter=False)
+    py_files = list(Path(sample_folder).glob('*.py'))[:limit]
+    
+    print(f"Files: {len(py_files)}")
+    print(f"{'─'*80}")
+    
+    for fmt in formats:
+        fmt_dir = output_path / fmt
+        fmt_dir.mkdir(parents=True, exist_ok=True)
+        
+        for py_file in py_files:
+            # Find module
+            module = None
+            for m in project.modules:
+                if Path(m.path).name == py_file.name:
+                    module = m
+                    break
+            
+            if not module:
+                continue
+            
+            try:
+                single_project = create_single_project(module, py_file)
+                spec = generate_spec(single_project, fmt)
+                prompt = get_token_reproduction_prompt(spec, fmt, py_file.name)
+                
+                response = client.generate(prompt, max_tokens=4000)
+                generated = extract_code_block(response)
+                
+                # Save
+                out_file = fmt_dir / f"{py_file.stem}_generated.py"
+                out_file.write_text(generated)
+                
+                print(f"  ✓ {fmt}/{py_file.name}")
+                
+            except Exception as e:
+                print(f"  ✗ {fmt}/{py_file.name}: {e}")
+    
+    return True
+
+
 def main():
     output_dir = 'examples/output/generated'
+    sample_folder = 'tests/samples'
     
-    # Check if output exists
-    if not Path(output_dir).exists():
-        print(f"Output directory not found: {output_dir}")
-        print("Run a benchmark first: python examples/11_token_benchmark.py")
-        return
+    # Check if we need to generate data
+    output_path = Path(output_dir)
+    existing_formats = set()
+    if output_path.exists():
+        existing_formats = {d.name for d in output_path.iterdir() if d.is_dir()}
+    
+    missing_formats = set(ALL_FORMATS) - existing_formats
+    
+    if missing_formats or len(existing_formats) < len(ALL_FORMATS):
+        print(f"Missing formats: {missing_formats or 'regenerating all'}")
+        if not generate_all_formats(sample_folder, output_dir, ALL_FORMATS):
+            print("Failed to generate test data")
+            return
     
     # Analyze files
     results = analyze_generated_files(output_dir)

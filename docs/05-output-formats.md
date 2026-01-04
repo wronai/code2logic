@@ -2,14 +2,16 @@
 
 > Comparison and usage guide for all output formats
 
-[← README](../README.md) | [← Python API](python-api.md) | [LLM Integration →](llm-integration.md)
+[← README](../README.md) | [← Python API](04-python-api.md) | [LLM Integration →](08-llm-integration.md)
 
 ## Format Overview
 
 | Format | Tokens | Accuracy | Best For |
 |--------|--------|----------|----------|
+| **TOON** | ~2K | 70% | Token efficiency (6x smaller than JSON) |
 | **Gherkin** | ~3K | 95% | LLM code generation |
 | **YAML** | ~6K | 90% | Human + LLM |
+| **LogicML** | ~5K | 65% | Compression + async code |
 | **Compact** | ~200 | 50% | Quick overview |
 | **CSV** | ~4K | 70% | Data analysis |
 | **Markdown** | ~4K | 60% | Documentation |
@@ -241,20 +243,24 @@ Based on analysis of `code2logic/` (13 files, 5,618 lines):
 ## Choosing a Format
 
 ```
-Need LLM code generation?     → Gherkin
+Need best token efficiency?   → TOON (6x smaller than JSON)
+Need LLM code generation?     → Gherkin or YAML
 Need human + LLM readability? → YAML
 Need minimal tokens?          → Compact
 Need data analysis?           → CSV
 Need documentation?           → Markdown
 Need RAG/embeddings?          → JSON flat
+Need async code handling?     → LogicML
 ```
 
 ## See Also
 
-- [CLI Reference](cli-reference.md) - Command-line options
-- [LLM Integration](llm-integration.md) - Using with LLMs
+- [TOON Format](07-toon.md) - Token-Oriented Object Notation
+- [Format Specifications](06-format-specifications.md) - Detailed format specs
+- [CLI Reference](03-cli-reference.md) - Command-line options
+- [LLM Integration](08-llm-integration.md) - Using with LLMs
 - [examples/11_token_benchmark.py](../examples/11_token_benchmark.py) - Token-aware benchmark
 
 ---
 
-[← Python API](python-api.md) | [LLM Integration →](llm-integration.md)
+[← Python API](04-python-api.md) | [LLM Integration →](08-llm-integration.md)

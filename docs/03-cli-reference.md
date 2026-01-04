@@ -2,7 +2,7 @@
 
 > Command-line interface for Code2Logic
 
-[← README](../README.md) | [← Configuration](configuration.md) | [Python API →](python-api.md)
+[← README](../README.md) | [← Configuration](02-configuration.md) | [Python API →](04-python-api.md)
 
 ## Basic Usage
 
@@ -182,10 +182,10 @@ CODE2LOGIC_VERBOSE=true code2logic /path/to/project
 
 ## See Also
 
-- [Output Formats](output-formats.md) - Detailed format comparison
-- [Python API](python-api.md) - Programmatic usage
-- [Examples](examples.md) - More usage examples
+- [Output Formats](05-output-formats.md) - Detailed format comparison
+- [Python API](04-python-api.md) - Programmatic usage
+- [Examples](12-examples.md) - More usage examples
 
 ---
 
-[← Configuration](configuration.md) | [Python API →](python-api.md)
+[← Configuration](02-configuration.md) | [Python API →](04-python-api.md)

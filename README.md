@@ -283,21 +283,21 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 📚 Documentation
 
-- [Docs Index](docs/index.md) - Documentation home (start here)
-- [Getting Started](docs/getting-started.md) - Install and first steps
-- [Configuration](docs/configuration.md) - API keys, environment setup
-- [CLI Reference](docs/cli-reference.md) - Command-line usage
-- [Python API](docs/python-api.md) - Programmatic usage
-- [Output Formats](docs/output-formats.md) - Format comparison and usage
-- [Benchmarking](docs/benchmark.md) - Benchmark methodology and results
-- [Repeatability](docs/repeatability.md) - Repeatability testing
-- [LLM Integration](docs/llm-integration.md) - OpenRouter/Ollama/LiteLLM
-- [LLM Comparison Report](docs/llm-comparison-report.md) - Provider/model comparison
-- [Architecture](docs/architecture.md) - System design and components
-- [Examples](docs/examples.md) - Usage workflows and examples
-- [Format Analysis](docs/FORMAT_ANALYSIS.md) - Deeper format evaluation
-- [API Documentation (legacy)](DOCS.md) - Repo-level API reference
-- [Refactoring Plan](TODO.md) - Development roadmap
+- [00 - Docs Index](docs/00-index.md) - Documentation home (start here)
+- [01 - Getting Started](docs/01-getting-started.md) - Install and first steps
+- [02 - Configuration](docs/02-configuration.md) - API keys, environment setup
+- [03 - CLI Reference](docs/03-cli-reference.md) - Command-line usage
+- [04 - Python API](docs/04-python-api.md) - Programmatic usage
+- [05 - Output Formats](docs/05-output-formats.md) - Format comparison and usage
+- [06 - Format Specifications](docs/06-format-specifications.md) - Detailed format specs
+- [07 - TOON Format](docs/07-toon.md) - Token-Oriented Object Notation
+- [08 - LLM Integration](docs/08-llm-integration.md) - OpenRouter/Ollama/LiteLLM
+- [09 - LLM Comparison](docs/09-llm-comparison-report.md) - Provider/model comparison
+- [10 - Benchmarking](docs/10-benchmark.md) - Benchmark methodology and results
+- [11 - Repeatability](docs/11-repeatability.md) - Repeatability testing
+- [12 - Examples](docs/12-examples.md) - Usage workflows and examples
+- [13 - Architecture](docs/13-architecture.md) - System design and components
+- [14 - Format Analysis](docs/14-format-analysis.md) - Deeper format evaluation
 
 ## 🔗 Links
 

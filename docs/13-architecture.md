@@ -2,7 +2,7 @@
 
 > System design and component overview
 
-[← README](../README.md) | [← Examples](examples.md) | [Index →](index.md)
+[← README](../README.md) | [← Examples](12-examples.md) | [Index →](00-index.md)
 
 ## System Overview
 
@@ -255,10 +255,10 @@ class CustomClient(BaseLLMClient):
 
 ## See Also
 
-- [Python API](python-api.md) - Detailed API reference
-- [Configuration](configuration.md) - Setup guide
+- [Python API](04-python-api.md) - Detailed API reference
+- [Configuration](02-configuration.md) - Setup guide
 - [TODO.md](../TODO.md) - Refactoring roadmap
 
 ---
 
-[← Examples](examples.md) | [Index →](index.md)
+[← Examples](12-examples.md) | [Index →](00-index.md)

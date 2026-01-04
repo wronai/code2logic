@@ -2,7 +2,7 @@
 
 > Programmatic usage of Code2Logic
 
-[← README](../README.md) | [← CLI Reference](cli-reference.md) | [Output Formats →](output-formats.md)
+[← README](../README.md) | [← CLI Reference](03-cli-reference.md) | [Output Formats →](05-output-formats.md)
 
 ## Core Functions
 
@@ -350,4 +350,4 @@ if client.is_available():
 
 ---
 
-[← CLI Reference](cli-reference.md) | [Output Formats →](output-formats.md)
+[← CLI Reference](03-cli-reference.md) | [Output Formats →](05-output-formats.md)

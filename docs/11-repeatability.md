@@ -1,5 +1,5 @@
 
-[← README](../README.md) | [Docs Index](index.md)
+[← README](../README.md) | [Docs Index](00-index.md)
 
 ## 📊 Podsumowanie - Test Powtarzalności
 

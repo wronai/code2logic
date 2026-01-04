@@ -6,14 +6,22 @@
 
 ## Quick Navigation
 
-- [Getting Started](getting-started.md) - Installation and first steps
-- [Configuration](configuration.md) - API keys, environment setup
-- [CLI Reference](cli-reference.md) - Command-line usage
-- [Python API](python-api.md) - Programmatic usage
-- [Output Formats](output-formats.md) - Format comparison and usage
-- [LLM Integration](llm-integration.md) - Using with LLMs (OpenRouter, Ollama, etc.)
-- [Examples](examples.md) - Usage examples and workflows
-- [Architecture](architecture.md) - System design and components
+| # | Document | Description |
+|---|----------|-------------|
+| 01 | [Getting Started](01-getting-started.md) | Installation and first steps |
+| 02 | [Configuration](02-configuration.md) | API keys, environment setup |
+| 03 | [CLI Reference](03-cli-reference.md) | Command-line usage |
+| 04 | [Python API](04-python-api.md) | Programmatic usage |
+| 05 | [Output Formats](05-output-formats.md) | Format comparison and usage |
+| 06 | [Format Specifications](06-format-specifications.md) | Detailed format specs |
+| 07 | [TOON Format](07-toon.md) | Token-Oriented Object Notation |
+| 08 | [LLM Integration](08-llm-integration.md) | OpenRouter, Ollama, LiteLLM |
+| 09 | [LLM Comparison](09-llm-comparison-report.md) | Provider/model comparison |
+| 10 | [Benchmarking](10-benchmark.md) | Benchmark methodology |
+| 11 | [Repeatability](11-repeatability.md) | Repeatability testing |
+| 12 | [Examples](12-examples.md) | Usage examples and workflows |
+| 13 | [Architecture](13-architecture.md) | System design and components |
+| 14 | [Format Analysis](14-format-analysis.md) | Deeper format evaluation |
 
 ## Repository Links
 
@@ -30,7 +38,7 @@ Code2Logic analyzes codebases and generates structured representations optimized
 
 | Feature | Description |
 |---------|-------------|
-| **Multi-format output** | Markdown, JSON, YAML, CSV, Gherkin, Compact |
+| **Multi-format output** | Markdown, JSON, YAML, TOON, LogicML, Gherkin, Compact |
 | **LLM-optimized** | Token-efficient formats for cost savings |
 | **BDD Generation** | Automatic Gherkin feature files |
 | **Duplicate Detection** | Find similar/duplicate functions |
@@ -41,10 +49,11 @@ Code2Logic analyzes codebases and generates structured representations optimized
 
 | Format | Tokens | LLM Accuracy | Best For |
 |--------|--------|--------------|----------|
+| **TOON** | ~2K | 70% | Token efficiency (smallest) |
 | Gherkin | ~3K | 95% | Code generation |
+| LogicML | ~5K | 65% | Compression + async |
 | YAML | ~6K | 90% | Human + LLM |
 | Compact | ~200 | 50% | Quick overview |
-| CSV | ~4K | 70% | Data analysis |
 | Markdown | ~4K | 60% | Documentation |
 | JSON | ~12K | 75% | RAG/Embeddings |
 
@@ -75,7 +84,7 @@ cp .env.example .env
 # Edit .env with your keys
 ```
 
-See [Configuration Guide](configuration.md) for details.
+See [Configuration Guide](02-configuration.md) for details.
 
 ## Links
 

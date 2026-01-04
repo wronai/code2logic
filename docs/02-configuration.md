@@ -2,7 +2,7 @@
 
 > Setting up API keys, environment variables, and LLM providers
 
-[← README](../README.md) | [← Back to Index](index.md) | [CLI Reference →](cli-reference.md)
+[← README](../README.md) | [← Back to Index](00-index.md) | [CLI Reference →](03-cli-reference.md)
 
 ## Environment Variables
 
@@ -213,4 +213,4 @@ Error: Model qwen2.5-coder:14b not found
 
 ---
 
-[← Back to Index](index.md) | [CLI Reference →](cli-reference.md)
+[← Back to Index](00-index.md) | [CLI Reference →](03-cli-reference.md)

@@ -2,7 +2,7 @@
 
 > Using Code2Logic with Large Language Models
 
-[← README](../README.md) | [← Output Formats](output-formats.md) | [Examples →](examples.md)
+[← README](../README.md) | [← Output Formats](05-output-formats.md) | [Examples →](12-examples.md)
 
 ## Overview
 
@@ -298,8 +298,8 @@ For Claude Desktop / Windsurf:
 }
 ```
 
-See [Examples](examples.md) for more integration patterns.
+See [Examples](12-examples.md) for more integration patterns.
 
 ---
 
-[← Output Formats](output-formats.md) | [Examples →](examples.md)
+[← Output Formats](05-output-formats.md) | [Examples →](12-examples.md)
