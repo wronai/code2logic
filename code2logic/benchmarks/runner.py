@@ -206,7 +206,12 @@ class {cls}:
 
         client: Optional[BaseLLMClient]
         if self._should_use_llm():
-            client = self._get_client()
+            try:
+                client = self._get_client()
+            except Exception as e:
+                client = None
+                if verbose:
+                    render.warning(f"LLM not available ({str(e)[:80]}). Falling back to template mode.")
         else:
             client = None
         

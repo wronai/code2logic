@@ -101,7 +101,7 @@ from code2logic.llm import get_client, BaseLLMClient
 from code2logic.tools import run_benchmark, CodeReviewer
 ```
 
-## 📋 Output Formats
+## Output Formats
 
 ### Markdown (default)
 Human-readable documentation with:
@@ -129,7 +129,7 @@ Machine-readable format for:
 - Database storage
 - Further analysis
 
-## 🔧 Configuration
+## Configuration
 
 ### Library Status
 Check which features are available:
@@ -189,7 +189,7 @@ code2logic llm priority set-mode mixed
 
 Model priority rules are stored in `~/.code2logic/llm_config.json`.
 
-### Python API
+### Python API (Library Status)
 
 ```python
 from code2logic import get_library_status
@@ -198,7 +198,7 @@ status = get_library_status()
 # {'tree_sitter': True, 'networkx': True, ...}
 ```
 
-## 📊 Analysis Features
+## Analysis Features
 
 ### Dependency Analysis
 - **PageRank** - Identifies most important modules
@@ -226,7 +226,7 @@ Similar Functions:
     - services/jwt.ts::verifyToken (85%)
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ```text
 code2logic/
@@ -240,7 +240,7 @@ code2logic/
 └── cli.py           # Command-line interface
 ```
 
-## 🔌 Integration Examples
+## Integration Examples
 
 ### With Claude/ChatGPT
 
@@ -276,7 +276,7 @@ for module in data['modules']:
         )
 ```
 
-## 🧪 Development
+## Development
 
 ### Setup
 
@@ -307,24 +307,24 @@ ruff check code2logic
 black code2logic
 ```
 
-## 📈 Performance
+## Performance
 
 | Codebase Size | Files | Lines | Time | Output Size |
-|--------------|-------|-------|------|-------------|
-| Small        | 10    | 1K    | <1s  | ~5KB        |
-| Medium       | 100   | 30K   | ~2s  | ~50KB       |
-| Large        | 500   | 150K  | ~10s | ~200KB      |
+| --- | --- | --- | --- | --- |
+| Small | 10 | 1K | <1s | ~5KB |
+| Medium | 100 | 30K | ~2s | ~50KB |
+| Large | 500 | 150K | ~10s | ~200KB |
 
 Compact format is ~10-15x smaller than Markdown.
 
-## 🔬 Code Reproduction Benchmarks
+## Code Reproduction Benchmarks
 
 Code2Logic can reproduce code from specifications using LLMs. Benchmark results:
 
 ### Format Comparison (Token Efficiency)
 
 | Format | Score | Token Efficiency | Spec Tokens | Runs OK |
-|--------|-------|------------------|-------------|---------|
+| --- | --- | --- | --- | --- |
 | **YAML** | **71.1%** | 42.1 | **366** | 66.7% |
 | **Markdown** | 65.6% | **48.7** | 385 | **100%** |
 | JSON | 61.9% | 23.7 | 605 | 66.7% |

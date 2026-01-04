@@ -49,6 +49,7 @@ def main():
     parser.add_argument('--limit', '-l', type=int, default=3)
     parser.add_argument('--output', '-o', default='examples/output/async_benchmark.json')
     parser.add_argument('--verbose', '-v', action='store_true')
+    parser.add_argument('--no-llm', action='store_true', help='Run without LLM (template fallback)')
     args = parser.parse_args()
     
     print(f"Running async benchmark on {args.folder}")
@@ -58,6 +59,7 @@ def main():
         max_files=args.limit,
         workers=3,
         verbose=args.verbose,
+        use_llm=not args.no_llm,
     )
     
     runner = BenchmarkRunner(config=config)

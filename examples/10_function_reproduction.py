@@ -50,11 +50,12 @@ def main():
     parser.add_argument('--limit', '-l', type=int, default=5)
     parser.add_argument('--output', '-o', default='examples/output/function_reproduction.json')
     parser.add_argument('--verbose', '-v', action='store_true')
+    parser.add_argument('--no-llm', action='store_true', help='Run without LLM (skeleton fallback)')
     args = parser.parse_args()
     
     print(f"Testing function reproduction: {args.file}")
     
-    runner = BenchmarkRunner()
+    runner = BenchmarkRunner(config=BenchmarkConfig(use_llm=not args.no_llm))
     result = runner.run_function_benchmark(
         args.file,
         limit=args.limit,

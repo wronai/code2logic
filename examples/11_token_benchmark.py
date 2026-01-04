@@ -62,6 +62,7 @@ def main():
     parser.add_argument('--limit', '-l', type=int, default=4)
     parser.add_argument('--output', '-o', default='examples/output/token_benchmark.json')
     parser.add_argument('--verbose', '-v', action='store_true')
+    parser.add_argument('--no-llm', action='store_true', help='Run without LLM (template fallback)')
     args = parser.parse_args()
     
     print(f"Running token benchmark on {args.folder}")
@@ -71,6 +72,7 @@ def main():
         formats=args.formats,
         max_files=args.limit,
         verbose=args.verbose,
+        use_llm=not args.no_llm,
     )
     
     runner = BenchmarkRunner(config=config)
