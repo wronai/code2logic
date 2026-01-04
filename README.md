@@ -6,7 +6,8 @@
 
 **Convert source code to logical representation for LLM analysis.**
 
-Code2Logic analyzes codebases and generates compact, LLM-friendly representations with semantic understanding. Perfect for feeding project context to AI assistants, building code documentation, or analyzing code structure.
+Code2Logic analyzes codebases and generates compact, LLM-friendly representations with semantic understanding. 
+Perfect for feeding project context to AI assistants, building code documentation, or analyzing code structure.
 
 ## ✨ Features
 
@@ -332,6 +333,8 @@ python examples/09_async_benchmark.py --folder tests/samples/
 
 # Function-level reproduction
 python examples/10_function_reproduction.py --multi-lang
+
+python examples/15_unified_benchmark.py --folder tests/samples/
 ```
 
 ## 🤝 Contributing

@@ -8,6 +8,14 @@
 
 Code2Logic uses environment variables for API configuration. You can set them directly or use a `.env` file.
 
+For local development, the recommended workflow is to use the CLI to update `.env`:
+
+```bash
+code2logic llm key set openrouter <OPENROUTER_API_KEY>
+code2logic llm set-model openrouter nvidia/nemotron-3-nano-30b-a3b:free
+code2logic llm set-provider auto
+```
+
 ### Quick Setup
 
 ```bash
@@ -43,6 +51,9 @@ export OLLAMA_MODEL="qwen2.5-coder:14b"
 
 # Default provider
 export CODE2LOGIC_DEFAULT_PROVIDER="ollama"
+
+# Automatic fallback selection
+export CODE2LOGIC_DEFAULT_PROVIDER="auto"
 ```
 
 ### Persistent Configuration
@@ -69,6 +80,14 @@ OLLAMA_MODEL=qwen2.5-coder:14b
 
 CODE2LOGIC_DEFAULT_PROVIDER=ollama
 CODE2LOGIC_VERBOSE=false
+```
+
+This `.env` file can be updated by the CLI commands:
+
+```bash
+code2logic llm set-provider auto
+code2logic llm set-model openrouter nvidia/nemotron-3-nano-30b-a3b:free
+code2logic llm key set openrouter <OPENROUTER_API_KEY>
 ```
 
 ## Provider Configuration
@@ -166,7 +185,11 @@ print(providers)
 
 ## Configuration File
 
-Advanced users can create `~/.code2logic/config.json`:
+Advanced users can create `~/.code2logic/config.json`.
+
+LLM routing preferences (priority mode, provider priority overrides, model/family rules) are stored in:
+
+- `~/.code2logic/llm_config.json`
 
 ```json
 {

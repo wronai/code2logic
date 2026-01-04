@@ -10,6 +10,26 @@
 code2logic /path/to/project [options]
 ```
 
+## LLM Management
+
+Code2Logic also provides LLM configuration and routing commands:
+
+```bash
+code2logic llm status
+code2logic llm set-provider <provider>
+code2logic llm set-model <provider> <model>
+code2logic llm key set <provider> <api_key>
+code2logic llm key unset <provider>
+code2logic llm priority set-provider <provider> <priority>
+code2logic llm priority set-model <model_name> <priority>
+code2logic llm priority set-llm-model <model> <priority>
+code2logic llm priority set-llm-family <prefix> <priority>
+code2logic llm priority set-mode <provider-first|model-first|mixed>
+code2logic llm config list
+```
+
+If `CODE2LOGIC_DEFAULT_PROVIDER=auto`, Code2Logic tries providers in priority order and picks the first one that is available.
+
 ## Options
 
 | Option | Short | Description |
@@ -185,6 +205,7 @@ CODE2LOGIC_VERBOSE=true code2logic /path/to/project
 - [Output Formats](05-output-formats.md) - Detailed format comparison
 - [Python API](04-python-api.md) - Programmatic usage
 - [Examples](12-examples.md) - More usage examples
+- [LLM Integration](08-llm-integration.md) - Provider setup and LLM workflows
 
 ---
 

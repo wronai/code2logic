@@ -8,6 +8,15 @@
 
 Code2Logic generates LLM-optimized representations of codebases. This guide covers integration with various LLM providers.
 
+In addition to exporting LLM-friendly formats, Code2Logic provides a CLI for managing LLM configuration:
+
+```bash
+code2logic llm status
+code2logic llm set-provider auto
+code2logic llm key set openrouter <OPENROUTER_API_KEY>
+code2logic llm set-model openrouter nvidia/nemotron-3-nano-30b-a3b:free
+```
+
 ## Supported Providers
 
 | Provider | Type | Setup |
@@ -28,6 +37,10 @@ Best for accessing multiple models through one API.
 # Get API key from https://openrouter.ai/keys
 export OPENROUTER_API_KEY="sk-or-v1-your-key"
 export OPENROUTER_MODEL="qwen/qwen-2.5-coder-32b-instruct"
+
+# Or configure via CLI (.env)
+code2logic llm key set openrouter <OPENROUTER_API_KEY>
+code2logic llm set-model openrouter qwen/qwen-2.5-coder-32b-instruct
 ```
 
 ### Recommended Models
@@ -90,7 +103,63 @@ ollama serve
 ```bash
 export OLLAMA_HOST="http://localhost:11434"
 export OLLAMA_MODEL="qwen2.5-coder:14b"
+
+# Or configure via CLI (.env)
+code2logic llm set-model ollama qwen2.5-coder:14b
 ```
+
+## Provider selection and priorities
+
+### Default provider
+
+```bash
+code2logic llm set-provider ollama
+code2logic llm set-provider openrouter
+```
+
+### Automatic fallback (recommended)
+
+```bash
+code2logic llm set-provider auto
+```
+
+When `CODE2LOGIC_DEFAULT_PROVIDER=auto`, Code2Logic tries providers in priority order and picks the first one that is available.
+
+### Setting provider priority
+
+Provider priorities can be set even if there are no matching entries in `litellm_config.yaml`:
+
+```bash
+code2logic llm priority set-provider openrouter 10
+code2logic llm priority set-provider ollama 20
+```
+
+Provider priority overrides and model rules are stored in:
+
+- `~/.code2logic/llm_config.json`
+
+### Model priority (independent of provider)
+
+You can prioritize specific models or model families (prefix):
+
+```bash
+code2logic llm priority set-llm-model nvidia/nemotron-3-nano-30b-a3b:free 5
+code2logic llm priority set-llm-family nvidia/ 5
+```
+
+### Priority modes
+
+Choose how priorities are resolved:
+
+```bash
+code2logic llm priority set-mode provider-first
+code2logic llm priority set-mode model-first
+code2logic llm priority set-mode mixed
+```
+
+- `provider-first`: provider priority controls ordering
+- `model-first`: model rules control ordering (fallback to provider priority)
+- `mixed`: best (lowest) priority wins
 
 ### Example
 

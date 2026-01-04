@@ -213,6 +213,7 @@ class OpenRouterClient(BaseLLMClient):
     """OpenRouter API client for cloud LLM access."""
     
     API_URL = "https://openrouter.ai/api/v1/chat/completions"
+    provider = "openrouter"
     
     def __init__(self, api_key: str = None, model: str = None):
         """Initialize OpenRouter client.
@@ -274,6 +275,8 @@ class OpenRouterClient(BaseLLMClient):
 
 class OllamaLocalClient(BaseLLMClient):
     """Ollama client for local LLM inference."""
+    
+    provider = "ollama"
     
     def __init__(self, model: str = None, host: str = None):
         """Initialize Ollama client.
@@ -337,6 +340,8 @@ class OllamaLocalClient(BaseLLMClient):
 
 class LiteLLMClient(BaseLLMClient):
     """LiteLLM client for universal LLM access."""
+    
+    provider = "litellm"
     
     def __init__(self, model: str = None):
         """Initialize LiteLLM client.
@@ -431,16 +436,22 @@ def _get_effective_provider_order() -> List[tuple[str, int]]:
     mode = _get_priority_mode()
     provider_priorities = dict(DEFAULT_PROVIDER_PRIORITIES)
 
-    for provider, pr in _get_provider_priorities_from_litellm_yaml().items():
+    yaml_priorities = _get_provider_priorities_from_litellm_yaml()
+    yaml_providers = set(yaml_priorities.keys())
+    for provider, pr in yaml_priorities.items():
         provider_priorities[provider] = min(int(provider_priorities.get(provider, 100)), int(pr))
 
-    for provider, pr in _get_provider_priority_overrides().items():
+    override_priorities = _get_provider_priority_overrides()
+    override_providers = set(override_priorities.keys())
+    for provider, pr in override_priorities.items():
         provider_priorities[provider] = int(pr)
 
     effective: Dict[str, int] = {}
+    has_model_rule: Dict[str, bool] = {}
     for provider, base_pr in provider_priorities.items():
         model_str = _get_provider_model_string(provider)
         model_pr = _get_model_priority(model_str)
+        has_model_rule[provider] = model_pr is not None
 
         if mode == 'model-first':
             # Prefer model rules; if missing, fall back to provider priority.
@@ -455,7 +466,24 @@ def _get_effective_provider_order() -> List[tuple[str, int]]:
             # provider-first
             effective[provider] = int(base_pr)
 
-    return sorted(effective.items(), key=lambda kv: int(kv[1]))
+    def _provider_source_rank(p: str) -> int:
+        # Lower number = more specific config should win ties
+        if p in override_providers:
+            return 0
+        if p in yaml_providers:
+            return 1
+        return 2
+
+    if mode == 'provider-first':
+        return sorted(
+            effective.items(),
+            key=lambda kv: (int(kv[1]), _provider_source_rank(kv[0]), kv[0]),
+        )
+
+    return sorted(
+        effective.items(),
+        key=lambda kv: (int(kv[1]), 0 if has_model_rule.get(kv[0], False) else 1, _provider_source_rank(kv[0]), kv[0]),
+    )
 
 
 def get_effective_provider_priorities() -> Dict[str, int]:

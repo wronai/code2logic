@@ -438,3 +438,42 @@ def auto_chunk_reproduce(
     """Auto-chunking reproduction with LLM adaptation."""
     reproducer = ChunkedReproducer(client, model_name)
     return reproducer.reproduce(spec, fmt, file_name)
+
+
+def adaptive_chunk_reproduce(
+    spec: str,
+    fmt: str,
+    file_name: str,
+    client,
+    provider: str = 'unknown',
+    model: str = 'unknown',
+) -> ChunkedResult:
+    """
+    Adaptive chunking reproduction using LLM profile.
+    
+    Uses stored LLM profiles to optimize chunk sizes and format selection.
+    
+    Args:
+        spec: Specification string
+        fmt: Format of specification
+        file_name: Target file name
+        client: LLM client
+        provider: LLM provider name
+        model: LLM model name
+    
+    Returns:
+        ChunkedResult with reproduction
+    """
+    from .llm_profiler import get_or_create_profile, AdaptiveChunker
+    
+    # Get or create profile for this model
+    profile = get_or_create_profile(provider, model)
+    chunker = AdaptiveChunker(profile)
+    
+    # Get optimal settings
+    settings = chunker.get_optimal_settings()
+    max_tokens = settings['max_chunk_tokens']
+    
+    # Use adaptive reproducer
+    reproducer = ChunkedReproducer(client, model, max_tokens=max_tokens)
+    return reproducer.reproduce(spec, fmt, file_name)

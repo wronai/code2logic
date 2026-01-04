@@ -601,6 +601,21 @@ Detail levels (columns in csv/json/yaml):
         action='store_true',
         help='Show library availability status and exit'
     )
+    parser.add_argument(
+        '--profile-llm',
+        action='store_true',
+        help='Profile LLM capabilities and save to ~/.code2logic/llm_profiles.json'
+    )
+    parser.add_argument(
+        '--profile-quick',
+        action='store_true',
+        help='Run quick LLM profile (fewer tests)'
+    )
+    parser.add_argument(
+        '--show-profiles',
+        action='store_true',
+        help='Show saved LLM profiles'
+    )
     
     args = parser.parse_args()
     
@@ -635,6 +650,57 @@ Detail levels (columns in csv/json/yaml):
         for lib, available in status.items():
             symbol = "✓" if available else "✗"
             print(f"  {lib}: {symbol}")
+        sys.exit(0)
+    
+    # Show LLM profiles
+    if args.show_profiles:
+        from .llm_profiler import load_profiles
+        profiles = load_profiles()
+        if not profiles:
+            print("No LLM profiles saved yet.")
+            print("Run: code2logic --profile-llm to create one")
+        else:
+            print(f"Saved LLM Profiles ({len(profiles)}):")
+            print("-" * 60)
+            for pid, p in profiles.items():
+                print(f"\n{Colors.BOLD}{p.provider}/{p.model}{Colors.NC}")
+                print(f"  Profile ID: {p.profile_id}")
+                print(f"  Created: {p.created_at}")
+                print(f"  Effective context: {p.effective_context} tokens")
+                print(f"  Optimal chunk: {p.optimal_chunk_size} tokens")
+                print(f"  Syntax accuracy: {p.syntax_accuracy:.0%}")
+                print(f"  Semantic accuracy: {p.semantic_accuracy:.0%}")
+                print(f"  Preferred format: {p.preferred_format}")
+        sys.exit(0)
+    
+    # Profile LLM
+    if args.profile_llm:
+        from .llm_clients import get_client
+        from .llm_profiler import LLMProfiler
+        
+        log.info("Profiling LLM capabilities...")
+        
+        try:
+            client = get_client()
+            provider = getattr(client, 'provider', 'unknown')
+            model = getattr(client, 'model', 'unknown')
+            
+            log.info(f"Using: {provider}/{model}")
+            
+            profiler = LLMProfiler(client, verbose=True)
+            profile = profiler.run_profile(quick=args.profile_quick)
+            
+            log.success(f"Profile saved: {profile.profile_id}")
+            print(f"\nRecommendations for {provider}/{model}:")
+            print(f"  Optimal chunk size: {profile.optimal_chunk_size} tokens")
+            print(f"  Preferred format: {profile.preferred_format}")
+            print(f"  Syntax accuracy: {profile.syntax_accuracy:.0%}")
+            print(f"  Semantic accuracy: {profile.semantic_accuracy:.0%}")
+            
+        except Exception as e:
+            log.error(f"Profiling failed: {e}")
+            sys.exit(1)
+        
         sys.exit(0)
     
     # Path is required for analysis

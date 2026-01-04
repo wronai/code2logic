@@ -195,6 +195,17 @@ from .chunked_reproduction import (
     auto_chunk_reproduce,
     get_llm_limit,
 )
+from .llm_profiler import (
+    LLMProfiler,
+    LLMProfile,
+    AdaptiveChunker,
+    profile_llm,
+    get_profile,
+    get_or_create_profile,
+    get_adaptive_chunker,
+    load_profiles,
+    save_profile,
+)
 
 __all__ = [
     # Version
@@ -302,4 +313,14 @@ __all__ = [
     "MarkdownSpec",
     "generate_markdown_hybrid",
     "generate_file_markdown",
+    # LLM Profiler
+    "LLMProfiler",
+    "LLMProfile",
+    "AdaptiveChunker",
+    "profile_llm",
+    "get_profile",
+    "get_or_create_profile",
+    "get_adaptive_chunker",
+    "load_profiles",
+    "save_profile",
 ]

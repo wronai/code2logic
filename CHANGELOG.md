@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `code2logic llm ...` command group for managing LLM provider configuration.
+- `code2logic llm set-provider auto` for automatic provider fallback.
+- Provider and model priority management:
+  - provider priorities (stored in `~/.code2logic/llm_config.json`)
+  - model priorities by exact model string and prefix (family)
+  - priority modes: `provider-first`, `model-first`, `mixed`
+
+### Changed
+- Provider auto-selection order now follows configured priorities.
+
 ## [1.0.1] - 2026-01-03
 
 ### Changed
