@@ -903,9 +903,15 @@ class UniversalReproducer:
     
     def __init__(self, client: BaseLLMClient = None):
         """Initialize reproducer."""
-        self.client = client or get_client()
+        self.client = client
         self.parser = UniversalParser()
         self.generator = CodeGenerator()
+
+    def _get_client(self) -> BaseLLMClient:
+        """Get or create LLM client."""
+        if self.client is None:
+            self.client = get_client()
+        return self.client
     
     def extract_logic(self, file_path: str) -> CodeLogic:
         """Extract code logic from file."""
@@ -978,6 +984,7 @@ class UniversalReproducer:
     
     def _generate_with_llm(self, logic: CodeLogic, target: Language) -> str:
         """Generate code using LLM."""
+        client = self._get_client()
         compact = logic.to_compact()
         
         lang_names = {
@@ -1007,7 +1014,7 @@ Output: Return ONLY code in ```{target.value} ... ``` blocks."""
 
 Generate complete, working {target_name} code that implements all elements."""
 
-        response = self.client.generate(prompt, system=system, max_tokens=8000)
+        response = client.generate(prompt, system=system, max_tokens=8000)
         return extract_code_block(response, target.value)
     
     def _save_result(

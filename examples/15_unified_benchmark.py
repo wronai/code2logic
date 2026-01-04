@@ -6,10 +6,10 @@ Demonstrates the standardized benchmark API that consolidates
 functionality from examples 10-13 into a simple, reusable interface.
 
 Usage:
-    python examples/14_unified_benchmark.py
-    python examples/14_unified_benchmark.py --type format --folder tests/samples/
-    python examples/14_unified_benchmark.py --type function --file tests/samples/sample_functions.py
-    python examples/14_unified_benchmark.py --type project --folder tests/samples/ --limit 3
+    python examples/15_unified_benchmark.py
+    python examples/15_unified_benchmark.py --type format --folder tests/samples/
+    python examples/15_unified_benchmark.py --type function --file tests/samples/sample_functions.py
+    python examples/15_unified_benchmark.py --type project --folder tests/samples/ --limit 3
 """
 
 import argparse
@@ -102,6 +102,7 @@ def main():
     parser.add_argument('--limit', '-l', type=int, default=3)
     parser.add_argument('--output', '-o', default='examples/output/unified_benchmark.json')
     parser.add_argument('--verbose', '-v', action='store_true')
+    parser.add_argument('--no-llm', action='store_true', help='Run without LLM (template fallback)')
     args = parser.parse_args()
     
     # Configure
@@ -109,6 +110,7 @@ def main():
         formats=args.formats,
         max_files=args.limit,
         verbose=args.verbose,
+        use_llm=not args.no_llm,
     )
     
     runner = BenchmarkRunner(config=config)

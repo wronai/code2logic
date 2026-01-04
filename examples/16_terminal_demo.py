@@ -182,6 +182,7 @@ def demo_log_highlighting():
 def main():
     parser = argparse.ArgumentParser(description='Terminal Rendering Demo')
     parser.add_argument('--no-color', action='store_true', help='Disable colors')
+    parser.add_argument('--folder', '-f', default=None, help='Ignored (kept for CLI compatibility)')
     args = parser.parse_args()
     
     if args.no_color:
