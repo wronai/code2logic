@@ -158,16 +158,29 @@ class TreeSitterParser:
                     constants.append(const)
         
         lines = content.split('\n')
+        # Deduplicate imports and remove malformed entries
+        seen = set()
+        clean_imports = []
+        for imp in imports:
+            if not imp or imp in seen:
+                continue
+            # Skip duplicates like "dataclasses.dataclasses" 
+            parts = imp.split('.')
+            if len(parts) >= 2 and parts[-1] == parts[-2]:
+                imp = '.'.join(parts[:-1])  # Remove duplicate suffix
+            if imp not in seen:
+                seen.add(imp)
+                clean_imports.append(imp)
         return ModuleInfo(
             path=filepath,
             language='python',
-            imports=imports[:20],
+            imports=clean_imports[:20],
             exports=exports,
             classes=classes,
             functions=functions,
             types=[],
             constants=constants[:10],
-            docstring=docstring[:100] if docstring else None,
+            docstring=self._truncate_docstring(docstring),
             lines_total=len(lines),
             lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('#')])
         )
@@ -178,7 +191,7 @@ class TreeSitterParser:
         name_node = self._find_child(node, 'identifier')
         if not name_node:
             return None
-        name = self._text(name_node, content)
+        name = self._text(name_node, content).strip()
         
         # Parameters
         params = []
@@ -227,7 +240,7 @@ class TreeSitterParser:
             name=name,
             params=params[:8],
             return_type=return_type,
-            docstring=docstring[:100] if docstring else None,
+            docstring=self._truncate_docstring(docstring),
             calls=[],
             raises=[],
             complexity=1,
@@ -246,7 +259,7 @@ class TreeSitterParser:
         name_node = self._find_child(node, 'identifier')
         if not name_node:
             return None
-        name = self._text(name_node, content)
+        name = self._text(name_node, content).strip()
         
         # Base classes
         bases = []
@@ -281,7 +294,7 @@ class TreeSitterParser:
         return ClassInfo(
             name=name,
             bases=bases,
-            docstring=docstring[:100] if docstring else None,
+            docstring=self._truncate_docstring(docstring),
             methods=methods,
             properties=[],
             is_interface=False,
@@ -649,8 +662,12 @@ class TreeSitterParser:
         return None
     
     def _text(self, node, content: str) -> str:
-        """Get text content of node."""
-        return content[node.start_byte:node.end_byte]
+        """Get text content of node.
+        
+        Tree-sitter returns byte offsets, so we must slice bytes, not chars.
+        """
+        content_bytes = content.encode('utf8')
+        return content_bytes[node.start_byte:node.end_byte].decode('utf8', errors='replace')
     
     def _extract_string(self, node, content: str) -> str:
         """Extract string content without quotes."""
@@ -659,6 +676,30 @@ class TreeSitterParser:
             return text[3:-3].strip()
         elif text.startswith('"') or text.startswith("'"):
             return text[1:-1].strip()
+        return text
+    
+    def _truncate_docstring(self, docstring: Optional[str], max_len: int = 80) -> Optional[str]:
+        """Truncate docstring to first sentence or max_len characters.
+        
+        Args:
+            docstring: Full docstring text
+            max_len: Maximum length (default 80)
+            
+        Returns:
+            Truncated docstring or None
+        """
+        if not docstring:
+            return None
+        # Get first line/sentence
+        text = docstring.strip()
+        # Find first sentence end
+        for end in ['. ', '.\n', '.\t']:
+            idx = text.find(end)
+            if idx > 0 and idx < max_len:
+                return text[:idx + 1].strip()
+        # No sentence end found, truncate at max_len
+        if len(text) > max_len:
+            return text[:max_len].rstrip() + '...'
         return text
 
 

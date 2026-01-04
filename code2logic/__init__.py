@@ -104,11 +104,11 @@ from .project_reproducer import (
     ProjectReproducer,
     ProjectResult,
     FileResult,
-    reproduce_project,
+    reproduce_project as _reproduce_project_from_source,
 )
 from .refactor import (
     find_duplicates,
-    analyze_quality,
+    analyze_quality as _analyze_quality_from_path,
     suggest_refactoring,
     compare_codebases,
     quick_analyze,
@@ -160,7 +160,7 @@ from .quality import (
     QualityAnalyzer,
     QualityReport,
     QualityIssue,
-    analyze_quality,
+    analyze_quality as _analyze_quality_from_project,
     get_quality_summary,
 )
 from .similarity import get_refactoring_suggestions
@@ -175,11 +175,24 @@ from .errors import (
 from .reproducer import (
     SpecReproducer,
     SpecValidator,
-    ReproductionResult,
+    ReproductionResult as SpecReproductionResult,
     FileValidation,
-    reproduce_project,
+    reproduce_project as _reproduce_project_from_spec,
     validate_files,
 )
+
+
+def analyze_quality(target, *args, **kwargs):
+    if isinstance(target, ProjectInfo):
+        return _analyze_quality_from_project(target, *args, **kwargs)
+    return _analyze_quality_from_path(str(target), *args, **kwargs)
+
+
+def reproduce_project(source: str, *args, **kwargs):
+    src = str(source)
+    if src.endswith(('.yaml', '.yml', '.json')):
+        return _reproduce_project_from_spec(src, *args, **kwargs)
+    return _reproduce_project_from_source(src, *args, **kwargs)
 from .toon_format import (
     TOONGenerator,
     TOONParser,
@@ -304,6 +317,7 @@ __all__ = [
     # Metrics
     "ReproductionMetrics",
     "ReproductionResult",
+    "SpecReproductionResult",
     "TextMetrics",
     "StructuralMetrics",
     "SemanticMetrics",

@@ -141,6 +141,8 @@ addopts = [
     "--tb=short",
     "--cov=code2logic",
     "--cov-report=term-missing",
+    "-p",
+    "no:aiohttp",
 ]
 
 [tool.coverage.run]

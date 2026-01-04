@@ -5,7 +5,7 @@ Complete specifications for Code2Logic output formats.
 ## Overview
 
 | Format | Score | Syntax OK | Compression | Best For |
-|--------|-------|-----------|-------------|----------|
+| --- | --- | --- | --- | --- |
 | **YAML** | 70.5% | 100% | 0.6x | Overall quality |
 | **LogicML** | 63.9% | 100% | 0.5x | Token efficiency |
 | **Markdown** | ~60% | ~80% | 0.5x | Documentation |
@@ -15,7 +15,7 @@ Complete specifications for Code2Logic output formats.
 
 ## YAML Format
 
-### Schema
+### Schema (YAML)
 
 ```yaml
 project: <project_name>
@@ -53,7 +53,7 @@ modules:
         is_async: true|false
 ```
 
-### Validation
+### Validation (YAML)
 
 ```python
 from code2logic import validate_yaml
@@ -74,18 +74,18 @@ if not is_valid:
     print("Errors:", errors)
 ```
 
-### Best Practices
+### Best Practices (YAML)
 
 1. Always include `signature` with full type hints
 2. Use `intent` for clear docstrings
-3. Include `is_async: true` for async methods
+3. Prefer `exports` for module public API
 4. List all imports for complete reproduction
 
 ---
 
 ## LogicML Format
 
-### Schema
+### Schema (LogicML)
 
 ```yaml
 # filename.py | ClassName, Class2 | N lines
@@ -130,10 +130,10 @@ exports:
   - helper_func
 ```
 
-### Key Features
+### Key Features (LogicML)
 
 | Feature | Syntax | Example |
-|---------|--------|---------|
+| --- | --- | --- |
 | **Signature** | `sig:` | `(self, x: int) -> str` |
 | **Async** | `async` prefix | `async (self) -> None` |
 | **Property** | `@property` prefix | `@property (self) -> Type` |
@@ -143,7 +143,7 @@ exports:
 | **Pydantic** | `bases: [BaseModel]` | Auto-generates Field() |
 | **Re-export** | `type: re-export` | For `__init__.py` |
 
-### Validation
+### Validation (LogicML)
 
 ```python
 from code2logic import validate_logicml
@@ -162,11 +162,11 @@ Calculator:
 is_valid, errors = validate_logicml(spec)
 ```
 
-### Best Practices
+### Best Practices (LogicML)
 
 1. Always start with header comment: `# filename | classes | lines`
 2. Use `bases: [BaseModel]` for Pydantic models
-3. Include `side:` for methods that modify state
+3. Mark re-exports with `type: re-export`
 4. Use `edge:` for important edge cases
 5. For re-export modules, use `type: re-export`
 
@@ -174,7 +174,7 @@ is_valid, errors = validate_logicml(spec)
 
 ## Markdown Hybrid Format
 
-### Schema
+### Schema (Markdown Hybrid)
 
 ```markdown
 # Module: filename.py
@@ -212,16 +212,9 @@ Scenario: Method behavior
 
 ## Functions
 
-### helper_function
+### Validation (Markdown Hybrid)
 
-```yaml
-signature: (data: List[str]) -> Dict[str, int]
-```
-```
-
-### Validation
-
-```python
+````python
 from code2logic import validate_markdown
 
 spec = """
@@ -236,18 +229,10 @@ spec = """
 signature: (self, data: str) -> str
 ```
 """
-
 is_valid, errors = validate_markdown(spec)
-```
+````
 
----
-
-## Format Selection Guide
-
-### By Use Case
-
-| Use Case | Recommended | Reason |
-|----------|-------------|--------|
+| --- | --- | --- |
 | Production code | YAML | Highest score (70.5%) |
 | Token-limited LLMs | LogicML | Best compression (0.5x) |
 | Documentation | Markdown | Human readable |
@@ -259,7 +244,7 @@ is_valid, errors = validate_markdown(spec)
 ### By Metric
 
 | Metric | Winner | Value |
-|--------|--------|-------|
+| --- | --- | --- |
 | Score | YAML | 70.5% |
 | Syntax OK | Both | 100% |
 | Compression | LogicML | 0.5x |
@@ -335,7 +320,7 @@ print(get_quality_summary(report))
 ### Quality Thresholds
 
 | Metric | Default | Description |
-|--------|---------|-------------|
+| --- | --- | --- |
 | `file_lines` | 500 | Max lines per file |
 | `function_lines` | 50 | Max lines per function |
 | `class_methods` | 20 | Max methods per class |
@@ -378,14 +363,14 @@ for s in suggestions:
 ### Suggestion Types
 
 | Type | Description |
-|------|-------------|
+| --- | --- |
 | `extract_to_base_class` | Same method in multiple classes |
 | `extract_to_utility` | Same function in multiple modules |
 | `consolidate` | Duplicate implementations to merge |
 
 ### Example Output
 
-```
+```text
 set_llm_client: Extract 'set_llm_client' to a shared base class or mixin
 is_available: Extract 'is_available' to a shared base class or mixin
 process_data: Extract 'process_data' to a shared utility module

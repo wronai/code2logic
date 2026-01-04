@@ -28,6 +28,7 @@ def main():
     parser.add_argument('--output', '-o', help='Output directory')
     parser.add_argument('--parallel', '-p', action='store_true')
     parser.add_argument('--compare', help='Compare with another project')
+    parser.add_argument('--no-llm', action='store_true', help='Skip LLM generation (template/AST mode)')
     args = parser.parse_args()
     
     print("="*60)
@@ -52,6 +53,7 @@ def main():
         args.project,
         output_dir=args.output or 'examples/output/project',
         parallel=args.parallel,
+        use_llm=not args.no_llm,
     )
     
     print(f"\n{'='*60}")

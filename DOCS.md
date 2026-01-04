@@ -458,22 +458,32 @@ All examples are in the `examples/` directory:
 
 | Example | Description |
 |---------|-------------|
-| `quick_start.py` | 5-minute tour of all features |
-| `bdd_workflow.py` | Complete BDD workflow |
-| `token_efficiency.py` | Compare all format token usage |
-| `duplicate_detection.py` | Find duplicate functions |
-| `refactor_suggestions.py` | LLM-powered refactoring |
-| `generate_code.py` | Generate code with Ollama |
-| `compare_projects.py` | Compare two projects |
+| `01_quick_start.py` | Basic usage guide |
+| `02_refactoring.py` | Duplicate + quality analysis |
+| `03_reproduction.py` | Reproduce code from specs |
+| `04_project.py` | Project-level reproduction |
+| `05_llm_integration.py` | LLM integration demo |
+| `06_metrics.py` | Detailed reproduction metrics |
+| `08_format_benchmark.py` | Benchmark formats across files |
+| `09_async_benchmark.py` | Parallel benchmark |
+| `10_function_reproduction.py` | Function-level reproduction |
+| `11_token_benchmark.py` | Token-aware benchmark |
+| `12_comprehensive_analysis.py` | Comprehensive format analysis |
+| `13_project_benchmark.py` | Whole-project benchmark |
+| `14_repeatability_test.py` | Repeatability testing |
+| `15_unified_benchmark.py` | Unified benchmark runner |
+| `16_terminal_demo.py` | Terminal markdown rendering demo |
 
 Run examples:
 
 ```bash
-python examples/quick_start.py
-python examples/bdd_workflow.py /path/to/project
-python examples/token_efficiency.py /path/to/project
-python examples/duplicate_detection.py /path/to/project
-python examples/refactor_suggestions.py /path/to/project --no-llm
+python examples/01_quick_start.py
+python examples/02_refactoring.py
+python examples/03_reproduction.py --show-spec
+python examples/04_project.py tests/samples/ --no-llm
+python examples/11_token_benchmark.py --folder tests/samples/ --no-llm
+python examples/15_unified_benchmark.py --type format --folder tests/samples/ --no-llm
+python examples/16_terminal_demo.py --folder tests/samples/
 ```
 
 ---

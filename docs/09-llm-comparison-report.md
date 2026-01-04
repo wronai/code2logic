@@ -82,20 +82,17 @@ The **similarity metric compares exact text**, not semantic equivalence:
 ## How to Run Tests
 
 ```bash
-# Test with Llama (free)
-python examples/openrouter_code_reproduction.py \
-  --source code2logic/models.py \
-  --model "meta-llama/llama-3.3-70b-instruct:free"
+# Run file benchmark (provider/model selected via environment variables)
+CODE2LOGIC_DEFAULT_PROVIDER=openrouter \
+OPENROUTER_MODEL="meta-llama/llama-3.3-70b-instruct:free" \
+python examples/15_unified_benchmark.py --type file --file code2logic/models.py
 
-# Test with DeepSeek
-python examples/openrouter_code_reproduction.py \
-  --source code2logic/models.py \
-  --model "deepseek/deepseek-r1"
+CODE2LOGIC_DEFAULT_PROVIDER=openrouter \
+OPENROUTER_MODEL="deepseek/deepseek-r1" \
+python examples/15_unified_benchmark.py --type file --file code2logic/models.py
 
-# Dry run (no API call)
-python examples/openrouter_code_reproduction.py \
-  --source code2logic/models.py \
-  --dry-run
+# Dry/offline run (no API call)
+python examples/15_unified_benchmark.py --type file --file code2logic/models.py --no-llm
 ```
 
 ## Files Generated

@@ -159,14 +159,13 @@ class BenchmarkResult:
         # Format results
         if self.format_results:
             for r in self.format_results:
-                if r.format_name not in self.format_scores:
-                    self.format_scores[r.format_name] = []
                 self.format_scores[r.format_name] = r.score
-            
-            if self.format_scores:
-                best = max(self.format_scores.items(), key=lambda x: x[1])
-                self.best_format = best[0]
-                self.best_score = best[1]
+
+        # Best format (works for both format_results-derived and directly populated format_scores)
+        if self.format_scores:
+            best = max(self.format_scores.items(), key=lambda x: x[1])
+            self.best_format = best[0]
+            self.best_score = best[1]
     
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)

@@ -8,6 +8,9 @@
 
 ```bash
 code2logic /path/to/project [options]
+
+# If the `code2logic` entrypoint is not available (e.g. running from source without install):
+python -m code2logic /path/to/project [options]
 ```
 
 ## LLM Management
@@ -34,7 +37,7 @@ If `CODE2LOGIC_DEFAULT_PROVIDER=auto`, Code2Logic tries providers in priority or
 
 | Option | Short | Description |
 |--------|-------|-------------|
-| `--format` | `-f` | Output format (markdown, compact, json, yaml, csv, gherkin) |
+| `--format` | `-f` | Output format (markdown, compact, json, yaml, csv, gherkin, toon) |
 | `--output` | `-o` | Output file path |
 | `--detail` | `-d` | Detail level (minimal, standard, full) |
 | `--flat` | | Flat JSON structure (for json format) |
@@ -97,6 +100,16 @@ code2logic /path/to/project -f compact -o analysis.txt
 ```
 
 Ultra-minimal format (~200 tokens for entire project).
+
+### TOON
+
+```bash
+# Token-oriented tabular format
+code2logic /path/to/project -f toon -o analysis.toon
+
+# Minimal TOON (maps CLI detail=minimal -> TOON compact)
+code2logic /path/to/project -f toon -d minimal
+```
 
 ## Detail Levels
 

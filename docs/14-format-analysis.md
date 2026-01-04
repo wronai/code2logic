@@ -17,6 +17,7 @@ code2logic supports multiple output formats, each optimized for different use ca
 ### JSON Format
 
 **Advantages for LLM:**
+
 - Structured, hierarchical data
 - Easy parsing and manipulation
 - Preserves data types and relationships
@@ -24,6 +25,7 @@ code2logic supports multiple output formats, each optimized for different use ca
 - Supports nested objects and arrays
 
 **Structure:**
+
 ```json
 {
   "project": {
@@ -53,6 +55,7 @@ code2logic supports multiple output formats, each optimized for different use ca
 ```
 
 **LLM Processing Tips:**
+
 - Use for complex analysis requiring structured data access
 - Ideal for programmatic processing and API integration
 - Best for preserving complete project context
@@ -60,12 +63,14 @@ code2logic supports multiple output formats, each optimized for different use ca
 ### YAML Format
 
 **Advantages for LLM:**
+
 - Human-readable and editable
 - Less verbose than JSON
 - Preserves structure and hierarchy
 - Easy to convert to/from JSON
 
 **Structure:**
+
 ```yaml
 project:
   name: project_name
@@ -101,6 +106,7 @@ project:
 ```
 
 **LLM Processing Tips:**
+
 - Use when human readability is important
 - Good for configuration files and documentation
 - Can be easily converted to JSON for processing
@@ -108,15 +114,18 @@ project:
 ### CSV Format
 
 **Advantages for LLM:**
+
 - Tabular structure for statistical analysis
 - Easy to import into data analysis tools
 - Simple format for numerical data
 - Supports spreadsheet applications
 
 **Structure:**
+
 Multiple CSV files are generated:
 
 **modules.csv:**
+
 ```csv
 name,path,lines_of_code,functions,classes,imports
 main.py,/project/main.py,150,5,2,"os,sys,json"
@@ -124,6 +133,7 @@ utils.py,/project/utils.py,80,3,1,"re,datetime"
 ```
 
 **functions.csv:**
+
 ```csv
 module,name,lines_of_code,complexity,docstring
 main.py,calculate_sum,15,2,True
@@ -132,6 +142,7 @@ utils.py,validate_email,12,3,False
 ```
 
 **classes.csv:**
+
 ```csv
 module,name,methods,base_classes,lines_of_code
 main.py,Calculator,4,,60
@@ -139,6 +150,7 @@ utils.py,DataProcessor,3,,45
 ```
 
 **dependencies.csv:**
+
 ```csv
 source,target,type,strength
 main.py,os,import,0.8
@@ -147,6 +159,7 @@ utils.py,re,import,0.8
 ```
 
 **LLM Processing Tips:**
+
 - Use for statistical analysis and data mining
 - Ideal for generating metrics and reports
 - Best for quantitative analysis
@@ -155,12 +168,14 @@ utils.py,re,import,0.8
 ### Markdown Format
 
 **Advantages for LLM:**
+
 - Natural language documentation
 - Rich formatting with headers and lists
 - Easy to read and understand
 - Supports code blocks and tables
 
 **Structure:**
+
 ```markdown
 # Project Name
 
@@ -189,13 +204,11 @@ utils.py,re,import,0.8
 - `json`
 
 **Functions:**
-- `calculate_sum()` (15 LOC, complexity: 2) 📝
-- `fibonacci()` (8 LOC, complexity: 5) 📝
+- `calculate_sum()` (15 LOC, complexity: 2)
+- `fibonacci()` (8 LOC, complexity: 5)
 
 **Classes:**
 - `Calculator` (4 methods)
-
----
 
 ### utils.py
 
@@ -212,8 +225,6 @@ utils.py,re,import,0.8
 **Classes:**
 - `DataProcessor` (3 methods)
 
----
-
 ## Dependencies
 
 | Source | Target | Type | Strength |
@@ -224,6 +235,7 @@ utils.py,re,import,0.8
 ```
 
 **LLM Processing Tips:**
+
 - Use for documentation generation
 - Good for human-readable reports
 - Ideal for presentations and summaries
@@ -232,13 +244,15 @@ utils.py,re,import,0.8
 ### Compact Format
 
 **Advantages for LLM:**
+
 - Minimal text representation
 - Quick overview of project structure
 - Easy to scan and understand
 - Low memory footprint
 
 **Structure:**
-```
+
+```text
 Project: my_project (/path/to/project)
 Modules: 10
 Functions: 50
@@ -262,6 +276,7 @@ models.py (120 LOC)
 ```
 
 **LLM Processing Tips:**
+
 - Use for quick project overviews
 - Good for chat-based interactions
 - Ideal for summarization tasks
@@ -274,12 +289,14 @@ models.py (120 LOC)
 **Recommended Format:** JSON
 
 **Use Cases:**
+
 - Dependency graph analysis
 - Code similarity detection
 - Refactoring recommendations
 - Architecture analysis
 
 **Processing Strategy:**
+
 1. Load JSON data into structured format
 2. Extract relevant sections (modules, dependencies, etc.)
 3. Apply analysis algorithms
@@ -290,12 +307,14 @@ models.py (120 LOC)
 **Recommended Format:** Markdown
 
 **Use Cases:**
+
 - Project documentation
 - API documentation
 - Reports and summaries
 - Readme generation
 
 **Processing Strategy:**
+
 1. Parse Markdown structure
 2. Extract key sections and statistics
 3. Generate natural language descriptions
@@ -306,12 +325,14 @@ models.py (120 LOC)
 **Recommended Format:** CSV
 
 **Use Cases:**
+
 - Code metrics analysis
 - Trend analysis
 - Quality metrics
 - Performance analysis
 
 **Processing Strategy:**
+
 1. Load CSV data into dataframes
 2. Perform statistical calculations
 3. Generate visualizations
@@ -322,12 +343,14 @@ models.py (120 LOC)
 **Recommended Format:** Compact
 
 **Use Cases:**
+
 - Chat-based queries
 - Quick summaries
 - Real-time analysis
 - Minimal context processing
 
 **Processing Strategy:**
+
 1. Parse compact text format
 2. Extract key metrics
 3. Provide quick insights
@@ -336,6 +359,7 @@ models.py (120 LOC)
 ## Format Conversion Strategies
 
 ### JSON to YAML
+
 ```python
 import yaml
 with open('data.json', 'r') as f:
@@ -345,6 +369,7 @@ with open('data.yaml', 'w') as f:
 ```
 
 ### YAML to JSON
+
 ```python
 import yaml
 import json
@@ -355,6 +380,7 @@ with open('data.json', 'w') as f:
 ```
 
 ### CSV to JSON
+
 ```python
 import pandas as pd
 df = pd.read_csv('data.csv')
@@ -362,6 +388,7 @@ data = df.to_dict('records')
 ```
 
 ### Markdown to Structured Data
+
 ```python
 import re
 from markdown import markdown
@@ -373,7 +400,8 @@ from markdown import markdown
 ## LLM Prompt Optimization
 
 ### For JSON Processing
-```
+
+```text
 Analyze the following project structure in JSON format:
 {json_data}
 
@@ -387,7 +415,8 @@ Provide structured recommendations with specific targets and actions.
 ```
 
 ### For Markdown Processing
-```
+
+```text
 Review the following project documentation:
 {markdown_content}
 
@@ -401,7 +430,8 @@ Generate a summary report with actionable recommendations.
 ```
 
 ### For CSV Analysis
-```
+
+```text
 Analyze the following code metrics data:
 {csv_data}
 
@@ -417,6 +447,7 @@ Provide statistical analysis with trends and recommendations.
 ## Performance Considerations
 
 ### Memory Usage
+
 - **JSON**: Higher memory usage due to verbosity
 - **YAML**: Moderate memory usage
 - **CSV**: Lower memory usage for tabular data
@@ -424,6 +455,7 @@ Provide statistical analysis with trends and recommendations.
 - **Compact**: Lowest memory usage
 
 ### Processing Speed
+
 - **JSON**: Fast parsing with native libraries
 - **YAML**: Slower parsing due to complexity
 - **CSV**: Very fast for tabular data
@@ -431,6 +463,7 @@ Provide statistical analysis with trends and recommendations.
 - **Compact**: Fastest due to simplicity
 
 ### LLM Token Usage
+
 - **JSON**: Higher token count
 - **YAML**: Moderate token count
 - **CSV**: Variable based on data size

@@ -96,8 +96,10 @@ code2logic llm key set openrouter <OPENROUTER_API_KEY>
 
 Best for cloud-based LLM access with multiple model options.
 
-1. Get API key: https://openrouter.ai/keys
+1. Get API key: <https://openrouter.ai/keys>
+
 2. Set environment variable:
+
    ```bash
    export OPENROUTER_API_KEY="sk-or-v1-..."
    ```
@@ -105,7 +107,7 @@ Best for cloud-based LLM access with multiple model options.
 **Recommended Models:**
 
 | Model | Size | Best For |
-|-------|------|----------|
+| --- | --- | --- |
 | `qwen/qwen-2.5-coder-32b-instruct` | 32B | Code generation |
 | `deepseek/deepseek-coder-33b-instruct` | 33B | Code analysis |
 | `anthropic/claude-3-haiku` | - | Fast responses |
@@ -114,12 +116,16 @@ Best for cloud-based LLM access with multiple model options.
 
 Best for local, private, and free LLM usage.
 
-1. Install Ollama: https://ollama.ai
+1. Install Ollama: <https://ollama.ai>
+
 2. Pull a model:
+
    ```bash
    ollama pull qwen2.5-coder:14b
    ```
+
 3. Start server:
+
    ```bash
    ollama serve
    ```
@@ -127,7 +133,7 @@ Best for local, private, and free LLM usage.
 **Recommended Local Models:**
 
 | Model | Size | VRAM |
-|-------|------|------|
+| --- | --- | --- |
 | `qwen2.5-coder:14b` | 14B | 10GB |
 | `qwen2.5-coder:7b` | 7B | 5GB |
 | `deepseek-coder:6.7b` | 6.7B | 5GB |
@@ -212,7 +218,7 @@ LLM routing preferences (priority mode, provider priority overrides, model/famil
 
 ### API Key Not Found
 
-```
+```text
 Error: OpenRouter API key not found
 ```
 
@@ -220,7 +226,7 @@ Error: OpenRouter API key not found
 
 ### Ollama Not Running
 
-```
+```text
 Error: Connection refused to localhost:11434
 ```
 
@@ -228,7 +234,7 @@ Error: Connection refused to localhost:11434
 
 ### Model Not Available
 
-```
+```text
 Error: Model qwen2.5-coder:14b not found
 ```
 

@@ -94,6 +94,7 @@ class ProjectReproducer:
         client: BaseLLMClient = None,
         max_workers: int = 4,
         target_lang: str = None,
+        use_llm: bool = True,
     ):
         """Initialize project reproducer.
         
@@ -102,11 +103,20 @@ class ProjectReproducer:
             max_workers: Max parallel workers
             target_lang: Target language for all files (None = same as source)
         """
-        self.client = client or get_client()
+        self.client = client
         self.max_workers = max_workers
         self.target_lang = target_lang
+        self.use_llm = use_llm
         self.parser = UniversalParser()
         self.reproducer = UniversalReproducer(client)
+
+    def _get_client(self) -> BaseLLMClient:
+        """Get or create LLM client."""
+        if self.client is None:
+            self.client = get_client()
+            # Keep UniversalReproducer in sync
+            self.reproducer.client = self.client
+        return self.client
     
     def find_source_files(
         self,
@@ -164,11 +174,15 @@ class ProjectReproducer:
             FileResult
         """
         try:
+            if self.use_llm:
+                # Ensure we have a client once; UniversalReproducer will also lazy-load,
+                # but this keeps provider selection consistent across files.
+                self._get_client()
             result = self.reproducer.reproduce(
                 str(file_path),
                 target_lang=self.target_lang,
                 output_dir=str(output_dir / file_path.stem),
-                use_llm=True,
+                use_llm=self.use_llm,
             )
             
             return FileResult(
@@ -370,6 +384,7 @@ def reproduce_project(
     output_dir: str = None,
     target_lang: str = None,
     parallel: bool = False,
+    use_llm: bool = True,
 ) -> ProjectResult:
     """Convenience function for project reproduction.
     
@@ -382,5 +397,5 @@ def reproduce_project(
     Returns:
         ProjectResult
     """
-    reproducer = ProjectReproducer(target_lang=target_lang)
+    reproducer = ProjectReproducer(target_lang=target_lang, use_llm=use_llm)
     return reproducer.reproduce_project(project_path, output_dir, parallel)

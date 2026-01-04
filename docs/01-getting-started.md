@@ -24,7 +24,7 @@ pip install -e .
 
 ```bash
 # All optional dependencies (recommended)
-pip install code2logic[all]
+pip install code2logic[full]
 
 # Just development tools
 pip install code2logic[dev]
@@ -101,7 +101,7 @@ code2logic ./my_project -f gherkin | ollama run qwen2.5-coder:7b "Review this"
 export OPENROUTER_API_KEY="sk-or-v1-your-key"
 
 # Run example
-python examples/openrouter_code_reproduction.py --source ./my_project
+python examples/15_unified_benchmark.py --type file --file ./my_project/some_file.py
 ```
 
 ## Configuration
@@ -133,16 +133,16 @@ Run the included examples:
 
 ```bash
 # Quick start guide
-python examples/quick_start.py
+python examples/01_quick_start.py
 
 # BDD workflow
-python examples/bdd_workflow.py ./my_project
+python examples/03_reproduction.py ./my_project/some_file.py --show-spec
 
 # Token efficiency comparison
-python examples/token_efficiency.py ./my_project
+python examples/11_token_benchmark.py --folder ./my_project --no-llm
 
 # Code review
-python examples/code_review.py ./my_project
+python examples/02_refactoring.py ./my_project
 ```
 
 ## Next Steps

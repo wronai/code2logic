@@ -58,7 +58,8 @@ def main():
     print(f"   Report generated: {len(markdown)} chars")
     
     # Save report
-    output = Path("refactoring_report.md")
+    output = Path("examples/output/refactoring_report.md")
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(markdown)
     print(f"   Saved to: {output}")
 

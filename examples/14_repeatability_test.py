@@ -35,6 +35,55 @@ from code2logic.reproduction import extract_code_block
 from code2logic.models import ProjectInfo, ModuleInfo
 
 
+def _template_generate(spec: str, fmt: str, file_name: str) -> str:
+    """Generate minimal Python code without an LLM (baseline mode)."""
+    import re
+
+    classes = re.findall(r"\bclass\s+([A-Za-z_][A-Za-z0-9_]*)", spec)
+    functions = re.findall(r"\bdef\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", spec)
+    functions += re.findall(r"\bScenario:\s*([A-Za-z_][A-Za-z0-9_]*)", spec)
+    
+    def uniq(items: List[str]) -> List[str]:
+        seen = set()
+        out: List[str] = []
+        for it in items:
+            if it and it not in seen:
+                seen.add(it)
+                out.append(it)
+        return out
+
+    classes = [c for c in uniq(classes) if c.isidentifier()][:3]
+    functions = [f for f in uniq(functions) if f.isidentifier() and f not in classes][:5]
+
+    code = """from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any
+
+"""
+
+    if not classes and not functions:
+        classes = ["GeneratedClass"]
+        functions = ["generated_function"]
+
+    for cls in classes:
+        code += f"""@dataclass
+class {cls}:
+    \"\"\"Generated placeholder for {file_name} ({fmt}).\"\"\"
+    value: Any = None
+
+"""
+
+    for fn in functions:
+        code += f"""def {fn}(*args: Any, **kwargs: Any) -> Any:
+    \"\"\"Generated placeholder for {file_name} ({fmt}).\"\"\"
+    return None
+
+"""
+
+    return code
+
+
 @dataclass
 class RunResult:
     """Result of a single generation run."""
@@ -148,6 +197,7 @@ def run_repeatability_test(
     formats: List[str],
     num_runs: int = 3,
     verbose: bool = False,
+    no_llm: bool = False,
 ) -> Dict[str, RepeatabilityResult]:
     """Run repeatability test for given file and formats."""
     
@@ -159,14 +209,19 @@ def run_repeatability_test(
     print(f"Runs per format: {num_runs}")
     
     # Initialize LLM
-    try:
-        client = get_client()
-        provider_name = getattr(client, 'provider', None) or client.__class__.__name__
-        print(f"Selected: {provider_name}")
-        print(f"Model: {getattr(client, 'model', 'default')}")
-    except Exception as e:
-        print(f"LLM not available: {e}")
-        return {}
+    client = None
+    if no_llm:
+        print("Selected: none (template mode)")
+        print("Model: none")
+    else:
+        try:
+            client = get_client()
+            provider_name = getattr(client, 'provider', None) or client.__class__.__name__
+            print(f"Selected: {provider_name}")
+            print(f"Model: {getattr(client, 'model', 'default')}")
+        except Exception as e:
+            print(f"LLM not available: {e}")
+            return {}
     
     # Analyze file
     print("\n📊 Analyzing file...")
@@ -216,12 +271,15 @@ def run_repeatability_test(
             print(f"  Run {run_id}/{num_runs}...", end=" ", flush=True)
             
             start = time.time()
-            try:
-                response = client.generate(prompt, max_tokens=4000)
-                code = extract_code_block(response)
-            except Exception as e:
-                code = ""
-                print(f"Error: {e}")
+            if client is None:
+                code = _template_generate(spec, fmt, target_name)
+            else:
+                try:
+                    response = client.generate(prompt, max_tokens=4000)
+                    code = extract_code_block(response)
+                except Exception as e:
+                    code = ""
+                    print(f"Error: {e}")
             
             elapsed = time.time() - start
             syntax_ok = test_syntax(code)
@@ -361,6 +419,7 @@ def main():
     parser.add_argument('--runs', '-r', type=int, default=3, help='Number of runs per format')
     parser.add_argument('--output', '-o', default='examples/output/repeatability_test.json')
     parser.add_argument('--verbose', '-v', action='store_true')
+    parser.add_argument('--no-llm', action='store_true', help='Run without LLM (template baseline)')
     args = parser.parse_args()
     
     results = run_repeatability_test(
@@ -368,6 +427,7 @@ def main():
         formats=args.formats,
         num_runs=args.runs,
         verbose=args.verbose,
+        no_llm=args.no_llm,
     )
     
     if results:

@@ -574,8 +574,26 @@ class YAMLGenerator:
         >>> output = generator.generate(project, flat=True, detail='standard')
     """
     
+    # Key legend for compact format (for LLM transparency)
+    KEY_LEGEND = {
+        'p': 'path',       # file path
+        'l': 'lines',      # line count  
+        'i': 'imports',    # import list
+        'e': 'exports',    # exported symbols
+        'c': 'classes',    # class definitions
+        'f': 'functions',  # standalone functions
+        'n': 'name',       # symbol name
+        'd': 'docstring',  # documentation string
+        'b': 'bases',      # base classes
+        'm': 'methods',    # class methods
+        'props': 'properties',  # class properties
+        'sig': 'signature',     # function signature
+        'ret': 'return_type',   # return type
+        'async': 'is_async',    # async function flag
+    }
+    
     def generate(self, project: ProjectInfo, flat: bool = False, 
-                 detail: str = 'standard') -> str:
+                 detail: str = 'standard', compact: bool = True) -> str:
         """
         Generate YAML output.
         
@@ -583,6 +601,7 @@ class YAMLGenerator:
             project: ProjectInfo analysis results
             flat: If True, generate flat list instead of nested structure
             detail: 'minimal', 'standard', or 'full'
+            compact: If True, use short keys for smaller output (default: True)
             
         Returns:
             YAML formatted string
@@ -590,16 +609,24 @@ class YAMLGenerator:
         try:
             import yaml
         except ImportError:
-            # Fallback to simple YAML generation
             return self._generate_simple_yaml(project, flat, detail)
         
         if flat:
             data = self._build_flat_data(project, detail)
+            yaml_str = yaml.dump(data, default_flow_style=False, allow_unicode=True, 
+                                sort_keys=False, width=120)
+        elif compact:
+            # Compact format with short keys and header legend
+            header = self._build_compact_header(project)
+            data = self._build_compact_data(project, detail)
+            yaml_str = header + yaml.dump(data, default_flow_style=False, 
+                                         allow_unicode=True, sort_keys=False, width=120)
         else:
             data = self._build_nested_data(project, detail)
+            yaml_str = yaml.dump(data, default_flow_style=False, allow_unicode=True, 
+                                sort_keys=False, width=120)
         
-        return yaml.dump(data, default_flow_style=False, allow_unicode=True, 
-                        sort_keys=False, width=120)
+        return yaml_str
 
     def generate_from_module(self, module: ModuleInfo, detail: str = 'full') -> str:
         project = ProjectInfo(

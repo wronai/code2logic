@@ -2,7 +2,7 @@
 
 [![PyPI version](https://badge.fury.io/py/code2logic.svg)](https://badge.fury.io/py/code2logic)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 **Convert source code to logical representation for LLM analysis.**
 
@@ -317,11 +317,11 @@ black code2logic
 
 ## 📈 Performance
 
-|Codebase Size|Files|Lines|Time|Output Size|
-|---|---|---|---|---|
-|Small|10|1K|<1s|~5KB|
-|Medium|100|30K|~2s|~50KB|
-|Large|500|150K|~10s|~200KB|
+| Codebase Size | Files | Lines | Time | Output Size |
+| --- | --- | --- | --- | --- |
+| Small | 10 | 1K | <1s | ~5KB |
+| Medium | 100 | 30K | ~2s | ~50KB |
+| Large | 500 | 150K | ~10s | ~200KB |
 
 Compact format is ~10-15x smaller than Markdown.
 
@@ -331,12 +331,12 @@ Code2Logic can reproduce code from specifications using LLMs. Benchmark results:
 
 ### Format Comparison (Token Efficiency)
 
-|Format|Score|Token Efficiency|Spec Tokens|Runs OK|
-|---|---|---|---|---|
-|**YAML**|**71.1%**|42.1|**366**|66.7%|
-|**Markdown**|65.6%|**48.7**|385|**100%**|
-|JSON|61.9%|23.7|605|66.7%|
-|Gherkin|51.3%|19.1|411|66.7%|
+| Format | Score | Token Efficiency | Spec Tokens | Runs OK |
+| --- | --- | --- | --- | --- |
+| **YAML** | **71.1%** | 42.1 | **366** | 66.7% |
+| **Markdown** | 65.6% | **48.7** | 385 | **100%** |
+| JSON | 61.9% | 23.7 | 605 | 66.7% |
+| Gherkin | 51.3% | 19.1 | 411 | 66.7% |
 
 ### Key Findings
 
@@ -349,15 +349,18 @@ Code2Logic can reproduce code from specifications using LLMs. Benchmark results:
 
 ```bash
 # Token-aware benchmark
-python examples/11_token_benchmark.py --folder tests/samples/
+python examples/11_token_benchmark.py --folder tests/samples/ --no-llm
 
 # Async multi-format benchmark
-python examples/09_async_benchmark.py --folder tests/samples/
+python examples/09_async_benchmark.py --folder tests/samples/ --no-llm
 
 # Function-level reproduction
-python examples/10_function_reproduction.py --multi-lang
+python examples/10_function_reproduction.py --file tests/samples/sample_functions.py --no-llm
 
-python examples/15_unified_benchmark.py --folder tests/samples/
+python examples/15_unified_benchmark.py --folder tests/samples/ --no-llm
+
+# Terminal markdown rendering demo
+python examples/16_terminal_demo.py --folder tests/samples/
 ```
 
 ## 🤝 Contributing

@@ -283,11 +283,11 @@ print(response.choices[0].message.content)
 Complete workflow: Code → Gherkin → LLM → Code
 
 ```bash
-# Run the OpenRouter reproduction example
-python examples/openrouter_code_reproduction.py --source code2logic/models.py
+# Run a benchmark example (uses CODE2LOGIC_DEFAULT_PROVIDER + provider env vars)
+CODE2LOGIC_DEFAULT_PROVIDER=openrouter python examples/15_unified_benchmark.py --type file --file code2logic/models.py
 
-# Or with Ollama (free, local)
-python examples/mcp_litellm_refactor.py ./my_project
+# Or local/offline mode
+python examples/15_unified_benchmark.py --type file --file code2logic/models.py --no-llm
 ```
 
 ### Workflow Steps
@@ -314,7 +314,7 @@ Output complete, working code."""
 response = llm_client.generate(prompt)
 
 # Step 3: Compare
-# See examples/openrouter_code_reproduction.py for full comparison
+# Use BenchmarkRunner results (examples/15_unified_benchmark.py) for full comparison
 ```
 
 ## Best Practices

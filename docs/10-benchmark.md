@@ -47,6 +47,12 @@ python examples/11_token_benchmark.py \
   --folder tests/samples/ \
   --formats yaml logicml markdown gherkin json
 
+# Offline mode (no API calls)
+python examples/11_token_benchmark.py \
+  --folder tests/samples/ \
+  --formats yaml logicml markdown gherkin json \
+  --no-llm
+
 # Best formats only
 python examples/11_token_benchmark.py \
   --folder tests/samples/ \
@@ -69,6 +75,12 @@ python examples/13_project_benchmark.py \
   --project /path/to/project \
   --formats yaml logicml markdown
 
+# Offline mode
+python examples/13_project_benchmark.py \
+  --project /path/to/project \
+  --formats yaml logicml markdown \
+  --no-llm
+
 # With verbose output
 python examples/13_project_benchmark.py \
   --project /path/to/project \
@@ -81,7 +93,7 @@ python examples/13_project_benchmark.py \
 Analyze generated code quality:
 
 ```bash
-python examples/12_comprehensive_analysis.py
+python examples/12_comprehensive_analysis.py --no-llm
 ```
 
 ## Sample Output
@@ -273,6 +285,11 @@ Testing how consistent code generation is across multiple invocations.
 # Test with 3 runs (default)
 python examples/14_repeatability_test.py \
   --file tests/samples/sample_class.py
+
+# Offline mode (template baseline)
+python examples/14_repeatability_test.py \
+  --file tests/samples/sample_class.py \
+  --no-llm
 
 # Test with 5 runs
 python examples/14_repeatability_test.py \

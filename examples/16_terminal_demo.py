@@ -83,32 +83,53 @@ def demo_status_messages():
     """Demo status messages."""
     render.heading(2, "Status Messages")
     
-    render.success("All tests passed!")
-    render.error("Failed to connect to LLM")
-    render.warning("Token limit exceeded, using fallback")
-    render.info("Processing 15 files...")
+    render.codeblock(
+        "log",
+        "\n".join(
+            [
+                "✅ All tests passed!",
+                "❌ Failed to connect to LLM",
+                "⚠️ Token limit exceeded, using fallback",
+                "ℹ️ Processing 15 files...",
+            ]
+        ),
+    )
 
 
 def demo_progress():
     """Demo progress bars."""
     render.heading(2, "Progress Bars")
     
-    render.progress(0, 10, "Starting...")
-    render.progress(3, 10, "Processing files")
-    render.progress(7, 10, "Running tests")
-    render.progress(10, 10, "Complete!")
+    render.codeblock(
+        "log",
+        "\n".join(
+            [
+                "[ ░░░░░░░░░░░░░░░░░░░░ ] 0% Starting...",
+                "[ ██████░░░░░░░░░░░░░░ ] 30% Processing files",
+                "[ ██████████████░░░░░░ ] 70% Running tests",
+                "[ ████████████████████ ] 100% Complete!",
+            ]
+        ),
+    )
 
 
 def demo_tasks():
     """Demo task status."""
     render.heading(2, "Task Status")
     
-    render.task("Create output folders", "done", 0.2)
-    render.task("Generate specifications", "done", 1.5)
-    render.task("Reproduce code", "running")
-    render.task("Run tests", "pending")
-    render.task("Validate output", "pending")
-    render.task("Failed task example", "failed", 0.1)
+    render.codeblock(
+        "log",
+        "\n".join(
+            [
+                "✅ Create output folders (0.2s)",
+                "✅ Generate specifications (1.5s)",
+                "🔄 Reproduce code",
+                "⏳ Run tests",
+                "⏳ Validate output",
+                "❌ Failed task example (0.1s)",
+            ]
+        ),
+    )
 
 
 def demo_key_value():
@@ -131,7 +152,7 @@ def demo_tables():
         ["yaml", "95.5%", "✓", "passed"],
         ["json", "87.2%", "✓", "passed"],
         ["gherkin", "72.1%", "✓", "passed"],
-        ["toon", "45.3%", "✗", "failed"],
+        ["toon", "n/a", "-", "demo"],
     ]
     render.table(headers, rows, widths=[12, 10, 10, 10])
 

@@ -15,6 +15,7 @@ import subprocess
 import time
 import logging
 import json
+import signal
 from datetime import datetime
 
 from . import __version__
@@ -509,6 +510,11 @@ def main():
     """Main CLI entry point."""
     cli_start = time.time()
 
+    try:
+        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
+    except Exception:
+        pass
+
     if len(sys.argv) > 1 and sys.argv[1] == 'llm':
         _code2logic_llm_cli(sys.argv[2:])
         return
@@ -524,12 +530,17 @@ Examples:
   code2logic /path/to/project -f yaml            # YAML (human-readable)
   code2logic /path/to/project -f json --flat     # Flat JSON (for comparisons)
   code2logic /path/to/project -f compact         # Ultra-compact text
+  code2logic /path/to/project -f logicml         # LogicML (compressed, reproduction-oriented)
+  code2logic /path/to/project -f toon            # TOON (token-oriented tabular format)
 
 Output formats (token efficiency):
   csv      - Best for LLM (~20K tokens/100 files) - flat table
   compact  - Good for LLM (~25K tokens/100 files) - minimal text
   json     - Standard (~35K tokens/100 files) - nested/flat
   yaml     - Readable (~35K tokens/100 files) - nested/flat  
+  logicml  - Compressed (best compression) - reproduction-oriented
+  toon     - Token-oriented (~JSON-size, more LLM-friendly) - tabular arrays
+  gherkin  - Behavioral scenarios - good for minimal implementations
   markdown - Documentation (~55K tokens/100 files)
 
 Detail levels (columns in csv/json/yaml):
@@ -538,6 +549,39 @@ Detail levels (columns in csv/json/yaml):
   full     - + calls, lines, complexity, hash (16 columns)
 '''
     )
+
+    def _maybe_print_pretty_help() -> bool:
+        """Print colorized help as markdown when appropriate.
+
+        Returns True if help was printed and the CLI should exit early.
+        """
+        force_pretty = os.environ.get("CODE2LOGIC_PRETTY_HELP") == "1" or bool(os.environ.get("FORCE_COLOR"))
+        if not force_pretty:
+            if not hasattr(sys.stdout, "isatty") or not sys.stdout.isatty():
+                return False
+        try:
+            from .terminal import render
+        except Exception:
+            return False
+
+        help_md = f"""# code2logic
+
+Convert source code to logical representation for LLM analysis.
+
+## Usage
+
+```bash
+code2logic [path] [options]
+```
+
+## Help
+
+```text
+{parser.format_help().rstrip()}
+```
+"""
+        render.markdown(help_md)
+        return True
     
     parser.add_argument(
         'path',
@@ -547,13 +591,13 @@ Detail levels (columns in csv/json/yaml):
     )
     parser.add_argument(
         '-f', '--format',
-        choices=['markdown', 'compact', 'json', 'yaml', 'csv', 'gherkin'],
+        choices=['markdown', 'compact', 'json', 'yaml', 'csv', 'gherkin', 'toon', 'logicml'],
         default='markdown',
         help='Output format (default: markdown)'
     )
     parser.add_argument(
         '-d', '--detail',
-        choices=['minimal', 'standard', 'full'],
+        choices=['minimal', 'standard', 'full', 'detailed'],
         default='standard',
         help='Detail level - columns to include (default: standard)'
     )
@@ -617,7 +661,15 @@ Detail levels (columns in csv/json/yaml):
         help='Show saved LLM profiles'
     )
     
+    if len(sys.argv) == 1 or any(a in ("-h", "--help") for a in sys.argv[1:]):
+        if not _maybe_print_pretty_help():
+            parser.print_help()
+        return
+
     args = parser.parse_args()
+
+    if args.detail == 'detailed':
+        args.detail = 'full'
     
     # Initialize logger
     log = Logger(verbose=args.verbose, debug=args.debug)
@@ -642,6 +694,8 @@ Detail levels (columns in csv/json/yaml):
         YAMLGenerator, CSVGenerator
     )
     from .gherkin import GherkinGenerator
+    from .toon_format import TOONGenerator
+    from .logicml import LogicMLGenerator
     
     # Status check
     if args.status:
@@ -705,9 +759,10 @@ Detail levels (columns in csv/json/yaml):
     
     # Path is required for analysis
     if args.path is None:
-        print("Error: path is required", file=sys.stderr)
-        parser.print_help()
-        sys.exit(1)
+        # Keep behavior consistent with --help
+        if not _maybe_print_pretty_help():
+            parser.print_help()
+        return
     
     # Validate path
     if not os.path.exists(args.path):
@@ -774,6 +829,20 @@ Detail levels (columns in csv/json/yaml):
     elif args.format == 'gherkin':
         generator = GherkinGenerator()
         output = generator.generate(project, detail=args.detail)
+
+    elif args.format == 'toon':
+        generator = TOONGenerator()
+        detail_map = {
+            'minimal': 'compact',
+            'standard': 'standard',
+            'full': 'full',
+        }
+        output = generator.generate(project, detail=detail_map.get(args.detail, 'standard'))
+
+    elif args.format == 'logicml':
+        generator = LogicMLGenerator()
+        spec = generator.generate(project, detail=args.detail)
+        output = spec.content
     
     gen_time = time.time() - gen_start
     
@@ -792,7 +861,14 @@ Detail levels (columns in csv/json/yaml):
             log.success(f"Output written to: {args.output}")
     else:
         if not args.quiet:
-            print(output)
+            try:
+                print(output, flush=True)
+            except BrokenPipeError:
+                try:
+                    sys.stdout.close()
+                except Exception:
+                    pass
+                os._exit(0)
     
     # Final summary
     if args.verbose:

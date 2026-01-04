@@ -9,14 +9,13 @@
 All examples are in the `examples/` folder:
 
 | Example | Description |
-|---------|-------------|
+| --- | --- |
 | [01_quick_start.py](../examples/01_quick_start.py) | Basic usage guide |
 | [02_refactoring.py](../examples/02_refactoring.py) | Duplicate + quality analysis |
 | [03_reproduction.py](../examples/03_reproduction.py) | Reproduce code from specs |
 | [04_project.py](../examples/04_project.py) | Project-level reproduction |
 | [05_llm_integration.py](../examples/05_llm_integration.py) | LLM integration demo |
 | [06_metrics.py](../examples/06_metrics.py) | Detailed reproduction metrics |
-| [07_folder_comparison.py](../examples/07_folder_comparison.py) | Folder-level format comparison |
 | [08_format_benchmark.py](../examples/08_format_benchmark.py) | Benchmark formats across files |
 | [09_async_benchmark.py](../examples/09_async_benchmark.py) | Parallel benchmark with multi-provider LLM |
 | [10_function_reproduction.py](../examples/10_function_reproduction.py) | Function-level reproduction |
@@ -24,6 +23,8 @@ All examples are in the `examples/` folder:
 | [12_comprehensive_analysis.py](../examples/12_comprehensive_analysis.py) | Post-run analysis of generated outputs |
 | [13_project_benchmark.py](../examples/13_project_benchmark.py) | Whole-project structure benchmark |
 | [14_repeatability_test.py](../examples/14_repeatability_test.py) | Repeatability testing |
+| [15_unified_benchmark.py](../examples/15_unified_benchmark.py) | Unified benchmark runner example |
+| [16_terminal_demo.py](../examples/16_terminal_demo.py) | Terminal markdown rendering demo |
 
 ## Quick Start
 
@@ -65,37 +66,16 @@ with open("tests/steps/test_steps.py", "w") as f:
     f.write(steps)
 ```
 
-## Code Reproduction with OpenRouter
+## Code Reproduction
+
+Reproduce a single file (LLM optional):
 
 ```bash
-# Configure API key
-export OPENROUTER_API_KEY="sk-or-v1-your-key"
+# Show spec only
+python examples/03_reproduction.py code2logic/models.py --show-spec
 
-# Run reproduction test
-python examples/openrouter_code_reproduction.py \
-  --source code2logic/models.py \
-  --model qwen/qwen-2.5-coder-32b-instruct \
-  --output results/
-```
-
-Output:
-```
-Step 1: Reading source code...
-  Read 5,234 chars from models.py
-
-Step 2: Generating Gherkin specification...
-  Generated 2,104 chars of Gherkin
-
-Step 3: Generating code with LLM...
-  Generated 4,892 chars of code
-
-Step 4: Comparing original vs generated...
-  Similarity: 72.5%
-  Structural score: 85.0%
-
-SUMMARY
-  Average Score: 78.8%
-  ✓ Good reproduction quality!
+# Offline mode (no LLM)
+python examples/03_reproduction.py code2logic/models.py --no-llm
 ```
 
 ## Duplicate Detection
@@ -122,6 +102,12 @@ for h, funcs in duplicates.items():
         print(f"Duplicate group {h}:")
         for f in funcs:
             print(f"  - {f}")
+```
+
+## Local Quality / Duplicate Analysis
+
+```bash
+python examples/02_refactoring.py ./my_project
 ```
 
 ## LLM Refactoring Suggestions
@@ -178,31 +164,6 @@ for name, output in formats.items():
     print(f"{name:12} {tokens:>6,} tokens")
 ```
 
-## API Documentation Generation
-
-```bash
-python examples/api_documentation.py ./my_project --format all --output docs/api/
-```
-
-Generates:
-- `API.md` - Markdown documentation
-- `openapi.json` - OpenAPI/Swagger spec
-- `types.d.ts` - TypeScript definitions
-- `project.pyi` - Python stubs
-
-## Code Review
-
-```bash
-# Run automated code review
-python examples/code_review.py ./my_project --focus all --output review.md
-
-# Security-focused review
-python examples/code_review.py ./my_project --focus security
-
-# Without LLM (fast, local analysis only)
-python examples/code_review.py ./my_project --no-llm
-```
-
 ## MCP Server Integration
 
 Start the MCP server for Claude Desktop:
@@ -216,6 +177,7 @@ make mcp-server
 ```
 
 Configure Claude Desktop:
+
 ```json
 {
   "mcpServers": {
@@ -231,25 +193,26 @@ Configure Claude Desktop:
 
 ```bash
 # Quick start
-python examples/quick_start.py
+python examples/01_quick_start.py
 
-# BDD workflow (uses current directory)
-python examples/bdd_workflow.py ./my_project
+# Duplicate + quality analysis
+python examples/02_refactoring.py
 
-# Token efficiency comparison
-python examples/token_efficiency.py ./my_project
+# Reproduce a file from a spec (LLM optional)
+python examples/03_reproduction.py --show-spec
+python examples/03_reproduction.py --no-llm
 
-# Duplicate detection
-python examples/duplicate_detection.py ./my_project
+# Project reproduction (LLM optional)
+python examples/04_project.py tests/samples/ --no-llm
 
-# Code review (with LLM)
-python examples/code_review.py ./my_project
+# LLM integration demo (local analysis only)
+python examples/05_llm_integration.py --no-llm
 
-# Code review (without LLM)
-python examples/code_review.py ./my_project --no-llm
+# Unified benchmarks (LLM optional)
+python examples/15_unified_benchmark.py --type format --folder tests/samples/ --no-llm
 
-# OpenRouter reproduction (requires API key)
-python examples/openrouter_code_reproduction.py --source code2logic/models.py
+# Terminal rendering demo
+python examples/16_terminal_demo.py --folder tests/samples/
 ```
 
 ## See Also

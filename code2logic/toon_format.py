@@ -40,7 +40,9 @@ class TOONGenerator:
             use_tabs: Use tab delimiter for better token efficiency
         """
         self.delimiter = '\t' if use_tabs else delimiter
-        self.delim_marker = ' ' if use_tabs else ('' if delimiter == ',' else delimiter)
+        # Field names inside `{...}` must be explicitly separated so both humans and
+        # parsers/LLMs can read them. Use comma-separated headers regardless of row delimiter.
+        self.delim_marker = ','
     
     def generate(self, project: ProjectInfo, detail: str = 'standard') -> str:
         """
@@ -97,12 +99,12 @@ class TOONGenerator:
                 
                 # ENHANCED: Add imports for better reproduction
                 if m.imports:
-                    imports_str = self.delimiter.join(m.imports[:15])
+                    imports_str = self.delimiter.join(self._quote(x) for x in m.imports[:15])
                     lines.append(f"    imports[{len(m.imports)}]: {imports_str}")
                 
                 # ENHANCED: Add exports
                 if m.exports:
-                    exports_str = self.delimiter.join(m.exports[:10])
+                    exports_str = self.delimiter.join(self._quote(x) for x in m.exports[:10])
                     lines.append(f"    exports[{len(m.exports)}]: {exports_str}")
                 
                 # Classes
@@ -147,7 +149,7 @@ class TOONGenerator:
                 
                 # ENHANCED: Add properties with types
                 if c.properties:
-                    props_str = self.delimiter.join(c.properties[:10])
+                    props_str = self.delimiter.join(self._quote(x) for x in c.properties[:10])
                     lines.append(f"{ind}    properties[{len(c.properties)}]: {props_str}")
                 
                 # Methods with full details
@@ -283,7 +285,18 @@ class TOONParser:
         """Parse TOON content to dict."""
         result = {}
         lines = content.split('\n')
+
+        # Best-effort delimiter detection for arrays.
+        # Note: headers always use commas, but row values may use ',', '\t', or '|'.
+        if any('\t' in ln for ln in lines):
+            self.delimiter = '\t'
+        elif any('|' in ln for ln in lines):
+            self.delimiter = '|'
+        else:
+            self.delimiter = ','
         
+        import csv
+
         i = 0
         while i < len(lines):
             line = lines[i]
@@ -323,7 +336,7 @@ class TOONParser:
                         i += 1
                         
                         if row_line:
-                            row_values = row_line.split(self.delimiter)
+                            row_values = next(csv.reader([row_line], delimiter=self.delimiter, quotechar='"', escapechar='\\'))
                             item = {}
                             for fi, fn in enumerate(field_names):
                                 if fi < len(row_values):
@@ -334,7 +347,8 @@ class TOONParser:
                 else:
                     # Primitive array
                     if value:
-                        items = [self._parse_value(v.strip()) for v in value.split(self.delimiter)]
+                        parts = next(csv.reader([value], delimiter=self.delimiter, quotechar='"', escapechar='\\'))
+                        items = [self._parse_value(v.strip()) for v in parts]
                         result[arr_name] = items
                     else:
                         result[arr_name] = []
