@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "code2logic"
-version = "1.0.6"
+version = "1.0.7"
 description = "Convert source code to logical representation for LLM analysis"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -208,7 +208,7 @@ module = [
 ignore_missing_imports = true
 
 [tool.bumpver]
-current_version = "1.0.6"
+current_version = "1.0.7"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit = false
 tag = false
