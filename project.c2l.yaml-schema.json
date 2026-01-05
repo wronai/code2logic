@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Code2Logic Compact YAML Schema",
+  "description": "Schema for Code2Logic compact YAML output with short keys and meta.legend",
+  "type": "object",
+  "properties": {
+    "meta": {
+      "type": "object",
+      "properties": {
+        "legend": {
+          "type": "object",
+          "description": "Key mapping legend for LLM transparency",
+          "properties": {
+            "p": {
+              "type": "string",
+              "const": "path"
+            },
+            "l": {
+              "type": "string",
+              "const": "lines"
+            },
+            "i": {
+              "type": "string",
+              "const": "imports"
+            },
+            "e": {
+              "type": "string",
+              "const": "exports"
+            },
+            "c": {
+              "type": "string",
+              "const": "classes"
+            },
+            "f": {
+              "type": "string",
+              "const": "functions"
+            },
+            "n": {
+              "type": "string",
+              "const": "name"
+            },
+            "d": {
+              "type": "string",
+              "const": "docstring"
+            },
+            "b": {
+              "type": "string",
+              "const": "bases"
+            },
+            "m": {
+              "type": "string",
+              "const": "methods"
+            },
+            "props": {
+              "type": "string",
+              "const": "properties"
+            },
+            "sig": {
+              "type": "string",
+              "const": "signature (without self)"
+            },
+            "ret": {
+              "type": "string",
+              "const": "return_type"
+            },
+            "async": {
+              "type": "string",
+              "const": "is_async"
+            },
+            "lang": {
+              "type": "string",
+              "const": "language"
+            }
+          },
+          "required": [
+            "p",
+            "l",
+            "i",
+            "c",
+            "f",
+            "n",
+            "d"
+          ]
+        }
+      },
+      "required": [
+        "legend"
+      ]
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "lang": {
+          "type": "string",
+          "description": "Default language"
+        }
+      }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "p": {
+            "type": "string",
+            "description": "Module path"
+          },
+          "lang": {
+            "type": "string",
+            "description": "Language (if different from default)"
+          },
+          "l": {
+            "type": "integer",
+            "description": "Lines of code"
+          },
+          "i": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Compact imports (grouped)"
+          },
+          "e": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Exports"
+          },
+          "c": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "n": {
+                  "type": "string",
+                  "description": "Class name"
+                },
+                "b": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Base classes"
+                },
+                "d": {
+                  "type": "string",
+                  "description": "Docstring"
+                },
+                "props": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Properties"
+                },
+                "m": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "n": {
+                        "type": "string",
+                        "description": "Method name"
+                      },
+                      "sig": {
+                        "type": "string",
+                        "description": "Signature without self"
+                      },
+                      "ret": {
+                        "type": "string",
+                        "description": "Return type"
+                      },
+                      "d": {
+                        "type": "string",
+                        "description": "Docstring/intent"
+                      },
+                      "l": {
+                        "type": "integer",
+                        "description": "Lines"
+                      },
+                      "async": {
+                        "type": "boolean",
+                        "description": "Is async"
+                      }
+                    },
+                    "required": [
+                      "n",
+                      "sig"
+                    ]
+                  },
+                  "description": "Methods"
+                }
+              },
+              "required": [
+                "n"
+              ]
+            },
+            "description": "Classes"
+          },
+          "f": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "n": {
+                  "type": "string",
+                  "description": "Function name"
+                },
+                "sig": {
+                  "type": "string",
+                  "description": "Signature"
+                },
+                "ret": {
+                  "type": "string",
+                  "description": "Return type"
+                },
+                "d": {
+                  "type": "string",
+                  "description": "Docstring/intent"
+                },
+                "l": {
+                  "type": "integer",
+                  "description": "Lines"
+                },
+                "async": {
+                  "type": "boolean",
+                  "description": "Is async"
+                }
+              },
+              "required": [
+                "n",
+                "sig"
+              ]
+            },
+            "description": "Functions"
+          }
+        },
+        "required": [
+          "p",
+          "l"
+        ]
+      }
+    }
+  },
+  "required": [
+    "meta",
+    "defaults",
+    "modules"
+  ]
+}

@@ -37,10 +37,13 @@ If `CODE2LOGIC_DEFAULT_PROVIDER=auto`, Code2Logic tries providers in priority or
 
 | Option | Short | Description |
 |--------|-------|-------------|
-| `--format` | `-f` | Output format (markdown, compact, json, yaml, csv, gherkin, toon) |
+| `--format` | `-f` | Output format (markdown, compact, json, yaml, csv, gherkin, toon, logicml) |
 | `--output` | `-o` | Output file path |
 | `--detail` | `-d` | Detail level (minimal, standard, full) |
 | `--flat` | | Flat JSON structure (for json format) |
+| `--compact` | | Use compact YAML format (14% smaller, meta.legend transparency) |
+| `--ultra-compact` | | Use ultra-compact TOON format (71% smaller) |
+| `--with-schema` | | Generate JSON schema alongside output |
 | `--verbose` | `-v` | Verbose output with timing |
 | `--debug` | | Debug output (very verbose) |
 | `--quiet` | `-q` | Suppress output except errors |
@@ -88,28 +91,32 @@ code2logic /path/to/project -f json --flat -o analysis.json
 ### YAML
 
 ```bash
+# Standard YAML
 code2logic /path/to/project -f yaml -o analysis.yaml
+
+# Compact YAML (14% smaller, recommended for LLM)
+code2logic /path/to/project -f yaml --compact -o analysis-compact.yaml
+
+# Generate schema alongside output
+code2logic /path/to/project -f yaml --compact --with-schema
 ```
 
-Human-readable structured format.
-
-### Compact
-
-```bash
-code2logic /path/to/project -f compact -o analysis.txt
-```
-
-Ultra-minimal format (~200 tokens for entire project).
+Human-readable structured format with compact variant using short keys and `meta.legend` for LLM transparency.
 
 ### TOON
 
 ```bash
-# Token-oriented tabular format
+# Standard TOON (token-efficient)
 code2logic /path/to/project -f toon -o analysis.toon
 
-# Minimal TOON (maps CLI detail=minimal -> TOON compact)
-code2logic /path/to/project -f toon -d minimal
+# Ultra-compact TOON (71% smaller, single-letter keys)
+code2logic /path/to/project -f toon --ultra-compact -o analysis-ultra.toon
+
+# Generate schema alongside output
+code2logic /path/to/project -f toon --ultra-compact --with-schema
 ```
+
+Token-oriented object notation - most efficient format for LLM consumption.
 
 ## Detail Levels
 

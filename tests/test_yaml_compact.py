@@ -159,19 +159,49 @@ class TestEmptyFieldsOmitted:
         assert 'decorators: -' not in yaml_str
 
 
-class TestHeaderLegend:
-    """Test that header contains key legend."""
+class TestMetaLegend:
+    """Test that meta.legend provides key transparency."""
     
-    def test_header_has_legend(self, sample_project):
-        """Verify header contains key legend for LLM transparency."""
+    def test_meta_legend_structure(self, sample_project):
+        """Verify meta.legend contains all expected key mappings."""
+        gen = YAMLGenerator()
+        yaml_str = gen.generate(sample_project, compact=True, detail='standard')
+        data = yaml.safe_load(yaml_str)
+        
+        # Should have meta.legend structure
+        assert 'meta' in data
+        assert 'legend' in data['meta']
+        legend = data['meta']['legend']
+        
+        # Check required legend mappings
+        required_mappings = {
+            'p': 'path',
+            'l': 'lines',
+            'i': 'imports',
+            'e': 'exports',
+            'c': 'classes',
+            'f': 'functions',
+            'n': 'name',
+            'd': 'docstring',
+            'b': 'bases',
+            'm': 'methods'
+        }
+        
+        for short, full in required_mappings.items():
+            assert short in legend, f"Legend missing '{short}' key"
+            assert legend[short] == full, f"Legend '{short}' should map to '{full}', got '{legend[short]}'"
+    
+    def test_meta_legend_in_output(self, sample_project):
+        """Verify meta.legend appears in YAML output string."""
         gen = YAMLGenerator()
         yaml_str = gen.generate(sample_project, compact=True, detail='standard')
         
-        # Should have header with key legend
-        assert '# Key legend:' in yaml_str
-        assert 'p=path' in yaml_str
-        assert 'l=lines' in yaml_str
-        assert 'n=name' in yaml_str
+        # Should contain meta.legend structure in output
+        assert 'meta:' in yaml_str
+        assert 'legend:' in yaml_str
+        assert 'p: path' in yaml_str
+        assert 'l: lines' in yaml_str
+        assert 'n: name' in yaml_str
 
 
 class TestCompactSizeReduction:

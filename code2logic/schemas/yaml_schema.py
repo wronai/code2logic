@@ -111,9 +111,30 @@ def validate_yaml(spec: str) -> Tuple[bool, List[str]]:
     if not isinstance(data, dict):
         return False, ["Root must be a dictionary"]
     
-    # Check required fields
-    if 'project' not in data and 'modules' not in data:
-        errors.append("Missing 'project' or 'modules' field")
+    # Check required fields - support both traditional and compact formats
+    required_fields = ['project', 'modules', 'meta', 'defaults']
+    if not any(field in data for field in required_fields):
+        errors.append("Missing required field (project, modules, meta, or defaults)")
+    
+    # Validate meta.legend if present
+    if 'meta' in data:
+        if not isinstance(data['meta'], dict):
+            errors.append("'meta' must be a dictionary")
+        elif 'legend' in data['meta']:
+            if not isinstance(data['meta']['legend'], dict):
+                errors.append("'meta.legend' must be a dictionary")
+            else:
+                # Validate that legend contains expected keys
+                expected_legend_keys = ['p', 'l', 'i', 'e', 'c', 'f', 'n', 'd', 'b', 'm']
+                legend = data['meta']['legend']
+                for key in expected_legend_keys:
+                    if key not in legend:
+                        errors.append(f"'meta.legend' missing expected key '{key}'")
+    
+    # Validate defaults if present
+    if 'defaults' in data:
+        if not isinstance(data['defaults'], dict):
+            errors.append("'defaults' must be a dictionary")
     
     # Validate modules
     if 'modules' in data:

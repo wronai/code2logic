@@ -50,33 +50,90 @@ Feature: Core Functionality
 
 ## YAML
 
-Human-readable structured format.
+Human-readable structured format with compact and full variants.
 
 ```bash
+# Standard YAML
 code2logic /path/to/project -f yaml -o analysis.yaml
+
+# Compact YAML (recommended for LLM)
+code2logic /path/to/project -f yaml --compact -o analysis-compact.yaml
+
+# Generate schema alongside output
+code2logic /path/to/project -f yaml --compact --with-schema
 ```
 
-**Sample output:**
+**Compact YAML Sample:**
 ```yaml
-project:
-  name: myproject
+meta:
+  legend:
+    p: path
+    l: lines
+    i: imports
+    e: exports
+    c: classes
+    f: functions
+    n: name
+    d: docstring
+    b: bases
+    m: methods
+    sig: signature (without self)
+    ret: return_type
+    async: is_async
+defaults:
+  lang: python
+modules:
+- p: src/analyzer.py
+  l: 221
+  i:
+  - typing.{Dict,List,Optional}
+  - dataclasses.dataclass
+  c:
+  - n: ProjectAnalyzer
+    d: Analyzes project structure and dependencies
+    m:
+    - n: analyze
+      sig: (path:str)->ProjectInfo
+      ret: ProjectInfo
+```
+
+**Full YAML Sample:**
+```yaml
+project: myproject
+statistics:
   files: 30
   lines: 10835
+  languages:
+    python: 30
 
 modules:
   - path: src/analyzer.py
     language: python
+    lines: 221
+    imports:
+      - typing.Dict
+      - typing.List
+      - dataclasses
     functions:
       - name: analyze
-        params: [self, path]
-        returns: ProjectInfo
+        signature: (self, path) -> ProjectInfo
         intent: Analyzes project structure
 ```
 
 **Best for:**
-- Human review + LLM
+- **Compact**: LLM processing (14% smaller, meta.legend transparency)
+- **Full**: Human review + detailed analysis
 - Configuration files
 - API documentation
+
+**Schema Generation:**
+YAML formats support JSON Schema generation for validation and LLM guidance:
+```python
+from code2logic.generators import YAMLGenerator
+
+gen = YAMLGenerator()
+schema = gen.generate_schema('compact')  # or 'full'
+```
 
 ## Compact
 

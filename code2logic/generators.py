@@ -16,7 +16,7 @@ from .models import (
     ProjectInfo, ModuleInfo, ClassInfo, FunctionInfo,
     DependencyNode
 )
-from .shared_utils import categorize_function, extract_domain, compute_hash, remove_self_from_params
+from .shared_utils import categorize_function, extract_domain, compute_hash, remove_self_from_params, compact_imports, deduplicate_imports
 
 
 class MarkdownGenerator:
@@ -602,17 +602,237 @@ class YAMLGenerator:
             yaml_str = yaml.dump(data, default_flow_style=False, allow_unicode=True, 
                                 sort_keys=False, width=120)
         elif compact:
-            # Compact format with short keys and header legend
-            header = self._build_compact_header(project)
+            # Compact format with short keys and meta.legend structure
             data = self._build_compact_data(project, detail)
-            yaml_str = header + yaml.dump(data, default_flow_style=False, 
-                                         allow_unicode=True, sort_keys=False, width=120)
+            yaml_str = yaml.dump(data, default_flow_style=False, 
+                                 allow_unicode=True, sort_keys=False, width=120)
         else:
             data = self._build_nested_data(project, detail)
             yaml_str = yaml.dump(data, default_flow_style=False, allow_unicode=True, 
                                 sort_keys=False, width=120)
         
         return yaml_str
+
+    def generate_schema(self, format_type: str = 'compact') -> str:
+        """
+        Generate JSON Schema for the YAML format.
+        
+        Args:
+            format_type: 'compact' or 'full' - determines key format
+            
+        Returns:
+            JSON Schema as string
+        """
+        if format_type == 'compact':
+            return self._generate_compact_schema()
+        else:
+            return self._generate_full_schema()
+    
+    def _generate_compact_schema(self) -> str:
+        """Generate JSON Schema for compact YAML format with meta.legend."""
+        import json
+        
+        schema = {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "title": "Code2Logic Compact YAML Schema",
+            "description": "Schema for Code2Logic compact YAML output with short keys and meta.legend",
+            "type": "object",
+            "properties": {
+                "meta": {
+                    "type": "object",
+                    "properties": {
+                        "legend": {
+                            "type": "object",
+                            "description": "Key mapping legend for LLM transparency",
+                            "properties": {
+                                "p": {"type": "string", "const": "path"},
+                                "l": {"type": "string", "const": "lines"},
+                                "i": {"type": "string", "const": "imports"},
+                                "e": {"type": "string", "const": "exports"},
+                                "c": {"type": "string", "const": "classes"},
+                                "f": {"type": "string", "const": "functions"},
+                                "n": {"type": "string", "const": "name"},
+                                "d": {"type": "string", "const": "docstring"},
+                                "b": {"type": "string", "const": "bases"},
+                                "m": {"type": "string", "const": "methods"},
+                                "props": {"type": "string", "const": "properties"},
+                                "sig": {"type": "string", "const": "signature (without self)"},
+                                "ret": {"type": "string", "const": "return_type"},
+                                "async": {"type": "string", "const": "is_async"},
+                                "lang": {"type": "string", "const": "language"}
+                            },
+                            "required": ["p", "l", "i", "c", "f", "n", "d"]
+                        }
+                    },
+                    "required": ["legend"]
+                },
+                "defaults": {
+                    "type": "object",
+                    "properties": {
+                        "lang": {"type": "string", "description": "Default language"}
+                    }
+                },
+                "modules": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "p": {"type": "string", "description": "Module path"},
+                            "lang": {"type": "string", "description": "Language (if different from default)"},
+                            "l": {"type": "integer", "description": "Lines of code"},
+                            "i": {
+                                "type": "array", 
+                                "items": {"type": "string"},
+                                "description": "Compact imports (grouped)"
+                            },
+                            "e": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "Exports"
+                            },
+                            "c": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "n": {"type": "string", "description": "Class name"},
+                                        "b": {
+                                            "type": "array",
+                                            "items": {"type": "string"},
+                                            "description": "Base classes"
+                                        },
+                                        "d": {"type": "string", "description": "Docstring"},
+                                        "props": {
+                                            "type": "array",
+                                            "items": {"type": "string"},
+                                            "description": "Properties"
+                                        },
+                                        "m": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "n": {"type": "string", "description": "Method name"},
+                                                    "sig": {"type": "string", "description": "Signature without self"},
+                                                    "ret": {"type": "string", "description": "Return type"},
+                                                    "d": {"type": "string", "description": "Docstring/intent"},
+                                                    "l": {"type": "integer", "description": "Lines"},
+                                                    "async": {"type": "boolean", "description": "Is async"}
+                                                },
+                                                "required": ["n", "sig"]
+                                            },
+                                            "description": "Methods"
+                                        }
+                                    },
+                                    "required": ["n"]
+                                },
+                                "description": "Classes"
+                            },
+                            "f": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "n": {"type": "string", "description": "Function name"},
+                                        "sig": {"type": "string", "description": "Signature"},
+                                        "ret": {"type": "string", "description": "Return type"},
+                                        "d": {"type": "string", "description": "Docstring/intent"},
+                                        "l": {"type": "integer", "description": "Lines"},
+                                        "async": {"type": "boolean", "description": "Is async"}
+                                    },
+                                    "required": ["n", "sig"]
+                                },
+                                "description": "Functions"
+                            }
+                        },
+                        "required": ["p", "l"]
+                    }
+                }
+            },
+            "required": ["meta", "defaults", "modules"]
+        }
+        
+        return json.dumps(schema, indent=2)
+    
+    def _generate_full_schema(self) -> str:
+        """Generate JSON Schema for full YAML format."""
+        import json
+        
+        schema = {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "title": "Code2Logic Full YAML Schema",
+            "description": "Schema for Code2Logic full YAML output with complete keys",
+            "type": "object",
+            "properties": {
+                "project": {"type": "string", "description": "Project name"},
+                "statistics": {
+                    "type": "object",
+                    "properties": {
+                        "files": {"type": "integer"},
+                        "lines": {"type": "integer"},
+                        "languages": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".*": {"type": "integer"}
+                            }
+                        }
+                    }
+                },
+                "modules": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "path": {"type": "string"},
+                            "language": {"type": "string"},
+                            "lines": {"type": "integer"},
+                            "imports": {"type": "array", "items": {"type": "string"}},
+                            "exports": {"type": "array", "items": {"type": "string"}},
+                            "classes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "bases": {"type": "array", "items": {"type": "string"}},
+                                        "docstring": {"type": "string"},
+                                        "properties": {"type": "array", "items": {"type": "string"}},
+                                        "methods": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {"type": "string"},
+                                                    "signature": {"type": "string"},
+                                                    "intent": {"type": "string"},
+                                                    "lines": {"type": "integer"},
+                                                    "is_async": {"type": "boolean"}
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "functions": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "signature": {"type": "string"},
+                                        "intent": {"type": "string"},
+                                        "lines": {"type": "integer"},
+                                        "is_async": {"type": "boolean"}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return json.dumps(schema, indent=2)
 
     def generate_from_module(self, module: ModuleInfo, detail: str = 'full') -> str:
         project = ProjectInfo(
@@ -876,19 +1096,6 @@ class YAMLGenerator:
         
         return '\n'.join(lines)
     
-    def _build_compact_header(self, project: ProjectInfo) -> str:
-        """Build header comment with key legend for LLM transparency."""
-        lang_summary = ','.join(f"{k}:{v}" for k, v in list(project.languages.items())[:3])
-        lines = [
-            f"# {project.name} | {project.total_files} files | {project.total_lines} lines | {lang_summary}",
-            "# Key legend: p=path, l=lines, i=imports, e=exports, c=classes, f=functions",
-            "#             n=name, d=docstring, b=bases, m=methods, props=properties",
-            "#             sig=signature (without self), ret=return_type, async=is_async",
-            "# Empty fields (bases:[], decorators:[]) are omitted for brevity",
-            "",
-        ]
-        return '\n'.join(lines)
-    
     def _build_compact_data(self, project: ProjectInfo, detail: str) -> dict:
         """Build compact data structure with short keys."""
         # Detect default language
@@ -926,6 +1133,25 @@ class YAMLGenerator:
             modules.append(mod_data)
         
         return {
+            'meta': {
+                'legend': {
+                    'p': 'path',
+                    'l': 'lines',
+                    'i': 'imports',
+                    'e': 'exports',
+                    'c': 'classes',
+                    'f': 'functions',
+                    'n': 'name',
+                    'd': 'docstring',
+                    'b': 'bases',
+                    'm': 'methods',
+                    'props': 'properties',
+                    'sig': 'signature (without self)',
+                    'ret': 'return_type',
+                    'async': 'is_async',
+                    'lang': 'language',
+                }
+            },
             'defaults': {'lang': default_lang},
             'modules': modules
         }

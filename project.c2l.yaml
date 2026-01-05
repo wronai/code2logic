@@ -1,8 +1,20 @@
-# code2logic | 51 files | 19645 lines | python:51
-# Key legend: p=path, l=lines, i=imports, e=exports, c=classes, f=functions
-#             n=name, d=docstring, b=bases, m=methods, props=properties
-#             sig=signature (without self), ret=return_type, async=is_async
-# Empty fields (bases:[], decorators:[]) are omitted for brevity
+meta:
+  legend:
+    p: path
+    l: lines
+    i: imports
+    e: exports
+    c: classes
+    f: functions
+    n: name
+    d: docstring
+    b: bases
+    m: methods
+    props: properties
+    sig: signature (without self)
+    ret: return_type
+    async: is_async
+    lang: language
 defaults:
   lang: python
 modules:
@@ -10,11 +22,9 @@ modules:
   l: 491
   i:
   - json
-  - hashlib
-  - time
-  - dataclasses
-  - typing
   - os
+  - time
+  - hashlib
   - datetime
   - dataclasses.{asdict,dataclass,field}
   - typing.{Any,Dict,List,Optional,Tuple}
@@ -124,10 +134,8 @@ modules:
 - p: config.py
   l: 168
   i:
-  - json
-  - typing
   - os
-  - pathlib
+  - json
   - pathlib.Path
   - typing.{Any,Dict,Optional}
   e:
@@ -198,10 +206,8 @@ modules:
 - p: file_formats.py
   l: 279
   i:
-  - typing
-  - json
-  - pathlib
   - re
+  - json
   - pathlib.Path
   - typing.{Any,Dict,List}
   e:
@@ -228,12 +234,9 @@ modules:
 - p: project_reproducer.py
   l: 322
   i:
+  - os
   - json
   - hashlib
-  - pathlib
-  - dataclasses
-  - typing
-  - os
   - dataclasses.{asdict,dataclass,field}
   - pathlib.Path
   - typing.{Any,Dict,List,Optional,Set}
@@ -279,7 +282,6 @@ modules:
   l: 50
   i:
   - logging
-  - typing
   - typing.Optional
   e:
   - VerboseMixin
@@ -334,18 +336,18 @@ modules:
       ret: str
       d: Generate output from project analysis.
 - p: cli.py
-  l: 721
+  l: 754
   i:
-  - json
   - argparse
-  - logging
-  - time
-  - __version__
-  - signal
   - os
   - sys
-  - datetime
   - subprocess
+  - time
+  - logging
+  - json
+  - signal
+  - datetime
+  - __version__
   e:
   - Colors
   - Logger
@@ -455,8 +457,6 @@ modules:
 - p: llm.py
   l: 376
   i:
-  - dataclasses
-  - typing
   - json
   - os
   - dataclasses.dataclass
@@ -546,11 +546,7 @@ modules:
 - p: errors.py
   l: 372
   i:
-  - pathlib
-  - enum
   - logging
-  - dataclasses
-  - typing
   - traceback
   - dataclasses.{dataclass,field}
   - enum.Enum
@@ -610,8 +606,6 @@ modules:
 - p: code_review.py
   l: 205
   i:
-  - typing
-  - collections
   - collections.defaultdict
   - typing.{Any,Dict,List}
   e:
@@ -650,9 +644,6 @@ modules:
 - p: analyzer.py
   l: 221
   i:
-  - pathlib
-  - collections
-  - typing
   - sys
   - datetime
   - collections.defaultdict
@@ -701,8 +692,6 @@ modules:
 - p: quality.py
   l: 212
   i:
-  - dataclasses
-  - typing
   - dataclasses.{dataclass,field}
   - models.{ModuleInfo,ProjectInfo}
   - typing.{Any,Dict,List}
@@ -732,7 +721,7 @@ modules:
       sig: func, file_path:str, report:QualityReport
       d: Check function quality.
     - n: _check_class
-      sig: cls, file_path:str, report:QualityReport
+      sig: file_path:str, report:QualityReport
       d: Check class quality.
     - n: _get_file_recommendation
       sig: module:ModuleInfo
@@ -750,7 +739,6 @@ modules:
 - p: shared_utils.py
   l: 279
   i:
-  - typing
   - hashlib
   - re
   - typing.{Dict,List,Optional,Set}
@@ -818,7 +806,6 @@ modules:
   l: 840
   i:
   - ast
-  - typing
   - re
   - intent.EnhancedIntentGenerator
   - models.{ClassInfo,FunctionInfo,ModuleInfo,TypeInfo}
@@ -842,7 +829,7 @@ modules:
       ret: bool
       d: Check if Tree-sitter parser is available for a lan
     - n: get_supported_languages
-      sig: cls
+      sig: ''
       ret: List[str]
       d: list of potentially supported languages.
     - n: parse
@@ -915,9 +902,6 @@ modules:
 - p: intent.py
   l: 429
   i:
-  - enum
-  - dataclasses
-  - typing
   - re
   - dataclasses.{dataclass,field}
   - enum.{Enum,auto}
@@ -950,7 +934,7 @@ modules:
       ret: List[str]
       d: Split function name into words.
     - n: get_available_features
-      sig: cls
+      sig: ''
       ret: dict[str, bool]
       d: dictionary of available NLP features.
   - n: IntentAnalyzer
@@ -1006,11 +990,8 @@ modules:
 - p: adaptive.py
   l: 475
   i:
-  - pathlib
-  - re
-  - dataclasses
-  - typing
   - os
+  - re
   - dataclasses.dataclass
   - llm_clients.{BaseLLMClient,get_client}
   - pathlib.Path
@@ -1078,13 +1059,10 @@ modules:
 - p: reproducer.py
   l: 534
   i:
-  - json
-  - pathlib
-  - re
-  - dataclasses
-  - typing
   - os
   - yaml
+  - json
+  - re
   - dataclasses.{dataclass,field}
   - pathlib.Path
   - typing.{Any,Callable,Dict,List,Optional}
@@ -1179,10 +1157,8 @@ modules:
 - p: llm_clients.py
   l: 415
   i:
-  - json
-  - typing
   - os
-  - abc
+  - json
   - abc.{ABC,abstractmethod}
   - typing.{Any,Dict,List,Optional}
   e:
@@ -1335,7 +1311,6 @@ modules:
 - p: prompts.py
   l: 120
   i:
-  - typing
   - typing.Dict
   e:
   - get_reproduction_prompt
@@ -1357,9 +1332,6 @@ modules:
 - p: chunked_reproduction.py
   l: 357
   i:
-  - dataclasses
-  - typing
-  - pathlib
   - re
   - dataclasses.{dataclass,field}
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
@@ -1434,7 +1406,7 @@ modules:
   - analyzer.{ProjectAnalyzer,analyze_project}
   - generators.{CSVGenerator,CompactGenerator,JSONGenerator,MarkdownGenerator,YAMLGenerator}
   - gherkin.{GherkinGenerator,StepDefinitionGenerator}
-  - models.{ClassInfo,DependencyNode,FunctionInfo,ModuleInfo,ProjectInfo,TypeInfo}
+  - models
   e:
   - analyze_quality
   - reproduce_project
@@ -1448,12 +1420,9 @@ modules:
 - p: metrics.py
   l: 447
   i:
-  - hashlib
   - re
-  - collections
-  - dataclasses
   - difflib
-  - typing
+  - hashlib
   - collections.Counter
   - dataclasses.{asdict,dataclass,field}
   - typing.{Any,Dict,List,Optional,Tuple}
@@ -1520,10 +1489,7 @@ modules:
 - p: refactor.py
   l: 313
   i:
-  - dataclasses
-  - typing
   - json
-  - pathlib
   - analyzer.analyze_project
   - code_review.analyze_code_quality
   - dataclasses.{asdict,dataclass,field}
@@ -1560,9 +1526,6 @@ modules:
 - p: logicml.py
   l: 281
   i:
-  - dataclasses
-  - typing
-  - pathlib
   - dataclasses.dataclass
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
   - pathlib.Path
@@ -1616,7 +1579,6 @@ modules:
   l: 16
   i:
   - shutil
-  - pathlib
   - pathlib.Path
   e:
   - estimate_tokens
@@ -1636,15 +1598,13 @@ modules:
     ret: None
     d: cleanup generated root
 - p: generators.py
-  l: 1019
+  l: 1164
   i:
-  - typing
   - json
-  - collections
-  - pathlib
   - collections.defaultdict
   - models.{ClassInfo,DependencyNode,FunctionInfo,ModuleInfo,ProjectInfo}
   - pathlib.Path
+  - shared_utils.{categorize_function,compute_hash,extract_domain}
   - typing.List
   e:
   - MarkdownGenerator
@@ -1729,6 +1689,18 @@ modules:
       sig: project:ProjectInfo, flat:bool, detail:str, compact:bool
       ret: str
       d: Generate YAML output.
+    - n: generate_schema
+      sig: format_type:str
+      ret: str
+      d: Generate JSON Schema for the YAML format.
+    - n: _generate_compact_schema
+      sig: ''
+      ret: str
+      d: Generate JSON Schema for compact YAML format with
+    - n: _generate_full_schema
+      sig: ''
+      ret: str
+      d: Generate JSON Schema for full YAML format.
     - n: generate_from_module
       sig: module:ModuleInfo, detail:str
       ret: str
@@ -1761,18 +1733,6 @@ modules:
       sig: f:FunctionInfo, detail:str
       ret: dict
       d: Convert method to dict for nested output.
-    - n: _build_signature
-      sig: f:FunctionInfo
-      ret: str
-      d: Build compact signature string.
-    - n: _categorize
-      sig: name:str
-      ret: str
-      d: Categorize function by name pattern.
-    - n: _extract_domain
-      sig: path:str
-      ret: str
-      d: Extract domain from file path.
   - n: CSVGenerator
     d: Generates CSV output optimized for LLM processing.
     m:
@@ -1811,10 +1771,7 @@ modules:
 - p: markdown_format.py
   l: 266
   i:
-  - dataclasses
-  - typing
   - os
-  - pathlib
   - dataclasses.dataclass
   - generators.YAMLGenerator
   - gherkin.GherkinGenerator
@@ -1872,14 +1829,11 @@ modules:
 - p: models.py
   l: 154
   i:
-  - dataclasses
-  - typing
   - dataclasses.{dataclass,field}
   - typing.{Dict,List,Optional}
 - p: similarity.py
   l: 178
   i:
-  - typing
   - models.ModuleInfo
   - typing.{Dict,List}
   e:
@@ -1917,16 +1871,13 @@ modules:
 - p: universal.py
   l: 831
   i:
+  - os
+  - re
   - json
   - hashlib
-  - pathlib
-  - re
-  - dataclasses
-  - typing
-  - os
   - dataclasses.dataclass
   - pathlib.Path
-  - typing.{Any,Dict,List,Optional,Tuple,Union}
+  - typing
   e:
   - ElementType
   - Language
@@ -2038,12 +1989,9 @@ modules:
 - p: benchmark.py
   l: 351
   i:
-  - json
-  - pathlib
-  - time
-  - dataclasses
-  - typing
   - os
+  - json
+  - time
   - datetime
   - analyzer.analyze_project
   - dataclasses.{asdict,dataclass}
@@ -2094,10 +2042,9 @@ modules:
 - p: terminal.py
   l: 500
   i:
-  - sys
-  - typing
   - os
   - re
+  - sys
   - typing.{Any,Dict,List,Literal,Optional}
   e:
   - ShellRenderer
@@ -2216,9 +2163,8 @@ modules:
     ret: None
     d: the global renderer instance.
 - p: toon_format.py
-  l: 332
+  l: 477
   i:
-  - typing
   - re
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
   - shared_utils.{compact_imports,truncate_docstring}
@@ -2271,6 +2217,10 @@ modules:
       sig: project:ProjectInfo
       ret: str
       d: Generate detailed TOON output.
+    - n: generate_schema
+      sig: format_type:str
+      ret: str
+      d: Generate JSON Schema for the TOON format.
     - n: generate_ultra_compact
       sig: project:ProjectInfo
       ret: str
@@ -2301,8 +2251,6 @@ modules:
 - p: dependency.py
   l: 187
   i:
-  - typing
-  - pathlib
   - models.{DependencyNode,ModuleInfo}
   - pathlib.Path
   - typing.{Dict,List,Optional}
@@ -2361,10 +2309,8 @@ modules:
   l: 293
   i:
   - json
-  - pathlib
-  - __version__
-  - typing
   - sys
+  - __version__
   - pathlib.Path
   - typing.Optional
   e:
@@ -2386,10 +2332,8 @@ modules:
 - p: reproduction.py
   l: 333
   i:
-  - pathlib
   - re
   - difflib
-  - typing
   - datetime
   - llm_clients.{BaseLLMClient,get_client}
   - pathlib.Path
@@ -2437,11 +2381,8 @@ modules:
 - p: gherkin.py
   l: 766
   i:
-  - hashlib
   - re
-  - collections
-  - dataclasses
-  - typing
+  - hashlib
   - collections.defaultdict
   - dataclasses.{dataclass,field}
   - models.{ModuleInfo,ProjectInfo}
@@ -2549,8 +2490,6 @@ modules:
 - p: schemas/logicml_schema.py
   l: 190
   i:
-  - dataclasses
-  - typing
   - re
   - dataclasses.{dataclass,field}
   - typing.{Any,Dict,List,Optional,Tuple}
@@ -2579,10 +2518,8 @@ modules:
   - markdown_schema.{MarkdownSchema,validate_markdown}
   - yaml_schema.{YAMLSchema,validate_yaml}
 - p: schemas/yaml_schema.py
-  l: 148
+  l: 164
   i:
-  - dataclasses
-  - typing
   - yaml
   - dataclasses.{dataclass,field}
   - typing.{Any,Dict,List,Optional,Tuple}
@@ -2604,8 +2541,6 @@ modules:
 - p: schemas/json_schema.py
   l: 206
   i:
-  - dataclasses
-  - typing
   - json
   - dataclasses.{dataclass,field}
   - typing.{Any,Dict,List,Optional,Tuple}
@@ -2632,8 +2567,6 @@ modules:
 - p: schemas/markdown_schema.py
   l: 121
   i:
-  - dataclasses
-  - typing
   - re
   - dataclasses.{dataclass,field}
   - typing.{Any,Dict,List,Optional,Tuple}
@@ -2654,7 +2587,6 @@ modules:
   i:
   - datetime
   - json
-  - pathlib
   - generators.{JSONGenerator,YAMLGenerator}
   - gherkin.GherkinGenerator
   - logicml.LogicMLGenerator
@@ -2705,12 +2637,10 @@ modules:
 - p: benchmarks/runner.py
   l: 638
   i:
-  - pathlib
   - re
+  - sys
   - time
   - dataclasses
-  - typing
-  - sys
   - concurrent.futures.{ThreadPoolExecutor,as_completed}
   - concurrent.futures.concurrent.futures
   - pathlib.Path
@@ -2785,17 +2715,14 @@ modules:
 - p: benchmarks/__init__.py
   l: 19
   i:
-  - common.{create_single_project,generate_spec,generate_spec_token,get_async_reproduction_prompt,get_simple_reproduction_prompt,get_token_reproduction_prompt}
+  - common
   - results.{BenchmarkConfig,BenchmarkResult,FileResult,FormatResult,FunctionResult}
   - runner.{BenchmarkRunner,run_benchmark}
 - p: benchmarks/results.py
   l: 148
   i:
-  - json
-  - pathlib
-  - dataclasses
-  - typing
   - datetime
+  - json
   - dataclasses.{asdict,dataclass,field}
   - pathlib.Path
   - typing.{Any,Dict,List,Optional}
@@ -2804,8 +2731,8 @@ modules:
   i:
   - analyzer.{ProjectAnalyzer,analyze_project}
   - dependency.DependencyAnalyzer
-  - errors.{AnalysisError,AnalysisResult,ErrorHandler,ErrorSeverity,ErrorType,create_error_handler}
-  - models.{ClassInfo,DependencyNode,FunctionInfo,ModuleInfo,ProjectInfo,TypeInfo}
+  - errors
+  - models
 - p: formats/__init__.py
   l: 27
   i:
@@ -2819,7 +2746,7 @@ modules:
   i:
   - benchmark.{BenchmarkResult,FormatResult,ReproductionBenchmark,run_benchmark}
   - code_review.{CodeReviewer,analyze_code_quality,check_performance_issues,check_security_issues}
-  - refactor.{DuplicateGroup,RefactoringReport,RefactoringSuggestion,compare_codebases,find_duplicates,quick_analyze,suggest_refactoring}
+  - refactor
 - p: llm/__init__.py
   l: 13
   i:

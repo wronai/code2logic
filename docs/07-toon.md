@@ -45,11 +45,54 @@ project = analyze_project('/path/to/project')
 gen = TOONGenerator()
 toon_output = gen.generate(project, detail='full')
 
+# Ultra-compact TOON (71% smaller)
+ultra_compact = gen.generate_ultra_compact(project)
+
+# Generate JSON Schema
+schema = gen.generate_schema('ultra_compact')  # or 'standard'
+
 # With tabs (better for some LLMs)
 gen_tabs = TOONGenerator(use_tabs=True)
 toon_tabs = gen_tabs.generate(project)
 
-print(toon_output)
+print(f"Standard: {len(toon_output)} chars")
+print(f"Ultra-compact: {len(ultra_compact)} chars")
+```
+
+### Ultra-Compact Format
+
+New ultra-compact format with single-letter keys for maximum token efficiency:
+
+```python
+# Ultra-compact TOON
+ultra = gen.generate_ultra_compact(project)
+print(ultra)
+```
+
+**Sample Ultra-Compact Output:**
+```
+# myproject | 15f 1700L | python:15
+# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
+M[2]:
+  utils.py,50
+  main.py,100
+
+D:
+  utils.py:
+    i: typing.{Dict,List},os.path
+    c: Helper: get_version(0), validate_input(1)
+    f: format_data()->str, load_config(path:str)->dict
+  main.py:
+    i: utils,click
+    f: main()->None, cli()->None
+```
+
+**Schema Generation:**
+```python
+# Generate JSON Schema for validation
+schema = gen.generate_schema('ultra_compact')
+with open('toon-schema.json', 'w') as f:
+    f.write(schema)
 ```
 
 ### Parse TOON

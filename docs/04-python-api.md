@@ -144,19 +144,39 @@ output = gen.generate(project, flat=False, detail='standard')
 ### YAMLGenerator
 
 ```python
-from code2logic.formats import YAMLGenerator
+from code2logic.generators import YAMLGenerator
 
+# Standard YAML
 gen = YAMLGenerator()
-output = gen.generate(project, flat=False, detail='standard')
+output = gen.generate(project, detail='standard')
+
+# Compact YAML (14% smaller, meta.legend transparency)
+gen_compact = YAMLGenerator()
+compact_output = gen_compact.generate(project, compact=True)
+
+# Generate JSON Schema
+schema = gen_compact.generate_schema('compact')  # or 'full'
+with open('yaml-schema.json', 'w') as f:
+    f.write(schema)
 ```
 
 ### TOONGenerator
 
 ```python
-from code2logic.formats import TOONGenerator
+from code2logic.toon_format import TOONGenerator
 
+# Standard TOON
 gen = TOONGenerator(use_tabs=False)
 output = gen.generate(project, detail='standard')
+
+# Ultra-compact TOON (71% smaller, single-letter keys)
+ultra_compact = gen.generate_ultra_compact(project)
+
+# Generate JSON Schema
+schema = gen.generate_schema('ultra_compact')  # or 'standard'
+with open('toon-schema.json', 'w') as f:
+    f.write(schema)
+
 # TOON: Token-Oriented Object Notation (6x smaller than JSON)
 ```
 

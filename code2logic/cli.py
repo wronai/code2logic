@@ -611,6 +611,21 @@ code2logic [path] [options]
         help='Use flat structure (for json/yaml) - better for comparisons'
     )
     parser.add_argument(
+        '--compact',
+        action='store_true',
+        help='Use compact YAML format (14% smaller, meta.legend transparency)'
+    )
+    parser.add_argument(
+        '--ultra-compact',
+        action='store_true',
+        help='Use ultra-compact TOON format (71% smaller, single-letter keys)'
+    )
+    parser.add_argument(
+        '--with-schema',
+        action='store_true',
+        help='Generate JSON schema alongside output'
+    )
+    parser.add_argument(
         '--no-install',
         action='store_true',
         help='Skip auto-installation of dependencies'
@@ -822,22 +837,48 @@ code2logic [path] [options]
         output = generator.generate(project, flat=args.flat, detail=args.detail)
     elif args.format == 'yaml':
         generator = YAMLGenerator()
-        output = generator.generate(project, flat=args.flat, detail=args.detail)
-    elif args.format == 'csv':
-        generator = CSVGenerator()
-        output = generator.generate(project, detail=args.detail)
-    elif args.format == 'gherkin':
-        generator = GherkinGenerator()
-        output = generator.generate(project, detail=args.detail)
-
+        compact = args.compact if hasattr(args, 'compact') else False
+        output = generator.generate(project, flat=args.flat, detail=args.detail, compact=compact)
+        
+        # Generate schema if requested
+        if args.with_schema:
+            schema = generator.generate_schema('compact' if compact else 'full')
+            base_name = os.path.splitext(args.output)[0] if args.output else 'output'
+            schema_path = f"{base_name}.yaml-schema.json"
+            with open(schema_path, 'w', encoding='utf-8') as f:
+                f.write(schema)
+            if args.verbose:
+                log.success(f"Schema written to: {schema_path}")
+    
     elif args.format == 'toon':
         generator = TOONGenerator()
-        detail_map = {
-            'minimal': 'compact',
-            'standard': 'standard',
-            'full': 'full',
-        }
-        output = generator.generate(project, detail=detail_map.get(args.detail, 'standard'))
+        # For TOON, --compact means ultra-compact format
+        compact = args.compact if hasattr(args, 'compact') else False
+        ultra_compact = args.ultra_compact if hasattr(args, 'ultra_compact') else False
+        
+        # Use compact or ultra_compact flag (compact takes precedence for TOON)
+        use_ultra_compact = ultra_compact or compact
+        
+        if use_ultra_compact:
+            output = generator.generate_ultra_compact(project)
+        else:
+            detail_map = {
+                'minimal': 'compact',
+                'standard': 'standard',
+                'full': 'full',
+            }
+            output = generator.generate(project, detail=detail_map.get(args.detail, 'standard'))
+        
+        # Generate schema if requested
+        if args.with_schema:
+            schema_type = 'ultra_compact' if use_ultra_compact else 'standard'
+            schema = generator.generate_schema(schema_type)
+            base_name = os.path.splitext(args.output)[0] if args.output else 'output'
+            schema_path = f"{base_name}.toon-schema.json"
+            with open(schema_path, 'w', encoding='utf-8') as f:
+                f.write(schema)
+            if args.verbose:
+                log.success(f"Schema written to: {schema_path}")
 
     elif args.format == 'logicml':
         generator = LogicMLGenerator()

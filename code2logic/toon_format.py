@@ -278,6 +278,159 @@ class TOONGenerator:
         """Generate detailed TOON output."""
         return self.generate(project, detail='full')
     
+    def generate_schema(self, format_type: str = 'standard') -> str:
+        """
+        Generate JSON Schema for the TOON format.
+        
+        Args:
+            format_type: 'standard', 'compact', 'ultra_compact' - determines format variant
+            
+        Returns:
+            JSON Schema as string
+        """
+        import json
+        
+        base_schema = {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "title": "Code2Logic TOON Schema",
+            "description": "Schema for Code2Logic TOON (Token-Oriented Object Notation) format",
+            "type": "object"
+        }
+        
+        if format_type == 'ultra_compact':
+            # Ultra-compact schema
+            base_schema.update({
+                "properties": {
+                    "M": {
+                        "type": "array",
+                        "description": "Modules as [path,lines] pairs",
+                        "items": {
+                            "type": "array",
+                            "items": [
+                                {"type": "string", "description": "Module path"},
+                                {"type": "integer", "description": "Lines of code"}
+                            ],
+                            "minItems": 2,
+                            "maxItems": 2
+                        }
+                    },
+                    "D": {
+                        "type": "object",
+                        "description": "Module details with compact keys",
+                        "patternProperties": {
+                            ".*": {
+                                "type": "object",
+                                "properties": {
+                                    "i": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                        "description": "Compact imports (grouped)"
+                                    },
+                                    "e": {
+                                        "type": "array", 
+                                        "items": {"type": "string"},
+                                        "description": "Exports"
+                                    },
+                                    "c": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                        "description": "Classes with inline method counts"
+                                    },
+                                    "f": {
+                                        "type": "array",
+                                        "items": {"type": "string"},
+                                        "description": "Functions with signatures"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        else:
+            # Standard TOON schema
+            base_schema.update({
+                "properties": {
+                    "project": {"type": "string", "description": "Project name"},
+                    "root": {"type": "string", "description": "Root path"},
+                    "generated": {"type": "string", "description": "Generation timestamp"},
+                    "stats": {
+                        "type": "object",
+                        "properties": {
+                            "files": {"type": "integer"},
+                            "lines": {"type": "integer"},
+                            "languages": {"type": "string", "description": "Language stats as delimited string"}
+                        }
+                    },
+                    "modules": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "path": {"type": "string"},
+                                "language": {"type": "string"},
+                                "lines": {"type": "integer"},
+                                "imports": {
+                                    "type": "array",
+                                    "items": {"type": "string"}
+                                },
+                                "exports": {
+                                    "type": "array", 
+                                    "items": {"type": "string"}
+                                },
+                                "classes": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {"type": "string"},
+                                            "bases": {"type": "array", "items": {"type": "string"}},
+                                            "docstring": {"type": "string"},
+                                            "properties": {"type": "array", "items": {"type": "string"}},
+                                            "methods": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {"type": "string"},
+                                                        "signature": {"type": "string"},
+                                                        "decorators": {"type": "array", "items": {"type": "string"}},
+                                                        "async": {"type": "string"},
+                                                        "lines": {"type": "integer"}
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "functions": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {"type": "string"},
+                                            "signature": {"type": "string"},
+                                            "decorators": {"type": "array", "items": {"type": "string"}},
+                                            "async": {"type": "string"},
+                                            "lines": {"type": "integer"}
+                                        }
+                                    }
+                                },
+                                "function_docs": {
+                                    "type": "object",
+                                    "description": "Additional function documentation",
+                                    "patternProperties": {
+                                        ".*": {"type": "string"}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        
+        return json.dumps(base_schema, indent=2)
+
     def generate_ultra_compact(self, project: ProjectInfo) -> str:
         """
         Generate minimal TOON with abbreviated keys.
