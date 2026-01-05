@@ -1,0 +1,2714 @@
+header:
+  project: code2logic
+  files: 51
+  lines: 20651
+  languages:
+    python: 51
+  modules_count: 51
+M:
+- llm_profiler.py:491
+- config.py:168
+- file_formats.py:279
+- project_reproducer.py:322
+- base.py:50
+- cli.py:767
+- llm.py:376
+- errors.py:372
+- code_review.py:205
+- analyzer.py:221
+- quality.py:212
+- shared_utils.py:279
+- parsers.py:929
+- intent.py:429
+- adaptive.py:475
+- reproducer.py:534
+- llm_clients.py:415
+- prompts.py:120
+- chunked_reproduction.py:357
+- __init__.py:320
+- metrics.py:447
+- __main__.py:9
+- refactor.py:313
+- logicml.py:281
+- utils.py:16
+- generators.py:1429
+- markdown_format.py:266
+- models.py:295
+- similarity.py:178
+- universal.py:831
+- benchmark.py:351
+- terminal.py:500
+- toon_format.py:477
+- dependency.py:187
+- mcp_server.py:293
+- reproduction.py:333
+- gherkin.py:766
+- schemas/logicml_schema.py:190
+- schemas/__init__.py:25
+- schemas/yaml_schema.py:164
+- schemas/json_schema.py:206
+- schemas/markdown_schema.py:121
+- benchmarks/common.py:206
+- benchmarks/runner.py:638
+- benchmarks/__init__.py:19
+- benchmarks/results.py:148
+- core/__init__.py:20
+- formats/__init__.py:27
+- tools/__init__.py:21
+- llm/__init__.py:13
+- integrations/__init__.py:5
+modules:
+- p: llm_profiler.py
+  l: 491
+  i:
+  - json
+  - os
+  - time
+  - hashlib
+  - datetime
+  - dataclasses.{asdict,dataclass,field}
+  - typing.{Any,Dict,List,Optional,Tuple}
+  e:
+  - load_profiles
+  - save_profile
+  - get_profile
+  - get_or_create_profile
+  - LLMProfiler
+  - AdaptiveChunker
+  - profile_llm
+  - get_adaptive_chunker
+  c:
+  - n: LLMProfiler
+    d: Profile LLM capabilities for code reproduction.
+    m:
+    - n: __init__
+      sig: (client,verbose:bool)
+      d: Initialize profiler.
+    - n: run_profile
+      sig: (quick:bool)
+      ret: LLMProfile
+      d: Run full profiling suite.
+    - n: _test_reproduction
+      sig: (name:str,code:str)
+      ret: ProfileTestResult
+      d: Test reproduction of a code snippet.
+    - n: _code_to_spec
+      sig: (code:str)
+      ret: str
+      d: Convert code to simple YAML spec.
+    - n: _extract_code
+      sig: (response:str)
+      ret: str
+      d: Extract code from LLM response.
+    - n: _check_syntax
+      sig: (code:str)
+      ret: bool
+      d: Check if code has valid Python syntax.
+    - n: _calculate_similarity
+      sig: (original:str,reproduced:str)
+      ret: float
+      d: Calculate code similarity.
+    - n: _calculate_metrics
+      sig: (profile:LLMProfile,results:List[ProfileTestResult])
+      ret: LLMProfile
+      d: Calculate aggregate metrics from test results.
+    - n: _test_consistency
+      sig: (profile:LLMProfile)
+      ret: LLMProfile
+      d: Test output consistency by running same prompt twice.
+  - n: AdaptiveChunker
+    d: Adaptive chunking based on LLM profile.
+    m:
+    - n: __init__
+      sig: (profile:Optional[LLMProfile])
+      d: Initialize chunker.
+    - n: get_optimal_settings
+      sig: ()
+      ret: Dict[str, Any]
+      d: optimal settings for the profiled model.
+    - n: chunk_spec
+      sig: (spec:str,format:str)
+      ret: List[Dict[str, Any]]
+      d: Chunk specification based on profile.
+    - n: recommend_format
+      sig: (spec_size_tokens:int)
+      ret: str
+      d: Recommend best format based on spec size and model.
+    - n: estimate_chunks_needed
+      sig: (spec_size_tokens:int)
+      ret: int
+      d: Estimate number of chunks needed.
+  f:
+  - n: _get_profiles_path
+    sig: ()
+    ret: Path
+    d: path to profiles storage.
+  - n: load_profiles
+    sig: ()
+    ret: Dict[str, LLMProfile]
+    d: Load all saved profiles.
+  - n: save_profile
+    sig: (profile:LLMProfile)
+    d: Save a profile to storage.
+  - n: get_profile
+    sig: (provider:str,model:str)
+    ret: Optional[LLMProfile]
+    d: profile for a specific model.
+  - n: get_or_create_profile
+    sig: (provider:str,model:str)
+    ret: LLMProfile
+    d: existing profile or create default one.
+  - n: _create_default_profile
+    sig: (provider:str,model:str)
+    ret: LLMProfile
+    d: default profile based on model characteristics.
+  - n: profile_llm
+    sig: (client,quick:bool)
+    ret: LLMProfile
+    d: Profile an LLM client.
+  - n: get_adaptive_chunker
+    sig: (provider:str,model:str)
+    ret: AdaptiveChunker
+    d: adaptive chunker for a model.
+- p: config.py
+  l: 168
+  i:
+  - os
+  - json
+  - pathlib.Path
+  - typing.{Any,Dict,Optional}
+  e:
+  - Config
+  - load_env
+  - get_api_key
+  - get_model
+  c:
+  - n: Config
+    d: Configuration manager for Code2Logic.
+    m:
+    - n: __init__
+      sig: (env_file:str)
+      d: Initialize configuration.
+    - n: _load_env_file
+      sig: (env_file:str)
+      d: Load environment variables from .env file.
+    - n: _parse_env_file
+      sig: (path:Path)
+      d: Parse .env file and set environment variables.
+    - n: _load_config_file
+      sig: ()
+      d: Load configuration from JSON file.
+    - n: get_api_key
+      sig: (provider:str)
+      ret: Optional[str]
+      d: API key for a provider.
+    - n: get_model
+      sig: (provider:str)
+      ret: str
+      d: model for a provider.
+    - n: get_ollama_host
+      sig: ()
+      ret: str
+      d: Ollama host URL.
+    - n: get_default_provider
+      sig: ()
+      ret: str
+      d: default LLM provider.
+    - n: is_verbose
+      sig: ()
+      ret: bool
+      d: Check if verbose mode is enabled.
+    - n: get_cache_dir
+      sig: ()
+      ret: Path
+      d: cache directory path.
+  f:
+  - n: load_env
+    sig: ()
+    d: Load environment variables from .env file.
+  - n: get_api_key
+    sig: (provider:str)
+    ret: Optional[str]
+    d: Convenience function to get API key.
+  - n: get_model
+    sig: (provider:str)
+    ret: str
+    d: Convenience function to get model.
+- p: file_formats.py
+  l: 279
+  i:
+  - re
+  - json
+  - pathlib.Path
+  - typing.{Any,Dict,List}
+  e:
+  - generate_file_csv
+  - generate_file_json
+  - generate_file_yaml
+  f:
+  - n: generate_file_csv
+    sig: (file_path:Path)
+    ret: str
+    d: Generate detailed CSV specification for a single file.
+  - n: generate_file_json
+    sig: (file_path:Path)
+    ret: str
+    d: Generate detailed JSON specification for a single file.
+  - n: generate_file_yaml
+    sig: (file_path:Path)
+    ret: str
+    d: Generate detailed YAML specification for a single file.
+  - n: _parse_file_elements
+    sig: (content:str)
+    ret: Dict[str, Any]
+    d: Parse file content to extract code elements.
+- p: project_reproducer.py
+  l: 322
+  i:
+  - os
+  - json
+  - hashlib
+  - dataclasses.{asdict,dataclass,field}
+  - pathlib.Path
+  - typing.{Any,Dict,List,Optional,Set}
+  e:
+  - ProjectReproducer
+  - reproduce_project
+  c:
+  - n: ProjectReproducer
+    d: Multi-file project reproduction system.
+    m:
+    - n: __init__
+      sig: (client:BaseLLMClient,max_workers:int,target_lang:str,use_llm:bool)
+      d: Initialize project reproducer.
+    - n: _get_client
+      sig: ()
+      ret: BaseLLMClient
+      d: or create LLM client.
+    - n: find_source_files
+      sig: (project_path:str,extensions:Set[str],exclude_patterns:List[str])
+      ret: List[Path]
+      d: Find all source files in project.
+    - n: reproduce_file
+      sig: (file_path:Path,output_dir:Path)
+      ret: FileResult
+      d: Reproduce a single file.
+    - n: reproduce_project
+      sig: (project_path:str,output_dir:str,parallel:bool)
+      ret: ProjectResult
+      d: Reproduce entire project.
+    - n: _aggregate_results
+      sig: (project_path:str,results:List[FileResult])
+      ret: ProjectResult
+      d: Aggregate file results into project result.
+    - n: _save_report
+      sig: (output_dir:Path,result:ProjectResult)
+      d: Save project reproduction report.
+  f:
+  - n: reproduce_project
+    sig: (project_path:str,output_dir:str,target_lang:str,parallel:bool,use_llm:bool)
+    ret: ProjectResult
+    d: Convenience function for project reproduction.
+  conditional_imports:
+  - dotenv.dotenv
+  - dotenv.load_dotenv
+- p: base.py
+  l: 50
+  i:
+  - logging
+  - typing.Optional
+  e:
+  - VerboseMixin
+  - BaseParser
+  - BaseGenerator
+  c:
+  - n: VerboseMixin
+    d: Mixin providing verbose logging functionality.
+    m:
+    - n: __init__
+      sig: (verbose:bool)
+      d: creates
+    - n: log
+      sig: (msg:str,level:str)
+      d: Log message if verbose mode enabled.
+    - n: debug
+      sig: (msg:str)
+      d: Log debug message.
+    - n: info
+      sig: (msg:str)
+      d: Log info message.
+    - n: warn
+      sig: (msg:str)
+      d: Log warning message.
+    - n: error
+      sig: (msg:str)
+      d: Log error message.
+  - n: BaseParser
+    b:
+    - VerboseMixin
+    d: Base class for code parsers.
+    m:
+    - n: __init__
+      sig: (verbose:bool)
+      d: creates
+    - n: parse
+      sig: (content:str,language:str)
+      d: Parse source code content.
+    - n: parse_file
+      sig: (path:str)
+      d: Parse source file.
+  - n: BaseGenerator
+    b:
+    - VerboseMixin
+    d: Base class for output generators.
+    m:
+    - n: __init__
+      sig: (verbose:bool)
+      d: creates
+    - n: generate
+      sig: (project,detail:str)
+      ret: str
+      d: Generate output from project analysis.
+- p: cli.py
+  l: 767
+  i:
+  - argparse
+  - os
+  - sys
+  - subprocess
+  - time
+  - logging
+  - json
+  - signal
+  - datetime
+  - __version__
+  e:
+  - Colors
+  - Logger
+  - ensure_dependencies
+  - main
+  c:
+  - n: Colors
+  - n: Logger
+    d: Enhanced logger for CLI output.
+    m:
+    - n: __init__
+      sig: (verbose:bool,debug:bool)
+      d: creates
+    - n: _elapsed
+      sig: ()
+      ret: str
+      d: elapsed time string.
+    - n: info
+      sig: (msg:str)
+      d: Print info message.
+    - n: success
+      sig: (msg:str)
+      d: Print success message.
+    - n: warning
+      sig: (msg:str)
+      d: Print warning message.
+    - n: error
+      sig: (msg:str)
+      d: Print error message.
+    - n: step
+      sig: (msg:str)
+      d: Print step message with counter.
+    - n: detail
+      sig: (msg:str)
+      d: Print detail message (only in verbose mode).
+    - n: debug_msg
+      sig: (msg:str)
+      d: Print debug message (only in debug mode).
+    - n: stats
+      sig: (label:str,value)
+      d: Print statistics.
+  f:
+  - n: ensure_dependencies
+    sig: ()
+    d: Auto-install optional dependencies for best results.
+  - n: _get_env_file_path
+    sig: ()
+    ret: str
+    d: retrieves env file path
+  - n: _read_text_file
+    sig: (path:str)
+    ret: str
+    d: retrieves text file
+  - n: _write_text_file
+    sig: (path:str,content:str)
+    d: logs text file
+  - n: _set_env_var
+    sig: (var_name:str,value:str)
+    ret: str
+    d: updates env var
+  - n: _unset_env_var
+    sig: (var_name:str)
+    ret: str
+    d: unset env var
+  - n: _get_litellm_config_path
+    sig: ()
+    ret: str
+    d: retrieves litellm config path
+  - n: _get_user_llm_config_path
+    sig: ()
+    ret: str
+    d: retrieves user llm config path
+  - n: _load_user_llm_config
+    sig: ()
+    ret: dict
+    d: retrieves user llm config
+  - n: _save_user_llm_config
+    sig: (data:dict)
+    ret: str
+    d: caches user llm config
+  - n: _load_litellm_yaml
+    sig: ()
+    ret: dict
+    d: retrieves litellm yaml
+  - n: _save_litellm_yaml
+    sig: (data:dict)
+    ret: str
+    d: caches litellm yaml
+- p: llm.py
+  l: 376
+  i:
+  - json
+  - os
+  - httpx
+  - dataclasses.dataclass
+  - litellm.completion
+  - llm_clients.{BaseLLMClient,OllamaLocalClient,OpenRouterClient}
+  - typing.{Any,Dict,List,Optional}
+  e:
+  - OllamaClient
+  - LiteLLMClient
+  - CodeAnalyzer
+  - get_available_backends
+  c:
+  - n: OllamaClient
+    d: Direct Ollama API client.
+    m:
+    - n: __init__
+      sig: (config:LLMConfig)
+      d: creates
+    - n: generate
+      sig: (prompt:str,system:Optional[str])
+      ret: str
+      d: Generate completion from Ollama.
+    - n: chat
+      sig: (messages:List[Dict[str, str]])
+      ret: str
+      d: Chat completion from Ollama.
+    - n: is_available
+      sig: ()
+      ret: bool
+      d: Check if Ollama is running.
+    - n: list_models
+      sig: ()
+      ret: List[str]
+      d: List available models.
+  - n: LiteLLMClient
+    d: LiteLLM client for unified API access.
+    m:
+    - n: __init__
+      sig: (config:LLMConfig)
+      d: creates
+    - n: generate
+      sig: (prompt:str,system:Optional[str])
+      ret: str
+      d: Generate completion via LiteLLM.
+    - n: chat
+      sig: (messages:List[Dict[str, str]])
+      ret: str
+      d: Chat completion via LiteLLM.
+    - n: is_available
+      sig: ()
+      ret: bool
+      d: Check if LiteLLM backend is available.
+  - n: CodeAnalyzer
+    d: LLM-powered code analysis for Code2Logic.
+    m:
+    - n: __init__
+      sig: (model:str,provider:str,base_url:str,api_key:str)
+      d: Initialize CodeAnalyzer.
+    - n: is_available
+      sig: ()
+      ret: bool
+      d: Check if LLM backend is available.
+    - n: suggest_refactoring
+      sig: (project)
+      ret: List[Dict[str, Any]]
+      d: Analyze project and suggest refactoring improvements.
+    - n: find_semantic_duplicates
+      sig: (project)
+      ret: List[Dict[str, Any]]
+      d: Find semantically similar functions using LLM.
+    - n: generate_code
+      sig: (project,target_lang:str,module_filter:Optional[str])
+      ret: Dict[str, str]
+      d: Generate code in target language from project analysis.
+    - n: translate_function
+      sig: (name:str,signature:str,intent:str,source_lang:str,target_lang:str)
+      ret: str
+      d: Translate a single function to another language.
+    - n: _build_signature
+      sig: (f)
+      ret: str
+      d: Build compact signature.
+  f:
+  - n: get_available_backends
+    sig: ()
+    ret: Dict[str, bool]
+    d: availability status of LLM backends.
+  conditional_imports:
+  - httpx
+  - litellm.litellm
+  - litellm.completion
+- p: errors.py
+  l: 372
+  i:
+  - logging
+  - traceback
+  - dataclasses.{dataclass,field}
+  - enum.Enum
+  - pathlib.Path
+  - typing.{Any,Callable,Dict,List,Optional}
+  e:
+  - ErrorSeverity
+  - ErrorType
+  - ErrorHandler
+  - create_error_handler
+  c:
+  - n: ErrorSeverity
+    b:
+    - Enum
+    d: Error severity levels.
+  - n: ErrorType
+    b:
+    - Enum
+    d: Types of errors that can occur during analysis.
+  - n: ErrorHandler
+    d: Handles errors during analysis with configurable behavior.
+    m:
+    - n: __init__
+      sig: (mode:str,max_file_size_mb:float,timeout_seconds:float,logger:Optional[logging.Logger])
+      d: creates
+    - n: reset
+      sig: ()
+      d: Reset error state for new analysis.
+    - n: handle_error
+      sig: (error_type:ErrorType,path:str,message:str,exception:Optional[Exception],severity:Optional[ErrorSeverity])
+      ret: bool
+      d: Handle an error.
+    - n: _default_severity
+      sig: (error_type:ErrorType)
+      ret: ErrorSeverity
+      d: default severity for error type.
+    - n: _log_error
+      sig: (error:AnalysisError)
+      d: Log an error.
+    - n: safe_read_file
+      sig: (path:Path)
+      ret: Optional[str]
+      d: Safely read a file with error handling.
+    - n: safe_write_file
+      sig: (path:Path,content:str)
+      ret: bool
+      d: Safely write a file with error handling.
+    - n: safe_parse
+      sig: (path:str,content:str,parser_func:Callable)
+      ret: Any
+      d: Safely parse content with error handling.
+  f:
+  - n: create_error_handler
+    sig: (mode:str,max_file_size_mb:float)
+    ret: ErrorHandler
+    d: an error handler with default settings.
+- p: code_review.py
+  l: 205
+  i:
+  - collections.defaultdict
+  - typing.{Any,Dict,List}
+  e:
+  - analyze_code_quality
+  - check_security_issues
+  - check_performance_issues
+  - CodeReviewer
+  c:
+  - n: CodeReviewer
+    d: Automated code review with optional LLM enhancement.
+    m:
+    - n: __init__
+      sig: (client)
+      d: Initialize reviewer.
+    - n: review
+      sig: (project,focus:str)
+      ret: Dict[str, Any]
+      d: Perform code review.
+    - n: generate_report
+      sig: (results:Dict[str, Any],project_name:str)
+      ret: str
+      d: Generate markdown review report.
+  f:
+  - n: analyze_code_quality
+    sig: (project)
+    ret: Dict[str, List[Dict]]
+    d: Analyze code quality issues.
+  - n: check_security_issues
+    sig: (project)
+    ret: Dict[str, List[Dict]]
+    d: Check for security vulnerabilities.
+  - n: check_performance_issues
+    sig: (project)
+    ret: Dict[str, List[Dict]]
+    d: Check for performance anti-patterns.
+- p: analyzer.py
+  l: 221
+  i:
+  - sys
+  - datetime
+  - collections.defaultdict
+  - models.{ModuleInfo,ProjectInfo}
+  - parsers.{TREE_SITTER_AVAILABLE,TreeSitterParser,UniversalParser}
+  - pathlib.Path
+  - typing.{Dict,List,Optional}
+  e:
+  - ProjectAnalyzer
+  - analyze_project
+  - get_library_status
+  c:
+  - n: ProjectAnalyzer
+    d: Main class for analyzing software projects.
+    m:
+    - n: __init__
+      sig: (root_path:str,use_treesitter:bool,verbose:bool,include_private:bool)
+      d: Initialize the project analyzer.
+    - n: _print_status
+      sig: ()
+      d: Print library availability status.
+    - n: analyze
+      sig: ()
+      ret: ProjectInfo
+      d: Analyze the project.
+    - n: _scan_files
+      sig: ()
+      d: Scan and parse all source files.
+    - n: _detect_entrypoints
+      sig: ()
+      ret: List[str]
+      d: Detect project entry points.
+    - n: get_statistics
+      sig: ()
+      ret: Dict
+      d: analysis statistics.
+  f:
+  - n: analyze_project
+    sig: (path:str,use_treesitter:bool,verbose:bool)
+    ret: ProjectInfo
+    d: Convenience function to analyze a project.
+  - n: get_library_status
+    sig: ()
+    ret: Dict[str, bool]
+    d: availability status of optional libraries.
+- p: quality.py
+  l: 212
+  i:
+  - dataclasses.{dataclass,field}
+  - models.{ModuleInfo,ProjectInfo}
+  - typing.{Any,Dict,List}
+  e:
+  - QualityAnalyzer
+  - analyze_quality
+  - get_quality_summary
+  c:
+  - n: QualityAnalyzer
+    d: Analyzes code quality and generates recommendations.
+    m:
+    - n: __init__
+      sig: (thresholds:Dict[str, int])
+      d: Initialize with custom thresholds.
+    - n: analyze
+      sig: (project:ProjectInfo)
+      ret: QualityReport
+      d: Analyze project quality.
+    - n: analyze_modules
+      sig: (modules:List[ModuleInfo])
+      ret: QualityReport
+      d: Analyze a list of modules.
+    - n: _analyze_module
+      sig: (module:ModuleInfo,report:QualityReport)
+      d: Analyze a single module.
+    - n: _check_function
+      sig: (func,file_path:str,report:QualityReport)
+      d: Check function quality.
+    - n: _check_class
+      sig: (file_path:str,report:QualityReport)
+      d: Check class quality.
+    - n: _get_file_recommendation
+      sig: (module:ModuleInfo)
+      ret: str
+      d: Generate recommendation for long file.
+  f:
+  - n: analyze_quality
+    sig: (project:ProjectInfo,thresholds:Dict[str, int])
+    ret: QualityReport
+    d: Convenience function to analyze project quality.
+  - n: get_quality_summary
+    sig: (report:QualityReport)
+    ret: str
+    d: Generate human-readable quality summary.
+- p: shared_utils.py
+  l: 279
+  i:
+  - hashlib
+  - re
+  - typing.{Dict,List,Optional,Set}
+  e:
+  - compact_imports
+  - deduplicate_imports
+  - abbreviate_type
+  - expand_type
+  - build_signature
+  - remove_self_from_params
+  - categorize_function
+  - extract_domain
+  - compute_hash
+  - truncate_docstring
+  f:
+  - n: compact_imports
+    sig: (imports:List[str],max_items:int)
+    ret: List[str]
+    d: Compact imports by grouping submodules.
+  - n: deduplicate_imports
+    sig: (imports:List[str])
+    ret: List[str]
+    d: Remove redundant imports.
+  - n: abbreviate_type
+    sig: (type_str:str)
+    ret: str
+    d: Abbreviate type annotations for compactness.
+  - n: expand_type
+    sig: (abbrev:str)
+    ret: str
+    d: Expand abbreviated type back to full form.
+  - n: build_signature
+    sig: (params:List[str],return_type:Optional[str],include_self:bool,abbreviate:bool,max_params:int)
+    ret: str
+    d: Build compact function signature.
+  - n: remove_self_from_params
+    sig: (params:List[str])
+    ret: List[str]
+    d: Remove 'self' and 'cls' from parameter list.
+  - n: categorize_function
+    sig: (name:str)
+    ret: str
+    d: Categorize function by name pattern.
+  - n: extract_domain
+    sig: (path:str)
+    ret: str
+    d: Extract domain from file path.
+  - n: compute_hash
+    sig: (name:str,signature:str,length:int)
+    ret: str
+    d: Compute short hash for quick comparison.
+  - n: truncate_docstring
+    sig: (docstring:Optional[str],max_length:int)
+    ret: str
+    d: Truncate docstring to first sentence or max_length.
+  - n: escape_for_yaml
+    sig: (text:str)
+    ret: str
+    d: Escape text for safe YAML inclusion.
+  - n: clean_identifier
+    sig: (name:str)
+    ret: str
+    d: Clean identifier by removing whitespace and special characte
+- p: parsers.py
+  l: 929
+  i:
+  - ast
+  - re
+  - tree_sitter_python
+  - intent.EnhancedIntentGenerator
+  - models
+  - typing.{List,Optional}
+  e:
+  - TreeSitterParser
+  - UniversalParser
+  - is_tree_sitter_available
+  c:
+  - n: TreeSitterParser
+    d: Parser using Tree-sitter for high-accuracy AST parsing.
+    m:
+    - n: __init__
+      sig: ()
+      d: Initialize Tree-sitter parsers for available languages.
+    - n: _init_parsers
+      sig: ()
+      d: Initialize parsers for each supported language.
+    - n: is_available
+      sig: (language:str)
+      ret: bool
+      d: Check if Tree-sitter parser is available for a language.
+    - n: get_supported_languages
+      sig: ()
+      ret: List[str]
+      d: list of potentially supported languages.
+    - n: parse
+      sig: (filepath:str,content:str,language:str)
+      ret: Optional[ModuleInfo]
+      d: Parse a source file using Tree-sitter.
+    - n: _parse_python
+      sig: (filepath:str,content:str,tree)
+      ret: ModuleInfo
+      d: Parse Python source using Tree-sitter AST.
+    - n: _extract_py_function
+      sig: (node,content:str,decorated_node)
+      ret: Optional[FunctionInfo]
+      d: Extract Python function from AST node.
+    - n: _extract_py_class
+      sig: (node,content:str)
+      ret: Optional[ClassInfo]
+      d: Extract Python class from AST node.
+    - n: _extract_py_import
+      sig: (node,content:str)
+      ret: List[str]
+      d: Extract import statement.
+    - n: _extract_py_from_import
+      sig: (node,content:str)
+      ret: List[str]
+      d: Extract from ... import ... statement.
+  - n: UniversalParser
+    d: Fallback parser using Python AST and regex.
+    m:
+    - n: __init__
+      sig: ()
+      d: Initialize the universal parser.
+    - n: parse
+      sig: (filepath:str,content:str,language:str)
+      ret: Optional[ModuleInfo]
+      d: Parse a source file using AST or regex.
+    - n: _parse_python
+      sig: (filepath:str,content:str)
+      ret: Optional[ModuleInfo]
+      d: Parse Python using built-in AST.
+    - n: _extract_ast_function
+      sig: (node)
+      ret: FunctionInfo
+      d: Extract function from Python AST node.
+    - n: _extract_ast_class
+      sig: (node:ast.ClassDef)
+      ret: ClassInfo
+      d: Extract class from Python AST node.
+    - n: _ann_str
+      sig: (node)
+      ret: str
+      d: Convert AST annotation to string.
+    - n: _parse_js_ts
+      sig: (filepath:str,content:str,language:str)
+      ret: ModuleInfo
+      d: Parse JS/TS using regex patterns.
+  f:
+  - n: is_tree_sitter_available
+    sig: ()
+    ret: bool
+    d: Check if Tree-sitter is available.
+  conditional_imports:
+  - tree_sitter_python
+  - tree_sitter_javascript
+  - tree_sitter.tree_sitter
+  - tree_sitter.Language
+  - tree_sitter.Parser
+- p: intent.py
+  l: 429
+  i:
+  - re
+  - dataclasses.{dataclass,field}
+  - enum.{Enum,auto}
+  - nltk.stem.nltk.stem
+  - typing.{Any,List,Optional,TYPE_CHECKING,Tuple}
+  e:
+  - IntentType
+  - EnhancedIntentGenerator
+  - IntentAnalyzer
+  c:
+  - n: IntentType
+    b:
+    - Enum
+    d: Types of user intents for code analysis.
+  - n: EnhancedIntentGenerator
+    d: Generator intencji z NLP - lemmatyzacja, ekstrakcja z docstringów.
+    m:
+    - n: __init__
+      sig: (lang:str)
+      d: Initialize the intent generator.
+    - n: generate
+      sig: (name:str,docstring:Optional[str])
+      ret: str
+      d: Generate intent from function name and optional docstring.
+    - n: _extract_from_docstring
+      sig: (docstring:str)
+      ret: Optional[str]
+      d: Extract intent from docstring's first line.
+    - n: _split_name
+      sig: (name:str)
+      ret: List[str]
+      d: Split function name into words.
+    - n: get_available_features
+      sig: ()
+      ret: dict[str, bool]
+      d: dictionary of available NLP features.
+  - n: IntentAnalyzer
+    d: Analyzes user queries to detect intent and provide suggestions.
+    m:
+    - n: __init__
+      sig: ()
+      d: Initialize the intent analyzer with patterns.
+    - n: _extract_keywords
+      sig: (query:str)
+      ret: List[str]
+      d: Extract keywords from a query string.
+    - n: _calculate_intent_confidence
+      sig: (keywords:List[str],patterns:List[str])
+      ret: float
+      d: Calculate confidence score based on keyword matches.
+    - n: _identify_target
+      sig: (query:str,project:Any)
+      ret: str
+      d: Identify the target of the query (module, function, class, o
+    - n: _generate_description
+      sig: (intent_type:IntentType,target:str)
+      ret: str
+      d: Generate a description for the detected intent.
+    - n: _generate_suggestions
+      sig: (intent_type:IntentType,target:str,project:Any)
+      ret: List[str]
+      d: Generate suggestions based on intent type.
+    - n: analyze_intent
+      sig: (query:str,project:Any)
+      ret: List[Intent]
+      d: Analyze a query and return detected intents sorted by confid
+    - n: detect_code_smells
+      sig: (project:Any)
+      ret: List[dict]
+      d: Detect code smells in the project.
+    - n: suggest_refactoring
+      sig: (target:str,project:Any)
+      ret: List[str]
+      d: Generate refactoring suggestions for a target.
+    - n: _find_target_object
+      sig: (target:str,project:Any)
+      ret: Any
+      d: Find the object referenced by target string.
+  conditional_imports:
+  - nltk
+  - nltk.stem.nltk.stem
+  - nltk.stem.WordNetLemmatizer
+  - spacy
+- p: adaptive.py
+  l: 475
+  i:
+  - os
+  - re
+  - dataclasses.dataclass
+  - dotenv.load_dotenv
+  - llm_clients.BaseLLMClient
+  - pathlib.Path
+  - typing.{Any,Dict,List,Optional,Tuple}
+  e:
+  - AdaptiveReproducer
+  - get_llm_capabilities
+  c:
+  - n: AdaptiveReproducer
+    d: Adaptive code reproduction with LLM capability detection.
+    m:
+    - n: __init__
+      sig: (client:BaseLLMClient,model:str)
+      d: Initialize adaptive reproducer.
+    - n: _get_capabilities
+      sig: ()
+      ret: Dict[str, Any]
+      d: LLM capabilities for current model.
+    - n: select_format
+      sig: (file_path:Path,content:str)
+      ret: str
+      d: Select optimal format based on file and LLM capabilities.
+    - n: should_chunk
+      sig: (content:str)
+      ret: bool
+      d: Determine if content should be chunked.
+    - n: chunk_content
+      sig: (content:str,file_path:Path)
+      ret: List[ChunkInfo]
+      d: Split content into logical chunks.
+    - n: generate_chunk_spec
+      sig: (chunk:ChunkInfo,format_name:str)
+      ret: str
+      d: Generate specification for a single chunk.
+    - n: _gherkin_for_chunk
+      sig: (chunk:ChunkInfo)
+      ret: str
+      d: Generate Gherkin for a chunk.
+    - n: _yaml_for_chunk
+      sig: (chunk:ChunkInfo)
+      ret: str
+      d: Generate YAML for a chunk.
+    - n: _json_for_chunk
+      sig: (chunk:ChunkInfo)
+      ret: str
+      d: Generate JSON for a chunk.
+    - n: reproduce
+      sig: (file_path:str,output_dir:str)
+      ret: AdaptiveResult
+      d: Reproduce code with adaptive format selection.
+  f:
+  - n: get_llm_capabilities
+    sig: (model:str)
+    ret: Dict[str, Any]
+    d: capabilities for a specific model.
+  conditional_imports:
+  - dotenv.dotenv
+  - dotenv.load_dotenv
+- p: reproducer.py
+  l: 534
+  i:
+  - os
+  - yaml
+  - json
+  - re
+  - dataclasses.{dataclass,field}
+  - pathlib.Path
+  - typing.{Any,Callable,Dict,List,Optional}
+  e:
+  - ReproductionStatus
+  - SpecReproducer
+  - SpecValidator
+  - reproduce_project
+  - validate_files
+  c:
+  - n: ReproductionStatus
+    b:
+    - Enum
+    d: Status of file reproduction.
+  - n: SpecReproducer
+    d: Reproduces code structure from logic specifications.
+    m:
+    - n: __init__
+      sig: (verbose:bool)
+      d: creates
+    - n: reproduce_from_yaml
+      sig: (spec_path:str,output_dir:str,filter_paths:Optional[List[str]])
+      ret: ReproductionResult
+      d: Reproduce files from YAML specification.
+    - n: reproduce_from_json
+      sig: (spec_path:str,output_dir:str,filter_paths:Optional[List[str]])
+      ret: ReproductionResult
+      d: Reproduce files from JSON specification.
+    - n: _reproduce
+      sig: (spec:Dict[str, Any],output_dir:str,filter_paths:Optional[List[str]])
+      ret: ReproductionResult
+      d: Internal reproduction logic.
+    - n: _generate_file
+      sig: (module:Dict[str, Any],output_path:Path)
+      ret: bool
+      d: Generate a single file from module spec.
+    - n: _generate_python
+      sig: (module:Dict[str, Any])
+      ret: str
+      d: Generate Python file content.
+    - n: _render_docstring
+      sig: (text:str,indent:str)
+      ret: List[str]
+      d: Render a safe Python docstring or fall back to comments.
+    - n: _sanitize_python_property
+      sig: (prop:str)
+      ret: str
+      d: Sanitize a Python class property declaration for valid synta
+    - n: _generate_python_class
+      sig: (cls:Dict[str, Any])
+      ret: List[str]
+      d: Generate Python class.
+    - n: _generate_python_method
+      sig: (method:Dict[str, Any])
+      ret: List[str]
+      d: Generate Python method.
+  - n: SpecValidator
+    d: Validates generated files against logic specification.
+    m:
+    - n: __init__
+      sig: ()
+      d: creates
+    - n: validate
+      sig: (spec_path:str,generated_dir:str,filter_paths:Optional[List[str]])
+      ret: List[FileValidation]
+      d: Validate generated files against spec.
+    - n: _validate_file
+      sig: (module:Dict[str, Any],base_path:Path)
+      ret: FileValidation
+      d: Validate a single file.
+    - n: _check_python_syntax
+      sig: (content:str,validation:FileValidation)
+      ret: bool
+      d: Check Python syntax.
+  f:
+  - n: reproduce_project
+    sig: (spec_path:str,output_dir:str,filter_paths:Optional[List[str]],validate:bool,verbose:bool)
+    ret: ReproductionResult
+    d: Convenience function to reproduce and validate a project.
+  - n: validate_files
+    sig: (spec_path:str,generated_dir:str,filter_paths:Optional[List[str]])
+    ret: List[FileValidation]
+    d: Validate specific files against spec.
+- p: llm_clients.py
+  l: 415
+  i:
+  - os
+  - json
+  - yaml
+  - httpx
+  - litellm
+  - abc.{ABC,abstractmethod}
+  - dotenv.load_dotenv
+  - typing.{Any,Dict,List,Optional}
+  e:
+  - get_priority_mode
+  - BaseLLMClient
+  - OpenRouterClient
+  - OllamaLocalClient
+  - LiteLLMClient
+  - get_client
+  - get_effective_provider_priorities
+  c:
+  - n: BaseLLMClient
+    b:
+    - ABC
+    d: Abstract base class for LLM clients.
+    m:
+    - n: generate
+      sig: (prompt:str,system:str,max_tokens:int)
+      ret: str
+      d: Generate completion.
+    - n: is_available
+      sig: ()
+      ret: bool
+      d: Check if client is available.
+    - n: chat
+      sig: (messages:List[Dict[str, str]],max_tokens:int)
+      ret: str
+      d: Chat completion (default implementation).
+  - n: OpenRouterClient
+    b:
+    - BaseLLMClient
+    d: OpenRouter API client for cloud LLM access.
+    m:
+    - n: __init__
+      sig: (api_key:str,model:str)
+      d: Initialize OpenRouter client.
+    - n: generate
+      sig: (prompt:str,system:str,max_tokens:int)
+      ret: str
+      d: Generate completion using OpenRouter.
+    - n: is_available
+      sig: ()
+      ret: bool
+      d: Check if OpenRouter is configured.
+    - n: list_recommended_models
+      sig: ()
+      ret: List[tuple]
+      d: List recommended models for code tasks.
+  - n: OllamaLocalClient
+    b:
+    - BaseLLMClient
+    d: Ollama client for local LLM inference.
+    m:
+    - n: __init__
+      sig: (model:str,host:str)
+      d: Initialize Ollama client.
+    - n: generate
+      sig: (prompt:str,system:str,max_tokens:int)
+      ret: str
+      d: Generate completion using Ollama.
+    - n: is_available
+      sig: ()
+      ret: bool
+      d: Check if Ollama is running.
+    - n: list_models
+      sig: ()
+      ret: List[str]
+      d: List available Ollama models.
+    - n: list_recommended_models
+      sig: ()
+      ret: List[tuple]
+      d: List recommended models for code tasks.
+  - n: LiteLLMClient
+    b:
+    - BaseLLMClient
+    d: LiteLLM client for universal LLM access.
+    m:
+    - n: __init__
+      sig: (model:str)
+      d: Initialize LiteLLM client.
+    - n: generate
+      sig: (prompt:str,system:str,max_tokens:int)
+      ret: str
+      d: Generate completion using LiteLLM.
+    - n: is_available
+      sig: ()
+      ret: bool
+      d: Check if LiteLLM is available.
+  f:
+  - n: _get_user_llm_config_path
+    sig: ()
+    ret: str
+    d: retrieves user llm config path
+  - n: _load_user_llm_config
+    sig: ()
+    ret: Dict[str, Any]
+    d: retrieves user llm config
+  - n: _get_priority_mode
+    sig: ()
+    ret: str
+    d: retrieves priority mode
+  - n: get_priority_mode
+    sig: ()
+    ret: str
+    d: retrieves priority mode
+  - n: _get_provider_priority_overrides
+    sig: ()
+    ret: Dict[str, int]
+    d: retrieves provider priority overrides
+  - n: _get_model_priority_rules
+    sig: ()
+    ret: Dict[str, Dict[str, int]]
+    d: retrieves model priority rules
+  - n: _get_model_priority
+    sig: (model_string:str)
+    ret: Optional[int]
+    d: retrieves model priority
+  - n: _get_provider_model_string
+    sig: (provider:str)
+    ret: str
+    d: retrieves provider model string
+  - n: get_client
+    sig: (provider:str,model:str)
+    ret: BaseLLMClient
+    d: appropriate LLM client based on provider.
+  - n: _try_client
+    sig: (provider:str,model:str)
+    ret: Optional[BaseLLMClient]
+    d: try client
+  - n: _get_priority_order
+    sig: ()
+    ret: List[str]
+    d: retrieves priority order
+  - n: _get_effective_provider_order
+    sig: ()
+    ret: List[tuple[str, int]]
+    d: retrieves effective provider order
+  conditional_imports:
+  - yaml
+  - dotenv.dotenv
+  - dotenv.load_dotenv
+  - httpx
+  - litellm
+- p: prompts.py
+  l: 120
+  i:
+  - typing.Dict
+  e:
+  - get_reproduction_prompt
+  - get_review_prompt
+  - get_fix_prompt
+  f:
+  - n: get_reproduction_prompt
+    sig: (spec:str,fmt:str,file_name:str,language:str,max_spec_length:int)
+    ret: str
+    d: Generate optimized reproduction prompt.
+  - n: get_review_prompt
+    sig: (code:str,spec:str,fmt:str)
+    ret: str
+    d: Generate code review prompt.
+  - n: get_fix_prompt
+    sig: (code:str,issues:list,spec:str)
+    ret: str
+    d: Generate code fix prompt.
+- p: chunked_reproduction.py
+  l: 357
+  i:
+  - re
+  - dataclasses.{dataclass,field}
+  - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
+  - pathlib.Path
+  - typing.{Dict,List,Optional,Tuple}
+  e:
+  - get_llm_limit
+  - chunk_yaml_spec
+  - chunk_gherkin_spec
+  - chunk_markdown_spec
+  - chunk_spec
+  - get_chunk_prompt
+  - merge_chunk_codes
+  - ChunkedReproducer
+  - auto_chunk_reproduce
+  - adaptive_chunk_reproduce
+  c:
+  - n: ChunkedReproducer
+    d: Reproduce code from chunked specifications.
+    m:
+    - n: __init__
+      sig: (client,model_name:str)
+      d: creates
+    - n: reproduce
+      sig: (spec:str,fmt:str,file_name:str)
+      ret: ChunkedResult
+      d: Reproduce code from specification, chunking if needed.
+    - n: _extract_code
+      sig: (response:str)
+      ret: str
+      d: Extract code from LLM response.
+  f:
+  - n: get_llm_limit
+    sig: (model_name:str)
+    ret: int
+    d: context limit for LLM model.
+  - n: chunk_yaml_spec
+    sig: (spec:str,max_tokens:int)
+    ret: List[Chunk]
+    d: Chunk YAML specification by modules/classes/functions.
+  - n: chunk_gherkin_spec
+    sig: (spec:str,max_tokens:int)
+    ret: List[Chunk]
+    d: Chunk Gherkin specification by Features/Scenarios.
+  - n: chunk_markdown_spec
+    sig: (spec:str,max_tokens:int)
+    ret: List[Chunk]
+    d: Chunk Markdown specification by sections.
+  - n: chunk_spec
+    sig: (spec:str,fmt:str,max_tokens:int)
+    ret: ChunkedSpec
+    d: Chunk specification based on format.
+  - n: get_chunk_prompt
+    sig: (chunk:Chunk,fmt:str,file_name:str,chunk_num:int,total_chunks:int)
+    ret: str
+    d: Generate prompt for a single chunk.
+  - n: merge_chunk_codes
+    sig: (codes:List[str],file_name:str)
+    ret: str
+    d: Merge code from multiple chunks.
+  - n: auto_chunk_reproduce
+    sig: (spec:str,fmt:str,file_name:str,client,model_name:str)
+    ret: ChunkedResult
+    d: Auto-chunking reproduction with LLM adaptation.
+  - n: adaptive_chunk_reproduce
+    sig: (spec:str,fmt:str,file_name:str,client,provider:str,...+1)
+    ret: ChunkedResult
+    d: Adaptive chunking reproduction using LLM profile.
+- p: __init__.py
+  l: 320
+  i:
+  - analyzer.{ProjectAnalyzer,analyze_project}
+  - generators.{CSVGenerator,CompactGenerator,JSONGenerator,MarkdownGenerator,YAMLGenerator}
+  - gherkin.{GherkinGenerator,StepDefinitionGenerator}
+  - models
+  e:
+  - analyze_quality
+  - reproduce_project
+  f:
+  - n: analyze_quality
+    sig: (target)
+    d: processes quality
+  - n: reproduce_project
+    sig: (source:str)
+    d: reproduce project
+- p: metrics.py
+  l: 447
+  i:
+  - re
+  - difflib
+  - hashlib
+  - collections.Counter
+  - dataclasses.{asdict,dataclass,field}
+  - typing.{Any,Dict,List,Optional,Tuple}
+  e:
+  - ReproductionMetrics
+  - analyze_reproduction
+  - compare_formats
+  c:
+  - n: ReproductionMetrics
+    d: Analyze reproduction quality with multiple metrics.
+    m:
+    - n: __init__
+      sig: (verbose:bool)
+      d: creates
+    - n: analyze
+      sig: (original:str,generated:str,spec:str,format_name:str,source_file:str)
+      ret: ReproductionResult
+      d: Analyze reproduction quality.
+    - n: _compute_text_metrics
+      sig: (original:str,generated:str)
+      ret: TextMetrics
+      d: Compute text-level metrics.
+    - n: _cosine_similarity
+      sig: (words1:List[str],words2:List[str])
+      ret: float
+      d: Compute cosine similarity between word lists.
+    - n: _compute_structural_metrics
+      sig: (original:str,generated:str)
+      ret: StructuralMetrics
+      d: Compute structural metrics.
+    - n: _compute_semantic_metrics
+      sig: (original:str,generated:str)
+      ret: SemanticMetrics
+      d: Compute semantic preservation metrics.
+    - n: _compute_format_metrics
+      sig: (original:str,generated:str,spec:str,format_name:str)
+      ret: FormatMetrics
+      d: Compute format efficiency metrics.
+    - n: _compute_overall_score
+      sig: (result:ReproductionResult)
+      ret: float
+      d: Compute weighted overall score.
+    - n: _get_grade
+      sig: (score:float)
+      ret: str
+      d: letter grade from score.
+    - n: _generate_recommendations
+      sig: (result:ReproductionResult)
+      ret: List[str]
+      d: Generate improvement recommendations.
+  f:
+  - n: analyze_reproduction
+    sig: (original:str,generated:str,spec:str,format_name:str,verbose:bool)
+    ret: ReproductionResult
+    d: Convenience function for reproduction analysis.
+  - n: compare_formats
+    sig: (original:str,results:Dict[str, Tuple[str, str]],verbose:bool)
+    ret: Dict[str, Any]
+    d: Compare reproduction quality across formats.
+- p: __main__.py
+  l: 9
+  i:
+  - cli.main
+- p: refactor.py
+  l: 313
+  i:
+  - json
+  - analyzer.analyze_project
+  - code_review.analyze_code_quality
+  - dataclasses.{asdict,dataclass,field}
+  - pathlib.Path
+  - similarity.SimilarityDetector
+  - typing.{Any,Dict,List,Optional}
+  e:
+  - find_duplicates
+  - analyze_quality
+  - suggest_refactoring
+  - compare_codebases
+  - quick_analyze
+  f:
+  - n: find_duplicates
+    sig: (project_path:str,threshold:float)
+    ret: List[DuplicateGroup]
+    d: Find duplicate functions in a project.
+  - n: analyze_quality
+    sig: (project_path:str,include_security:bool,include_performance:bool)
+    ret: RefactoringReport
+    d: Analyze code quality and generate refactoring report.
+  - n: suggest_refactoring
+    sig: (project_path:str,use_llm:bool,client:BaseLLMClient)
+    ret: RefactoringReport
+    d: Generate refactoring suggestions for a project.
+  - n: compare_codebases
+    sig: (project1:str,project2:str)
+    ret: Dict[str, Any]
+    d: Compare two codebases for similarities and differences.
+  - n: quick_analyze
+    sig: (project_path:str)
+    ret: Dict[str, Any]
+    d: Quick analysis for a project.
+- p: logicml.py
+  l: 281
+  i:
+  - dataclasses.dataclass
+  - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
+  - pathlib.Path
+  - shared_utils.truncate_docstring
+  - typing.{Any,Dict,List,Optional,Set}
+  e:
+  - LogicMLGenerator
+  - generate_logicml
+  c:
+  - n: LogicMLGenerator
+    d: Generates LogicML format - optimized for LLM code reproduction.
+    m:
+    - n: __init__
+      sig: (verbose:bool)
+      d: creates
+    - n: generate
+      sig: (project:ProjectInfo,detail:str)
+      ret: LogicMLSpec
+      d: Generate LogicML specification for a project.
+    - n: _generate_module
+      sig: (module:ModuleInfo,detail:str)
+      ret: str
+      d: Generate LogicML for a single module.
+    - n: _generate_imports
+      sig: (imports:List[str])
+      ret: str
+      d: Generate compact imports section.
+    - n: _generate_class
+      sig: (cls:ClassInfo,detail:str)
+      ret: str
+      d: Generate LogicML for a class.
+    - n: _generate_method
+      sig: (method:FunctionInfo,detail:str,indent:int)
+      ret: str
+      d: Generate LogicML for a method.
+    - n: _generate_functions
+      sig: (functions:List[FunctionInfo],detail:str)
+      ret: str
+      d: Generate LogicML for top-level functions.
+    - n: _detect_side_effects
+      sig: (method:FunctionInfo)
+      ret: Optional[str]
+      d: Detect side effects from method calls and name patterns.
+  f:
+  - n: generate_logicml
+    sig: (project:ProjectInfo,detail:str)
+    ret: str
+    d: Convenience function to generate LogicML format.
+- p: utils.py
+  l: 16
+  i:
+  - shutil
+  - pathlib.Path
+  e:
+  - estimate_tokens
+  - write_text_atomic
+  - cleanup_generated_root
+  f:
+  - n: estimate_tokens
+    sig: (text:str)
+    ret: int
+    d: estimate tokens
+  - n: write_text_atomic
+    sig: (path:Path,content:str)
+    d: logs text atomic
+  - n: cleanup_generated_root
+    sig: (generated_root:Path,allowed_dirs:set[str])
+    d: cleanup generated root
+- p: generators.py
+  l: 1429
+  i:
+  - json
+  - collections.defaultdict
+  - models.{ClassInfo,DependencyNode,FunctionInfo,ModuleInfo,ProjectInfo}
+  - pathlib.Path
+  - shared_utils.{categorize_function,compute_hash,extract_domain}
+  - typing.List
+  e:
+  - MarkdownGenerator
+  - CompactGenerator
+  - JSONGenerator
+  - YAMLGenerator
+  - CSVGenerator
+  c:
+  - n: MarkdownGenerator
+    d: Generates Markdown output for project analysis.
+    m:
+    - n: generate
+      sig: (project:ProjectInfo,detail_level:str)
+      ret: str
+      d: Generate Markdown output.
+    - n: _gen_tree
+      sig: (lines:List[str],project:ProjectInfo)
+      d: Generate project structure tree.
+    - n: _print_tree
+      sig: (lines:List[str],tree:dict,prefix:str,depth:int)
+      d: Recursively print tree structure.
+    - n: _gen_module
+      sig: (lines:List[str],m:ModuleInfo,detail:str,proj:ProjectInfo)
+      d: Generate module documentation.
+    - n: _gen_class
+      sig: (lines:List[str],cls:ClassInfo,detail:str)
+      d: Generate class documentation.
+    - n: _sig
+      sig: (f:FunctionInfo)
+      ret: str
+      d: Generate function signature.
+  - n: CompactGenerator
+    d: Generates ultra-compact output for token efficiency.
+    m:
+    - n: generate
+      sig: (project:ProjectInfo)
+      ret: str
+      d: Generate compact output.
+  - n: JSONGenerator
+    d: Generates JSON output for machine processing.
+    m:
+    - n: generate
+      sig: (project:ProjectInfo,flat:bool,detail:str)
+      ret: str
+      d: Generate JSON output.
+    - n: generate_from_module
+      sig: (module:ModuleInfo,detail:str)
+      ret: str
+      d: creates from module
+    - n: _generate_nested
+      sig: (project:ProjectInfo,detail:str)
+      ret: str
+      d: Generate nested JSON structure.
+    - n: _generate_flat
+      sig: (project:ProjectInfo,detail:str)
+      ret: str
+      d: Generate flat JSON list for comparisons.
+    - n: _build_element_row
+      sig: (m:ModuleInfo,elem_type:str,name:str,signature:str,f:FunctionInfo,...+2)
+      ret: dict
+      d: Build a single element row for flat output.
+    - n: _build_signature
+      sig: (f:FunctionInfo)
+      ret: str
+      d: Build compact signature.
+    - n: _categorize
+      sig: (name:str)
+      ret: str
+      d: Categorize by name pattern.
+    - n: _extract_domain
+      sig: (path:str)
+      ret: str
+      d: Extract domain from path.
+    - n: _compute_hash
+      sig: (name:str,signature:str)
+      ret: str
+      d: Compute short hash.
+  - n: YAMLGenerator
+    d: Generates YAML output for human-readable representation.
+    m:
+    - n: generate
+      sig: (project:ProjectInfo,flat:bool,detail:str,compact:bool)
+      ret: str
+      d: Generate YAML output.
+    - n: generate_schema
+      sig: (format_type:str)
+      ret: str
+      d: Generate JSON Schema for the YAML format.
+    - n: _generate_compact_schema
+      sig: ()
+      ret: str
+      d: Generate JSON Schema for compact YAML format with meta.legen
+    - n: _generate_full_schema
+      sig: ()
+      ret: str
+      d: Generate JSON Schema for full YAML format.
+    - n: _generate_hybrid_schema
+      sig: ()
+      ret: str
+      d: Generate JSON Schema for hybrid format.
+    - n: generate_hybrid
+      sig: (project:ProjectInfo)
+      ret: str
+      d: Generate hybrid format combining TOON compactness with YAML
+    - n: _build_enhanced_signature
+      sig: (f:FunctionInfo)
+      ret: str
+      d: Build enhanced signature with better parameter handling.
+    - n: _extract_constants
+      sig: (module:ModuleInfo)
+      ret: list
+      d: Extract constants and type definitions from module.
+    - n: _extract_dataclasses
+      sig: (module:ModuleInfo)
+      ret: list
+      d: Extract dataclass information from classes.
+    - n: _extract_conditional_imports
+      sig: (module:ModuleInfo)
+      ret: list
+      d: Extract conditional imports from constants.
+  - n: CSVGenerator
+    d: Generates CSV output optimized for LLM processing.
+    m:
+    - n: generate
+      sig: (project:ProjectInfo,detail:str)
+      ret: str
+      d: Generate CSV output.
+    - n: _build_row
+      sig: (m:ModuleInfo,elem_type:str,name:str,signature:str,calls:list,...+2)
+      ret: dict
+      d: Build a single CSV row.
+    - n: _build_function_row
+      sig: (m:ModuleInfo,elem_type:str,name:str,f:FunctionInfo,deps:str,...+2)
+      ret: dict
+      d: Build CSV row for function/method.
+    - n: _build_signature
+      sig: (f:FunctionInfo)
+      ret: str
+      d: Build compact signature.
+    - n: _categorize
+      sig: (name:str)
+      ret: str
+      d: Categorize function by name pattern.
+    - n: _extract_domain
+      sig: (path:str)
+      ret: str
+      d: Extract domain from file path.
+    - n: _compute_hash
+      sig: (name:str,signature:str)
+      ret: str
+      d: Compute short hash for quick comparison.
+    - n: _escape_csv
+      sig: (text:str)
+      ret: str
+      d: Escape text for CSV (remove newlines, limit commas).
+- p: markdown_format.py
+  l: 266
+  i:
+  - os
+  - dataclasses.dataclass
+  - generators.YAMLGenerator
+  - gherkin.GherkinGenerator
+  - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
+  - pathlib.Path
+  - typing.{Dict,List,Optional}
+  e:
+  - MarkdownHybridGenerator
+  - generate_markdown_hybrid
+  - generate_file_markdown
+  c:
+  - n: MarkdownHybridGenerator
+    d: Generates optimized Markdown hybrid format.
+    m:
+    - n: __init__
+      sig: (verbose:bool)
+      d: creates
+    - n: generate
+      sig: (project:ProjectInfo,detail:str)
+      ret: MarkdownSpec
+      d: Generate Markdown hybrid specification.
+    - n: _generate_header
+      sig: (project:ProjectInfo)
+      ret: str
+      d: Generate header section.
+    - n: _generate_tree
+      sig: (project:ProjectInfo)
+      ret: str
+      d: Generate file tree section.
+    - n: _generate_imports
+      sig: (project:ProjectInfo)
+      ret: str
+      d: Generate imports as YAML for precise reproduction.
+    - n: _generate_classes_yaml
+      sig: (project:ProjectInfo)
+      ret: str
+      d: Generate classes as detailed YAML codeblock.
+    - n: _generate_functions_gherkin
+      sig: (project:ProjectInfo)
+      ret: str
+      d: Generate functions as detailed Gherkin codeblock.
+    - n: _generate_dependencies
+      sig: (project:ProjectInfo)
+      ret: str
+      d: Generate module dependencies section.
+  f:
+  - n: generate_markdown_hybrid
+    sig: (project:ProjectInfo,detail:str)
+    ret: str
+    d: Convenience function to generate Markdown hybrid format.
+  - n: generate_file_markdown
+    sig: (file_path:str)
+    ret: str
+    d: Generate Markdown hybrid for a single file.
+- p: models.py
+  l: 295
+  i:
+  - dataclasses.{dataclass,field}
+  - typing.{Dict,List,Optional}
+- p: similarity.py
+  l: 178
+  i:
+  - models.ModuleInfo
+  - rapidfuzz.{fuzz,process}
+  - typing.{Dict,List}
+  e:
+  - SimilarityDetector
+  - is_rapidfuzz_available
+  - get_refactoring_suggestions
+  c:
+  - n: SimilarityDetector
+    d: Detects similar functions using fuzzy string matching.
+    m:
+    - n: __init__
+      sig: (threshold:float)
+      d: Initialize the similarity detector.
+    - n: find_similar_functions
+      sig: (modules:List[ModuleInfo])
+      ret: Dict[str, List[str]]
+      d: Find similar functions across all modules.
+    - n: find_duplicate_signatures
+      sig: (modules:List[ModuleInfo])
+      ret: Dict[str, List[str]]
+      d: Find functions with identical signatures.
+    - n: _build_signature
+      sig: (name:str,params:List[str],return_type:str)
+      ret: str
+      d: Build a normalized signature string.
+  f:
+  - n: is_rapidfuzz_available
+    sig: ()
+    ret: bool
+    d: Check if Rapidfuzz is available.
+  - n: get_refactoring_suggestions
+    sig: (similar_functions:Dict[str, List[str]])
+    ret: List[Dict[str, any]]
+    d: Generate refactoring suggestions based on similar functions.
+  conditional_imports:
+  - rapidfuzz.rapidfuzz
+  - rapidfuzz.fuzz
+  - rapidfuzz.process
+- p: universal.py
+  l: 831
+  i:
+  - os
+  - re
+  - json
+  - hashlib
+  - dataclasses.dataclass
+  - pathlib.Path
+  - typing
+  e:
+  - ElementType
+  - Language
+  - UniversalParser
+  - CodeGenerator
+  - UniversalReproducer
+  - reproduce_file
+  c:
+  - n: ElementType
+    b:
+    - Enum
+    d: Types of code elements.
+  - n: Language
+    b:
+    - Enum
+    d: Supported languages.
+  - n: UniversalParser
+    d: Parse source code into universal CodeLogic format.
+    m:
+    - n: detect_language
+      sig: (content:str,file_ext:str)
+      ret: Language
+      d: Detect programming language from content and extension.
+    - n: parse
+      sig: (file_path:Union[str, Path])
+      ret: CodeLogic
+      d: Parse source file into CodeLogic.
+    - n: _parse_python
+      sig: (path:Path,content:str,hash_:str)
+      ret: CodeLogic
+      d: Parse Python file.
+    - n: _parse_js_ts
+      sig: (path:Path,content:str,hash_:str,lang:Language)
+      ret: CodeLogic
+      d: Parse JavaScript/TypeScript file.
+    - n: _parse_go
+      sig: (path:Path,content:str,hash_:str)
+      ret: CodeLogic
+      d: Parse Go file.
+    - n: _parse_sql
+      sig: (path:Path,content:str,hash_:str)
+      ret: CodeLogic
+      d: Parse SQL file.
+    - n: _parse_generic
+      sig: (path:Path,content:str,hash_:str,lang:Language)
+      ret: CodeLogic
+      d: Generic parser for unknown languages.
+  - n: CodeGenerator
+    d: Generate code from CodeLogic in target language.
+    m:
+    - n: generate
+      sig: (logic:CodeLogic,target_lang:Language)
+      ret: str
+      d: Generate code in target language.
+    - n: _generate_python
+      sig: (logic:CodeLogic)
+      ret: str
+      d: Generate Python code.
+    - n: _generate_python_element
+      sig: (elem:CodeElement,indent:int)
+      ret: List[str]
+      d: Generate Python code for element.
+    - n: _generate_typescript
+      sig: (logic:CodeLogic)
+      ret: str
+      d: Generate TypeScript code.
+    - n: _generate_go
+      sig: (logic:CodeLogic)
+      ret: str
+      d: Generate Go code.
+    - n: _generate_sql
+      sig: (logic:CodeLogic)
+      ret: str
+      d: Generate SQL code.
+    - n: _generate_generic
+      sig: (logic:CodeLogic,target:Language)
+      ret: str
+      d: Generate generic code.
+  - n: UniversalReproducer
+    d: Universal code reproduction system.
+    m:
+    - n: __init__
+      sig: (client:BaseLLMClient)
+      d: Initialize reproducer.
+    - n: _get_client
+      sig: ()
+      ret: BaseLLMClient
+      d: or create LLM client.
+    - n: extract_logic
+      sig: (file_path:str)
+      ret: CodeLogic
+      d: Extract code logic from file.
+    - n: reproduce
+      sig: (source_path:str,target_lang:str,output_dir:str,use_llm:bool)
+      ret: Dict[str, Any]
+      d: Reproduce code from source file.
+    - n: _generate_with_llm
+      sig: (logic:CodeLogic,target:Language)
+      ret: str
+      d: Generate code using LLM.
+    - n: _save_result
+      sig: (output_dir:Path,original:str,logic:CodeLogic,generated:str,result:Dict[str, Any])
+      d: Save reproduction results.
+  f:
+  - n: reproduce_file
+    sig: (source_path:str,target_lang:str,output_dir:str,use_llm:bool)
+    ret: Dict[str, Any]
+    d: Convenience function for single file reproduction.
+  conditional_imports:
+  - dotenv.dotenv
+  - dotenv.load_dotenv
+- p: benchmark.py
+  l: 351
+  i:
+  - os
+  - json
+  - time
+  - datetime
+  - dataclasses.dataclass
+  - dotenv.load_dotenv
+  - pathlib.Path
+  - typing.{Any,Dict,List,Optional}
+  e:
+  - ReproductionBenchmark
+  - run_benchmark
+  c:
+  - n: ReproductionBenchmark
+    d: Benchmark reproduction quality across formats.
+    m:
+    - n: __init__
+      sig: (client:BaseLLMClient)
+      d: Initialize benchmark.
+    - n: generate_spec
+      sig: (file_path:Path,format_name:str,detail:str)
+      ret: str
+      d: Generate specification in given format.
+    - n: reproduce_with_format
+      sig: (file_path:Path,format_name:str,original_code:str)
+      ret: FormatResult
+      d: Test reproduction with a specific format.
+    - n: run_single
+      sig: (file_path:str,formats:List[str])
+      ret: BenchmarkResult
+      d: Run benchmark on a single file.
+    - n: run_all
+      sig: (files:List[str],output_dir:str)
+      ret: Dict[str, Any]
+      d: Run benchmark on multiple files.
+    - n: _generate_summary
+      sig: (results:List[BenchmarkResult])
+      ret: Dict[str, Any]
+      d: Generate summary from benchmark results.
+    - n: _save_results
+      sig: (output_dir:Path,results:List[BenchmarkResult],summary:Dict)
+      d: Save benchmark results.
+    - n: _generate_report
+      sig: (results:List[BenchmarkResult],summary:Dict)
+      ret: str
+      d: Generate markdown benchmark report.
+  f:
+  - n: run_benchmark
+    sig: (files:List[str],output_dir:str,provider:str,model:str)
+    ret: Dict[str, Any]
+    d: Run reproduction benchmark.
+  conditional_imports:
+  - dotenv.dotenv
+  - dotenv.load_dotenv
+- p: terminal.py
+  l: 500
+  i:
+  - os
+  - re
+  - sys
+  - typing.{Any,Dict,List,Literal,Optional}
+  e:
+  - ShellRenderer
+  - get_renderer
+  - set_renderer
+  - RenderAPI
+  c:
+  - n: ShellRenderer
+    d: Renders colorized markdown output in terminal.
+    m:
+    - n: __init__
+      sig: (use_colors:bool,verbose:bool)
+      d: creates
+    - n: _supports_colors
+      sig: ()
+      ret: bool
+      d: Check if terminal supports ANSI colors.
+    - n: enable_log
+      sig: ()
+      d: Enable log buffering for markdown export.
+    - n: get_log
+      sig: ()
+      ret: str
+      d: buffered log as clean markdown (no ANSI codes).
+    - n: clear_log
+      sig: ()
+      d: Clear log buffer.
+    - n: _log
+      sig: (text:str)
+      d: Log a line (strips ANSI codes for markdown).
+    - n: _c
+      sig: (color:str,text:str)
+      ret: str
+      d: Apply color to text.
+    - n: heading
+      sig: (level:int,text:str)
+      d: Print a markdown heading.
+    - n: codeblock
+      sig: (language:Language,content:str)
+      d: Print a syntax-highlighted code block.
+    - n: render_markdown
+      sig: (text:str)
+      d: Render full markdown text with syntax highlighting.
+  - n: RenderAPI
+    d: Convenience API for terminal rendering.
+    m:
+    - n: heading
+      sig: (level:int,text:str)
+      d: heading
+    - n: code
+      sig: (lang:Language,content:str)
+      d: code
+    - n: codeblock
+      sig: (lang:Language,content:str)
+      d: codeblock
+    - n: markdown
+      sig: (text:str)
+      d: markdown
+    - n: success
+      sig: (message:str)
+      d: success
+    - n: error
+      sig: (message:str)
+      d: error
+    - n: warning
+      sig: (message:str)
+      d: warning
+    - n: info
+      sig: (message:str)
+      d: info
+    - n: status
+      sig: (icon:str,message:str,type:Literal["info", "success", "warning", "error"])
+      d: status
+    - n: kv
+      sig: (key:str,value:Any)
+      d: kv
+  f:
+  - n: get_renderer
+    sig: (use_colors:bool,verbose:bool)
+    ret: ShellRenderer
+    d: or create the global renderer instance.
+  - n: set_renderer
+    sig: (renderer:ShellRenderer)
+    d: the global renderer instance.
+- p: toon_format.py
+  l: 477
+  i:
+  - re
+  - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
+  - shared_utils.{compact_imports,truncate_docstring}
+  - typing.{Any,Dict,List,Optional}
+  e:
+  - TOONGenerator
+  - TOONParser
+  - generate_toon
+  - parse_toon
+  c:
+  - n: TOONGenerator
+    d: Generates TOON format output from ProjectInfo.
+    m:
+    - n: __init__
+      sig: (delimiter:str,use_tabs:bool)
+      d: Initialize TOON generator.
+    - n: generate
+      sig: (project:ProjectInfo,detail:str)
+      ret: str
+      d: Generate TOON format from ProjectInfo.
+    - n: _generate_modules
+      sig: (modules:List[ModuleInfo],detail:str)
+      ret: List[str]
+      d: Generate modules section.
+    - n: _generate_classes
+      sig: (classes:List[ClassInfo],detail:str,indent:int)
+      ret: List[str]
+      d: Generate classes in TOON format.
+    - n: _generate_methods
+      sig: (methods:List[FunctionInfo],detail:str,indent:int)
+      ret: List[str]
+      d: Generate methods in tabular TOON format.
+    - n: _generate_functions
+      sig: (functions:List[FunctionInfo],detail:str,indent:int)
+      ret: List[str]
+      d: Generate functions in tabular TOON format.
+    - n: _build_signature
+      sig: (f:FunctionInfo)
+      ret: str
+      d: Build compact signature string without self/cls.
+    - n: _quote
+      sig: (value:Any)
+      ret: str
+      d: Quote a value if necessary for TOON format.
+    - n: generate_compact
+      sig: (project:ProjectInfo)
+      ret: str
+      d: Generate minimal TOON output.
+    - n: generate_full
+      sig: (project:ProjectInfo)
+      ret: str
+      d: Generate detailed TOON output.
+  - n: TOONParser
+    d: Parse TOON format back to Python dict.
+    m:
+    - n: __init__
+      sig: ()
+      d: creates
+    - n: parse
+      sig: (content:str)
+      ret: Dict[str, Any]
+      d: Parse TOON content to dict.
+    - n: _parse_value
+      sig: (value:str)
+      ret: Any
+      d: Parse a TOON value to Python type.
+  f:
+  - n: generate_toon
+    sig: (project:ProjectInfo,detail:str,use_tabs:bool)
+    ret: str
+    d: Convenience function to generate TOON format.
+  - n: parse_toon
+    sig: (content:str)
+    ret: Dict[str, Any]
+    d: Convenience function to parse TOON content.
+- p: dependency.py
+  l: 187
+  i:
+  - networkx
+  - models.{DependencyNode,ModuleInfo}
+  - pathlib.Path
+  - typing.{Dict,List,Optional}
+  e:
+  - DependencyAnalyzer
+  - is_networkx_available
+  c:
+  - n: DependencyAnalyzer
+    d: Analyzes dependency graphs using NetworkX.
+    m:
+    - n: __init__
+      sig: ()
+      d: Initialize the dependency analyzer.
+    - n: build_graph
+      sig: (modules:List[ModuleInfo])
+      ret: Dict[str, List[str]]
+      d: Build dependency graph from modules.
+    - n: analyze_metrics
+      sig: ()
+      ret: Dict[str, DependencyNode]
+      d: Compute metrics for each node in the graph.
+    - n: get_entrypoints
+      sig: ()
+      ret: List[str]
+      d: entry points (nodes with no incoming edges).
+    - n: get_hubs
+      sig: ()
+      ret: List[str]
+      d: hub modules (high centrality).
+    - n: detect_cycles
+      sig: ()
+      ret: List[List[str]]
+      d: Detect dependency cycles.
+    - n: get_strongly_connected_components
+      sig: ()
+      ret: List[List[str]]
+      d: strongly connected components.
+    - n: _detect_clusters
+      sig: ()
+      ret: Dict[str, int]
+      d: Detect clusters using connected components.
+    - n: _module_name
+      sig: (path:str)
+      ret: str
+      d: Convert file path to module name.
+    - n: get_dependency_depth
+      sig: (module_path:str)
+      ret: int
+      d: the maximum depth of dependencies for a module.
+  f:
+  - n: is_networkx_available
+    sig: ()
+    ret: bool
+    d: Check if NetworkX is available.
+  conditional_imports:
+  - networkx
+- p: mcp_server.py
+  l: 293
+  i:
+  - json
+  - sys
+  - __version__
+  - pathlib.Path
+  - typing.Optional
+  e:
+  - handle_request
+  - call_tool
+  - run_server
+  f:
+  - n: handle_request
+    sig: (request:dict)
+    ret: dict
+    d: Handle incoming MCP request.
+  - n: call_tool
+    sig: (tool_name:str,arguments:dict)
+    ret: str
+    d: Execute a tool and return result.
+  - n: run_server
+    sig: ()
+    d: Run the MCP server.
+- p: reproduction.py
+  l: 333
+  i:
+  - re
+  - difflib
+  - datetime
+  - llm_clients.{BaseLLMClient,get_client}
+  - pathlib.Path
+  - typing.{Any,Dict,List,Optional}
+  e:
+  - generate_file_gherkin
+  - compare_code
+  - extract_code_block
+  - CodeReproducer
+  c:
+  - n: CodeReproducer
+    d: Code reproduction workflow using LLM.
+    m:
+    - n: __init__
+      sig: (client:BaseLLMClient,provider:str)
+      d: Initialize reproducer.
+    - n: reproduce_file
+      sig: (source_path:str,output_dir:str)
+      ret: Dict[str, Any]
+      d: Reproduce code from a source file.
+    - n: generate_from_gherkin
+      sig: (gherkin:str,language:str)
+      ret: str
+      d: Generate code from Gherkin specification.
+    - n: _save_results
+      sig: (output_dir:Path,results:Dict[str, Any])
+      d: Save reproduction results to files.
+    - n: _generate_report
+      sig: (results:Dict[str, Any])
+      ret: str
+      d: Generate markdown comparison report.
+  f:
+  - n: generate_file_gherkin
+    sig: (file_path:Path)
+    ret: str
+    d: Generate detailed Gherkin specification for a single file wi
+  - n: compare_code
+    sig: (original:str,generated:str)
+    ret: Dict[str, Any]
+    d: Compare original and generated code.
+  - n: extract_code_block
+    sig: (text:str,language:str)
+    ret: str
+    d: Extract code block from LLM response.
+- p: gherkin.py
+  l: 766
+  i:
+  - re
+  - hashlib
+  - collections.defaultdict
+  - dataclasses.{dataclass,field}
+  - models.{ModuleInfo,ProjectInfo}
+  - typing.{Any,Dict,List,Optional,Set}
+  e:
+  - GherkinGenerator
+  - StepDefinitionGenerator
+  - CucumberYAMLGenerator
+  - csv_to_gherkin
+  - gherkin_to_test_data
+  c:
+  - n: GherkinGenerator
+    d: Generates Gherkin feature files from code analysis.
+    m:
+    - n: __init__
+      sig: (language:str)
+      d: Initialize GherkinGenerator.
+    - n: generate
+      sig: (project:ProjectInfo,detail:str,group_by:str)
+      ret: str
+      d: Generate Gherkin feature files from project analysis.
+    - n: generate_test_scenarios
+      sig: (project:ProjectInfo,group_by:str)
+      ret: List[GherkinFeature]
+      d: Generate structured test scenarios for programmatic use.
+    - n: get_step_definitions
+      sig: ()
+      ret: List[StepDefinition]
+      d: all unique step definitions from generated features.
+    - n: _extract_features
+      sig: (project:ProjectInfo,group_by:str)
+      ret: List[GherkinFeature]
+      d: Extract Gherkin features from project.
+    - n: _create_feature
+      sig: (group_name:str,items:List[dict],project:ProjectInfo,group_by:str)
+      ret: GherkinFeature
+      d: a Gherkin feature from grouped items.
+    - n: _create_scenario
+      sig: (category:str,items:List[dict],domain:str)
+      ret: GherkinScenario
+      d: a scenario from category items.
+    - n: _create_edge_case_scenarios
+      sig: (category:str,items:List[dict])
+      ret: List[GherkinScenario]
+      d: edge case scenarios for thorough testing.
+    - n: _create_when_step
+      sig: (func:FunctionInfo,verb:str)
+      ret: str
+      d: a When step from function info.
+    - n: _create_background
+      sig: (domain:str,items:List[dict])
+      ret: Optional[List[str]]
+      d: background steps for common setup.
+  - n: StepDefinitionGenerator
+    d: Generates step definition stubs from Gherkin features.
+    m:
+    - n: generate_pytest_bdd
+      sig: (features:List[GherkinFeature])
+      ret: str
+      d: Generate pytest-bdd step definitions.
+    - n: generate_behave
+      sig: (features:List[GherkinFeature])
+      ret: str
+      d: Generate behave step definitions.
+    - n: generate_cucumber_js
+      sig: (features:List[GherkinFeature])
+      ret: str
+      d: Generate Cucumber.js step definitions.
+    - n: _step_to_func_name
+      sig: (step:str)
+      ret: str
+      d: Convert step text to valid function name.
+  - n: CucumberYAMLGenerator
+    d: Generates Cucumber YAML configuration and test data.
+    m:
+    - n: generate
+      sig: (project:ProjectInfo,detail:str)
+      ret: str
+      d: Generate Cucumber YAML configuration.
+    - n: _extract_domain
+      sig: (path:str)
+      ret: str
+      d: Extract domain from path.
+    - n: _categorize
+      sig: (name:str)
+      ret: str
+      d: Categorize by name pattern.
+  f:
+  - n: csv_to_gherkin
+    sig: (csv_content:str,language:str)
+    ret: str
+    d: Convert CSV analysis directly to Gherkin.
+  - n: gherkin_to_test_data
+    sig: (gherkin_content:str)
+    ret: Dict[str, Any]
+    d: Extract structured test data from Gherkin for LLM processing
+- p: schemas/logicml_schema.py
+  l: 190
+  i:
+  - re
+  - dataclasses.{dataclass,field}
+  - typing.{Any,Dict,List,Optional,Tuple}
+  e:
+  - validate_logicml
+  - parse_logicml_header
+  - extract_logicml_signature
+  f:
+  - n: validate_logicml
+    sig: (spec:str)
+    ret: Tuple[bool, List[str]]
+    d: Validate LogicML specification.
+  - n: parse_logicml_header
+    sig: (line:str)
+    ret: Optional[Dict[str, Any]]
+    d: Parse LogicML header comment.
+  - n: extract_logicml_signature
+    sig: (sig_line:str)
+    ret: Dict[str, Any]
+    d: 'Extract signature components from LogicML sig: line.'
+- p: schemas/__init__.py
+  l: 25
+  i:
+  - json_schema.{JSONSchema,parse_json_spec,validate_json}
+  - logicml_schema.{LogicMLSchema,validate_logicml}
+  - markdown_schema.{MarkdownSchema,validate_markdown}
+  - yaml_schema.{YAMLSchema,validate_yaml}
+- p: schemas/yaml_schema.py
+  l: 164
+  i:
+  - yaml
+  - dataclasses.{dataclass,field}
+  - typing.{Any,Dict,List,Optional,Tuple}
+  e:
+  - validate_yaml
+  f:
+  - n: validate_yaml
+    sig: (spec:str)
+    ret: Tuple[bool, List[str]]
+    d: Validate YAML specification.
+  - n: _validate_module
+    sig: (module:Dict,index:int)
+    ret: List[str]
+    d: Validate a module definition.
+  - n: _validate_class
+    sig: (cls:Dict,prefix:str)
+    ret: List[str]
+    d: Validate a class definition.
+- p: schemas/json_schema.py
+  l: 206
+  i:
+  - json
+  - dataclasses.{dataclass,field}
+  - typing.{Any,Dict,List,Optional,Tuple}
+  e:
+  - validate_json
+  - parse_json_spec
+  f:
+  - n: validate_json
+    sig: (spec:str)
+    ret: Tuple[bool, List[str]]
+    d: Validate JSON specification.
+  - n: _validate_json_module
+    sig: (module:Dict,index:int)
+    ret: List[str]
+    d: Validate a JSON module definition.
+  - n: _validate_json_class
+    sig: (cls:Dict,prefix:str)
+    ret: List[str]
+    d: Validate a JSON class definition.
+  - n: parse_json_spec
+    sig: (spec:str)
+    ret: Optional[JSONSchema]
+    d: Parse JSON specification into schema.
+- p: schemas/markdown_schema.py
+  l: 121
+  i:
+  - re
+  - dataclasses.{dataclass,field}
+  - typing.{Any,Dict,List,Optional,Tuple}
+  e:
+  - validate_markdown
+  - extract_markdown_sections
+  f:
+  - n: validate_markdown
+    sig: (spec:str)
+    ret: Tuple[bool, List[str]]
+    d: Validate Markdown specification.
+  - n: extract_markdown_sections
+    sig: (spec:str)
+    ret: Dict[str, Any]
+    d: Extract sections from Markdown specification.
+- p: benchmarks/common.py
+  l: 206
+  i:
+  - datetime
+  - json
+  - generators.{JSONGenerator,YAMLGenerator}
+  - gherkin.GherkinGenerator
+  - logicml.LogicMLGenerator
+  - markdown_format.MarkdownHybridGenerator
+  - models.ProjectInfo
+  - pathlib.Path
+  - toon_format.TOONGenerator
+  e:
+  - create_single_project
+  - generate_spec
+  - generate_spec_token
+  - get_async_reproduction_prompt
+  - get_token_reproduction_prompt
+  - get_simple_reproduction_prompt
+  f:
+  - n: create_single_project
+    sig: (module_info,file_path:Path)
+    ret: ProjectInfo
+    d: creates single project
+  - n: generate_spec
+    sig: (project:ProjectInfo,fmt:str)
+    ret: str
+    d: creates spec
+  - n: _generate_token_json
+    sig: (project:ProjectInfo)
+    ret: str
+    d: Generate compact, token-friendly JSON spec (used by examples
+  - n: _generate_token_json_compact
+    sig: (project:ProjectInfo)
+    ret: str
+    d: creates token json compact
+  - n: generate_spec_token
+    sig: (project:ProjectInfo,fmt:str)
+    ret: str
+    d: Generate spec optimized for token benchmark (keeps historica
+  - n: get_async_reproduction_prompt
+    sig: (spec:str,fmt:str,file_name:str,with_tests:bool)
+    ret: str
+    d: retrieves async reproduction prompt
+  - n: get_token_reproduction_prompt
+    sig: (spec:str,fmt:str,file_name:str)
+    ret: str
+    d: retrieves token reproduction prompt
+  - n: get_simple_reproduction_prompt
+    sig: (spec:str,fmt:str,file_name:str)
+    ret: str
+    d: retrieves simple reproduction prompt
+- p: benchmarks/runner.py
+  l: 638
+  i:
+  - re
+  - sys
+  - time
+  - dataclasses
+  - concurrent.futures.{ThreadPoolExecutor,as_completed}
+  - concurrent.futures.concurrent.futures
+  - pathlib.Path
+  - typing.{Callable,Dict,List,Optional,Tuple}
+  e:
+  - BenchmarkRunner
+  - run_benchmark
+  c:
+  - n: BenchmarkRunner
+    d: Unified benchmark runner for code2logic.
+    m:
+    - n: __init__
+      sig: (client:Optional[BaseLLMClient],config:Optional[BenchmarkConfig])
+      d: Initialize benchmark runner.
+    - n: _should_use_llm
+      sig: ()
+      ret: bool
+      d: whether this runner should call an LLM.
+    - n: _get_client
+      sig: ()
+      ret: BaseLLMClient
+      d: or create LLM client.
+    - n: _template_generate_code
+      sig: (spec:str,fmt:str,file_name:str)
+      ret: str
+      d: Generate minimal Python code without an LLM (fallback mode).
+    - n: run_format_benchmark
+      sig: (folder:str,formats:List[str],limit:Optional[int],verbose:bool)
+      ret: BenchmarkResult
+      d: Run format comparison benchmark.
+    - n: _test_format
+      sig: (project,original:str,fmt:str,file_name:str,client:Optional[BaseLLMClient],...+1)
+      ret: FormatResult
+      d: Test a single format.
+    - n: run_file_benchmark
+      sig: (file_path:str,formats:List[str],verbose:bool)
+      ret: BenchmarkResult
+      d: Run benchmark on a single file.
+    - n: run_function_benchmark
+      sig: (file_path:str,function_names:List[str],limit:Optional[int],verbose:bool)
+      ret: BenchmarkResult
+      d: Run function-level reproduction benchmark.
+    - n: _test_function
+      sig: (func,content:str,language:str,file_path:Path,client:Optional[BaseLLMClient],...+1)
+      ret: FunctionResult
+      d: Test reproduction of a single function.
+    - n: run_project_benchmark
+      sig: (project_path:str,formats:List[str],limit:Optional[int],verbose:bool)
+      ret: BenchmarkResult
+      d: Run benchmark on entire project.
+  f:
+  - n: _test_python_syntax
+    sig: (code:str)
+    ret: bool
+    d: Test if Python code has valid syntax.
+  - n: _test_python_runs
+    sig: (code:str,timeout:int)
+    ret: bool
+    d: Test if Python code runs without errors.
+  - n: _extract_code
+    sig: (response:str)
+    ret: str
+    d: Extract code from LLM response.
+  - n: run_benchmark
+    sig: (source:str,benchmark_type:str,formats:List[str],limit:Optional[int],output:Optional[str],...+1)
+    ret: BenchmarkResult
+    d: Convenience function to run benchmarks.
+- p: benchmarks/__init__.py
+  l: 19
+  i:
+  - common
+  - results.{BenchmarkConfig,BenchmarkResult,FileResult,FormatResult,FunctionResult}
+  - runner.{BenchmarkRunner,run_benchmark}
+- p: benchmarks/results.py
+  l: 148
+  i:
+  - datetime
+  - json
+  - dataclasses.{asdict,dataclass,field}
+  - pathlib.Path
+  - typing.{Any,Dict,List,Optional}
+- p: core/__init__.py
+  l: 20
+  i:
+  - analyzer.{ProjectAnalyzer,analyze_project}
+  - dependency.DependencyAnalyzer
+  - errors
+  - models
+- p: formats/__init__.py
+  l: 27
+  i:
+  - generators.{CSVGenerator,CompactGenerator,JSONGenerator,MarkdownGenerator,YAMLGenerator}
+  - gherkin.{CucumberYAMLGenerator,GherkinGenerator,StepDefinitionGenerator,csv_to_gherkin,gherkin_to_test_data}
+  - logicml.{LogicMLGenerator,LogicMLSpec}
+  - markdown_format.{MarkdownHybridGenerator,MarkdownSpec}
+  - toon_format.TOONGenerator
+- p: tools/__init__.py
+  l: 21
+  i:
+  - benchmark.{BenchmarkResult,FormatResult,ReproductionBenchmark,run_benchmark}
+  - code_review.{CodeReviewer,analyze_code_quality,check_performance_issues,check_security_issues}
+  - refactor
+- p: llm/__init__.py
+  l: 13
+  i:
+  - intent.EnhancedIntentGenerator
+  - llm_clients.{BaseLLMClient,LiteLLMClient,OllamaLocalClient,OpenRouterClient,get_client}
+- p: integrations/__init__.py
+  l: 5
+  i:
+  - mcp_server.{call_tool,handle_request,run_server}
+defaults:
+  lang: python
