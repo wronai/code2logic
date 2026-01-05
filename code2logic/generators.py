@@ -594,6 +594,7 @@ class YAMLGenerator:
         'sig': 'signature',     # function signature
         'ret': 'return_type',   # return type
         'async': 'is_async',    # async function flag
+        'kb': 'kilobytes',      # file size in kilobytes
     }
     
     def generate(self, project: ProjectInfo, flat: bool = False, 
@@ -990,10 +991,15 @@ class YAMLGenerator:
         # Detect default language
         default_lang = max(project.languages.items(), key=lambda x: x[1])[0] if project.languages else 'python'
         
+        total_kb = bytes_to_kb(getattr(project, 'total_bytes', 0))
         # Compact module overview
         modules_overview = []
         for m in project.modules:
-            modules_overview.append(f"{m.path}:{m.lines_code}")
+            file_kb = bytes_to_kb(getattr(m, 'file_bytes', 0))
+            entry = f"{m.path}:{m.lines_code}"
+            if file_kb:
+                entry = f"{entry}:{file_kb}kb"
+            modules_overview.append(entry)
         
         # Build detailed module data with enhanced information
         detailed_modules = []
@@ -1008,6 +1014,8 @@ class YAMLGenerator:
             
             # Add line count
             mod_data['l'] = m.lines_code  # lines
+            if file_kb:
+                mod_data['kb'] = file_kb
             
             # Enhanced imports with grouping
             if m.imports:
@@ -1186,6 +1194,7 @@ class YAMLGenerator:
                 'project': project.name,
                 'files': project.total_files,
                 'lines': project.total_lines,
+                'kb': total_kb,
                 'languages': dict(project.languages),
                 'modules_count': len(project.modules)
             },
@@ -1591,10 +1600,17 @@ class YAMLGenerator:
         # Detect default language
         default_lang = max(project.languages.items(), key=lambda x: x[1])[0] if project.languages else 'python'
         
+        total_bytes = getattr(project, 'total_bytes', 0)
+        total_kb = bytes_to_kb(total_bytes)
         modules = []
         module_overview = []
         for m in project.modules:
-            module_overview.append(f"{m.path}:{m.lines_code}")
+            file_bytes = getattr(m, 'file_bytes', 0)
+            file_kb = bytes_to_kb(file_bytes)
+            overview_entry = f"{m.path}:{m.lines_code}"
+            if file_kb:
+                overview_entry = f"{overview_entry}:{file_kb}kb"
+            module_overview.append(overview_entry)
             mod_data = {
                 'p': m.path,  # path
             }
@@ -1605,6 +1621,8 @@ class YAMLGenerator:
             
             # Add line count as comment in path
             mod_data['l'] = m.lines_code  # lines
+            if file_kb:
+                mod_data['kb'] = file_kb
             
             if detail in ('standard', 'full'):
                 # Deduplicate and compact imports
@@ -1634,6 +1652,7 @@ class YAMLGenerator:
                 'project': project.name,
                 'files': project.total_files,
                 'lines': project.total_lines,
+                'kb': total_kb,
                 'languages': project.languages,
                 'modules_count': len(project.modules),
             },

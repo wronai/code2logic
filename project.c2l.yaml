@@ -1,63 +1,63 @@
 header:
   project: code2logic
   files: 51
-  lines: 21185
-  kb: 717.8
+  lines: 21199
+  kb: 718.4
   languages:
     python: 51
   modules_count: 51
 M:
-- llm_profiler.py:491
-- config.py:168
-- file_formats.py:279
-- project_reproducer.py:322
-- base.py:50
-- cli.py:767
-- llm.py:376
-- errors.py:372
-- code_review.py:205
-- analyzer.py:235
-- quality.py:212
-- shared_utils.py:279
-- parsers.py:1162
-- intent.py:429
-- adaptive.py:475
-- reproducer.py:534
-- llm_clients.py:415
-- prompts.py:120
-- chunked_reproduction.py:357
-- __init__.py:320
-- metrics.py:447
-- __main__.py:9
-- refactor.py:313
-- logicml.py:281
-- utils.py:16
-- generators.py:1605
-- markdown_format.py:266
-- models.py:295
-- similarity.py:178
-- universal.py:831
-- benchmark.py:351
-- terminal.py:500
-- toon_format.py:477
-- dependency.py:187
-- mcp_server.py:293
-- reproduction.py:333
-- gherkin.py:766
-- schemas/logicml_schema.py:190
-- schemas/__init__.py:25
-- schemas/yaml_schema.py:164
-- schemas/json_schema.py:206
-- schemas/markdown_schema.py:121
-- benchmarks/common.py:206
-- benchmarks/runner.py:638
-- benchmarks/__init__.py:19
-- benchmarks/results.py:148
-- core/__init__.py:20
-- formats/__init__.py:27
-- tools/__init__.py:21
-- llm/__init__.py:13
-- integrations/__init__.py:5
+- llm_profiler.py:491:20.4kb
+- config.py:168:7.4kb
+- file_formats.py:279:12.3kb
+- project_reproducer.py:322:12.2kb
+- base.py:50:1.8kb
+- cli.py:767:32.5kb
+- llm.py:376:14.6kb
+- errors.py:372:13.7kb
+- code_review.py:205:9.0kb
+- analyzer.py:235:9.6kb
+- quality.py:212:8.8kb
+- shared_utils.py:279:11.6kb
+- parsers.py:1162:57.4kb
+- intent.py:429:20.5kb
+- adaptive.py:475:19.9kb
+- reproducer.py:534:22.0kb
+- llm_clients.py:415:16.5kb
+- prompts.py:120:4.0kb
+- chunked_reproduction.py:357:14.2kb
+- __init__.py:320:7.7kb
+- metrics.py:447:22.7kb
+- __main__.py:9:0.2kb
+- refactor.py:313:11.4kb
+- logicml.py:281:12.8kb
+- utils.py:16:0.6kb
+- generators.py:1619:79.3kb
+- markdown_format.py:266:13.9kb
+- models.py:295:10.6kb
+- similarity.py:178:7.8kb
+- universal.py:831:39.7kb
+- benchmark.py:351:14.4kb
+- terminal.py:500:21.6kb
+- toon_format.py:477:25.5kb
+- dependency.py:187:7.5kb
+- mcp_server.py:293:12.2kb
+- reproduction.py:333:15.3kb
+- gherkin.py:766:35.4kb
+- schemas/logicml_schema.py:190:6.7kb
+- schemas/__init__.py:25:0.7kb
+- schemas/yaml_schema.py:164:6.7kb
+- schemas/json_schema.py:206:7.2kb
+- schemas/markdown_schema.py:121:4.2kb
+- benchmarks/common.py:206:8.5kb
+- benchmarks/runner.py:638:27.3kb
+- benchmarks/__init__.py:19:0.4kb
+- benchmarks/results.py:148:6.3kb
+- core/__init__.py:20:0.7kb
+- formats/__init__.py:27:1.2kb
+- tools/__init__.py:21:1.0kb
+- llm/__init__.py:13:0.4kb
+- integrations/__init__.py:5:0.2kb
 meta:
   legend:
     p: path
@@ -2263,8 +2263,8 @@ modules:
     ret: None
     d: cleanup generated root
 - p: generators.py
-  l: 1605
-  kb: 78.8
+  l: 1619
+  kb: 79.3
   i:
   - json
   - collections.defaultdict

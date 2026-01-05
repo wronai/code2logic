@@ -1,65 +1,67 @@
 header:
   project: code2logic
   files: 51
-  lines: 21185
+  lines: 21199
+  kb: 718.4
   languages:
     python: 51
   modules_count: 51
 M:
-- llm_profiler.py:491
-- config.py:168
-- file_formats.py:279
-- project_reproducer.py:322
-- base.py:50
-- cli.py:767
-- llm.py:376
-- errors.py:372
-- code_review.py:205
-- analyzer.py:235
-- quality.py:212
-- shared_utils.py:279
-- parsers.py:1162
-- intent.py:429
-- adaptive.py:475
-- reproducer.py:534
-- llm_clients.py:415
-- prompts.py:120
-- chunked_reproduction.py:357
-- __init__.py:320
-- metrics.py:447
-- __main__.py:9
-- refactor.py:313
-- logicml.py:281
-- utils.py:16
-- generators.py:1605
-- markdown_format.py:266
-- models.py:295
-- similarity.py:178
-- universal.py:831
-- benchmark.py:351
-- terminal.py:500
-- toon_format.py:477
-- dependency.py:187
-- mcp_server.py:293
-- reproduction.py:333
-- gherkin.py:766
-- schemas/logicml_schema.py:190
-- schemas/__init__.py:25
-- schemas/yaml_schema.py:164
-- schemas/json_schema.py:206
-- schemas/markdown_schema.py:121
-- benchmarks/common.py:206
-- benchmarks/runner.py:638
-- benchmarks/__init__.py:19
-- benchmarks/results.py:148
-- core/__init__.py:20
-- formats/__init__.py:27
-- tools/__init__.py:21
-- llm/__init__.py:13
-- integrations/__init__.py:5
+- llm_profiler.py:491:20.4kb
+- config.py:168:7.4kb
+- file_formats.py:279:12.3kb
+- project_reproducer.py:322:12.2kb
+- base.py:50:1.8kb
+- cli.py:767:32.5kb
+- llm.py:376:14.6kb
+- errors.py:372:13.7kb
+- code_review.py:205:9.0kb
+- analyzer.py:235:9.6kb
+- quality.py:212:8.8kb
+- shared_utils.py:279:11.6kb
+- parsers.py:1162:57.4kb
+- intent.py:429:20.5kb
+- adaptive.py:475:19.9kb
+- reproducer.py:534:22.0kb
+- llm_clients.py:415:16.5kb
+- prompts.py:120:4.0kb
+- chunked_reproduction.py:357:14.2kb
+- __init__.py:320:7.7kb
+- metrics.py:447:22.7kb
+- __main__.py:9:0.2kb
+- refactor.py:313:11.4kb
+- logicml.py:281:12.8kb
+- utils.py:16:0.6kb
+- generators.py:1619:79.3kb
+- markdown_format.py:266:13.9kb
+- models.py:295:10.6kb
+- similarity.py:178:7.8kb
+- universal.py:831:39.7kb
+- benchmark.py:351:14.4kb
+- terminal.py:500:21.6kb
+- toon_format.py:477:25.5kb
+- dependency.py:187:7.5kb
+- mcp_server.py:293:12.2kb
+- reproduction.py:333:15.3kb
+- gherkin.py:766:35.4kb
+- schemas/logicml_schema.py:190:6.7kb
+- schemas/__init__.py:25:0.7kb
+- schemas/yaml_schema.py:164:6.7kb
+- schemas/json_schema.py:206:7.2kb
+- schemas/markdown_schema.py:121:4.2kb
+- benchmarks/common.py:206:8.5kb
+- benchmarks/runner.py:638:27.3kb
+- benchmarks/__init__.py:19:0.4kb
+- benchmarks/results.py:148:6.3kb
+- core/__init__.py:20:0.7kb
+- formats/__init__.py:27:1.2kb
+- tools/__init__.py:21:1.0kb
+- llm/__init__.py:13:0.4kb
+- integrations/__init__.py:5:0.2kb
 modules:
 - p: llm_profiler.py
   l: 491
+  kb: 0.2
   i:
   - json
   - os
@@ -192,6 +194,7 @@ modules:
     d: adaptive chunker for a model.
 - p: config.py
   l: 168
+  kb: 0.2
   i:
   - os
   - json
@@ -258,6 +261,7 @@ modules:
     d: Convenience function to get model.
 - p: file_formats.py
   l: 279
+  kb: 0.2
   i:
   - re
   - json
@@ -286,6 +290,7 @@ modules:
     d: Parse file content to extract code elements.
 - p: project_reproducer.py
   l: 322
+  kb: 0.2
   i:
   - os
   - json
@@ -353,6 +358,7 @@ modules:
     d: Convenience function for project reproduction.
 - p: base.py
   l: 50
+  kb: 0.2
   i:
   - logging
   - typing.Optional
@@ -410,6 +416,7 @@ modules:
       d: creates
 - p: cli.py
   l: 767
+  kb: 0.2
   i:
   - argparse
   - os
@@ -511,6 +518,7 @@ modules:
     d: caches litellm yaml
 - p: llm.py
   l: 376
+  kb: 0.2
   i:
   - json
   - os
@@ -603,6 +611,7 @@ modules:
     d: availability status of LLM backends.
 - p: errors.py
   l: 372
+  kb: 0.2
   i:
   - logging
   - traceback
@@ -686,6 +695,7 @@ modules:
     d: an error handler with default settings.
 - p: code_review.py
   l: 205
+  kb: 0.2
   i:
   - collections.defaultdict
   - typing.{Any,Dict,List}
@@ -745,6 +755,7 @@ modules:
     d: Check for performance anti-patterns.
 - p: analyzer.py
   l: 235
+  kb: 0.2
   i:
   - sys
   - datetime
@@ -795,6 +806,7 @@ modules:
     d: availability status of optional libraries.
 - p: quality.py
   l: 212
+  kb: 0.2
   i:
   - dataclasses.{dataclass,field}
   - models.{ModuleInfo,ProjectInfo}
@@ -853,6 +865,7 @@ modules:
     d: Generate human-readable quality summary.
 - p: shared_utils.py
   l: 279
+  kb: 0.2
   i:
   - hashlib
   - re
@@ -943,6 +956,7 @@ modules:
     d: Clean identifier by removing whitespace and special characte
 - p: parsers.py
   l: 1162
+  kb: 0.2
   i:
   - ast
   - re
@@ -1061,6 +1075,7 @@ modules:
     d: Check if Tree-sitter is available.
 - p: intent.py
   l: 429
+  kb: 0.2
   i:
   - re
   - spacy
@@ -1154,6 +1169,7 @@ modules:
   - spacy
 - p: adaptive.py
   l: 475
+  kb: 0.2
   i:
   - os
   - re
@@ -1233,6 +1249,7 @@ modules:
     d: capabilities for a specific model.
 - p: reproducer.py
   l: 534
+  kb: 0.2
   i:
   - os
   - yaml
@@ -1358,6 +1375,7 @@ modules:
     d: Validate specific files against spec.
 - p: llm_clients.py
   l: 415
+  kb: 0.2
   i:
   - os
   - json
@@ -1533,6 +1551,7 @@ modules:
     d: retrieves effective provider order
 - p: prompts.py
   l: 120
+  kb: 0.2
   i:
   - typing.Dict
   e:
@@ -1554,6 +1573,7 @@ modules:
     d: Generate code fix prompt.
 - p: chunked_reproduction.py
   l: 357
+  kb: 0.2
   i:
   - re
   - dataclasses.{dataclass,field}
@@ -1645,6 +1665,7 @@ modules:
     d: Adaptive chunking reproduction using LLM profile.
 - p: __init__.py
   l: 320
+  kb: 0.2
   i:
   - analyzer.{ProjectAnalyzer,analyze_project}
   - generators.{CSVGenerator,CompactGenerator,JSONGenerator,MarkdownGenerator,YAMLGenerator}
@@ -1662,6 +1683,7 @@ modules:
     d: reproduce project
 - p: metrics.py
   l: 447
+  kb: 0.2
   i:
   - re
   - difflib
@@ -1752,10 +1774,12 @@ modules:
     d: Compare reproduction quality across formats.
 - p: __main__.py
   l: 9
+  kb: 0.2
   i:
   - cli.main
 - p: refactor.py
   l: 313
+  kb: 0.2
   i:
   - json
   - analyzer.analyze_project
@@ -1813,6 +1837,7 @@ modules:
     d: Quick analysis for a project.
 - p: logicml.py
   l: 281
+  kb: 0.2
   i:
   - dataclasses.dataclass
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
@@ -1869,6 +1894,7 @@ modules:
     d: Convenience function to generate LogicML format.
 - p: utils.py
   l: 16
+  kb: 0.2
   i:
   - shutil
   - __future__.annotations
@@ -1889,7 +1915,8 @@ modules:
     sig: (generated_root:Path,allowed_dirs:set[str])
     d: cleanup generated root
 - p: generators.py
-  l: 1605
+  l: 1619
+  kb: 0.2
   i:
   - json
   - collections.defaultdict
@@ -2063,6 +2090,7 @@ modules:
     d: Convert bytes to kilobytes with single decimal precision.
 - p: markdown_format.py
   l: 266
+  kb: 0.2
   i:
   - os
   - dataclasses.dataclass
@@ -2124,11 +2152,13 @@ modules:
     d: Generate Markdown hybrid for a single file.
 - p: models.py
   l: 295
+  kb: 0.2
   i:
   - dataclasses.{dataclass,field}
   - typing.{Dict,List,Optional}
 - p: similarity.py
   l: 178
+  kb: 0.2
   i:
   - models.ModuleInfo
   - typing.{Dict,List}
@@ -2169,6 +2199,7 @@ modules:
     d: Generate refactoring suggestions based on similar functions.
 - p: universal.py
   l: 831
+  kb: 0.2
   i:
   - os
   - re
@@ -2314,6 +2345,7 @@ modules:
     d: Convenience function for single file reproduction.
 - p: benchmark.py
   l: 351
+  kb: 0.2
   i:
   - os
   - json
@@ -2382,6 +2414,7 @@ modules:
     d: Run reproduction benchmark.
 - p: terminal.py
   l: 500
+  kb: 0.2
   i:
   - os
   - re
@@ -2515,6 +2548,7 @@ modules:
     d: the global renderer instance.
 - p: toon_format.py
   l: 477
+  kb: 0.2
   i:
   - re
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
@@ -2593,6 +2627,7 @@ modules:
     d: Convenience function to parse TOON content.
 - p: dependency.py
   l: 187
+  kb: 0.2
   i:
   - models.{DependencyNode,ModuleInfo}
   - pathlib.Path
@@ -2653,6 +2688,7 @@ modules:
     d: Check if NetworkX is available.
 - p: mcp_server.py
   l: 293
+  kb: 0.2
   i:
   - json
   - sys
@@ -2677,6 +2713,7 @@ modules:
     d: Run the MCP server.
 - p: reproduction.py
   l: 333
+  kb: 0.2
   i:
   - re
   - difflib
@@ -2726,6 +2763,7 @@ modules:
     d: Extract code block from LLM response.
 - p: gherkin.py
   l: 766
+  kb: 0.2
   i:
   - re
   - hashlib
@@ -2836,6 +2874,7 @@ modules:
     d: Extract structured test data from Gherkin for LLM processing
 - p: schemas/logicml_schema.py
   l: 190
+  kb: 0.2
   i:
   - re
   - dataclasses.{dataclass,field}
@@ -2872,6 +2911,7 @@ modules:
     d: 'Extract signature components from LogicML sig: line.'
 - p: schemas/__init__.py
   l: 25
+  kb: 0.2
   i:
   - json_schema.{JSONSchema,parse_json_spec,validate_json}
   - logicml_schema.{LogicMLSchema,validate_logicml}
@@ -2879,6 +2919,7 @@ modules:
   - yaml_schema.{YAMLSchema,validate_yaml}
 - p: schemas/yaml_schema.py
   l: 164
+  kb: 0.2
   i:
   - yaml
   - dataclasses.{dataclass,field}
@@ -2916,6 +2957,7 @@ modules:
     d: Validate a class definition.
 - p: schemas/json_schema.py
   l: 206
+  kb: 0.2
   i:
   - json
   - dataclasses.{dataclass,field}
@@ -2958,6 +3000,7 @@ modules:
     d: Parse JSON specification into schema.
 - p: schemas/markdown_schema.py
   l: 121
+  kb: 0.2
   i:
   - re
   - dataclasses.{dataclass,field}
@@ -2989,6 +3032,7 @@ modules:
     d: Extract sections from Markdown specification.
 - p: benchmarks/common.py
   l: 206
+  kb: 0.2
   i:
   - datetime
   - json
@@ -3042,6 +3086,7 @@ modules:
     d: retrieves simple reproduction prompt
 - p: benchmarks/runner.py
   l: 638
+  kb: 0.2
   i:
   - re
   - sys
@@ -3117,12 +3162,14 @@ modules:
     d: Convenience function to run benchmarks.
 - p: benchmarks/__init__.py
   l: 19
+  kb: 0.2
   i:
   - common
   - results.{BenchmarkConfig,BenchmarkResult,FileResult,FormatResult,FunctionResult}
   - runner.{BenchmarkRunner,run_benchmark}
 - p: benchmarks/results.py
   l: 148
+  kb: 0.2
   i:
   - datetime
   - json
@@ -3131,6 +3178,7 @@ modules:
   - typing.{Any,Dict,List,Optional}
 - p: core/__init__.py
   l: 20
+  kb: 0.2
   i:
   - analyzer.{ProjectAnalyzer,analyze_project}
   - dependency.DependencyAnalyzer
@@ -3138,6 +3186,7 @@ modules:
   - models
 - p: formats/__init__.py
   l: 27
+  kb: 0.2
   i:
   - generators.{CSVGenerator,CompactGenerator,JSONGenerator,MarkdownGenerator,YAMLGenerator}
   - gherkin.{CucumberYAMLGenerator,GherkinGenerator,StepDefinitionGenerator,csv_to_gherkin,gherkin_to_test_data}
@@ -3146,17 +3195,20 @@ modules:
   - toon_format.TOONGenerator
 - p: tools/__init__.py
   l: 21
+  kb: 0.2
   i:
   - benchmark.{BenchmarkResult,FormatResult,ReproductionBenchmark,run_benchmark}
   - code_review.{CodeReviewer,analyze_code_quality,check_performance_issues,check_security_issues}
   - refactor
 - p: llm/__init__.py
   l: 13
+  kb: 0.2
   i:
   - intent.EnhancedIntentGenerator
   - llm_clients.{BaseLLMClient,LiteLLMClient,OllamaLocalClient,OpenRouterClient,get_client}
 - p: integrations/__init__.py
   l: 5
+  kb: 0.2
   i:
   - mcp_server.{call_tool,handle_request,run_server}
 defaults:

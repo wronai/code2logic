@@ -1,4 +1,4 @@
-# code2logic | 51f 21185L | python:51
+# code2logic | 51f 21199L | python:51
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[51]:
   llm_profiler.py,491
@@ -26,7 +26,7 @@ M[51]:
   refactor.py,313
   logicml.py,281
   utils.py,16
-  generators.py,1605
+  generators.py,1619
   markdown_format.py,266
   models.py,295
   similarity.py,178
