@@ -14,7 +14,7 @@ from collections import defaultdict
 
 from .models import (
     ProjectInfo, ModuleInfo, ClassInfo, FunctionInfo,
-    DependencyNode
+    DependencyNode, ConstantInfo
 )
 from .shared_utils import categorize_function, extract_domain, compute_hash, remove_self_from_params, compact_imports, deduplicate_imports
 
@@ -953,7 +953,7 @@ class YAMLGenerator:
         
         return json.dumps(schema, indent=2)
 
-    def generate_hybrid(self, project: ProjectInfo) -> str:
+    def generate_hybrid(self, project: ProjectInfo, detail: str = 'standard') -> str:
         """
         Generate hybrid format combining TOON compactness with YAML completeness.
         
@@ -1005,13 +1005,18 @@ class YAMLGenerator:
             if hasattr(m, 'constants') and m.constants:
                 const_data = []
                 for const in m.constants:
-                    const_dict = {'n': const.name}
-                    if const.type_annotation:
-                        const_dict['t'] = const.type_annotation
-                    if const.value_keys:  # For dicts, show keys
-                        const_dict['keys'] = const.value_keys[:10]
-                    elif const.value and len(const.value) <= 100:  # For small values
-                        const_dict['v'] = const.value
+                    if isinstance(const, str):
+                        # Handle string constants (from UniversalParser)
+                        const_dict = {'n': const}
+                    else:
+                        # Handle ConstantInfo objects (from TreeSitter parser)
+                        const_dict = {'n': const.name}
+                        if const.type_annotation:
+                            const_dict['t'] = const.type_annotation
+                        if const.value_keys:  # For dicts, show keys
+                            const_dict['keys'] = const.value_keys[:10]
+                        elif const.value and len(const.value) <= 100:  # For small values
+                            const_dict['v'] = const.value
                     const_data.append(const_dict)
                 if const_data:
                     mod_data['const'] = const_data
@@ -1571,7 +1576,8 @@ class YAMLGenerator:
             
             # Functions with compact format
             if m.functions:
-                mod_data['f'] = [self._compact_function(f, detail) for f in m.functions[:15]]
+                mod_data['f'] = [self._compact_function(f, detail) for f in m.functions[:15] 
+                               if hasattr(f, 'params')]  # Skip non-FunctionInfo objects
             
             modules.append(mod_data)
         
@@ -1629,6 +1635,37 @@ class YAMLGenerator:
         if cls.methods:
             data['m'] = [self._compact_method(m, detail) for m in cls.methods[:12]]
         
+        if cls.is_dataclass:
+            data['dataclass'] = True
+            if getattr(cls, 'fields', None):
+                fields_data = []
+                for field in cls.fields[:10]:
+                    field_dict = {'n': field.name}
+                    if field.type_annotation:
+                        field_dict['t'] = field.type_annotation
+                    if field.default:
+                        field_dict['default'] = field.default
+                    if field.default_factory:
+                        field_dict['factory'] = field.default_factory
+                    fields_data.append(field_dict)
+                if fields_data:
+                    data['fields'] = fields_data
+        
+        if getattr(cls, 'decorators', None):
+            data['dec'] = cls.decorators[:5]
+        
+        if getattr(cls, 'attributes', None):
+            attrs_data = []
+            for attr in cls.attributes[:10]:
+                attr_dict = {'n': attr.name}
+                if attr.type_annotation:
+                    attr_dict['t'] = attr.type_annotation
+                if hasattr(attr, 'set_in_init'):
+                    attr_dict['init'] = attr.set_in_init
+                attrs_data.append(attr_dict)
+            if attrs_data:
+                data['attrs'] = attrs_data
+        
         return data
     
     def _compact_function(self, f: FunctionInfo, detail: str) -> dict:
@@ -1650,6 +1687,16 @@ class YAMLGenerator:
             data['l'] = f.lines  # lines
             if f.is_async:
                 data['async'] = True
+            if getattr(f, 'decorators', None):
+                data['dec'] = f.decorators[:3]
+        
+        # Surface defaults if available
+        if getattr(f, 'params_with_defaults', None):
+            defaults = []
+            for name, val in list(f.params_with_defaults.items())[:4]:
+                defaults.append(f"{name}={val}")
+            if defaults:
+                data['defaults'] = defaults
         
         return data
     

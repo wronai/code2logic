@@ -138,24 +138,6 @@ class TreeSitterParser:
                     # Also add to regular imports but mark as conditional
                     imports.extend(try_imports)
             
-            # Functions
-            elif node_type == 'function_definition':
-                func = self._extract_py_function(child, content)
-                if func:
-                    functions.append(func)
-                    if not func.name.startswith('_'):
-                        exports.append(func.name)
-            
-            # Decorated functions
-            elif node_type == 'decorated_definition':
-                inner = self._find_child(child, 'function_definition')
-                if inner:
-                    func = self._extract_py_function(inner, content, child)
-                    if func:
-                        functions.append(func)
-                        if not func.name.startswith('_'):
-                            exports.append(func.name)
-            
             # Classes
             elif node_type == 'class_definition':
                 cls = self._extract_py_class(child, content)
@@ -165,10 +147,13 @@ class TreeSitterParser:
                         exports.append(cls.name)
             
             # Constants with enhanced extraction
-            elif node_type == 'assignment':
+            elif node_type == 'expression_statement':
                 const = self._extract_py_constant(child, content)
                 if const:
                     constants.append(const)
+                    # Add constants to exports if they're uppercase (convention)
+                    if const.name.isupper():
+                        exports.append(const.name)
         
         lines = content.split('\n')
         # Deduplicate imports and remove malformed entries
@@ -331,6 +316,118 @@ class TreeSitterParser:
     
     def _extract_py_function(self, node, content: str, 
                               decorated_node=None) -> Optional[FunctionInfo]:
+        """Extract Python function from AST node."""
+        name_node = self._find_child(node, 'identifier')
+        if not name_node:
+            return None
+        name = self._text(name_node, content).strip()
+        
+        # Parameters - try AST parsing first for reliability
+        params = []
+        try:
+            # Try to use UniversalParser's AST-based parameter extraction
+            from .parsers import UniversalParser
+            uni_parser = UniversalParser()
+            
+            # Create a minimal function text for AST parsing
+            lines = content.split('\n')
+            start_line = node.start_point[0]
+            
+            # Extract just the def line
+            def_line = lines[start_line].strip()
+            if def_line.startswith('def '):
+                func_header = def_line
+            else:
+                func_header = def_line
+            
+            # Try to parse with AST
+            import ast
+            try:
+                # Parse the function header
+                tree = ast.parse(func_header)
+                func_node = tree.body[0]
+                
+                # Use UniversalParser's parameter extraction
+                enhanced_params = uni_parser._extract_ast_function(func_node).params
+                params = enhanced_params[:8]
+            except:
+                pass
+        except:
+            pass
+        
+        # If AST parsing failed, fall back to TreeSitter extraction
+        if not params:
+            params_node = self._find_child(node, 'parameters')
+            if params_node:
+                for p in params_node.children:
+                    if p.type == 'identifier':
+                        params.append(self._text(p, content))
+                    elif p.type == 'typed_parameter':
+                        param_name = None
+                        param_type = None
+                        for sub in p.children:
+                            if sub.type == 'identifier':
+                                param_name = self._text(sub, content)
+                            elif sub.type == 'type':
+                                param_type = self._text(sub, content)
+                        if param_name:
+                            if param_type:
+                                params.append(f"{param_name}:{param_type}")
+                            else:
+                                params.append(param_name)
+        
+        # Decorators
+        decorators = []
+        if decorated_node:
+            for c in decorated_node.children:
+                if c.type == 'decorator':
+                    dec_text = self._text(c, content).lstrip('@')
+                    decorators.append(dec_text.split('(')[0])
+        
+        # Check for async
+        is_async = False
+        if decorated_node:
+            for c in decorated_node.children:
+                if c.type == 'async':
+                    is_async = True
+                    break
+        
+        # Return type
+        return_type = None
+        return_ann = self._find_child(node, 'type')
+        if return_ann:
+            return_type = self._text(return_ann, content)
+        
+        # Docstring
+        docstring = None
+        body = self._find_child(node, 'block')
+        if body and body.children:
+            first_child = body.children[0]
+            if first_child.type == 'expression_statement':
+                expr = first_child.children[0] if first_child.children else None
+                if expr and expr.type == 'string':
+                    docstring = self._extract_string(expr, content)
+        
+        return FunctionInfo(
+            name=name,
+            params=params[:8],
+            return_type=return_type,
+            docstring=self._truncate_docstring(docstring),
+            calls=[],
+            raises=[],
+            complexity=1,
+            lines=1,  # Tree-sitter doesn't give us line counts easily
+            decorators=decorators,
+            is_async=is_async,
+            is_static='staticmethod' in decorators,
+            is_classmethod='classmethod' in decorators,
+            is_property='property' in decorators,
+            intent=self.intent_gen.generate(name),
+            start_line=node.start_point[0] + 1,
+            end_line=node.end_point[0] + 1
+        )
+    
+    def _extract_py_class(self, node, content: str) -> Optional[ClassInfo]:
         """Extract Python class from AST node."""
         name_node = self._find_child(node, 'identifier')
         if not name_node:
@@ -348,11 +445,9 @@ class TreeSitterParser:
         # Check for dataclass decorator
         decorators = []
         is_dataclass = False
-        decorated_node = None
         # Look for parent decorated_definition
         parent = getattr(node, 'parent', None)
         if parent and parent.type == 'decorated_definition':
-            decorated_node = parent
             for c in parent.children:
                 if c.type == 'decorator':
                     dec_text = self._text(c, content).lstrip('@')
@@ -525,27 +620,30 @@ class TreeSitterParser:
     
     def _extract_py_constant(self, node, content: str) -> Optional[ConstantInfo]:
         """Extract constant (UPPERCASE assignment) with value."""
-        # node is already an assignment node
-        left = node.children[0] if node.children else None
-        right = node.children[1] if len(node.children) > 1 else None
-        if left and left.type == 'identifier':
-            name = self._text(left, content)
-            if name.isupper():  # Convention: CONSTANTS are UPPERCASE
-                const = ConstantInfo(name=name)
-                
-                # Get the value
-                if right:
-                    value_text = self._text(right, content).strip()
-                    const.value = value_text if len(value_text) <= 200 else None
-                    
-                    # For dictionaries, extract keys
-                    if value_text.startswith('{') and value_text.endswith('}'):
-                        # Simple regex to extract keys
-                        import re
-                        keys = re.findall(r"'([^']+)'|'([^']+)'", value_text[:500])
-                        const.value_keys = [k for pair in keys for k in pair if k][:10]
-                
-                return const
+        # node is expression_statement, check if it contains assignment
+        if node.children:
+            expr = node.children[0]
+            if expr.type == 'assignment':
+                left = expr.children[0] if expr.children else None
+                right = expr.children[1] if len(expr.children) > 1 else None
+                if left and left.type == 'identifier':
+                    name = self._text(left, content)
+                    if name.isupper():  # Convention: CONSTANTS are UPPERCASE
+                        const = ConstantInfo(name=name)
+                        
+                        # Get the value
+                        if right:
+                            value_text = self._text(right, content).strip()
+                            const.value = value_text if len(value_text) <= 200 else None
+                            
+                            # For dictionaries, extract keys
+                            if value_text.startswith('{') and value_text.endswith('}'):
+                                # Simple regex to extract keys
+                                import re
+                                keys = re.findall(r"'([^']+)'|'([^']+)'", value_text[:500])
+                                const.value_keys = [k for pair in keys for k in pair if k][:10]
+                        
+                        return const
         return None
     
     def _extract_conditional_imports(self, node, content: str) -> List[str]:

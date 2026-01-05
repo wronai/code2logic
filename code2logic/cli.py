@@ -847,7 +847,7 @@ code2logic [path] [options]
         hybrid = args.hybrid if hasattr(args, 'hybrid') else False
         
         if hybrid:
-            output = generator.generate_hybrid(project)
+            output = generator.generate_hybrid(project, detail=args.detail)
         else:
             output = generator.generate(project, flat=args.flat, detail=args.detail, compact=compact)
         

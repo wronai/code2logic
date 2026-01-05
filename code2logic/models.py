@@ -299,6 +299,7 @@ class FunctionInfo:
     intent: str = ""
     start_line: int = 0
     end_line: int = 0
+    is_private: bool = False
 
 
 @dataclass
