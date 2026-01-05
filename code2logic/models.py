@@ -165,7 +165,8 @@ class ProjectInfo:
     similar_functions: Dict[str, List[str]]
     total_files: int
     total_lines: int
-    generated_at: str
+    total_bytes: int = 0
+    generated_at: str = ""
 
 
 # Backwards compatibility aliases for tests
@@ -317,6 +318,7 @@ class ModuleInfo:
         docstring: Module docstring
         lines_total: Total line count
         lines_code: Lines of actual code (excluding comments/blanks)
+        file_bytes: Size of the source file in bytes
     """
     path: str
     language: str = "python"
@@ -332,3 +334,4 @@ class ModuleInfo:
     docstring: Optional[str] = None
     lines_total: int = 0
     lines_code: int = 0
+    file_bytes: int = 0

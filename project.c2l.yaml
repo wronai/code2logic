@@ -1,3 +1,63 @@
+header:
+  project: code2logic
+  files: 51
+  lines: 21185
+  kb: 717.8
+  languages:
+    python: 51
+  modules_count: 51
+M:
+- llm_profiler.py:491
+- config.py:168
+- file_formats.py:279
+- project_reproducer.py:322
+- base.py:50
+- cli.py:767
+- llm.py:376
+- errors.py:372
+- code_review.py:205
+- analyzer.py:235
+- quality.py:212
+- shared_utils.py:279
+- parsers.py:1162
+- intent.py:429
+- adaptive.py:475
+- reproducer.py:534
+- llm_clients.py:415
+- prompts.py:120
+- chunked_reproduction.py:357
+- __init__.py:320
+- metrics.py:447
+- __main__.py:9
+- refactor.py:313
+- logicml.py:281
+- utils.py:16
+- generators.py:1605
+- markdown_format.py:266
+- models.py:295
+- similarity.py:178
+- universal.py:831
+- benchmark.py:351
+- terminal.py:500
+- toon_format.py:477
+- dependency.py:187
+- mcp_server.py:293
+- reproduction.py:333
+- gherkin.py:766
+- schemas/logicml_schema.py:190
+- schemas/__init__.py:25
+- schemas/yaml_schema.py:164
+- schemas/json_schema.py:206
+- schemas/markdown_schema.py:121
+- benchmarks/common.py:206
+- benchmarks/runner.py:638
+- benchmarks/__init__.py:19
+- benchmarks/results.py:148
+- core/__init__.py:20
+- formats/__init__.py:27
+- tools/__init__.py:21
+- llm/__init__.py:13
+- integrations/__init__.py:5
 meta:
   legend:
     p: path
@@ -11,15 +71,16 @@ meta:
     b: bases
     m: methods
     props: properties
-    sig: signature (without self)
+    sig: signature
     ret: return_type
     async: is_async
-    lang: language
+    kb: kilobytes
 defaults:
   lang: python
 modules:
 - p: llm_profiler.py
   l: 491
+  kb: 20.4
   i:
   - json
   - os
@@ -171,8 +232,15 @@ modules:
     d: adaptive chunker for a model.
   const:
   - n: PROFILE_TEST_CASES
+    keys:
+    - simple_function
+    - class_with_methods
+    - async_function
+    - decorator_usage
+    - complex_logic
 - p: config.py
   l: 168
+  kb: 7.4
   i:
   - os
   - json
@@ -249,8 +317,11 @@ modules:
     d: Convenience function to get model.
   const:
   - n: SHELL_COMMANDS
+    v: '''\n# =============================================================================\n# Code2Logic API Configuration
+      Co...'
 - p: file_formats.py
   l: 279
+  kb: 12.3
   i:
   - re
   - json
@@ -279,6 +350,7 @@ modules:
     d: Parse file content to extract code elements.
 - p: project_reproducer.py
   l: 322
+  kb: 12.2
   i:
   - os
   - json
@@ -358,8 +430,19 @@ modules:
     d: Convenience function for project reproduction.
   const:
   - n: SUPPORTED_EXTENSIONS
+    keys:
+    - .py
+    - .js
+    - .ts
+    - .tsx
+    - .go
+    - .rs
+    - .java
+    - .sql
+    - .cs
 - p: base.py
   l: 50
+  kb: 1.8
   i:
   - logging
   - typing.Optional
@@ -417,6 +500,7 @@ modules:
       d: creates
 - p: cli.py
   l: 767
+  kb: 32.5
   i:
   - argparse
   - os
@@ -545,6 +629,7 @@ modules:
     d: Main CLI entry point.
 - p: llm.py
   l: 376
+  kb: 14.6
   i:
   - json
   - os
@@ -647,6 +732,7 @@ modules:
     d: availability status of LLM backends.
 - p: errors.py
   l: 372
+  kb: 13.7
   i:
   - logging
   - traceback
@@ -766,6 +852,7 @@ modules:
     d: an error handler with default settings.
 - p: code_review.py
   l: 205
+  kb: 9.0
   i:
   - collections.defaultdict
   - typing.{Any,Dict,List}
@@ -804,13 +891,28 @@ modules:
     d: Check for performance anti-patterns.
   const:
   - n: SECURITY_PATTERNS
+    keys:
+    - sql_injection
+    - command_injection
+    - path_traversal
+    - hardcoded_secrets
+    - insecure_random
   - n: PERFORMANCE_PATTERNS
+    keys:
+    - n_plus_one
+    - large_memory
+    - blocking_io
   - n: COMPLEXITY_HIGH
+    v: '15'
   - n: COMPLEXITY_MEDIUM
+    v: '10'
   - n: LINES_MAX
+    v: '50'
   - n: FILE_LINES_MAX
+    v: '500'
 - p: analyzer.py
-  l: 230
+  l: 235
+  kb: 9.6
   i:
   - sys
   - datetime
@@ -865,6 +967,7 @@ modules:
     d: availability status of optional libraries.
 - p: quality.py
   l: 212
+  kb: 8.8
   i:
   - dataclasses.{dataclass,field}
   - models.{ModuleInfo,ProjectInfo}
@@ -937,6 +1040,7 @@ modules:
     d: Generate human-readable quality summary.
 - p: shared_utils.py
   l: 279
+  kb: 11.6
   i:
   - hashlib
   - re
@@ -1003,10 +1107,33 @@ modules:
     d: Clean identifier by removing whitespace and specia
   const:
   - n: TYPE_ABBREVIATIONS
+    keys:
+    - str
+    - int
+    - bool
+    - float
+    - None
+    - Any
+    - List
+    - Dict
+    - Set
+    - Tuple
   - n: CATEGORY_PATTERNS
+    keys:
+    - read
+    - create
+    - update
+    - delete
+    - validate
+    - transform
+    - lifecycle
+    - communicate
   - n: DOMAIN_KEYWORDS
+    v: '[''auth'', ''user'', ''order'', ''payment'', ''product'', ''cart'', ''config'', ''util'', ''api'', ''service'', ''model'',
+      ''controller'', ''v...'
 - p: parsers.py
-  l: 1114
+  l: 1162
+  kb: 57.4
   i:
   - ast
   - re
@@ -1089,6 +1216,14 @@ modules:
       sig: node:Any
       ret: ClassInfo
       d: Extract class from Python AST node.
+    - n: _extract_ast_constant
+      sig: node:Any, content:str
+      ret: Optional[ConstantInfo]
+      d: Extract ConstantInfo from an AST assignment node i
+    - n: _format_ast_value
+      sig: value_node:Any, content:str
+      ret: str
+      d: Best-effort string representation of an AST value
     - n: _ann_str
       sig: node
       ret: str
@@ -1110,14 +1245,20 @@ modules:
     sig: module_name:str, identifier:str
     ret: str
     d: Combine module and identifier while avoiding dupli
+  - n: _truncate_constant_value
+    sig: value_text:str, limit:int=400
+    ret: str
+    d: a trimmed single-line snippet for constant values.
   - n: is_tree_sitter_available
     sig: ''
     ret: bool
     d: Check if Tree-sitter is available.
   const:
   - n: TREE_SITTER_AVAILABLE
+    v: 'False'
 - p: intent.py
   l: 429
+  kb: 20.5
   i:
   - re
   - spacy
@@ -1208,6 +1349,7 @@ modules:
       d: suggest class refactoring
 - p: adaptive.py
   l: 475
+  kb: 19.9
   i:
   - os
   - re
@@ -1301,8 +1443,18 @@ modules:
     d: capabilities for a specific model.
   const:
   - n: LLM_CAPABILITIES
+    keys:
+    - qwen/qwen-2.5-coder-32b-instruct
+    - nvidia/nemotron-3-nano-30b-a3b:free
+    - meta-llama/llama-3.3-70b-instruct:free
+    - deepseek/deepseek-coder-33b-instruct
+    - qwen2.5-coder:14b
+    - qwen2.5-coder:7b
+    - codellama:7b-instruct
+    - default
 - p: reproducer.py
   l: 534
+  kb: 22.0
   i:
   - os
   - yaml
@@ -1453,6 +1605,7 @@ modules:
     d: Validate specific files against spec.
 - p: llm_clients.py
   l: 415
+  kb: 16.5
   i:
   - os
   - json
@@ -1614,10 +1767,30 @@ modules:
     d: candidate litellm yaml paths
   const:
   - n: RECOMMENDED_MODELS
+    keys:
+    - openrouter
+    - ollama
   - n: DEFAULT_MODELS
+    keys:
+    - openrouter
+    - openai
+    - anthropic
+    - groq
+    - together
+    - ollama
+    - litellm
   - n: DEFAULT_PROVIDER_PRIORITIES
+    keys:
+    - ollama
+    - openrouter
+    - groq
+    - together
+    - openai
+    - anthropic
+    - litellm
 - p: prompts.py
   l: 120
+  kb: 4.0
   i:
   - typing.Dict
   e:
@@ -1639,6 +1812,7 @@ modules:
     d: Generate code fix prompt.
 - p: chunked_reproduction.py
   l: 357
+  kb: 14.2
   i:
   - re
   - dataclasses.{dataclass,field}
@@ -1735,8 +1909,20 @@ modules:
     d: Adaptive chunking reproduction using LLM profile.
   const:
   - n: LLM_CONTEXT_LIMITS
+    keys:
+    - gpt-4
+    - gpt-4-turbo
+    - gpt-3.5-turbo
+    - claude-3
+    - claude-2
+    - llama-7b
+    - llama-13b
+    - llama-70b
+    - mistral-7b
+    - mixtral-8x7b
 - p: __init__.py
   l: 320
+  kb: 7.7
   i:
   - analyzer.{ProjectAnalyzer,analyze_project}
   - generators.{CSVGenerator,CompactGenerator,JSONGenerator,MarkdownGenerator,YAMLGenerator}
@@ -1754,6 +1940,7 @@ modules:
     d: reproduce project
 - p: metrics.py
   l: 447
+  kb: 22.7
   i:
   - re
   - difflib
@@ -1899,10 +2086,12 @@ modules:
     d: Compare reproduction quality across formats.
 - p: __main__.py
   l: 9
+  kb: 0.2
   i:
   - cli.main
 - p: refactor.py
   l: 313
+  kb: 11.4
   i:
   - json
   - analyzer.analyze_project
@@ -1980,6 +2169,7 @@ modules:
     d: Quick analysis for a project.
 - p: logicml.py
   l: 281
+  kb: 12.8
   i:
   - dataclasses.dataclass
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
@@ -2047,8 +2237,10 @@ modules:
     d: Convenience function to generate LogicML format.
   const:
   - n: LOGICML_EXAMPLE
+    v: '''\n# sample_class.py | Calculator | 74 lines\n\nimports:\n  stdlib: [typing.List, typing.Optional]\n\nCalculator:\n  ...'
 - p: utils.py
   l: 16
+  kb: 0.6
   i:
   - shutil
   - __future__.annotations
@@ -2071,13 +2263,14 @@ modules:
     ret: None
     d: cleanup generated root
 - p: generators.py
-  l: 1568
+  l: 1605
+  kb: 78.8
   i:
   - json
   - collections.defaultdict
   - models
   - pathlib.Path
-  - shared_utils.{categorize_function,compact_imports,compute_hash,extract_domain,remove_self_from_params}
+  - shared_utils.{categorize_function,compute_hash,extract_domain,remove_self_from_params}
   - typing.List
   e:
   - MarkdownGenerator
@@ -2085,164 +2278,179 @@ modules:
   - JSONGenerator
   - YAMLGenerator
   - CSVGenerator
+  - bytes_to_kb
   c:
   - n: MarkdownGenerator
     d: Generates Markdown output for project analysis.
     m:
     - n: generate
-      sig: project:ProjectInfo
+      sig: project:ProjectInfo, detail_level:str='standard'
       ret: str
-      d: creates
+      d: Generate Markdown output.
     - n: _gen_tree
       sig: lines:List[str], project:ProjectInfo
-      d: gen tree
+      d: Generate project structure tree.
     - n: _print_tree
-      sig: lines:List[str], tree:dict, prefix:str
-      d: logs tree
+      sig: lines:List[str], tree:dict, prefix:str, depth:int=0
+      d: Recursively print tree structure.
     - n: _gen_module
       sig: lines:List[str], m:ModuleInfo, detail:str, proj:ProjectInfo
-      d: gen module
+      d: Generate module documentation.
     - n: _gen_class
       sig: lines:List[str], cls:ClassInfo, detail:str
-      d: gen class
+      d: Generate class documentation.
     - n: _sig
       sig: f:FunctionInfo
       ret: str
-      d: sig
+      d: Generate function signature.
   - n: CompactGenerator
     d: Generates ultra-compact output for token efficiency.
     m:
     - n: generate
       sig: project:ProjectInfo
       ret: str
-      d: creates
+      d: Generate compact output.
   - n: JSONGenerator
     d: Generates JSON output for machine processing.
     m:
     - n: generate
-      sig: project:ProjectInfo
+      sig: project:ProjectInfo, flat:bool=False, detail:str='standard'
       ret: str
-      d: creates
+      d: Generate JSON output.
     - n: generate_from_module
-      sig: module:ModuleInfo
+      sig: module:ModuleInfo, detail:str='full'
       ret: str
       d: creates from module
     - n: _generate_nested
       sig: project:ProjectInfo, detail:str
       ret: str
-      d: creates nested
+      d: Generate nested JSON structure.
+    - n: _field_to_dict
+      sig: field:FieldInfo
+      ret: dict
+      d: Serialize dataclass FieldInfo to dictionary.
     - n: _generate_flat
       sig: project:ProjectInfo, detail:str
       ret: str
-      d: creates flat
+      d: Generate flat JSON list for comparisons.
     - n: _build_element_row
       sig: m:ModuleInfo, elem_type:str, name:str, signature:str, f:FunctionInfo, ...+2
       ret: dict
-      d: creates element row
+      d: Build a single element row for flat output.
     - n: _build_signature
       sig: f:FunctionInfo
       ret: str
-      d: creates signature
+      d: Build compact signature.
     - n: _categorize
       sig: name:str
       ret: str
-      d: categorize
+      d: Categorize by name pattern.
     - n: _extract_domain
       sig: path:str
       ret: str
-      d: parses domain
+      d: Extract domain from path.
     - n: _compute_hash
       sig: name:str, signature:str
       ret: str
-      d: processes hash
+      d: Compute short hash.
   - n: YAMLGenerator
     d: Generates YAML output for human-readable representation.
+    props:
+    - KEY_LEGEND
     m:
     - n: generate
-      sig: project:ProjectInfo
+      sig: project:ProjectInfo, flat:bool=False, detail:str='standard', compact:bool=True
       ret: str
-      d: creates
+      d: Generate YAML output.
     - n: generate_schema
-      sig: ''
+      sig: format_type:str='compact'
       ret: str
-      d: creates schema
+      d: Generate JSON Schema for the YAML format.
     - n: _generate_compact_schema
       sig: ''
       ret: str
-      d: creates compact schema
+      d: Generate JSON Schema for compact YAML format with
     - n: _generate_full_schema
       sig: ''
       ret: str
-      d: creates full schema
+      d: Generate JSON Schema for full YAML format.
     - n: _generate_hybrid_schema
       sig: ''
       ret: str
-      d: creates hybrid schema
+      d: Generate JSON Schema for hybrid format.
     - n: generate_hybrid
-      sig: project:ProjectInfo
+      sig: project:ProjectInfo, detail:str='standard'
       ret: str
-      d: creates hybrid
+      d: Generate hybrid format combining TOON compactness
     - n: _build_enhanced_signature
       sig: f:FunctionInfo
       ret: str
-      d: creates enhanced signature
+      d: Build enhanced signature with better parameter han
     - n: _extract_constants
       sig: module:ModuleInfo
       ret: list
-      d: parses constants
+      d: Extract constants and type definitions from module
     - n: _extract_dataclasses
       sig: module:ModuleInfo
       ret: list
-      d: parses dataclasses
+      d: Extract dataclass information from classes.
     - n: _extract_conditional_imports
       sig: module:ModuleInfo
       ret: list
-      d: parses conditional imports
+      d: Extract conditional imports from constants.
     - n: generate_from_module
-      sig: module:ModuleInfo
+      sig: module:ModuleInfo, detail:str='full'
       ret: str
       d: creates from module
     - n: _build_flat_data
       sig: project:ProjectInfo, detail:str
       ret: dict
-      d: creates flat data
+      d: Build flat data structure optimized for comparison
   - n: CSVGenerator
     d: Generates CSV output optimized for LLM processing.
+    props:
+    - COLUMNS
     m:
     - n: generate
-      sig: project:ProjectInfo
+      sig: project:ProjectInfo, detail:str='standard'
       ret: str
-      d: creates
+      d: Generate CSV output.
     - n: _build_row
       sig: m:ModuleInfo, elem_type:str, name:str, signature:str, calls:list, ...+2
       ret: dict
-      d: creates row
+      d: Build a single CSV row.
     - n: _build_function_row
       sig: m:ModuleInfo, elem_type:str, name:str, f:FunctionInfo, deps:str, ...+2
       ret: dict
-      d: creates function row
+      d: Build CSV row for function/method.
     - n: _build_signature
       sig: f:FunctionInfo
       ret: str
-      d: creates signature
+      d: Build compact signature.
     - n: _categorize
       sig: name:str
       ret: str
-      d: categorize
+      d: Categorize function by name pattern.
     - n: _extract_domain
       sig: path:str
       ret: str
-      d: parses domain
+      d: Extract domain from file path.
     - n: _compute_hash
       sig: name:str, signature:str
       ret: str
-      d: processes hash
+      d: Compute short hash for quick comparison.
     - n: _escape_csv
       sig: text:str
       ret: str
-      d: escape csv
+      d: Escape text for CSV (remove newlines, limit commas
+  f:
+  - n: bytes_to_kb
+    sig: bytes_value:int
+    ret: float
+    d: Convert bytes to kilobytes with single decimal pre
 - p: markdown_format.py
   l: 266
+  kb: 13.9
   i:
   - os
   - dataclasses.dataclass
@@ -2308,12 +2516,14 @@ modules:
     ret: str
     d: Generate Markdown hybrid for a single file.
 - p: models.py
-  l: 292
+  l: 295
+  kb: 10.6
   i:
   - dataclasses.{dataclass,field}
   - typing.{Dict,List,Optional}
 - p: similarity.py
   l: 178
+  kb: 7.8
   i:
   - models.ModuleInfo
   - typing.{Dict,List}
@@ -2351,8 +2561,10 @@ modules:
     d: Generate refactoring suggestions based on similar
   const:
   - n: RAPIDFUZZ_AVAILABLE
+    v: 'False'
 - p: universal.py
   l: 831
+  kb: 39.7
   i:
   - os
   - re
@@ -2549,6 +2761,7 @@ modules:
     d: Convenience function for single file reproduction.
 - p: benchmark.py
   l: 351
+  kb: 14.4
   i:
   - os
   - json
@@ -2630,8 +2843,15 @@ modules:
     d: Run reproduction benchmark.
   const:
   - n: FORMAT_PROMPTS
+    keys:
+    - gherkin
+    - csv
+    - json
+    - yaml
+    - markdown
 - p: terminal.py
   l: 500
+  kb: 21.6
   i:
   - os
   - re
@@ -2755,8 +2975,20 @@ modules:
     d: the global renderer instance.
   const:
   - n: COLORS
+    keys:
+    - reset
+    - bold
+    - dim
+    - italic
+    - underline
+    - black
+    - red
+    - green
+    - yellow
+    - blue
 - p: toon_format.py
   l: 477
+  kb: 25.5
   i:
   - re
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
@@ -2846,6 +3078,7 @@ modules:
     d: Convenience function to parse TOON content.
 - p: dependency.py
   l: 187
+  kb: 7.5
   i:
   - models.{DependencyNode,ModuleInfo}
   - pathlib.Path
@@ -2903,8 +3136,10 @@ modules:
     d: Check if NetworkX is available.
   const:
   - n: NETWORKX_AVAILABLE
+    v: 'False'
 - p: mcp_server.py
   l: 293
+  kb: 12.2
   i:
   - json
   - sys
@@ -2929,6 +3164,7 @@ modules:
     d: Run the MCP server.
 - p: reproduction.py
   l: 333
+  kb: 15.3
   i:
   - re
   - difflib
@@ -2978,6 +3214,7 @@ modules:
     d: Extract code block from LLM response.
 - p: gherkin.py
   l: 766
+  kb: 35.4
   i:
   - re
   - hashlib
@@ -3121,6 +3358,7 @@ modules:
     d: Extract structured test data from Gherkin for LLM
 - p: schemas/logicml_schema.py
   l: 190
+  kb: 6.7
   i:
   - re
   - dataclasses.{dataclass,field}
@@ -3189,6 +3427,7 @@ modules:
     d: 'Extract signature components from LogicML sig: lin'
 - p: schemas/__init__.py
   l: 25
+  kb: 0.7
   i:
   - json_schema.{JSONSchema,parse_json_spec,validate_json}
   - logicml_schema.{LogicMLSchema,validate_logicml}
@@ -3196,6 +3435,7 @@ modules:
   - yaml_schema.{YAMLSchema,validate_yaml}
 - p: schemas/yaml_schema.py
   l: 164
+  kb: 6.7
   i:
   - yaml
   - dataclasses.{dataclass,field}
@@ -3268,6 +3508,7 @@ modules:
     d: Validate a class definition.
 - p: schemas/json_schema.py
   l: 206
+  kb: 7.2
   i:
   - json
   - dataclasses.{dataclass,field}
@@ -3345,6 +3586,7 @@ modules:
     d: Parse JSON specification into schema.
 - p: schemas/markdown_schema.py
   l: 121
+  kb: 4.2
   i:
   - re
   - dataclasses.{dataclass,field}
@@ -3396,6 +3638,7 @@ modules:
     d: Extract sections from Markdown specification.
 - p: benchmarks/common.py
   l: 206
+  kb: 8.5
   i:
   - datetime
   - json
@@ -3449,6 +3692,7 @@ modules:
     d: retrieves simple reproduction prompt
 - p: benchmarks/runner.py
   l: 638
+  kb: 27.3
   i:
   - re
   - sys
@@ -3529,12 +3773,14 @@ modules:
     d: Convenience function to run benchmarks.
 - p: benchmarks/__init__.py
   l: 19
+  kb: 0.4
   i:
   - common
   - results.{BenchmarkConfig,BenchmarkResult,FileResult,FormatResult,FunctionResult}
   - runner.{BenchmarkRunner,run_benchmark}
 - p: benchmarks/results.py
   l: 148
+  kb: 6.3
   i:
   - datetime
   - json
@@ -3543,6 +3789,7 @@ modules:
   - typing.{Any,Dict,List,Optional}
 - p: core/__init__.py
   l: 20
+  kb: 0.7
   i:
   - analyzer.{ProjectAnalyzer,analyze_project}
   - dependency.DependencyAnalyzer
@@ -3550,6 +3797,7 @@ modules:
   - models
 - p: formats/__init__.py
   l: 27
+  kb: 1.2
   i:
   - generators.{CSVGenerator,CompactGenerator,JSONGenerator,MarkdownGenerator,YAMLGenerator}
   - gherkin.{CucumberYAMLGenerator,GherkinGenerator,StepDefinitionGenerator,csv_to_gherkin,gherkin_to_test_data}
@@ -3558,16 +3806,19 @@ modules:
   - toon_format.TOONGenerator
 - p: tools/__init__.py
   l: 21
+  kb: 1.0
   i:
   - benchmark.{BenchmarkResult,FormatResult,ReproductionBenchmark,run_benchmark}
   - code_review.{CodeReviewer,analyze_code_quality,check_performance_issues,check_security_issues}
   - refactor
 - p: llm/__init__.py
   l: 13
+  kb: 0.4
   i:
   - intent.EnhancedIntentGenerator
   - llm_clients.{BaseLLMClient,LiteLLMClient,OllamaLocalClient,OpenRouterClient,get_client}
 - p: integrations/__init__.py
   l: 5
+  kb: 0.2
   i:
   - mcp_server.{call_tool,handle_request,run_server}

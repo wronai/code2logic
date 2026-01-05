@@ -58,6 +58,16 @@ def _combine_import_name(module_name: str, identifier: str) -> str:
     return f"{module_name}.{identifier}"
 
 
+def _truncate_constant_value(value_text: str, limit: int = 400) -> str:
+    """Return a trimmed single-line snippet for constant values."""
+    if not value_text:
+        return ''
+    snippet = value_text.replace('\n', ' ').strip()
+    if len(snippet) > limit:
+        snippet = snippet[: limit - 3].rstrip() + '...'
+    return snippet
+
+
 class TreeSitterParser:
     """
     Parser using Tree-sitter for high-accuracy AST parsing.
@@ -206,6 +216,7 @@ class TreeSitterParser:
         
         # Deduplicate imports and normalize names at extraction time
         lines = content.split('\n')
+        file_bytes = len(content.encode('utf-8', errors='ignore'))
         
         # Extract TYPE_CHECKING and aliases from the entire tree
         type_checking_imports = self._extract_type_checking_imports(root, content)
@@ -230,7 +241,8 @@ class TreeSitterParser:
             aliases=aliases,
             docstring=self._truncate_docstring(docstring),
             lines_total=len(lines),
-            lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('#')])
+            lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('#')]),
+            file_bytes=file_bytes,
         )
     
     def _extract_constants(self, tree, content: str) -> List[ConstantInfo]:
@@ -676,7 +688,7 @@ class TreeSitterParser:
                         # Get the value
                         if right:
                             value_text = self._text(right, content).strip()
-                            const.value = value_text if len(value_text) <= 200 else None
+                            const.value = _truncate_constant_value(value_text)
                             
                             # For dictionaries, extract keys
                             if value_text.startswith('{') and value_text.endswith('}'):
@@ -1116,9 +1128,9 @@ class UniversalParser:
                 if func:
                     functions.append(func)
             elif isinstance(node, ast.Assign):
-                for t in node.targets:
-                    if isinstance(t, ast.Name) and t.id.isupper():
-                        constants.append(t.id)
+                const = self._extract_ast_constant(node, content)
+                if const:
+                    constants.append(const)
         
         exports = [c.name for c in classes if not c.name.startswith('_')]
         exports += [f.name for f in functions if not f.name.startswith('_')]
@@ -1248,6 +1260,48 @@ class UniversalParser:
             is_abstract='ABC' in bases or is_dataclass,
             generic_params=[]
         )
+
+    def _extract_ast_constant(self, node: ast.Assign, content: str) -> Optional[ConstantInfo]:
+        """Extract ConstantInfo from an AST assignment node if applicable."""
+        if not node.targets:
+            return None
+        target = node.targets[0]
+        if not isinstance(target, ast.Name) or not target.id.isupper():
+            return None
+
+        const = ConstantInfo(name=target.id)
+        value_text = self._format_ast_value(node.value, content)
+        if value_text:
+            const.value = _truncate_constant_value(value_text)
+
+        if isinstance(node.value, ast.Dict):
+            keys = []
+            for key in node.value.keys:
+                if isinstance(key, ast.Constant) and isinstance(key.value, str):
+                    keys.append(key.value)
+            if keys:
+                const.value_keys = keys[:10]
+        return const
+
+    def _format_ast_value(self, value_node: ast.AST, content: str) -> str:
+        """Best-effort string representation of an AST value node."""
+        if value_node is None:
+            return ''
+        try:
+            import ast
+            if hasattr(ast, "unparse"):
+                return ast.unparse(value_node)
+        except Exception:
+            pass
+        try:
+            segment = ast.get_source_segment(content, value_node)
+            if segment:
+                return segment
+        except Exception:
+            pass
+        if isinstance(value_node, ast.Constant):
+            return repr(value_node.value)
+        return ''
     
     def _ann_str(self, node) -> str:
         """Convert AST annotation to string."""

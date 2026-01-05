@@ -1,7 +1,7 @@
 header:
   project: code2logic
   files: 51
-  lines: 21082
+  lines: 21185
   languages:
     python: 51
   modules_count: 51
@@ -15,10 +15,10 @@ M:
 - llm.py:376
 - errors.py:372
 - code_review.py:205
-- analyzer.py:230
+- analyzer.py:235
 - quality.py:212
 - shared_utils.py:279
-- parsers.py:1114
+- parsers.py:1162
 - intent.py:429
 - adaptive.py:475
 - reproducer.py:534
@@ -31,9 +31,9 @@ M:
 - refactor.py:313
 - logicml.py:281
 - utils.py:16
-- generators.py:1568
+- generators.py:1605
 - markdown_format.py:266
-- models.py:292
+- models.py:295
 - similarity.py:178
 - universal.py:831
 - benchmark.py:351
@@ -83,6 +83,12 @@ modules:
   - get_adaptive_chunker
   const:
   - n: PROFILE_TEST_CASES
+    keys:
+    - simple_function
+    - class_with_methods
+    - async_function
+    - decorator_usage
+    - complex_logic
   c:
   - n: LLMProfile
     d: Profile of LLM capabilities for code reproduction.
@@ -296,6 +302,16 @@ modules:
   - reproduce_project
   const:
   - n: SUPPORTED_EXTENSIONS
+    keys:
+    - .py
+    - .js
+    - .ts
+    - .tsx
+    - .go
+    - .rs
+    - .java
+    - .sql
+    - .cs
   c:
   - n: FileResult
     d: Result for a single file reproduction.
@@ -680,11 +696,25 @@ modules:
   - check_performance_issues
   const:
   - n: SECURITY_PATTERNS
+    keys:
+    - sql_injection
+    - command_injection
+    - path_traversal
+    - hardcoded_secrets
+    - insecure_random
   - n: PERFORMANCE_PATTERNS
+    keys:
+    - n_plus_one
+    - large_memory
+    - blocking_io
   - n: COMPLEXITY_HIGH
+    v: '15'
   - n: COMPLEXITY_MEDIUM
+    v: '10'
   - n: LINES_MAX
+    v: '50'
   - n: FILE_LINES_MAX
+    v: '500'
   c:
   - n: CodeReviewer
     d: Automated code review with optional LLM enhancement.
@@ -714,7 +744,7 @@ modules:
     ret: Dict[str,List[Dict]]
     d: Check for performance anti-patterns.
 - p: analyzer.py
-  l: 230
+  l: 235
   i:
   - sys
   - datetime
@@ -840,7 +870,27 @@ modules:
   - truncate_docstring
   const:
   - n: TYPE_ABBREVIATIONS
+    keys:
+    - str
+    - int
+    - bool
+    - float
+    - None
+    - Any
+    - List
+    - Dict
+    - Set
+    - Tuple
   - n: CATEGORY_PATTERNS
+    keys:
+    - read
+    - create
+    - update
+    - delete
+    - validate
+    - transform
+    - lifecycle
+    - communicate
   - n: DOMAIN_KEYWORDS
   f:
   - n: compact_imports
@@ -892,7 +942,7 @@ modules:
     ret: str
     d: Clean identifier by removing whitespace and special characte
 - p: parsers.py
-  l: 1114
+  l: 1162
   i:
   - ast
   - re
@@ -905,6 +955,7 @@ modules:
   - is_tree_sitter_available
   const:
   - n: TREE_SITTER_AVAILABLE
+    v: 'False'
   c:
   - n: TreeSitterParser
     d: Parser using Tree-sitter for high-accuracy AST parsing.
@@ -971,6 +1022,14 @@ modules:
       sig: (node:Any)
       ret: ClassInfo
       d: Extract class from Python AST node.
+    - n: _extract_ast_constant
+      sig: (node:Any,content:str)
+      ret: Optional[ConstantInfo]
+      d: Extract ConstantInfo from an AST assignment node if applicab
+    - n: _format_ast_value
+      sig: (value_node:Any,content:str)
+      ret: str
+      d: Best-effort string representation of an AST value node.
     - n: _ann_str
       sig: (node)
       ret: str
@@ -992,6 +1051,10 @@ modules:
     sig: (module_name:str,identifier:str)
     ret: str
     d: Combine module and identifier while avoiding duplicate suffi
+  - n: _truncate_constant_value
+    sig: (value_text:str,limit:int=400)
+    ret: str
+    d: a trimmed single-line snippet for constant values.
   - n: is_tree_sitter_available
     sig: ()
     ret: bool
@@ -1107,6 +1170,15 @@ modules:
   - get_llm_capabilities
   const:
   - n: LLM_CAPABILITIES
+    keys:
+    - qwen/qwen-2.5-coder-32b-instruct
+    - nvidia/nemotron-3-nano-30b-a3b:free
+    - meta-llama/llama-3.3-70b-instruct:free
+    - deepseek/deepseek-coder-33b-instruct
+    - qwen2.5-coder:14b
+    - qwen2.5-coder:7b
+    - codellama:7b-instruct
+    - default
   c:
   - n: ChunkInfo
     d: Information about a code chunk.
@@ -1301,8 +1373,27 @@ modules:
   - get_effective_provider_priorities
   const:
   - n: RECOMMENDED_MODELS
+    keys:
+    - openrouter
+    - ollama
   - n: DEFAULT_MODELS
+    keys:
+    - openrouter
+    - openai
+    - anthropic
+    - groq
+    - together
+    - ollama
+    - litellm
   - n: DEFAULT_PROVIDER_PRIORITIES
+    keys:
+    - ollama
+    - openrouter
+    - groq
+    - together
+    - openai
+    - anthropic
+    - litellm
   c:
   - n: BaseLLMClient
     b:
@@ -1483,6 +1574,17 @@ modules:
   - get_chunk_prompt
   const:
   - n: LLM_CONTEXT_LIMITS
+    keys:
+    - gpt-4
+    - gpt-4-turbo
+    - gpt-3.5-turbo
+    - claude-3
+    - claude-2
+    - llama-7b
+    - llama-13b
+    - llama-70b
+    - mistral-7b
+    - mixtral-8x7b
   c:
   - n: Chunk
     d: A chunk of specification for reproduction.
@@ -1787,13 +1889,13 @@ modules:
     sig: (generated_root:Path,allowed_dirs:set[str])
     d: cleanup generated root
 - p: generators.py
-  l: 1568
+  l: 1605
   i:
   - json
   - collections.defaultdict
   - models
   - pathlib.Path
-  - shared_utils.{categorize_function,compact_imports,compute_hash,extract_domain,remove_self_from_params}
+  - shared_utils.{categorize_function,compute_hash,extract_domain,remove_self_from_params}
   - typing.List
   e:
   - MarkdownGenerator
@@ -1801,154 +1903,164 @@ modules:
   - JSONGenerator
   - YAMLGenerator
   - CSVGenerator
+  - bytes_to_kb
   c:
   - n: MarkdownGenerator
     d: Generates Markdown output for project analysis.
     m:
     - n: generate
-      sig: (project:ProjectInfo)
+      sig: (project:ProjectInfo,detail_level:str='standard')
       ret: str
-      d: creates
+      d: Generate Markdown output.
     - n: _gen_tree
       sig: (lines:List[str],project:ProjectInfo)
-      d: gen tree
+      d: Generate project structure tree.
     - n: _print_tree
-      sig: (lines:List[str],tree:dict,prefix:str)
-      d: logs tree
+      sig: (lines:List[str],tree:dict,prefix:str,depth:int=0)
+      d: Recursively print tree structure.
     - n: _gen_module
       sig: (lines:List[str],m:ModuleInfo,detail:str,proj:ProjectInfo)
-      d: gen module
+      d: Generate module documentation.
     - n: _gen_class
       sig: (lines:List[str],cls:ClassInfo,detail:str)
-      d: gen class
+      d: Generate class documentation.
     - n: _sig
       sig: (f:FunctionInfo)
       ret: str
-      d: sig
+      d: Generate function signature.
   - n: CompactGenerator
     d: Generates ultra-compact output for token efficiency.
     m:
     - n: generate
       sig: (project:ProjectInfo)
       ret: str
-      d: creates
+      d: Generate compact output.
   - n: JSONGenerator
     d: Generates JSON output for machine processing.
     m:
     - n: generate
-      sig: (project:ProjectInfo)
+      sig: (project:ProjectInfo,flat:bool=False,detail:str='standard')
       ret: str
-      d: creates
+      d: Generate JSON output.
     - n: generate_from_module
-      sig: (module:ModuleInfo)
+      sig: (module:ModuleInfo,detail:str='full')
       ret: str
       d: creates from module
     - n: _generate_nested
       sig: (project:ProjectInfo,detail:str)
       ret: str
-      d: creates nested
+      d: Generate nested JSON structure.
+    - n: _field_to_dict
+      sig: (field:FieldInfo)
+      ret: dict
+      d: Serialize dataclass FieldInfo to dictionary.
     - n: _generate_flat
       sig: (project:ProjectInfo,detail:str)
       ret: str
-      d: creates flat
+      d: Generate flat JSON list for comparisons.
     - n: _build_element_row
       sig: (m:ModuleInfo,elem_type:str,name:str,signature:str,f:FunctionInfo,...+2)
       ret: dict
-      d: creates element row
+      d: Build a single element row for flat output.
     - n: _build_signature
       sig: (f:FunctionInfo)
       ret: str
-      d: creates signature
+      d: Build compact signature.
     - n: _categorize
       sig: (name:str)
       ret: str
-      d: categorize
+      d: Categorize by name pattern.
     - n: _extract_domain
       sig: (path:str)
       ret: str
-      d: parses domain
+      d: Extract domain from path.
     - n: _compute_hash
       sig: (name:str,signature:str)
       ret: str
-      d: processes hash
+      d: Compute short hash.
   - n: YAMLGenerator
     d: Generates YAML output for human-readable representation.
     m:
     - n: generate
-      sig: (project:ProjectInfo)
+      sig: (project:ProjectInfo,flat:bool=False,detail:str='standard',compact:bool=True)
       ret: str
-      d: creates
+      d: Generate YAML output.
     - n: generate_schema
-      sig: ()
+      sig: (format_type:str='compact')
       ret: str
-      d: creates schema
+      d: Generate JSON Schema for the YAML format.
     - n: _generate_compact_schema
       sig: ()
       ret: str
-      d: creates compact schema
+      d: Generate JSON Schema for compact YAML format with meta.legen
     - n: _generate_full_schema
       sig: ()
       ret: str
-      d: creates full schema
+      d: Generate JSON Schema for full YAML format.
     - n: _generate_hybrid_schema
       sig: ()
       ret: str
-      d: creates hybrid schema
+      d: Generate JSON Schema for hybrid format.
     - n: generate_hybrid
-      sig: (project:ProjectInfo)
+      sig: (project:ProjectInfo,detail:str='standard')
       ret: str
-      d: creates hybrid
+      d: Generate hybrid format combining TOON compactness with YAML
     - n: _build_enhanced_signature
       sig: (f:FunctionInfo)
       ret: str
-      d: creates enhanced signature
+      d: Build enhanced signature with better parameter handling.
     - n: _extract_constants
       sig: (module:ModuleInfo)
       ret: list
-      d: parses constants
+      d: Extract constants and type definitions from module.
     - n: _extract_dataclasses
       sig: (module:ModuleInfo)
       ret: list
-      d: parses dataclasses
+      d: Extract dataclass information from classes.
     - n: _extract_conditional_imports
       sig: (module:ModuleInfo)
       ret: list
-      d: parses conditional imports
+      d: Extract conditional imports from constants.
   - n: CSVGenerator
     d: Generates CSV output optimized for LLM processing.
     m:
     - n: generate
-      sig: (project:ProjectInfo)
+      sig: (project:ProjectInfo,detail:str='standard')
       ret: str
-      d: creates
+      d: Generate CSV output.
     - n: _build_row
       sig: (m:ModuleInfo,elem_type:str,name:str,signature:str,calls:list,...+2)
       ret: dict
-      d: creates row
+      d: Build a single CSV row.
     - n: _build_function_row
       sig: (m:ModuleInfo,elem_type:str,name:str,f:FunctionInfo,deps:str,...+2)
       ret: dict
-      d: creates function row
+      d: Build CSV row for function/method.
     - n: _build_signature
       sig: (f:FunctionInfo)
       ret: str
-      d: creates signature
+      d: Build compact signature.
     - n: _categorize
       sig: (name:str)
       ret: str
-      d: categorize
+      d: Categorize function by name pattern.
     - n: _extract_domain
       sig: (path:str)
       ret: str
-      d: parses domain
+      d: Extract domain from file path.
     - n: _compute_hash
       sig: (name:str,signature:str)
       ret: str
-      d: processes hash
+      d: Compute short hash for quick comparison.
     - n: _escape_csv
       sig: (text:str)
       ret: str
-      d: escape csv
+      d: Escape text for CSV (remove newlines, limit commas).
+  f:
+  - n: bytes_to_kb
+    sig: (bytes_value:int)
+    ret: float
+    d: Convert bytes to kilobytes with single decimal precision.
 - p: markdown_format.py
   l: 266
   i:
@@ -2011,7 +2123,7 @@ modules:
     ret: str
     d: Generate Markdown hybrid for a single file.
 - p: models.py
-  l: 292
+  l: 295
   i:
   - dataclasses.{dataclass,field}
   - typing.{Dict,List,Optional}
@@ -2026,6 +2138,7 @@ modules:
   - get_refactoring_suggestions
   const:
   - n: RAPIDFUZZ_AVAILABLE
+    v: 'False'
   c:
   - n: SimilarityDetector
     d: Detects similar functions using fuzzy string matching.
@@ -2218,6 +2331,12 @@ modules:
   - run_benchmark
   const:
   - n: FORMAT_PROMPTS
+    keys:
+    - gherkin
+    - csv
+    - json
+    - yaml
+    - markdown
   c:
   - n: FormatResult
     d: Result for a single format test.
@@ -2275,6 +2394,17 @@ modules:
   - set_renderer
   const:
   - n: COLORS
+    keys:
+    - reset
+    - bold
+    - dim
+    - italic
+    - underline
+    - black
+    - red
+    - green
+    - yellow
+    - blue
   c:
   - n: ShellRenderer
     d: Renders colorized markdown output in terminal.
@@ -2472,6 +2602,7 @@ modules:
   - is_networkx_available
   const:
   - n: NETWORKX_AVAILABLE
+    v: 'False'
   c:
   - n: DependencyAnalyzer
     d: Analyzes dependency graphs using NetworkX.

@@ -157,6 +157,7 @@ class ProjectAnalyzer:
             similar_functions=similar,
             total_files=len(self.modules),
             total_lines=sum(m.lines_total for m in self.modules),
+            total_bytes=sum(getattr(m, 'file_bytes', 0) for m in self.modules),
             generated_at=datetime.now().isoformat()
         )
     
@@ -208,6 +209,10 @@ class ProjectAnalyzer:
                     continue
             
             if module:
+                try:
+                    module.file_bytes = fp.stat().st_size
+                except Exception:
+                    module.file_bytes = len(content.encode('utf-8', errors='ignore'))
                 self.modules.append(module)
     
     def _detect_entrypoints(self) -> List[str]:

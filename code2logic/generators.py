@@ -14,9 +14,16 @@ from collections import defaultdict
 
 from .models import (
     ProjectInfo, ModuleInfo, ClassInfo, FunctionInfo,
-    DependencyNode, ConstantInfo
+    DependencyNode, ConstantInfo, FieldInfo
 )
 from .shared_utils import categorize_function, extract_domain, compute_hash, remove_self_from_params, compact_imports, deduplicate_imports
+
+
+def bytes_to_kb(bytes_value: int) -> float:
+    """Convert bytes to kilobytes with single decimal precision."""
+    if not bytes_value:
+        return 0.0
+    return round(bytes_value / 1024, 1)
 
 
 class MarkdownGenerator:
@@ -410,6 +417,17 @@ class JSONGenerator:
                 data['lines'] = f.lines
                 data['is_private'] = f.is_private
             return data
+    
+    def _field_to_dict(self, field: FieldInfo) -> dict:
+        """Serialize dataclass FieldInfo to dictionary."""
+        data = {'name': field.name}
+        if getattr(field, 'type_annotation', None):
+            data['type'] = field.type_annotation
+        if getattr(field, 'default', None):
+            data['default'] = field.default
+        if getattr(field, 'default_factory', None):
+            data['factory'] = field.default_factory
+        return data
         
         def ser_class(c: ClassInfo) -> dict:
             data = {
@@ -1300,6 +1318,9 @@ class YAMLGenerator:
     def _build_nested_data(self, project: ProjectInfo, detail: str) -> dict:
         """Build nested hierarchical data structure."""
         modules = []
+        module_overview = []
+        for m in project.modules:
+            module_overview.append(f"{m.path}:{m.lines_code}")
         for m in project.modules:
             module_data = {
                 'path': m.path,
@@ -1313,27 +1334,48 @@ class YAMLGenerator:
             
             if m.classes:
                 module_data['classes'] = []
+                dataclass_summary = []
                 for c in m.classes:
                     cls_data = {
                         'name': c.name,
                         'bases': c.bases,
                         'docstring': c.docstring[:80] if c.docstring else '',
                     }
-                    # Include properties (critical for dataclass reproduction)
-                    if c.properties:
+                    if getattr(c, 'properties', None):
                         cls_data['properties'] = c.properties[:20]
+                    # Include properties (critical for dataclass reproduction)
+                    if getattr(c, 'is_dataclass', False):
+                        cls_data['dataclass'] = True
+                        if getattr(c, 'fields', None):
+                            cls_data['fields'] = [
+                                self._field_to_dict(field)
+                                for field in c.fields[:15]
+                            ]
+                        dataclass_summary.append({
+                            'name': c.name,
+                            'fields': [
+                                self._field_to_dict(field)
+                                for field in c.fields[:15]
+                            ] if getattr(c, 'fields', None) else []
+                        })
                     if c.methods:
                         cls_data['methods'] = [
                             self._method_to_dict(method, detail)
                             for method in c.methods[:15]
                         ]
                     module_data['classes'].append(cls_data)
+                if dataclass_summary:
+                    module_data['dataclasses'] = dataclass_summary[:10]
             
             if m.functions:
                 module_data['functions'] = [
                     self._function_to_dict(f, detail)
                     for f in m.functions[:20]
                 ]
+            
+            constant_entries = self._constants_for_module_verbose(m, limit=12)
+            if constant_entries:
+                module_data['constants'] = constant_entries
             
             modules.append(module_data)
         
@@ -1550,7 +1592,9 @@ class YAMLGenerator:
         default_lang = max(project.languages.items(), key=lambda x: x[1])[0] if project.languages else 'python'
         
         modules = []
+        module_overview = []
         for m in project.modules:
+            module_overview.append(f"{m.path}:{m.lines_code}")
             mod_data = {
                 'p': m.path,  # path
             }
@@ -1586,24 +1630,16 @@ class YAMLGenerator:
             modules.append(mod_data)
         
         return {
+            'header': {
+                'project': project.name,
+                'files': project.total_files,
+                'lines': project.total_lines,
+                'languages': project.languages,
+                'modules_count': len(project.modules),
+            },
+            'M': module_overview,
             'meta': {
-                'legend': {
-                    'p': 'path',
-                    'l': 'lines',
-                    'i': 'imports',
-                    'e': 'exports',
-                    'c': 'classes',
-                    'f': 'functions',
-                    'n': 'name',
-                    'd': 'docstring',
-                    'b': 'bases',
-                    'm': 'methods',
-                    'props': 'properties',
-                    'sig': 'signature (without self)',
-                    'ret': 'return_type',
-                    'async': 'is_async',
-                    'lang': 'language',
-                }
+                'legend': self.KEY_LEGEND.copy()
             },
             'defaults': {'lang': default_lang},
             'modules': modules

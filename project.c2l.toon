@@ -1,4 +1,4 @@
-# code2logic | 51f 21082L | python:51
+# code2logic | 51f 21185L | python:51
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[51]:
   llm_profiler.py,491
@@ -10,10 +10,10 @@ M[51]:
   llm.py,376
   errors.py,372
   code_review.py,205
-  analyzer.py,230
+  analyzer.py,235
   quality.py,212
   shared_utils.py,279
-  parsers.py,1114
+  parsers.py,1162
   intent.py,429
   adaptive.py,475
   reproducer.py,534
@@ -26,9 +26,9 @@ M[51]:
   refactor.py,313
   logicml.py,281
   utils.py,16
-  generators.py,1568
+  generators.py,1605
   markdown_format.py,266
-  models.py,292
+  models.py,295
   similarity.py,178
   universal.py,831
   benchmark.py,351
@@ -165,6 +165,7 @@ D:
     _normalize_import_path(import_path:str)->str
     _clean_imports(imports:List[str])->List[str]
     _combine_import_name(module_name:str;identifier:str)->str
+    _truncate_constant_value(value_text:str;limit:int=400)->str
     is_tree_sitter_available()->bool
   intent.py:
     i: re,dataclasses.{dataclass,field},enum.{Enum,auto},typing.{Any,List,Optional,TYPE_CHECKING,Tuple}
@@ -265,12 +266,13 @@ D:
     cleanup_generated_root(generated_root:Path;allowed_dirs:set[str])->None
   generators.py:
     i: json,collections.defaultdict,models,pathlib.Path,typing.List
-    e: MarkdownGenerator,CompactGenerator,JSONGenerator,YAMLGenerator,CSVGenerator
-    MarkdownGenerator: generate(1),_gen_tree(2),_print_tree(3),_gen_module(4),_gen_class(3)  # Generates Markdown output for project...
+    e: MarkdownGenerator,CompactGenerator,JSONGenerator,YAMLGenerator,CSVGenerator,bytes_to_kb
+    MarkdownGenerator: generate(2),_gen_tree(2),_print_tree(4),_gen_module(4),_gen_class(3)  # Generates Markdown output for project...
     CompactGenerator: generate(1)  # Generates ultra-compact output for to...
-    JSONGenerator: generate(1),generate_from_module(1),_generate_nested(2),_generate_flat(2),_build_element_row(7)  # Generates JSON output for machine pro...
-    YAMLGenerator: generate(1),generate_schema(0),_generate_compact_schema(0),_generate_full_schema(0),_generate_hybrid_schema(0)  # Generates YAML output for human-reada...
-    CSVGenerator: generate(1),_build_row(7),_build_function_row(7),_build_signature(1),_categorize(1)  # Generates CSV output optimized for LL...
+    JSONGenerator: generate(3),generate_from_module(2),_generate_nested(2),_field_to_dict(1),_generate_flat(2)  # Generates JSON output for machine pro...
+    YAMLGenerator: generate(4),generate_schema(1),_generate_compact_schema(0),_generate_full_schema(0),_generate_hybrid_schema(0)  # Generates YAML output for human-reada...
+    CSVGenerator: generate(2),_build_row(7),_build_function_row(7),_build_signature(1),_categorize(1)  # Generates CSV output optimized for LL...
+    bytes_to_kb(bytes_value:int)->float
   markdown_format.py:
     i: os,dataclasses.dataclass,models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo},pathlib.Path,typing.{Dict,List,Optional}
     e: MarkdownSpec,MarkdownHybridGenerator,generate_markdown_hybrid,generate_file_markdown
