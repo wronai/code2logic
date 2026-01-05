@@ -4,10 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "code2logic"
-version = "1.0.5"
+version = "1.0.6"
 description = "Convert source code to logical representation for LLM analysis"
 readme = "README.md"
-license = {text = "MIT"}
+license = {file = "LICENSE"}
 requires-python = ">=3.9"
 authors = [
     {name = "Softreck", email = "info@softreck.dev"}
@@ -30,7 +30,7 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Console",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
@@ -208,7 +208,7 @@ module = [
 ignore_missing_imports = true
 
 [tool.bumpver]
-current_version = "1.0.5"
+current_version = "1.0.6"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit = false
 tag = false

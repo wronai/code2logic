@@ -1,4 +1,4 @@
-# code2logic | 50 files | 19181 lines | python:50
+# code2logic | 51 files | 19645 lines | python:51
 # Key legend: p=path, l=lines, i=imports, e=exports, c=classes, f=functions
 #             n=name, d=docstring, b=bases, m=methods, props=properties
 #             sig=signature (without self), ret=return_type, async=is_async
@@ -9,13 +9,13 @@ modules:
 - p: llm_profiler.py
   l: 491
   i:
-  - os
-  - datetime
+  - json
   - hashlib
   - time
-  - typing
-  - json
   - dataclasses
+  - typing
+  - os
+  - datetime
   - dataclasses.{asdict,dataclass,field}
   - typing.{Any,Dict,List,Optional,Tuple}
   e:
@@ -124,9 +124,9 @@ modules:
 - p: config.py
   l: 168
   i:
-  - os
-  - typing
   - json
+  - typing
+  - os
   - pathlib
   - pathlib.Path
   - typing.{Any,Dict,Optional}
@@ -198,10 +198,10 @@ modules:
 - p: file_formats.py
   l: 279
   i:
-  - re
   - typing
   - json
   - pathlib
+  - re
   - pathlib.Path
   - typing.{Any,Dict,List}
   e:
@@ -228,12 +228,12 @@ modules:
 - p: project_reproducer.py
   l: 322
   i:
-  - os
-  - pathlib
-  - hashlib
-  - typing
   - json
+  - hashlib
+  - pathlib
   - dataclasses
+  - typing
+  - os
   - dataclasses.{asdict,dataclass,field}
   - pathlib.Path
   - typing.{Any,Dict,List,Optional,Set}
@@ -336,16 +336,16 @@ modules:
 - p: cli.py
   l: 721
   i:
-  - os
-  - sys
-  - signal
-  - datetime
-  - logging
-  - time
   - json
   - argparse
-  - subprocess
+  - logging
+  - time
   - __version__
+  - signal
+  - os
+  - sys
+  - datetime
+  - subprocess
   e:
   - Colors
   - Logger
@@ -456,9 +456,9 @@ modules:
   l: 376
   i:
   - dataclasses
-  - os
   - typing
   - json
+  - os
   - dataclasses.dataclass
   - llm_clients.{BaseLLMClient,LiteLLMClient,OllamaLocalClient,OpenRouterClient,get_client}
   - typing.{Any,Dict,List,Optional}
@@ -547,10 +547,10 @@ modules:
   l: 372
   i:
   - pathlib
-  - logging
-  - typing
-  - dataclasses
   - enum
+  - logging
+  - dataclasses
+  - typing
   - traceback
   - dataclasses.{dataclass,field}
   - enum.Enum
@@ -650,11 +650,11 @@ modules:
 - p: analyzer.py
   l: 221
   i:
-  - datetime
-  - sys
   - pathlib
-  - typing
   - collections
+  - typing
+  - sys
+  - datetime
   - collections.defaultdict
   - models.{ModuleInfo,ProjectInfo}
   - parsers.{TREE_SITTER_AVAILABLE,TreeSitterParser,UniversalParser}
@@ -747,6 +747,73 @@ modules:
     sig: report:QualityReport
     ret: str
     d: Generate human-readable quality summary.
+- p: shared_utils.py
+  l: 279
+  i:
+  - typing
+  - hashlib
+  - re
+  - typing.{Dict,List,Optional,Set}
+  e:
+  - compact_imports
+  - deduplicate_imports
+  - abbreviate_type
+  - expand_type
+  - build_signature
+  - remove_self_from_params
+  - categorize_function
+  - extract_domain
+  - compute_hash
+  - truncate_docstring
+  f:
+  - n: compact_imports
+    sig: imports:List[str], max_items:int
+    ret: List[str]
+    d: Compact imports by grouping submodules.
+  - n: deduplicate_imports
+    sig: imports:List[str]
+    ret: List[str]
+    d: Remove redundant imports.
+  - n: abbreviate_type
+    sig: type_str:str
+    ret: str
+    d: Abbreviate type annotations for compactness.
+  - n: expand_type
+    sig: abbrev:str
+    ret: str
+    d: Expand abbreviated type back to full form.
+  - n: build_signature
+    sig: params:List[str], return_type:Optional[str], include_self:bool, abbreviate:bool, max_params:int
+    ret: str
+    d: Build compact function signature.
+  - n: remove_self_from_params
+    sig: params:List[str]
+    ret: List[str]
+    d: Remove 'self' and 'cls' from parameter list.
+  - n: categorize_function
+    sig: name:str
+    ret: str
+    d: Categorize function by name pattern.
+  - n: extract_domain
+    sig: path:str
+    ret: str
+    d: Extract domain from file path.
+  - n: compute_hash
+    sig: name:str, signature:str, length:int
+    ret: str
+    d: Compute short hash for quick comparison.
+  - n: truncate_docstring
+    sig: docstring:Optional[str], max_length:int
+    ret: str
+    d: Truncate docstring to first sentence or max_length
+  - n: escape_for_yaml
+    sig: text:str
+    ret: str
+    d: Escape text for safe YAML inclusion.
+  - n: clean_identifier
+    sig: name:str
+    ret: str
+    d: Clean identifier by removing whitespace and specia
 - p: parsers.py
   l: 840
   i:
@@ -848,10 +915,10 @@ modules:
 - p: intent.py
   l: 429
   i:
-  - re
-  - typing
-  - dataclasses
   - enum
+  - dataclasses
+  - typing
+  - re
   - dataclasses.{dataclass,field}
   - enum.{Enum,auto}
   - typing.{Any,List,Optional,TYPE_CHECKING,Tuple}
@@ -939,11 +1006,11 @@ modules:
 - p: adaptive.py
   l: 475
   i:
-  - os
   - pathlib
   - re
-  - typing
   - dataclasses
+  - typing
+  - os
   - dataclasses.dataclass
   - llm_clients.{BaseLLMClient,get_client}
   - pathlib.Path
@@ -1011,12 +1078,12 @@ modules:
 - p: reproducer.py
   l: 534
   i:
-  - os
+  - json
   - pathlib
   - re
-  - typing
-  - json
   - dataclasses
+  - typing
+  - os
   - yaml
   - dataclasses.{dataclass,field}
   - pathlib.Path
@@ -1112,9 +1179,9 @@ modules:
 - p: llm_clients.py
   l: 415
   i:
-  - os
-  - typing
   - json
+  - typing
+  - os
   - abc
   - abc.{ABC,abstractmethod}
   - typing.{Any,Dict,List,Optional}
@@ -1290,10 +1357,10 @@ modules:
 - p: chunked_reproduction.py
   l: 357
   i:
-  - re
-  - typing
   - dataclasses
+  - typing
   - pathlib
+  - re
   - dataclasses.{dataclass,field}
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
   - pathlib.Path
@@ -1383,10 +1450,10 @@ modules:
   i:
   - hashlib
   - re
-  - typing
+  - collections
   - dataclasses
   - difflib
-  - collections
+  - typing
   - collections.Counter
   - dataclasses.{asdict,dataclass,field}
   - typing.{Any,Dict,List,Optional,Tuple}
@@ -1491,7 +1558,7 @@ modules:
     ret: Dict[str, Any]
     d: Quick analysis for a project.
 - p: logicml.py
-  l: 296
+  l: 281
   i:
   - dataclasses
   - typing
@@ -1499,6 +1566,7 @@ modules:
   - dataclasses.dataclass
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
   - pathlib.Path
+  - shared_utils.truncate_docstring
   - typing.{Any,Dict,List,Optional,Set}
   e:
   - LogicMLGenerator
@@ -1744,8 +1812,8 @@ modules:
   l: 266
   i:
   - dataclasses
-  - os
   - typing
+  - os
   - pathlib
   - dataclasses.dataclass
   - generators.YAMLGenerator
@@ -1849,13 +1917,13 @@ modules:
 - p: universal.py
   l: 831
   i:
-  - os
-  - pathlib
-  - hashlib
-  - re
-  - typing
   - json
+  - hashlib
+  - pathlib
+  - re
   - dataclasses
+  - typing
+  - os
   - dataclasses.dataclass
   - pathlib.Path
   - typing.{Any,Dict,List,Optional,Tuple,Union}
@@ -1970,13 +2038,13 @@ modules:
 - p: benchmark.py
   l: 351
   i:
-  - os
-  - datetime
+  - json
   - pathlib
   - time
-  - typing
-  - json
   - dataclasses
+  - typing
+  - os
+  - datetime
   - analyzer.analyze_project
   - dataclasses.{asdict,dataclass}
   - pathlib.Path
@@ -2026,10 +2094,10 @@ modules:
 - p: terminal.py
   l: 500
   i:
-  - re
-  - os
-  - typing
   - sys
+  - typing
+  - os
+  - re
   - typing.{Any,Dict,List,Literal,Optional}
   e:
   - ShellRenderer
@@ -2148,11 +2216,12 @@ modules:
     ret: None
     d: the global renderer instance.
 - p: toon_format.py
-  l: 285
+  l: 332
   i:
-  - re
   - typing
+  - re
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
+  - shared_utils.{compact_imports,truncate_docstring}
   - typing.{Any,Dict,List,Optional}
   e:
   - TOONGenerator
@@ -2189,7 +2258,7 @@ modules:
     - n: _build_signature
       sig: f:FunctionInfo
       ret: str
-      d: Build compact but complete signature string.
+      d: Build compact signature string without self/cls.
     - n: _quote
       sig: value:Any
       ret: str
@@ -2202,6 +2271,10 @@ modules:
       sig: project:ProjectInfo
       ret: str
       d: Generate detailed TOON output.
+    - n: generate_ultra_compact
+      sig: project:ProjectInfo
+      ret: str
+      d: Generate minimal TOON with abbreviated keys.
   - n: TOONParser
     d: Parse TOON format back to Python dict.
     m:
@@ -2287,11 +2360,11 @@ modules:
 - p: mcp_server.py
   l: 293
   i:
-  - sys
-  - pathlib
-  - typing
   - json
+  - pathlib
   - __version__
+  - typing
+  - sys
   - pathlib.Path
   - typing.Optional
   e:
@@ -2313,11 +2386,11 @@ modules:
 - p: reproduction.py
   l: 333
   i:
-  - datetime
   - pathlib
   - re
-  - typing
   - difflib
+  - typing
+  - datetime
   - llm_clients.{BaseLLMClient,get_client}
   - pathlib.Path
   - typing.{Any,Dict,List,Optional}
@@ -2366,9 +2439,9 @@ modules:
   i:
   - hashlib
   - re
-  - typing
-  - dataclasses
   - collections
+  - dataclasses
+  - typing
   - collections.defaultdict
   - dataclasses.{dataclass,field}
   - models.{ModuleInfo,ProjectInfo}
@@ -2509,8 +2582,8 @@ modules:
   l: 148
   i:
   - dataclasses
-  - yaml
   - typing
+  - yaml
   - dataclasses.{dataclass,field}
   - typing.{Any,Dict,List,Optional,Tuple}
   e:
@@ -2579,8 +2652,8 @@ modules:
 - p: benchmarks/common.py
   l: 206
   i:
-  - json
   - datetime
+  - json
   - pathlib
   - generators.{JSONGenerator,YAMLGenerator}
   - gherkin.GherkinGenerator
@@ -2632,12 +2705,12 @@ modules:
 - p: benchmarks/runner.py
   l: 638
   i:
-  - sys
   - pathlib
   - re
   - time
-  - typing
   - dataclasses
+  - typing
+  - sys
   - concurrent.futures.{ThreadPoolExecutor,as_completed}
   - concurrent.futures.concurrent.futures
   - pathlib.Path
@@ -2718,11 +2791,11 @@ modules:
 - p: benchmarks/results.py
   l: 148
   i:
-  - datetime
-  - pathlib
-  - typing
   - json
+  - pathlib
   - dataclasses
+  - typing
+  - datetime
   - dataclasses.{asdict,dataclass,field}
   - pathlib.Path
   - typing.{Any,Dict,List,Optional}

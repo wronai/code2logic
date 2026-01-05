@@ -137,6 +137,7 @@ Machine-readable format for:
 ## 🔧 Configuration
 
 ### Library Status
+
 Check which features are available:
 
 ```bash
@@ -172,6 +173,10 @@ Notes:
 
 - `code2logic llm set-provider auto` enables automatic fallback selection: providers are tried in priority order.
 - API keys should be stored in `.env` (or environment variables), not in `litellm_config.yaml`.
+- These commands write configuration files:
+  - `.env` in the current working directory
+  - `litellm_config.yaml` in the current working directory
+  - `~/.code2logic/llm_config.json` in your home directory
 
 #### Priority modes
 

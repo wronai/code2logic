@@ -16,6 +16,7 @@ from .models import (
     ProjectInfo, ModuleInfo, ClassInfo, FunctionInfo,
     DependencyNode
 )
+from .shared_utils import categorize_function, extract_domain, compute_hash, remove_self_from_params
 
 
 class MarkdownGenerator:
@@ -267,14 +268,16 @@ class MarkdownGenerator:
             pre = "static "
         if f.is_async:
             pre += "async "
-        
-        params = f.params[:4]
-        if len(f.params) > 4:
-            params.append(f"...+{len(f.params)-4}")
+ 
+        raw_params = [p.replace('\n', ' ').replace('  ', ' ').strip() for p in (f.params or [])]
+        params_no_self = remove_self_from_params(raw_params)
+        params = params_no_self[:4]
+        if len(params_no_self) > 4:
+            params = params + [f"...+{len(params_no_self)-4}"]
         ps = ', '.join(params)
-        
+ 
         ret = f" -> {f.return_type}" if f.return_type else ""
-        
+ 
         return f"{pre}{f.name}({ps}){ret}"
 
 
@@ -520,43 +523,26 @@ class JSONGenerator:
     
     def _build_signature(self, f: FunctionInfo) -> str:
         """Build compact signature."""
-        params = ','.join(f.params[:4])
-        if len(f.params) > 4:
-            params += f'...+{len(f.params)-4}'
+        raw_params = [p.replace('\n', ' ').replace('  ', ' ').strip() for p in (f.params or [])]
+        params_no_self = [p for p in raw_params if p]
+        params_no_self = remove_self_from_params(params_no_self)
+        params = ','.join(params_no_self[:4])
+        if len(params_no_self) > 4:
+            params += f'...+{len(params_no_self)-4}'
         ret = f"->{f.return_type}" if f.return_type else ""
         return f"({params}){ret}"
     
     def _categorize(self, name: str) -> str:
         """Categorize by name pattern."""
-        name_lower = name.lower().split('.')[-1]
-        patterns = {
-            'read': ('get', 'fetch', 'find', 'load', 'read'),
-            'create': ('create', 'add', 'insert', 'new', 'make'),
-            'update': ('update', 'set', 'modify', 'edit'),
-            'delete': ('delete', 'remove', 'clear'),
-            'validate': ('validate', 'check', 'verify', 'is', 'has'),
-            'transform': ('convert', 'transform', 'parse', 'format'),
-        }
-        for cat, verbs in patterns.items():
-            if any(v in name_lower for v in verbs):
-                return cat
-        return 'other'
+        return categorize_function(name)
     
     def _extract_domain(self, path: str) -> str:
         """Extract domain from path."""
-        parts = path.lower().replace('\\', '/').split('/')
-        domains = ['auth', 'user', 'order', 'payment', 'config', 'util', 
-                   'api', 'service', 'model', 'validation', 'generator']
-        for part in parts:
-            for domain in domains:
-                if domain in part:
-                    return domain
-        return parts[-2] if len(parts) > 1 else 'root'
+        return extract_domain(path)
     
     def _compute_hash(self, name: str, signature: str) -> str:
         """Compute short hash."""
-        import hashlib
-        return hashlib.md5(f"{name}:{signature}".encode()).hexdigest()[:8]
+        return compute_hash(name, signature, length=8)
 
 
 # ============================================================================
@@ -825,53 +811,32 @@ class YAMLGenerator:
         """Build compact signature string."""
         # Clean params - remove newlines and extra spaces
         clean_params = []
-        for p in f.params[:6]:
+        raw_params = [p.replace('\n', ' ').replace('  ', ' ').strip() for p in (f.params or [])]
+        raw_params = [p for p in raw_params if p]
+        params_no_self = remove_self_from_params(raw_params)
+        for p in params_no_self[:6]:
             p_clean = p.replace('\n', ' ').replace('  ', ' ').strip()
             if p_clean:
                 clean_params.append(p_clean)
         
         params = ','.join(clean_params)
-        if len(f.params) > 6:
-            params += f'...+{len(f.params)-6}'
+        if len(params_no_self) > 6:
+            params += f'...+{len(params_no_self)-6}'
         
         ret = f"->{f.return_type}" if f.return_type else ""
         return f"({params}){ret}"
     
     def _categorize(self, name: str) -> str:
         """Categorize function by name pattern."""
-        name_lower = name.lower()
-        if any(v in name_lower for v in ('get', 'fetch', 'find', 'load', 'read')):
-            return 'read'
-        if any(v in name_lower for v in ('create', 'add', 'insert', 'new', 'make')):
-            return 'create'
-        if any(v in name_lower for v in ('update', 'set', 'modify', 'edit')):
-            return 'update'
-        if any(v in name_lower for v in ('delete', 'remove', 'clear')):
-            return 'delete'
-        if any(v in name_lower for v in ('validate', 'check', 'verify', 'is', 'has')):
-            return 'validate'
-        if any(v in name_lower for v in ('convert', 'transform', 'parse', 'format')):
-            return 'transform'
-        if any(v in name_lower for v in ('init', 'setup', 'configure')):
-            return 'lifecycle'
-        return 'other'
+        return categorize_function(name)
     
     def _extract_domain(self, path: str) -> str:
         """Extract domain from file path."""
-        parts = path.lower().replace('\\', '/').split('/')
-        domains = ['auth', 'user', 'order', 'payment', 'product', 'cart', 
-                   'config', 'util', 'api', 'service', 'model', 'controller']
-        for part in parts:
-            for domain in domains:
-                if domain in part:
-                    return domain
-        return parts[-2] if len(parts) > 1 else 'root'
+        return extract_domain(path)
     
     def _compute_hash(self, name: str, signature: str) -> str:
         """Compute short hash for quick comparison."""
-        import hashlib
-        content = f"{name}:{signature}"
-        return hashlib.md5(content.encode()).hexdigest()[:8]
+        return compute_hash(name, signature, length=8)
     
     def _generate_simple_yaml(self, project: ProjectInfo, flat: bool, 
                               detail: str) -> str:
@@ -969,31 +934,7 @@ class YAMLGenerator:
         """Deduplicate and compact imports (typing.Dict, typing.List -> typing.{Dict,List})."""
         if not imports:
             return []
-        
-        # Group by module
-        modules = {}
-        standalone = []
-        for imp in imports:
-            if '.' in imp:
-                parts = imp.rsplit('.', 1)
-                if len(parts) == 2:
-                    mod, name = parts
-                    # Skip duplicates like module.module
-                    if mod != name:
-                        modules.setdefault(mod, set()).add(name)
-                else:
-                    standalone.append(imp)
-            else:
-                standalone.append(imp)
-        
-        result = list(set(standalone))  # Dedupe standalone
-        for mod, names in sorted(modules.items()):
-            if len(names) == 1:
-                result.append(f"{mod}.{list(names)[0]}")
-            elif len(names) > 1:
-                result.append(f"{mod}.{{{','.join(sorted(names))}}}")
-        
-        return result
+        return compact_imports(deduplicate_imports(list(imports)), max_items=10)
     
     def _compact_class(self, cls: ClassInfo, detail: str) -> dict:
         """Generate compact class representation."""
@@ -1053,7 +994,7 @@ class YAMLGenerator:
         for p in f.params[:6]:
             p_clean = p.replace('\n', ' ').replace('  ', ' ').strip()
             # Skip 'self' parameter
-            if p_clean and p_clean != 'self' and not p_clean.startswith('self:'):
+            if p_clean and p_clean not in ('self', 'cls') and not p_clean.startswith('self:'):
                 clean_params.append(p_clean)
         
         params = ', '.join(clean_params)
@@ -1209,45 +1150,25 @@ class CSVGenerator:
     
     def _build_signature(self, f: FunctionInfo) -> str:
         """Build compact signature."""
-        params = ','.join(p.split(':')[0] if ':' in p else p for p in f.params[:4])
-        if len(f.params) > 4:
-            params += f'...+{len(f.params)-4}'
+        raw_params = [p.replace('\n', ' ').replace('  ', ' ').strip() for p in (f.params or [])]
+        raw_params = [p for p in raw_params if p]
+        params_no_self = remove_self_from_params(raw_params)
+        params = ','.join(
+            (p.split(':')[0] if ':' in p else p)
+            for p in params_no_self[:4]
+        )
+        if len(params_no_self) > 4:
+            params += f'...+{len(params_no_self)-4}'
         ret = f"->{f.return_type}" if f.return_type else ""
         return f"({params}){ret}"
     
     def _categorize(self, name: str) -> str:
         """Categorize function by name pattern."""
-        name_lower = name.lower().split('.')[-1]  # Get last part for methods
-        if any(v in name_lower for v in ('get', 'fetch', 'find', 'load', 'read', 'query')):
-            return 'read'
-        if any(v in name_lower for v in ('create', 'add', 'insert', 'new', 'make', 'build')):
-            return 'create'
-        if any(v in name_lower for v in ('update', 'set', 'modify', 'edit', 'patch')):
-            return 'update'
-        if any(v in name_lower for v in ('delete', 'remove', 'clear', 'destroy')):
-            return 'delete'
-        if any(v in name_lower for v in ('validate', 'check', 'verify', 'is', 'has', 'can')):
-            return 'validate'
-        if any(v in name_lower for v in ('convert', 'transform', 'parse', 'format', 'to')):
-            return 'transform'
-        if any(v in name_lower for v in ('init', 'setup', 'configure', 'start', 'stop')):
-            return 'lifecycle'
-        if any(v in name_lower for v in ('send', 'emit', 'notify', 'publish')):
-            return 'communicate'
-        return 'other'
+        return categorize_function(name)
     
     def _extract_domain(self, path: str) -> str:
         """Extract domain from file path."""
-        parts = path.lower().replace('\\', '/').split('/')
-        domains = ['auth', 'user', 'order', 'payment', 'product', 'cart', 
-                   'config', 'util', 'api', 'service', 'model', 'controller',
-                   'validation', 'test', 'generator', 'parser', 'llm']
-        for part in parts:
-            for domain in domains:
-                if domain in part:
-                    return domain
-        # Return parent folder name
-        return parts[-2] if len(parts) > 1 else 'root'
+        return extract_domain(path)
     
     def _compute_hash(self, name: str, signature: str) -> str:
         """Compute short hash for quick comparison."""
