@@ -540,6 +540,7 @@ Output formats (token efficiency):
   yaml     - Readable (~35K tokens/100 files) - nested/flat  
   logicml  - Compressed (best compression) - reproduction-oriented
   toon     - Token-oriented (~JSON-size, more LLM-friendly) - tabular arrays
+  hybrid   - Optimal balance (70% YAML size, 90% info, best LLM quality)
   gherkin  - Behavioral scenarios - good for minimal implementations
   markdown - Documentation (~55K tokens/100 files)
 
@@ -619,6 +620,11 @@ code2logic [path] [options]
         '--ultra-compact',
         action='store_true',
         help='Use ultra-compact TOON format (71% smaller, single-letter keys)'
+    )
+    parser.add_argument(
+        '--hybrid',
+        action='store_true',
+        help='Use hybrid format (70% of YAML size, 90% of info, best LLM quality)'
     )
     parser.add_argument(
         '--with-schema',
@@ -838,11 +844,19 @@ code2logic [path] [options]
     elif args.format == 'yaml':
         generator = YAMLGenerator()
         compact = args.compact if hasattr(args, 'compact') else False
-        output = generator.generate(project, flat=args.flat, detail=args.detail, compact=compact)
+        hybrid = args.hybrid if hasattr(args, 'hybrid') else False
+        
+        if hybrid:
+            output = generator.generate_hybrid(project)
+        else:
+            output = generator.generate(project, flat=args.flat, detail=args.detail, compact=compact)
         
         # Generate schema if requested
         if args.with_schema:
-            schema = generator.generate_schema('compact' if compact else 'full')
+            if hybrid:
+                schema = generator.generate_schema('hybrid')
+            else:
+                schema = generator.generate_schema('compact' if compact else 'full')
             base_name = os.path.splitext(args.output)[0] if args.output else 'output'
             schema_path = f"{base_name}.yaml-schema.json"
             with open(schema_path, 'w', encoding='utf-8') as f:

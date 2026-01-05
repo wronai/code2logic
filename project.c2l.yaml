@@ -336,7 +336,7 @@ modules:
       ret: str
       d: Generate output from project analysis.
 - p: cli.py
-  l: 754
+  l: 767
   i:
   - argparse
   - os
@@ -1598,7 +1598,7 @@ modules:
     ret: None
     d: cleanup generated root
 - p: generators.py
-  l: 1164
+  l: 1413
   i:
   - json
   - collections.defaultdict
@@ -1701,6 +1701,26 @@ modules:
       sig: ''
       ret: str
       d: Generate JSON Schema for full YAML format.
+    - n: _generate_hybrid_schema
+      sig: ''
+      ret: str
+      d: Generate JSON Schema for hybrid format.
+    - n: generate_hybrid
+      sig: project:ProjectInfo
+      ret: str
+      d: Generate hybrid format combining TOON compactness
+    - n: _build_enhanced_signature
+      sig: f:FunctionInfo
+      ret: str
+      d: Build enhanced signature with better parameter han
+    - n: _extract_constants
+      sig: module:ModuleInfo
+      ret: list
+      d: Extract constants and type definitions from module
+    - n: _extract_dataclasses
+      sig: module:ModuleInfo
+      ret: list
+      d: Extract dataclass information from classes.
     - n: generate_from_module
       sig: module:ModuleInfo, detail:str
       ret: str
@@ -1713,26 +1733,6 @@ modules:
       sig: project:ProjectInfo, detail:str
       ret: dict
       d: Build nested hierarchical data structure.
-    - n: _build_row
-      sig: path:str, elem_type:str, name:str, signature:str, language:str, ...+2
-      ret: dict
-      d: Build a single row for flat output.
-    - n: _build_function_row
-      sig: path:str, f:FunctionInfo, language:str, detail:str, project:ProjectInfo, ...+1
-      ret: dict
-      d: Build row for standalone function.
-    - n: _build_method_row
-      sig: path:str, class_name:str, f:FunctionInfo, language:str, detail:str, ...+2
-      ret: dict
-      d: Build row for class method.
-    - n: _function_to_dict
-      sig: f:FunctionInfo, detail:str
-      ret: dict
-      d: Convert function to dict for nested output.
-    - n: _method_to_dict
-      sig: f:FunctionInfo, detail:str
-      ret: dict
-      d: Convert method to dict for nested output.
   - n: CSVGenerator
     d: Generates CSV output optimized for LLM processing.
     m:

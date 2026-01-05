@@ -49,11 +49,14 @@ pip install code2logic[nlp]         # Enhanced intents
 # Standard Markdown output
 code2logic /path/to/project
 
-# Compact format (10-15x smaller)
-code2logic /path/to/project -f compact
+# Compact YAML (14% smaller, meta.legend transparency)
+code2logic /path/to/project -f yaml --compact -o analysis-compact.yaml
 
-# JSON for RAG systems
-code2logic /path/to/project -f json -o project.json
+# Ultra-compact TOON (71% smaller, single-letter keys)
+code2logic /path/to/project -f toon --ultra-compact -o analysis-ultra.toon
+
+# Generate schema alongside output
+code2logic /path/to/project -f yaml --compact --with-schema
 
 # With detailed analysis
 code2logic /path/to/project -d detailed

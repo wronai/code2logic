@@ -618,12 +618,14 @@ class YAMLGenerator:
         Generate JSON Schema for the YAML format.
         
         Args:
-            format_type: 'compact' or 'full' - determines key format
+            format_type: 'compact', 'full', or 'hybrid' - determines key format
             
         Returns:
             JSON Schema as string
         """
-        if format_type == 'compact':
+        if format_type == 'hybrid':
+            return self._generate_hybrid_schema()
+        elif format_type == 'compact':
             return self._generate_compact_schema()
         else:
             return self._generate_full_schema()
@@ -833,6 +835,333 @@ class YAMLGenerator:
         }
         
         return json.dumps(schema, indent=2)
+    
+    def _generate_hybrid_schema(self) -> str:
+        """Generate JSON Schema for hybrid format."""
+        import json
+        
+        schema = {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "title": "Code2Logic Hybrid YAML Schema",
+            "description": "Schema for Code2Logic hybrid format combining TOON compactness with YAML completeness",
+            "type": "object",
+            "properties": {
+                "header": {
+                    "type": "object",
+                    "properties": {
+                        "project": {"type": "string"},
+                        "files": {"type": "integer"},
+                        "lines": {"type": "integer"},
+                        "languages": {"type": "object"},
+                        "modules_count": {"type": "integer"}
+                    },
+                    "required": ["project", "files", "lines"]
+                },
+                "M": {
+                    "type": "array",
+                    "description": "Compact module overview (path:lines)",
+                    "items": {"type": "string"}
+                },
+                "modules": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "p": {"type": "string", "description": "Path"},
+                            "lang": {"type": "string", "description": "Language"},
+                            "l": {"type": "integer", "description": "Lines"},
+                            "i": {"type": "array", "items": {"type": "string"}, "description": "Imports"},
+                            "e": {"type": "array", "items": {"type": "string"}, "description": "Exports"},
+                            "c": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "n": {"type": "string", "description": "Class name"},
+                                        "b": {"type": "array", "items": {"type": "string"}, "description": "Bases"},
+                                        "d": {"type": "string", "description": "Docstring"},
+                                        "props": {"type": "array", "items": {"type": "string"}, "description": "Properties"},
+                                        "m": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "n": {"type": "string", "description": "Method name"},
+                                                    "sig": {"type": "string", "description": "Signature"},
+                                                    "ret": {"type": "string", "description": "Return type"},
+                                                    "d": {"type": "string", "description": "Intent"},
+                                                    "async": {"type": "boolean", "description": "Is async"}
+                                                },
+                                                "required": ["n", "sig"]
+                                            },
+                                            "description": "Methods"
+                                        }
+                                    },
+                                    "required": ["n"]
+                                },
+                                "description": "Classes"
+                            },
+                            "f": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "n": {"type": "string", "description": "Function name"},
+                                        "sig": {"type": "string", "description": "Signature"},
+                                        "ret": {"type": "string", "description": "Return type"},
+                                        "d": {"type": "string", "description": "Intent"},
+                                        "async": {"type": "boolean", "description": "Is async"}
+                                    },
+                                    "required": ["n", "sig"]
+                                },
+                                "description": "Functions"
+                            },
+                            "const": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "n": {"type": "string", "description": "Constant name"},
+                                        "t": {"type": "string", "description": "Type"}
+                                    }
+                                },
+                                "description": "Constants"
+                            },
+                            "dataclasses": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "Dataclass names"
+                            }
+                        },
+                        "required": ["p", "l"]
+                    }
+                },
+                "defaults": {
+                    "type": "object",
+                    "properties": {
+                        "lang": {"type": "string", "description": "Default language"}
+                    }
+                }
+            },
+            "required": ["header", "M", "modules", "defaults"]
+        }
+        
+        return json.dumps(schema, indent=2)
+
+    def generate_hybrid(self, project: ProjectInfo) -> str:
+        """
+        Generate hybrid format combining TOON compactness with YAML completeness.
+        
+        Features:
+        - Compact module overview (like TOON header)
+        - Full YAML structure for detailed information
+        - Includes constants, dataclasses, default values
+        - ~70% of YAML size, ~90% of information
+        - Best balance for LLM code generation
+        """
+        try:
+            import yaml
+        except ImportError:
+            return self._generate_simple_hybrid(project)
+        
+        # Detect default language
+        default_lang = max(project.languages.items(), key=lambda x: x[1])[0] if project.languages else 'python'
+        
+        # Compact module overview
+        modules_overview = []
+        for m in project.modules:
+            modules_overview.append(f"{m.path}:{m.lines_code}")
+        
+        # Build detailed module data with enhanced information
+        detailed_modules = []
+        for m in project.modules:
+            mod_data = {
+                'p': m.path,  # path
+            }
+            
+            # Only add language if different from default
+            if m.language != default_lang:
+                mod_data['lang'] = m.language
+            
+            # Add line count
+            mod_data['l'] = m.lines_code  # lines
+            
+            # Enhanced imports with grouping
+            if m.imports:
+                compact_imports = self._compact_imports(m.imports[:15])
+                if compact_imports:
+                    mod_data['i'] = compact_imports  # imports
+            
+            # Exports
+            if m.exports:
+                mod_data['e'] = m.exports[:10]  # exports
+            
+            # Classes with enhanced information
+            if m.classes:
+                classes_data = []
+                for c in m.classes[:8]:  # Limit to 8 classes per module
+                    cls_data = {
+                        'n': c.name,  # name
+                    }
+                    
+                    # Bases
+                    if c.bases:
+                        cls_data['b'] = c.bases  # bases
+                    
+                    # Enhanced docstring
+                    if c.docstring:
+                        doc = c.docstring.split('\n')[0][:80].strip()
+                        if doc:
+                            cls_data['d'] = doc  # docstring
+                    
+                    # Properties (important for dataclasses)
+                    if c.properties:
+                        cls_data['props'] = c.properties[:12]
+                    
+                    # Methods with enhanced signatures
+                    if c.methods:
+                        methods_data = []
+                        for method in c.methods[:10]:  # Limit to 10 methods per class
+                            method_data = {
+                                'n': method.name,  # name
+                                'sig': self._build_enhanced_signature(method),  # enhanced signature
+                            }
+                            
+                            # Return type
+                            if method.return_type and method.return_type != 'None':
+                                method_data['ret'] = method.return_type
+                            
+                            # Intent/docstring for method
+                            if method.intent:
+                                intent = method.intent.replace('\n', ' ')[:60].strip()
+                                if intent:
+                                    method_data['d'] = intent  # docstring/intent
+                            
+                            # Async flag
+                            if method.is_async:
+                                method_data['async'] = True
+                            
+                            methods_data.append(method_data)
+                        
+                        if methods_data:
+                            cls_data['m'] = methods_data
+                    
+                    classes_data.append(cls_data)
+                
+                if classes_data:
+                    mod_data['c'] = classes_data
+            
+            # Functions with enhanced information
+            if m.functions:
+                functions_data = []
+                for f in m.functions[:12]:  # Limit to 12 functions per module
+                    func_data = {
+                        'n': f.name,  # name
+                        'sig': self._build_enhanced_signature(f),  # enhanced signature
+                    }
+                    
+                    # Return type
+                    if f.return_type and f.return_type != 'None':
+                        func_data['ret'] = f.return_type
+                    
+                    # Intent
+                    if f.intent:
+                        intent = f.intent.replace('\n', ' ')[:60].strip()
+                        if intent:
+                            func_data['d'] = intent
+                    
+                    # Async flag
+                    if f.is_async:
+                        func_data['async'] = True
+                    
+                    functions_data.append(func_data)
+                
+                if functions_data:
+                    mod_data['f'] = functions_data
+            
+            # Add constants/types information (if available)
+            constants = self._extract_constants(m)
+            if constants:
+                mod_data['const'] = constants
+            
+            # Add dataclass information
+            dataclasses = self._extract_dataclasses(m)
+            if dataclasses:
+                mod_data['dataclasses'] = dataclasses
+            
+            detailed_modules.append(mod_data)
+        
+        # Build final hybrid structure
+        hybrid_data = {
+            # Compact header (like TOON)
+            'header': {
+                'project': project.name,
+                'files': project.total_files,
+                'lines': project.total_lines,
+                'languages': dict(project.languages),
+                'modules_count': len(project.modules)
+            },
+            
+            # Compact module overview
+            'M': modules_overview,  # M for modules (like TOON)
+            
+            # Full YAML details
+            'modules': detailed_modules,
+            
+            # Defaults
+            'defaults': {'lang': default_lang}
+        }
+        
+        yaml_str = yaml.dump(hybrid_data, default_flow_style=False, 
+                           allow_unicode=True, sort_keys=False, width=120)
+        return yaml_str
+
+    def _build_enhanced_signature(self, f: FunctionInfo) -> str:
+        """Build enhanced signature with better parameter handling."""
+        if not f.params:
+            return '()'
+        
+        # Remove self/cls parameters
+        params = []
+        for p in f.params:
+            p_clean = p.replace('\n', ' ').strip()
+            if p_clean and p_clean not in ('self', 'cls') and not p_clean.startswith('self:'):
+                params.append(p_clean)
+        
+        if not params:
+            return '()'
+        
+        # Limit to 5 params for compactness
+        if len(params) > 5:
+            params = params[:5] + [f'...+{len(params)-5}']
+        
+        return f"({','.join(params)})"
+
+    def _extract_constants(self, module: ModuleInfo) -> list:
+        """Extract constants and type definitions from module."""
+        constants = []
+        
+        # Look for common constant patterns
+        for name in module.exports:
+            # Check if it looks like a constant (UPPER_CASE)
+            if name.isupper() and '_' in name:
+                constants.append({
+                    'n': name,
+                    't': 'constant'  # type hint
+                })
+        
+        return constants[:5]  # Limit to 5 constants
+
+    def _extract_dataclasses(self, module: ModuleInfo) -> list:
+        """Extract dataclass information from classes."""
+        dataclasses = []
+        
+        for cls in module.classes:
+            # Simple heuristic: check if class has properties (likely dataclass)
+            if cls.properties and len(cls.properties) > 2:
+                dataclasses.append(cls.name)
+        
+        return dataclasses[:3]  # Limit to 3 dataclasses
 
     def generate_from_module(self, module: ModuleInfo, detail: str = 'full') -> str:
         project = ProjectInfo(

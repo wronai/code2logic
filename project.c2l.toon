@@ -1,4 +1,4 @@
-# code2logic | 51f 20007L | python:51
+# code2logic | 51f 20350L | python:51
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[51]:
   llm_profiler.py,491
@@ -6,7 +6,7 @@ M[51]:
   file_formats.py,279
   project_reproducer.py,322
   base.py,50
-  cli.py,754
+  cli.py,767
   llm.py,376
   errors.py,372
   code_review.py,205
@@ -26,7 +26,7 @@ M[51]:
   refactor.py,313
   logicml.py,281
   utils.py,16
-  generators.py,1164
+  generators.py,1413
   markdown_format.py,266
   models.py,154
   similarity.py,178
@@ -242,7 +242,7 @@ D:
     MarkdownGenerator: generate(2),_gen_tree(2),_print_tree(4),_gen_module(4),_gen_class(3)  # Generates Markdown output for project...
     CompactGenerator: generate(1)  # Generates ultra-compact output for to...
     JSONGenerator: generate(3),generate_from_module(2),_generate_nested(2),_generate_flat(2),_build_element_row(7)  # Generates JSON output for machine pro...
-    YAMLGenerator: generate(4),generate_schema(1),_generate_compact_schema(0),_generate_full_schema(0),generate_from_module(2)  # Generates YAML output for human-reada...
+    YAMLGenerator: generate(4),generate_schema(1),_generate_compact_schema(0),_generate_full_schema(0),_generate_hybrid_schema(0)  # Generates YAML output for human-reada...
     CSVGenerator: generate(2),_build_row(7),_build_function_row(7),_build_signature(1),_categorize(1)  # Generates CSV output optimized for LL...
   markdown_format.py:
     i: os,pathlib,typing,dataclasses,dataclasses.dataclass,models.ProjectInfo,pathlib.Path,typing.{Dict,List,Optional}
