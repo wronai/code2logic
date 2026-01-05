@@ -10,7 +10,7 @@ import ast
 import re
 from typing import Optional, List
 
-from .models import FunctionInfo, ClassInfo, TypeInfo, ModuleInfo
+from .models import FunctionInfo, ClassInfo, TypeInfo, ModuleInfo, ConstantInfo, FieldInfo, AttributeInfo, OptionalImport
 from .intent import EnhancedIntentGenerator
 
 # Optional Tree-sitter imports
@@ -110,6 +110,11 @@ class TreeSitterParser:
         imports, classes, functions, constants, exports = [], [], [], [], []
         docstring = None
         
+        # Track conditional imports (try/except)
+        conditional_imports = []
+        type_checking_imports = []
+        aliases = {}
+        
         for child in root.children:
             node_type = child.type
             
@@ -119,11 +124,19 @@ class TreeSitterParser:
                 if expr and expr.type == 'string':
                     docstring = self._extract_string(expr, content)
             
-            # Imports
+            # Regular imports
             elif node_type == 'import_statement':
                 imports.extend(self._extract_py_import(child, content))
             elif node_type in ('import_from_statement', 'from_import_statement', 'import_from'):
                 imports.extend(self._extract_py_from_import(child, content))
+            
+            # Conditional imports (try/except blocks)
+            elif node_type == 'try_statement':
+                try_imports = self._extract_conditional_imports(child, content)
+                if try_imports:
+                    conditional_imports.extend(try_imports)
+                    # Also add to regular imports but mark as conditional
+                    imports.extend(try_imports)
             
             # Functions
             elif node_type == 'function_definition':
@@ -151,8 +164,8 @@ class TreeSitterParser:
                     if not cls.name.startswith('_'):
                         exports.append(cls.name)
             
-            # Constants
-            elif node_type == 'expression_statement':
+            # Constants with enhanced extraction
+            elif node_type == 'assignment':
                 const = self._extract_py_constant(child, content)
                 if const:
                     constants.append(const)
@@ -171,6 +184,16 @@ class TreeSitterParser:
             if imp not in seen:
                 seen.add(imp)
                 clean_imports.append(imp)
+        
+        # Extract TYPE_CHECKING and aliases from the entire tree
+        type_checking_imports = self._extract_type_checking_imports(root, content)
+        aliases = self._extract_aliases(root, content)
+        
+        # Create enhanced constants with conditional imports
+        enhanced_constants = constants[:10]
+        if conditional_imports:
+            enhanced_constants.extend([f"conditional:{imp}" for imp in conditional_imports[:5]])
+        
         return ModuleInfo(
             path=filepath,
             language='python',
@@ -179,82 +202,135 @@ class TreeSitterParser:
             classes=classes,
             functions=functions,
             types=[],
-            constants=constants[:10],
+            constants=enhanced_constants,
+            type_checking_imports=type_checking_imports,
+            optional_imports=[],  # TODO: implement proper optional import extraction
+            aliases=aliases,
             docstring=self._truncate_docstring(docstring),
             lines_total=len(lines),
             lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('#')])
         )
     
+    def _extract_constants(self, tree, content: str) -> List[ConstantInfo]:
+        """Extract module-level UPPERCASE constants."""
+        constants = []
+        for node in tree.root_node.children:
+            if node.type == 'expression_statement':
+                expr = node.children[0] if node.children else None
+                if expr and expr.type == 'assignment':
+                    # Get the target
+                    left = expr.children[0] if expr.children else None
+                    if left and left.type == 'identifier':
+                        name = self._text(left, content)
+                        if name.isupper():  # Convention: CONSTANTS are UPPERCASE
+                            const = ConstantInfo(name=name)
+                            
+                            # Get the value
+                            right = expr.children[1] if len(expr.children) > 1 else None
+                            if right:
+                                value_text = self._text(right, content).strip()
+                                const.value = value_text if len(value_text) <= 200 else None
+                                
+                                # For dictionaries, extract keys
+                                if value_text.startswith('{') and value_text.endswith('}'):
+                                    # Simple regex to extract keys
+                                    import re
+                                    keys = re.findall(r"'([^']+)'|'([^']+)'", value_text[:500])
+                                    const.value_keys = [k for pair in keys for k in pair if k][:10]
+                            
+                            constants.append(const)
+        
+        return constants[:15]
+
+    def _extract_type_checking_imports(self, tree, content: str) -> List[str]:
+        """Extract TYPE_CHECKING block imports."""
+        type_checking_imports = []
+        in_type_checking = False
+        
+        for node in tree.children:  # tree is already the root node
+            if node.type == 'if_statement':
+                # Check if this is `if TYPE_CHECKING:`
+                condition = self._find_child(node, 'condition')
+                if condition:
+                    cond_text = self._text(condition, content).strip()
+                    if 'TYPE_CHECKING' in cond_text:
+                        in_type_checking = True
+                        # Extract imports from the body
+                        body = self._find_child(node, 'body')
+                        if body:
+                            for child in body.children:
+                                if child.type == 'import_statement':
+                                    type_checking_imports.extend(self._extract_py_import(child, content))
+                                elif child.type in ('import_from_statement', 'from_import_statement', 'import_from'):
+                                    type_checking_imports.extend(self._extract_py_from_import(child, content))
+                        break
+        
+        return type_checking_imports
+
+    def _extract_conditional_imports(self, node, content: str) -> List[str]:
+        """Extract imports from try/except blocks."""
+        imports = []
+        
+        # Find the try body
+        try_body = self._find_child(node, 'block')
+        if try_body:
+            for child in try_body.children:
+                if child.type == 'import_statement':
+                    imports.extend(self._extract_py_import(child, content))
+                elif child.type in ('import_from_statement', 'from_import_statement', 'import_from'):
+                    imports.extend(self._extract_py_from_import(child, content))
+        
+        return imports
+
+    def _extract_aliases(self, tree, content: str) -> dict:
+        """Extract module aliases (import X as Y)."""
+        aliases = {}
+        
+        for node in tree.children:  # tree is already the root node
+            if node.type == 'import_statement':
+                for c in node.children:
+                    if c.type == 'aliased_import':
+                        orig_name = None
+                        alias_name = None
+                        
+                        # Find the original name and alias
+                        for subchild in c.children:
+                            if subchild.type == 'dotted_name':
+                                orig_name = self._text(subchild, content)
+                            elif subchild.type == 'identifier' and subchild != c.children[0]:
+                                alias_name = self._text(subchild, content)
+                        
+                        if orig_name and alias_name:
+                            aliases[alias_name] = orig_name
+            
+            elif node.type in ('import_from_statement', 'from_import_statement', 'import_from'):
+                for c in node.children:
+                    if c.type == 'aliased_import':
+                        orig_name = None
+                        alias_name = None
+                        
+                        for subchild in c.children:
+                            if subchild.type == 'identifier' and 'as' not in self._text(subchild, content):
+                                orig_name = self._text(subchild, content)
+                            elif subchild.type == 'identifier' and 'as' in self._text(subchild, content):
+                                # This is the alias part
+                                pass
+                        
+                        # Extract from the full text
+                        text = self._text(c, content)
+                        if ' as ' in text:
+                            parts = text.split(' as ')
+                            if len(parts) == 2:
+                                orig_name = parts[0].strip()
+                                alias_name = parts[1].strip()
+                        
+                        if orig_name and alias_name:
+                            aliases[alias_name] = orig_name
+        
+        return aliases
+    
     def _extract_py_function(self, node, content: str, 
                               decorated_node=None) -> Optional[FunctionInfo]:
-        """Extract Python function from AST node."""
-        name_node = self._find_child(node, 'identifier')
-        if not name_node:
-            return None
-        name = self._text(name_node, content).strip()
-        
-        # Parameters
-        params = []
-        params_node = self._find_child(node, 'parameters')
-        if params_node:
-            for child in params_node.children:
-                if child.type == 'identifier':
-                    params.append(self._text(child, content))
-                elif child.type in ('typed_parameter', 'typed_default_parameter'):
-                    n = self._find_child(child, 'identifier')
-                    t = self._find_child(child, 'type')
-                    if n:
-                        p = self._text(n, content)
-                        if t:
-                            p += ':' + self._text(t, content)
-                        params.append(p)
-                elif child.type == 'default_parameter' and child.children:
-                    params.append(self._text(child.children[0], content))
-        
-        # Return type
-        return_type = None
-        ret_node = self._find_child(node, 'type')
-        if ret_node:
-            return_type = self._text(ret_node, content)
-        
-        # Docstring
-        docstring = None
-        body = self._find_child(node, 'block')
-        if body and body.children:
-            first = body.children[0]
-            if first.type == 'expression_statement':
-                expr = first.children[0] if first.children else None
-                if expr and expr.type == 'string':
-                    docstring = self._extract_string(expr, content)
-        
-        # Decorators
-        decorators = []
-        if decorated_node:
-            for c in decorated_node.children:
-                if c.type == 'decorator':
-                    decorators.append(self._text(c, content).lstrip('@').split('(')[0])
-        
-        is_async = node.type == 'async_function_definition'
-        
-        return FunctionInfo(
-            name=name,
-            params=params[:8],
-            return_type=return_type,
-            docstring=self._truncate_docstring(docstring),
-            calls=[],
-            raises=[],
-            complexity=1,
-            lines=node.end_point[0] - node.start_point[0] + 1,
-            decorators=decorators,
-            is_async=is_async,
-            is_static='staticmethod' in decorators,
-            is_private=name.startswith('_') and not name.startswith('__'),
-            intent=self.intent_gen.generate(name, docstring),
-            start_line=node.start_point[0] + 1,
-            end_line=node.end_point[0] + 1
-        )
-    
-    def _extract_py_class(self, node, content: str) -> Optional[ClassInfo]:
         """Extract Python class from AST node."""
         name_node = self._find_child(node, 'identifier')
         if not name_node:
@@ -269,9 +345,26 @@ class TreeSitterParser:
                 if c.type in ('identifier', 'attribute'):
                     bases.append(self._text(c, content))
         
+        # Check for dataclass decorator
+        decorators = []
+        is_dataclass = False
+        decorated_node = None
+        # Look for parent decorated_definition
+        parent = getattr(node, 'parent', None)
+        if parent and parent.type == 'decorated_definition':
+            decorated_node = parent
+            for c in parent.children:
+                if c.type == 'decorator':
+                    dec_text = self._text(c, content).lstrip('@')
+                    decorators.append(dec_text.split('(')[0])
+                    if 'dataclass' in dec_text:
+                        is_dataclass = True
+        
         # Docstring and methods
         docstring = None
         methods = []
+        fields = []
+        attributes = []
         body = self._find_child(node, 'block')
         if body:
             for i, child in enumerate(body.children):
@@ -290,17 +383,98 @@ class TreeSitterParser:
                         m = self._extract_py_function(inner, content, child)
                         if m:
                             methods.append(m)
+                
+                # Extract dataclass fields
+                elif is_dataclass and child.type == 'expression_statement':
+                    field = self._extract_dataclass_field(child, content)
+                    if field:
+                        fields.append(field)
+                
+                # Extract instance attributes (self.x = ...)
+                elif child.type == 'expression_statement' and not is_dataclass:
+                    attr = self._extract_class_attribute(child, content)
+                    if attr:
+                        attributes.append(attr)
         
         return ClassInfo(
             name=name,
             bases=bases,
+            decorators=decorators,
             docstring=self._truncate_docstring(docstring),
+            is_dataclass=is_dataclass,
+            fields=fields,
+            attributes=attributes,
             methods=methods,
-            properties=[],
             is_interface=False,
             is_abstract='ABC' in bases or 'ABCMeta' in bases,
             generic_params=[]
         )
+    
+    def _extract_dataclass_field(self, node, content: str) -> Optional[FieldInfo]:
+        """Extract dataclass field from assignment."""
+        if node.children:
+            expr = node.children[0]
+            if expr.type == 'assignment':
+                left = expr.children[0] if expr.children else None
+                if left and left.type == 'identifier':
+                    name = self._text(left, content)
+                    
+                    # Check if this looks like a field assignment
+                    right = expr.children[1] if len(expr.children) > 1 else None
+                    if right:
+                        right_text = self._text(right, content).strip()
+                        
+                        # Extract type annotation from field() call or direct assignment
+                        type_annotation = ""
+                        default = None
+                        default_factory = None
+                        
+                        if right_text.startswith('field('):
+                            # field(default_factory=list)
+                            if 'default_factory=' in right_text:
+                                factory_match = right_text.split('default_factory=')[1].split(',')[0].split(')')[0]
+                                default_factory = factory_match.strip()
+                        else:
+                            # Direct value assignment
+                            default = right_text
+                        
+                        return FieldInfo(
+                            name=name,
+                            type_annotation=type_annotation,
+                            default=default,
+                            default_factory=default_factory
+                        )
+        return None
+    
+    def _extract_class_attribute(self, node, content: str) -> Optional[AttributeInfo]:
+        """Extract class attribute from self.x = ... assignment."""
+        if node.children:
+            expr = node.children[0]
+            if expr.type == 'assignment':
+                left = expr.children[0] if expr.children else None
+                if left and left.type == 'attribute':
+                    # Check if it's self.attribute
+                    obj = left.children[0] if left.children else None
+                    attr = left.children[1] if len(left.children) > 1 else None
+                    
+                    if obj and attr and obj.type == 'identifier' and self._text(obj, content) == 'self':
+                        attr_name = self._text(attr, content)
+                        
+                        # Try to infer type from the assignment
+                        type_annotation = ""
+                        right = expr.children[1] if len(expr.children) > 1 else None
+                        if right:
+                            right_text = self._text(right, content).strip()
+                            # Simple type inference
+                            if right_text in ('[]', 'list()', 'dict()', '{}'):
+                                type_annotation = "List" if right_text in ('[]', 'list()') else "Dict"
+                        
+                        return AttributeInfo(
+                            name=attr_name,
+                            type_annotation=type_annotation,
+                            set_in_init=True
+                        )
+        return None
     
     def _extract_py_import(self, node, content: str) -> List[str]:
         """Extract import statement."""
@@ -349,17 +523,45 @@ class TreeSitterParser:
                     imports.append(f"{module}.{name}" if module else name)
         return imports
     
-    def _extract_py_constant(self, node, content: str) -> Optional[str]:
-        """Extract constant (UPPERCASE assignment)."""
-        if node.children:
-            expr = node.children[0]
-            if expr.type == 'assignment':
-                left = expr.children[0] if expr.children else None
-                if left and left.type == 'identifier':
-                    name = self._text(left, content)
-                    if name.isupper():
-                        return name
+    def _extract_py_constant(self, node, content: str) -> Optional[ConstantInfo]:
+        """Extract constant (UPPERCASE assignment) with value."""
+        # node is already an assignment node
+        left = node.children[0] if node.children else None
+        right = node.children[1] if len(node.children) > 1 else None
+        if left and left.type == 'identifier':
+            name = self._text(left, content)
+            if name.isupper():  # Convention: CONSTANTS are UPPERCASE
+                const = ConstantInfo(name=name)
+                
+                # Get the value
+                if right:
+                    value_text = self._text(right, content).strip()
+                    const.value = value_text if len(value_text) <= 200 else None
+                    
+                    # For dictionaries, extract keys
+                    if value_text.startswith('{') and value_text.endswith('}'):
+                        # Simple regex to extract keys
+                        import re
+                        keys = re.findall(r"'([^']+)'|'([^']+)'", value_text[:500])
+                        const.value_keys = [k for pair in keys for k in pair if k][:10]
+                
+                return const
         return None
+    
+    def _extract_conditional_imports(self, node, content: str) -> List[str]:
+        """Extract imports from try/except blocks."""
+        imports = []
+        
+        # Find the try body
+        try_body = self._find_child(node, 'block')
+        if try_body:
+            for child in try_body.children:
+                if child.type == 'import_statement':
+                    imports.extend(self._extract_py_import(child, content))
+                elif child.type in ('import_from_statement', 'from_import_statement', 'import_from'):
+                    imports.extend(self._extract_py_from_import(child, content))
+        
+        return imports
     
     def _parse_js_ts(self, filepath: str, content: str, tree, language: str) -> ModuleInfo:
         """Parse JavaScript/TypeScript source using Tree-sitter AST."""
@@ -796,12 +998,39 @@ class UniversalParser:
     def _extract_ast_function(self, node) -> FunctionInfo:
         """Extract function from Python AST node."""
         is_async = isinstance(node, ast.AsyncFunctionDef)
+        
+        # Extract parameters with defaults
         params = []
+        defaults = []
         for arg in node.args.args:
             p = arg.arg
             if arg.annotation:
                 p += ':' + self._ann_str(arg.annotation)
             params.append(p)
+        
+        # Extract default values
+        for default in node.args.defaults:
+            if isinstance(default, ast.Constant):
+                defaults.append(repr(default.value))
+            elif isinstance(default, ast.Str):
+                defaults.append(repr(default.s))
+            elif isinstance(default, ast.NameConstant):
+                defaults.append(str(default.value))
+            elif isinstance(default, ast.Name):
+                defaults.append(default.id)
+            else:
+                defaults.append(str(ast.unparse(default) if hasattr(ast, 'unparse') else repr(default)))
+        
+        # Align defaults with parameters (defaults apply to last N parameters)
+        param_defaults = [None] * (len(params) - len(defaults)) + defaults
+        
+        # Create enhanced params with defaults
+        enhanced_params = []
+        for i, param in enumerate(params[:8]):
+            if i < len(param_defaults) and param_defaults[i]:
+                enhanced_params.append(f"{param}={param_defaults[i]}")
+            else:
+                enhanced_params.append(param)
         
         decorators = []
         for dec in node.decorator_list:
@@ -813,7 +1042,7 @@ class UniversalParser:
         docstring = ast.get_docstring(node)
         return FunctionInfo(
             name=node.name,
-            params=params[:8],
+            params=enhanced_params,
             return_type=self._ann_str(node.returns) if node.returns else None,
             docstring=docstring[:100] if docstring else None,
             calls=[],
@@ -826,7 +1055,7 @@ class UniversalParser:
             is_private=node.name.startswith('_') and not node.name.startswith('__'),
             intent=self.intent_gen.generate(node.name, docstring),
             start_line=node.lineno,
-            end_line=node.end_lineno if hasattr(node, 'end_lineno') else node.lineno
+            end_line=getattr(node, 'end_lineno', node.lineno)
         )
     
     def _extract_ast_class(self, node: ast.ClassDef) -> ClassInfo:

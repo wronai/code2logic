@@ -931,6 +931,11 @@ class YAMLGenerator:
                                 "type": "array",
                                 "items": {"type": "string"},
                                 "description": "Dataclass names"
+                            },
+                            "conditional_imports": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "Imports in try/except blocks"
                             }
                         },
                         "required": ["p", "l"]
@@ -996,6 +1001,44 @@ class YAMLGenerator:
             if m.exports:
                 mod_data['e'] = m.exports[:10]  # exports
             
+            # Constants
+            if hasattr(m, 'constants') and m.constants:
+                const_data = []
+                for const in m.constants:
+                    const_dict = {'n': const.name}
+                    if const.type_annotation:
+                        const_dict['t'] = const.type_annotation
+                    if const.value_keys:  # For dicts, show keys
+                        const_dict['keys'] = const.value_keys[:10]
+                    elif const.value and len(const.value) <= 100:  # For small values
+                        const_dict['v'] = const.value
+                    const_data.append(const_dict)
+                if const_data:
+                    mod_data['const'] = const_data
+            
+            # TYPE_CHECKING imports
+            if hasattr(m, 'type_checking_imports') and m.type_checking_imports:
+                mod_data['type_checking'] = m.type_checking_imports[:10]
+            
+            # Conditional imports
+            if hasattr(m, 'optional_imports') and m.optional_imports:
+                optional_data = []
+                for opt in m.optional_imports:
+                    opt_dict = {'module': opt.module}
+                    if opt.flag_name:
+                        opt_dict['flag'] = opt.flag_name
+                    if not opt.fallback_value:
+                        opt_dict['fallback'] = False
+                    if opt.imports:
+                        opt_dict['imports'] = opt.imports
+                    optional_data.append(opt_dict)
+                if optional_data:
+                    mod_data['optional_imports'] = optional_data
+            
+            # Aliases
+            if hasattr(m, 'aliases') and m.aliases:
+                mod_data['aliases'] = m.aliases
+            
             # Classes with enhanced information
             if m.classes:
                 classes_data = []
@@ -1014,34 +1057,43 @@ class YAMLGenerator:
                         if doc:
                             cls_data['d'] = doc  # docstring
                     
-                    # Properties (important for dataclasses)
-                    if c.properties:
-                        cls_data['props'] = c.properties[:12]
+                    # NEW: Class decorators
+                    if hasattr(c, 'decorators') and c.decorators:
+                        cls_data['dec'] = c.decorators
+                    
+                    # NEW: Dataclass fields
+                    if hasattr(c, 'is_dataclass') and c.is_dataclass and hasattr(c, 'fields') and c.fields:
+                        fields_data = []
+                        for field in c.fields:
+                            field_dict = {'n': field.name}
+                            if field.type_annotation:
+                                field_dict['t'] = field.type_annotation
+                            if field.default:
+                                field_dict['default'] = field.default
+                            if field.default_factory:
+                                field_dict['factory'] = field.default_factory
+                            fields_data.append(field_dict)
+                        if fields_data:
+                            cls_data['fields'] = fields_data
+                    
+                    # NEW: Class attributes
+                    if hasattr(c, 'attributes') and c.attributes:
+                        attrs_data = []
+                        for attr in c.attributes:
+                            attr_dict = {'n': attr.name}
+                            if attr.type_annotation:
+                                attr_dict['t'] = attr.type_annotation
+                            attrs_data.append(attr_dict)
+                        if attrs_data:
+                            cls_data['attrs'] = attrs_data
                     
                     # Methods with enhanced signatures
                     if c.methods:
                         methods_data = []
                         for method in c.methods[:10]:  # Limit to 10 methods per class
-                            method_data = {
-                                'n': method.name,  # name
-                                'sig': self._build_enhanced_signature(method),  # enhanced signature
-                            }
-                            
-                            # Return type
-                            if method.return_type and method.return_type != 'None':
-                                method_data['ret'] = method.return_type
-                            
-                            # Intent/docstring for method
-                            if method.intent:
-                                intent = method.intent.replace('\n', ' ')[:60].strip()
-                                if intent:
-                                    method_data['d'] = intent  # docstring/intent
-                            
-                            # Async flag
-                            if method.is_async:
-                                method_data['async'] = True
-                            
-                            methods_data.append(method_data)
+                            method_data = self._method_to_dict(method, detail)
+                            if method_data:
+                                methods_data.append(method_data)
                         
                         if methods_data:
                             cls_data['m'] = methods_data
@@ -1055,6 +1107,10 @@ class YAMLGenerator:
             if m.functions:
                 functions_data = []
                 for f in m.functions[:12]:  # Limit to 12 functions per module
+                    # Skip if not a FunctionInfo object (safety check)
+                    if not hasattr(f, 'params'):
+                        continue
+                    
                     func_data = {
                         'n': f.name,  # name
                         'sig': self._build_enhanced_signature(f),  # enhanced signature
@@ -1063,6 +1119,10 @@ class YAMLGenerator:
                     # Return type
                     if f.return_type and f.return_type != 'None':
                         func_data['ret'] = f.return_type
+                    
+                    # NEW: Function decorators
+                    if hasattr(f, 'decorators') and f.decorators:
+                        func_data['dec'] = f.decorators
                     
                     # Intent
                     if f.intent:
@@ -1088,6 +1148,11 @@ class YAMLGenerator:
             dataclasses = self._extract_dataclasses(m)
             if dataclasses:
                 mod_data['dataclasses'] = dataclasses
+            
+            # Add conditional imports information
+            conditional_imports = self._extract_conditional_imports(m)
+            if conditional_imports:
+                mod_data['conditional_imports'] = conditional_imports
             
             detailed_modules.append(mod_data)
         
@@ -1157,11 +1222,23 @@ class YAMLGenerator:
         dataclasses = []
         
         for cls in module.classes:
-            # Simple heuristic: check if class has properties (likely dataclass)
-            if cls.properties and len(cls.properties) > 2:
+            # Check if class is marked as dataclass
+            if getattr(cls, 'is_dataclass', False):
                 dataclasses.append(cls.name)
         
         return dataclasses[:3]  # Limit to 3 dataclasses
+    
+    def _extract_conditional_imports(self, module: ModuleInfo) -> list:
+        """Extract conditional imports from constants."""
+        conditional_imports = []
+        
+        for const in module.constants:
+            if isinstance(const, str) and const.startswith('conditional:'):
+                # Extract the import name
+                import_name = const.replace('conditional:', '')
+                conditional_imports.append(import_name)
+        
+        return conditional_imports[:5]  # Limit to 5 conditional imports
 
     def generate_from_module(self, module: ModuleInfo, detail: str = 'full') -> str:
         project = ProjectInfo(
@@ -1353,8 +1430,45 @@ class YAMLGenerator:
         return data
     
     def _method_to_dict(self, f: FunctionInfo, detail: str) -> dict:
-        """Convert method to dict for nested output."""
-        return self._function_to_dict(f, detail)
+        """Convert method to dictionary for YAML output."""
+        if not f:
+            return None
+            
+        # Enhanced signature with defaults
+        sig = self._build_enhanced_signature(f)
+        
+        data = {
+            'n': f.name,
+            'sig': sig,
+        }
+        
+        # Return type
+        if f.return_type and f.return_type != 'None':
+            data['ret'] = f.return_type
+        
+        # NEW: Method decorators
+        if hasattr(f, 'decorators') and f.decorators:
+            data['dec'] = f.decorators
+        
+        # Intent/docstring
+        if f.intent:
+            intent = f.intent.replace('\n', ' ')[:60].strip()
+            if intent:
+                data['d'] = intent
+        
+        # Async flag
+        if f.is_async:
+            data['async'] = True
+            
+        # NEW: Method type flags
+        if hasattr(f, 'is_static') and f.is_static:
+            data['static'] = True
+        if hasattr(f, 'is_classmethod') and f.is_classmethod:
+            data['classmethod'] = True
+        if hasattr(f, 'is_property') and f.is_property:
+            data['property'] = True
+        
+        return data
     
     def _build_signature(self, f: FunctionInfo) -> str:
         """Build compact signature string."""

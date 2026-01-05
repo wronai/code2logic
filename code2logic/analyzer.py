@@ -192,11 +192,20 @@ class ProjectAnalyzer:
             
             # Try Tree-sitter first, then fallback
             module = None
-            if self.ts_parser and self.ts_parser.is_available(language):
-                module = self.ts_parser.parse(rel_path, content, language)
+            try:
+                if self.ts_parser and self.ts_parser.is_available(language):
+                    module = self.ts_parser.parse(rel_path, content, language)
+            except Exception as e:
+                if self.verbose:
+                    print(f"Tree-sitter parser failed for {rel_path}: {e}", file=sys.stderr)
             
             if module is None:
-                module = self.fallback_parser.parse(rel_path, content, language)
+                try:
+                    module = self.fallback_parser.parse(rel_path, content, language)
+                except Exception as e:
+                    if self.verbose:
+                        print(f"Fallback parser failed for {rel_path}: {e}", file=sys.stderr)
+                    continue
             
             if module:
                 self.modules.append(module)
