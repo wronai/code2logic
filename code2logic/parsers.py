@@ -24,6 +24,40 @@ except ImportError:
     pass
 
 
+def _normalize_import_path(import_path: str) -> str:
+    """Normalize import path by removing duplicate suffix segments."""
+    if not import_path:
+        return import_path
+    parts = import_path.split('.')
+    if len(parts) >= 2 and parts[-1] == parts[-2]:
+        parts = parts[:-1]
+    return '.'.join(parts)
+
+
+def _clean_imports(imports: List[str]) -> List[str]:
+    """Deduplicate and normalize import paths while preserving order."""
+    seen = set()
+    cleaned = []
+    for imp in imports:
+        if not imp:
+            continue
+        norm = _normalize_import_path(imp.strip())
+        if norm and norm not in seen:
+            seen.add(norm)
+            cleaned.append(norm)
+    return cleaned
+
+
+def _combine_import_name(module_name: str, identifier: str) -> str:
+    """Combine module and identifier while avoiding duplicate suffixes."""
+    if not module_name:
+        return identifier
+    tail = module_name.split('.')[-1]
+    if tail == identifier:
+        return module_name
+    return f"{module_name}.{identifier}"
+
+
 class TreeSitterParser:
     """
     Parser using Tree-sitter for high-accuracy AST parsing.
@@ -145,9 +179,24 @@ class TreeSitterParser:
                     classes.append(cls)
                     if not cls.name.startswith('_'):
                         exports.append(cls.name)
+            # Top-level functions (regular or decorated)
+            elif node_type == 'function_definition':
+                func = self._extract_py_function(child, content, filepath, content)
+                if func:
+                    functions.append(func)
+                    if not func.name.startswith('_'):
+                        exports.append(func.name)
+            elif node_type == 'decorated_definition':
+                inner_func = self._find_child(child, 'function_definition')
+                if inner_func:
+                    func = self._extract_py_function(inner_func, content, filepath, content, child)
+                    if func:
+                        functions.append(func)
+                        if not func.name.startswith('_'):
+                            exports.append(func.name)
             
             # Constants with enhanced extraction
-            elif node_type == 'expression_statement':
+            if node_type == 'expression_statement':
                 const = self._extract_py_constant(child, content)
                 if const:
                     constants.append(const)
@@ -155,20 +204,8 @@ class TreeSitterParser:
                     if const.name.isupper():
                         exports.append(const.name)
         
+        # Deduplicate imports and normalize names at extraction time
         lines = content.split('\n')
-        # Deduplicate imports and remove malformed entries
-        seen = set()
-        clean_imports = []
-        for imp in imports:
-            if not imp or imp in seen:
-                continue
-            # Skip duplicates like "dataclasses.dataclasses" 
-            parts = imp.split('.')
-            if len(parts) >= 2 and parts[-1] == parts[-2]:
-                imp = '.'.join(parts[:-1])  # Remove duplicate suffix
-            if imp not in seen:
-                seen.add(imp)
-                clean_imports.append(imp)
         
         # Extract TYPE_CHECKING and aliases from the entire tree
         type_checking_imports = self._extract_type_checking_imports(root, content)
@@ -182,7 +219,7 @@ class TreeSitterParser:
         return ModuleInfo(
             path=filepath,
             language='python',
-            imports=clean_imports[:20],
+            imports=_clean_imports(imports)[:20],
             exports=exports,
             classes=classes,
             functions=functions,
@@ -603,19 +640,24 @@ class TreeSitterParser:
 
         module = ''.join(module_parts).strip().lstrip('.')
 
+        collecting = False
         for c in node.children:
+            if c.type == 'import':
+                collecting = True
+                continue
+            if not collecting:
+                continue
             if c.type == 'identifier':
                 name = self._text(c, content)
-                imports.append(f"{module}.{name}" if module else name)
+                imports.append(_combine_import_name(module, name))
             elif c.type == 'dotted_name':
                 name = self._text(c, content)
-                if seen_import_kw:
-                    imports.append(f"{module}.{name}" if module else name)
+                imports.append(_combine_import_name(module, name))
             elif c.type == 'aliased_import':
                 n = self._find_child(c, 'identifier')
                 if n:
                     name = self._text(n, content)
-                    imports.append(f"{module}.{name}" if module else name)
+                    imports.append(_combine_import_name(module, name))
         return imports
     
     def _extract_py_constant(self, node, content: str) -> Optional[ConstantInfo]:
@@ -1061,7 +1103,10 @@ class UniversalParser:
                 imports.extend(a.name for a in node.names)
             elif isinstance(node, ast.ImportFrom):
                 module = node.module or ''
-                imports.extend(f"{module}.{a.name}" for a in node.names if a.name != '*')
+                for alias in node.names:
+                    if alias.name == '*':
+                        continue
+                    imports.append(_combine_import_name(module, alias.name))
             elif isinstance(node, ast.ClassDef):
                 cls = self._extract_ast_class(node)
                 if cls:

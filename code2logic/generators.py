@@ -1147,7 +1147,7 @@ class YAMLGenerator:
             # Add constants/types information (if available)
             constants = self._extract_constants(m)
             if constants:
-                mod_data['const'] = constants
+                mod_data.setdefault('const', []).extend(constants)
             
             # Add dataclass information
             dataclasses = self._extract_dataclasses(m)
@@ -1579,6 +1579,10 @@ class YAMLGenerator:
                 mod_data['f'] = [self._compact_function(f, detail) for f in m.functions[:15] 
                                if hasattr(f, 'params')]  # Skip non-FunctionInfo objects
             
+            const_entries = self._constants_for_module(m, limit=8)
+            if const_entries:
+                mod_data['const'] = const_entries
+            
             modules.append(mod_data)
         
         return {
@@ -1635,6 +1639,21 @@ class YAMLGenerator:
         if cls.methods:
             data['m'] = [self._compact_method(m, detail) for m in cls.methods[:12]]
         
+        if getattr(cls, 'decorators', None):
+            data['dec'] = cls.decorators[:5]
+        
+        if getattr(cls, 'attributes', None):
+            attrs_data = []
+            for attr in cls.attributes[:10]:
+                attr_dict = {'n': attr.name}
+                if attr.type_annotation:
+                    attr_dict['t'] = attr.type_annotation
+                if hasattr(attr, 'set_in_init'):
+                    attr_dict['init'] = attr.set_in_init
+                attrs_data.append(attr_dict)
+            if attrs_data:
+                data['attrs'] = attrs_data
+        
         if cls.is_dataclass:
             data['dataclass'] = True
             if getattr(cls, 'fields', None):
@@ -1650,21 +1669,6 @@ class YAMLGenerator:
                     fields_data.append(field_dict)
                 if fields_data:
                     data['fields'] = fields_data
-        
-        if getattr(cls, 'decorators', None):
-            data['dec'] = cls.decorators[:5]
-        
-        if getattr(cls, 'attributes', None):
-            attrs_data = []
-            for attr in cls.attributes[:10]:
-                attr_dict = {'n': attr.name}
-                if attr.type_annotation:
-                    attr_dict['t'] = attr.type_annotation
-                if hasattr(attr, 'set_in_init'):
-                    attr_dict['init'] = attr.set_in_init
-                attrs_data.append(attr_dict)
-            if attrs_data:
-                data['attrs'] = attrs_data
         
         return data
     
@@ -1718,6 +1722,35 @@ class YAMLGenerator:
             params += f', ...+{len(f.params)-6}'
         
         return params if params else ''
+
+    def _constants_for_module(self, module: ModuleInfo, limit: int = 10) -> list:
+        """Convert module constants into compact dictionaries."""
+        constants_attr = getattr(module, 'constants', []) or []
+        constants: list = []
+        for const in constants_attr:
+            if isinstance(const, str):
+                if const.startswith('conditional:'):
+                    continue  # handled separately for optional imports
+                constants.append({'n': const})
+            else:
+                constants.append(self._constant_to_dict(const))
+            if len(constants) >= limit:
+                break
+        return constants
+
+    def _constant_to_dict(self, constant: ConstantInfo) -> dict:
+        """Serialize ConstantInfo into a compact dictionary."""
+        data = {'n': constant.name}
+        if getattr(constant, 'type_annotation', None):
+            data['t'] = constant.type_annotation
+        if getattr(constant, 'value_keys', None):
+            data['keys'] = constant.value_keys[:10]
+        elif getattr(constant, 'value', None):
+            snippet = constant.value.replace('\n', ' ').strip()
+            if len(snippet) > 120:
+                snippet = snippet[:117] + '...'
+            data['v'] = snippet
+        return data
 
 
 # ============================================================================

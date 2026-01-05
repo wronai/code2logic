@@ -1,14 +1,10 @@
 """
 Data models for Code2Logic.
-
-Contains dataclasses representing the analyzed code structure:
-- FunctionInfo: Function/method details
-- ClassInfo: Class/interface details
-- TypeInfo: Type alias/interface/enum details
-- ModuleInfo: File/module details
 - DependencyNode: Dependency graph node with metrics
 - ProjectInfo: Complete project analysis results
 """
+
+from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Optional, List, Dict
@@ -104,7 +100,7 @@ class ModuleInfo:
         classes: List of classes in the module
         functions: List of top-level functions
         types: List of type definitions
-        constants: List of constant names (UPPERCASE)
+        constants: List of constant metadata
         docstring: Module docstring
         lines_total: Total line count
         lines_code: Lines of actual code (excluding comments/blanks)
@@ -116,7 +112,7 @@ class ModuleInfo:
     classes: List[ClassInfo]
     functions: List[FunctionInfo]
     types: List[TypeInfo]
-    constants: List[str]
+    constants: List[ConstantInfo]
     docstring: Optional[str]
     lines_total: int
     lines_code: int

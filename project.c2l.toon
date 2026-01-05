@@ -1,4 +1,4 @@
-# code2logic | 51f 20350L | python:51
+# code2logic | 51f 21082L | python:51
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[51]:
   llm_profiler.py,491
@@ -10,10 +10,10 @@ M[51]:
   llm.py,376
   errors.py,372
   code_review.py,205
-  analyzer.py,221
+  analyzer.py,230
   quality.py,212
   shared_utils.py,279
-  parsers.py,840
+  parsers.py,1114
   intent.py,429
   adaptive.py,475
   reproducer.py,534
@@ -26,9 +26,9 @@ M[51]:
   refactor.py,313
   logicml.py,281
   utils.py,16
-  generators.py,1413
+  generators.py,1568
   markdown_format.py,266
-  models.py,154
+  models.py,292
   similarity.py,178
   universal.py,831
   benchmark.py,351
@@ -54,43 +54,47 @@ M[51]:
   integrations/__init__.py,5
 D:
   llm_profiler.py:
-    i: json,os,time,hashlib,dataclasses,datetime,typing,dataclasses.{asdict,dataclass,field}
-    e: load_profiles,save_profile,get_profile,get_or_create_profile,LLMProfiler,AdaptiveChunker,profile_llm,get_adaptive_chunker
+    i: json,os,time,hashlib,datetime,dataclasses.{asdict,dataclass,field},typing.{Dict,List}
+    e: LLMProfile,ProfileTestResult,LLMProfiler,AdaptiveChunker,load_profiles,save_profile,get_profile,get_or_create_profile
+    LLMProfile: __post_init__(0)  # Profile of LLM capabilities for code...
+    ProfileTestResult:   # Result of a single profile test.
     LLMProfiler: __init__(2),run_profile(1),_test_reproduction(2),_code_to_spec(1),_extract_code(1)  # Profile LLM capabilities for code rep...
     AdaptiveChunker: __init__(1),get_optimal_settings(0),chunk_spec(2),recommend_format(1),estimate_chunks_needed(1)  # Adaptive chunking based on LLM profile.
     _get_profiles_path()->Path
-    load_profiles()->Dict[str, LLMProfile]
+    load_profiles()->Dict[str,LLMProfile]
     save_profile(profile:LLMProfile)->None
     get_profile(provider:str;model:str)->Optional[LLMProfile]
     get_or_create_profile(provider:str;model:str)->LLMProfile
     _create_default_profile(provider:str;model:str)->LLMProfile
-    profile_llm(client;quick:bool)->LLMProfile
+    profile_llm(client;quick:bool=False)->LLMProfile
     get_adaptive_chunker(provider:str;model:str)->AdaptiveChunker
   config.py:
-    i: os,json,pathlib,typing,pathlib.Path,typing.{Any,Dict,Optional}
+    i: os,json,pathlib.Path,typing.{Any,Dict,Optional}
     e: Config,load_env,get_api_key,get_model
     Config: __init__(1),_load_env_file(1),_parse_env_file(1),_load_config_file(0),get_api_key(1)  # Configuration manager for Code2Logic.
     load_env()->None
     get_api_key(provider:str)->Optional[str]
     get_model(provider:str)->str
   file_formats.py:
-    i: re,json,pathlib,typing,pathlib.Path,typing.{Any,Dict,List}
+    i: re,json,pathlib.Path,typing.{Any,Dict,List}
     e: generate_file_csv,generate_file_json,generate_file_yaml
     generate_file_csv(file_path:Path)->str
     generate_file_json(file_path:Path)->str
     generate_file_yaml(file_path:Path)->str
-    _parse_file_elements(content:str)->Dict[str, Any]
+    _parse_file_elements(content:str)->Dict[str,Any]
   project_reproducer.py:
-    i: os,json,hashlib,pathlib,typing,pathlib.Path,typing.{Any,Dict,List,Optional}
-    e: ProjectReproducer,reproduce_project
+    i: os,json,hashlib,dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,List,Optional,Set}
+    e: FileResult,ProjectResult,ProjectReproducer,reproduce_project
+    FileResult:   # Result for a single file reproduction.
+    ProjectResult:   # Result for project reproduction.
     ProjectReproducer: __init__(4),_get_client(0),find_source_files(3),reproduce_file(2),reproduce_project(3)  # Multi-file project reproduction system.
-    reproduce_project(project_path:str;output_dir:str;target_lang:str;parallel:bool;use_llm:bool)->ProjectResult
+    reproduce_project(project_path:str;output_dir:str=None;target_lang:str=None;parallel:bool=False;use_llm:bool=True)->ProjectResult
   base.py:
-    i: logging,typing,typing.Optional
+    i: logging,typing.Optional
     e: VerboseMixin,BaseParser,BaseGenerator
-    VerboseMixin: __init__(1),log(2),debug(1),info(1),warn(1)  # Mixin providing verbose logging funct...
-    BaseParser: __init__(1),parse(2),parse_file(1)  # Base class for code parsers.
-    BaseGenerator: __init__(1),generate(2)  # Base class for output generators.
+    VerboseMixin: __init__(0),log(1),debug(1),info(1),warn(1)  # Mixin providing verbose logging funct...
+    BaseParser: __init__(0),parse(1),parse_file(1)  # Base class for code parsers.
+    BaseGenerator: __init__(0),generate(1)  # Base class for output generators.
   cli.py:
     i: argparse,os,sys,subprocess,time,logging,json,signal,datetime,__version__
     e: Colors,Logger,ensure_dependencies,main
@@ -105,251 +109,297 @@ D:
     _get_litellm_config_path()->str
     _get_user_llm_config_path()->str
   llm.py:
-    i: json,os,typing,dataclasses,dataclasses.dataclass,llm_clients.BaseLLMClient,typing.{Any,Dict,List,Optional}
-    e: OllamaClient,LiteLLMClient,CodeAnalyzer,get_available_backends
+    i: json,os,dataclasses.dataclass,llm_clients.{BaseLLMClient,OllamaLocalClient,OpenRouterClient},typing.{Any,Dict,List,Optional}
+    e: LLMConfig,OllamaClient,LiteLLMClient,CodeAnalyzer,get_available_backends
+    LLMConfig:   # Configuration for LLM backend.
     OllamaClient: __init__(1),generate(2),chat(1),is_available(0),list_models(0)  # Direct Ollama API client.
     LiteLLMClient: __init__(1),generate(2),chat(1),is_available(0)  # LiteLLM client for unified API access.
     CodeAnalyzer: __init__(4),is_available(0),suggest_refactoring(1),find_semantic_duplicates(1),generate_code(3)  # LLM-powered code analysis for Code2Lo...
-    get_available_backends()->Dict[str, bool]
+    get_available_backends()->Dict[str,bool]
   errors.py:
-    i: dataclasses,enum,pathlib,typing,dataclasses.{dataclass,field},enum.Enum,pathlib.Path,typing.{Dict,List}
-    e: ErrorSeverity,ErrorType,ErrorHandler,create_error_handler
+    i: logging,dataclasses.{dataclass,field},enum.Enum,pathlib.Path,typing.{Any,Callable,Dict,List,Optional}
+    e: ErrorSeverity,ErrorType,AnalysisError,AnalysisResult,ErrorHandler,create_error_handler
     ErrorSeverity:   # Error severity levels.
     ErrorType:   # Types of errors that can occur during...
+    AnalysisError: to_dict(0)  # Represents an error during analysis.
+    AnalysisResult: add_error(1),has_errors(0),summary(0)  # Result of analysis with errors tracked.
     ErrorHandler: __init__(4),reset(0),handle_error(5),_default_severity(1),_log_error(1)  # Handles errors during analysis with c...
-    create_error_handler(mode:str;max_file_size_mb:float)->ErrorHandler
+    create_error_handler(mode:str='lenient';max_file_size_mb:float=10.0)->ErrorHandler
   code_review.py:
-    i: typing,collections,collections.defaultdict,typing.{Any,Dict,List}
-    e: analyze_code_quality,check_security_issues,check_performance_issues,CodeReviewer
+    i: collections.defaultdict,typing.{Any,Dict,List}
+    e: CodeReviewer,analyze_code_quality,check_security_issues,check_performance_issues
     CodeReviewer: __init__(1),review(2),generate_report(2)  # Automated code review with optional L...
-    analyze_code_quality(project)->Dict[str, List[Dict]]
-    check_security_issues(project)->Dict[str, List[Dict]]
-    check_performance_issues(project)->Dict[str, List[Dict]]
+    analyze_code_quality(project)->Dict[str,List[Dict]]
+    check_security_issues(project)->Dict[str,List[Dict]]
+    check_performance_issues(project)->Dict[str,List[Dict]]
   analyzer.py:
-    i: sys,pathlib,datetime,collections,typing,collections.defaultdict,pathlib.Path,typing.{Dict,List,Optional}
+    i: sys,datetime,collections.defaultdict,models.{ModuleInfo,ProjectInfo},parsers.TreeSitterParser,pathlib.Path,typing.{Dict,List,Optional}
     e: ProjectAnalyzer,analyze_project,get_library_status
     ProjectAnalyzer: __init__(4),_print_status(0),analyze(0),_scan_files(0),_detect_entrypoints(0)  # Main class for analyzing software pro...
-    analyze_project(path:str;use_treesitter:bool;verbose:bool)->ProjectInfo
-    get_library_status()->Dict[str, bool]
+    analyze_project(path:str;use_treesitter:bool=True;verbose:bool=False)->ProjectInfo
+    get_library_status()->Dict[str,bool]
   quality.py:
-    i: dataclasses,typing,dataclasses.{dataclass,field},models.{ModuleInfo,ProjectInfo},typing.{Any,Dict,List}
-    e: QualityAnalyzer,analyze_quality,get_quality_summary
+    i: dataclasses.{dataclass,field},models.{ModuleInfo,ProjectInfo},typing.{Any,Dict,List}
+    e: QualityIssue,QualityReport,QualityAnalyzer,analyze_quality,get_quality_summary
+    QualityIssue:   # Represents a code quality issue.
+    QualityReport: to_dict(0)  # Complete quality analysis report.
     QualityAnalyzer: __init__(1),analyze(1),analyze_modules(1),_analyze_module(2),_check_function(3)  # Analyzes code quality and generates r...
-    analyze_quality(project:ProjectInfo;thresholds:Dict[str; int])->QualityReport
+    analyze_quality(project:ProjectInfo;thresholds:Dict[str;int]=None)->QualityReport
     get_quality_summary(report:QualityReport)->str
   shared_utils.py:
-    i: typing,hashlib,re,typing.{Dict,List,Optional,Set}
+    i: hashlib,re,typing.{Dict,List,Optional,Set}
     e: compact_imports,deduplicate_imports,abbreviate_type,expand_type,build_signature,remove_self_from_params,categorize_function,extract_domain
-    compact_imports(imports:List[str];max_items:int)->List[str]
+    compact_imports(imports:List[str];max_items:int=10)->List[str]
     deduplicate_imports(imports:List[str])->List[str]
     abbreviate_type(type_str:str)->str
     expand_type(abbrev:str)->str
-    build_signature(params:List[str];return_type:Optional[str];include_self:bool;abbreviate:bool;max_params:int)->str
+    build_signature(params:List[str];return_type:Optional[str]=None;include_self:bool=False;abbreviate:bool=False;max_params:int=6)->str
     remove_self_from_params(params:List[str])->List[str]
     categorize_function(name:str)->str
     extract_domain(path:str)->str
   parsers.py:
-    i: ast,re,typing,intent.EnhancedIntentGenerator,models.{ClassInfo,FunctionInfo,ModuleInfo,TypeInfo},typing.{List,Optional}
+    i: ast,re,models,typing.{List,Optional}
     e: TreeSitterParser,UniversalParser,is_tree_sitter_available
     TreeSitterParser: __init__(0),_init_parsers(0),is_available(1),get_supported_languages(0),parse(3)  # Parser using Tree-sitter for high-acc...
     UniversalParser: __init__(0),parse(3),_parse_python(2),_extract_ast_function(1),_extract_ast_class(1)  # Fallback parser using Python AST and...
+    _normalize_import_path(import_path:str)->str
+    _clean_imports(imports:List[str])->List[str]
+    _combine_import_name(module_name:str;identifier:str)->str
     is_tree_sitter_available()->bool
   intent.py:
-    i: re,dataclasses,enum,typing,dataclasses.{dataclass,field},enum.{Enum,auto},typing.{List,Optional}
+    i: re,dataclasses.{dataclass,field},enum.{Enum,auto},typing.{Any,List,Optional,TYPE_CHECKING,Tuple}
     e: IntentType,EnhancedIntentGenerator,IntentAnalyzer
     IntentType:   # Types of user intents for code analysis.
-    EnhancedIntentGenerator: __init__(1),generate(2),_extract_from_docstring(1),_split_name(1),get_available_features(0)  # Generator intencji z NLP - lemmatyzac...
+    EnhancedIntentGenerator: __init__(0),generate(1),_extract_from_docstring(1),_split_name(1),get_available_features(0)  # Generator intencji z NLP - lemmatyzac...
     IntentAnalyzer: __init__(0),_extract_keywords(1),_calculate_intent_confidence(2),_identify_target(2),_generate_description(2)  # Analyzes user queries to detect inten...
   adaptive.py:
-    i: os,re,pathlib,typing,pathlib.Path,typing.{Any,Dict,List,Optional,Tuple}
-    e: AdaptiveReproducer,get_llm_capabilities
+    i: os,re,dataclasses.dataclass,llm_clients.BaseLLMClient,pathlib.Path,typing.{Any,Dict,List,Optional,Tuple}
+    e: ChunkInfo,AdaptiveResult,AdaptiveReproducer,get_llm_capabilities
+    ChunkInfo:   # Information about a code chunk.
+    AdaptiveResult:   # Result of adaptive reproduction.
     AdaptiveReproducer: __init__(2),_get_capabilities(0),select_format(2),should_chunk(1),chunk_content(2)  # Adaptive code reproduction with LLM c...
-    get_llm_capabilities(model:str)->Dict[str, Any]
+    get_llm_capabilities(model:str)->Dict[str,Any]
   reproducer.py:
-    i: os,yaml,json,re,pathlib,dataclasses,typing,dataclasses.{dataclass,field},pathlib.Path
-    e: ReproductionStatus,SpecReproducer,SpecValidator,reproduce_project,validate_files
+    i: os,yaml,json,re,dataclasses.{dataclass,field},pathlib.Path,typing.{Any,Dict,List}
+    e: ReproductionStatus,FileValidation,ReproductionResult,SpecReproducer,SpecValidator,reproduce_project,validate_files
     ReproductionStatus:   # Status of file reproduction.
+    FileValidation: score(0),to_dict(0)  # Validation result for a single file.
+    ReproductionResult: success_rate(0),average_score(0),summary(0)  # Result of reproduction process.
     SpecReproducer: __init__(1),reproduce_from_yaml(3),reproduce_from_json(3),_reproduce(3),_generate_file(2)  # Reproduces code structure from logic...
     SpecValidator: __init__(0),validate(3),_validate_file(2),_check_python_syntax(2)  # Validates generated files against log...
-    reproduce_project(spec_path:str;output_dir:str;filter_paths:Optional[List[str]];validate:bool;verbose:bool)->ReproductionResult
-    validate_files(spec_path:str;generated_dir:str;filter_paths:Optional[List[str]])->List[FileValidation]
+    reproduce_project(spec_path:str;output_dir:str;filter_paths:Optional[List[str]]=None;validate:bool=True;verbose:bool=True)->ReproductionResult
+    validate_files(spec_path:str;generated_dir:str;filter_paths:Optional[List[str]]=None)->List[FileValidation]
   llm_clients.py:
-    i: os,json,typing,abc,abc.{ABC,abstractmethod},typing.{Any,Dict,List,Optional}
-    e: get_priority_mode,BaseLLMClient,OpenRouterClient,OllamaLocalClient,LiteLLMClient,get_client,get_effective_provider_priorities
+    i: os,json,abc.{ABC,abstractmethod},typing.{Any,Dict,List,Optional}
+    e: BaseLLMClient,OpenRouterClient,OllamaLocalClient,LiteLLMClient,get_priority_mode,get_client,get_effective_provider_priorities
     BaseLLMClient: generate(3),is_available(0),chat(2)  # Abstract base class for LLM clients.
     OpenRouterClient: __init__(2),generate(3),is_available(0),list_recommended_models(0)  # OpenRouter API client for cloud LLM a...
     OllamaLocalClient: __init__(2),generate(3),is_available(0),list_models(0),list_recommended_models(0)  # Ollama client for local LLM inference.
     LiteLLMClient: __init__(1),generate(3),is_available(0)  # LiteLLM client for universal LLM access.
     _get_user_llm_config_path()->str
-    _load_user_llm_config()->Dict[str, Any]
+    _load_user_llm_config()->Dict[str,Any]
     _get_priority_mode()->str
     get_priority_mode()->str
-    _get_provider_priority_overrides()->Dict[str, int]
-    _get_model_priority_rules()->Dict[str, Dict[str, int]]
+    _get_provider_priority_overrides()->Dict[str,int]
+    _get_model_priority_rules()->Dict[str,Dict[str,int]]
     _get_model_priority(model_string:str)->Optional[int]
     _get_provider_model_string(provider:str)->str
   prompts.py:
-    i: typing,typing.Dict
+    i: typing.Dict
     e: get_reproduction_prompt,get_review_prompt,get_fix_prompt
-    get_reproduction_prompt(spec:str;fmt:str;file_name:str;language:str;max_spec_length:int)->str
+    get_reproduction_prompt(spec:str;fmt:str;file_name:str;language:str='python';max_spec_length:int=5000)->str
     get_review_prompt(code:str;spec:str;fmt:str)->str
     get_fix_prompt(code:str;issues:list;spec:str)->str
   chunked_reproduction.py:
-    i: re,dataclasses,typing,pathlib,dataclasses.{dataclass,field},typing.{Dict,List,Optional,Tuple}
-    e: get_llm_limit,chunk_yaml_spec,chunk_gherkin_spec,chunk_markdown_spec,chunk_spec,get_chunk_prompt,merge_chunk_codes,ChunkedReproducer
+    i: re,dataclasses.{dataclass,field},models.{ModuleInfo,ProjectInfo},pathlib.Path,typing.{Dict,List,Optional,Tuple}
+    e: Chunk,ChunkedSpec,ChunkedResult,ChunkedReproducer,get_llm_limit,chunk_yaml_spec,chunk_gherkin_spec,chunk_markdown_spec
+    Chunk:   # A chunk of specification for reproduc...
+    ChunkedSpec:   # Chunked specification.
+    ChunkedResult:   # Result of chunked reproduction.
     ChunkedReproducer: __init__(2),reproduce(3),_extract_code(1)  # Reproduce code from chunked specifica...
     get_llm_limit(model_name:str)->int
-    chunk_yaml_spec(spec:str;max_tokens:int)->List[Chunk]
-    chunk_gherkin_spec(spec:str;max_tokens:int)->List[Chunk]
-    chunk_markdown_spec(spec:str;max_tokens:int)->List[Chunk]
-    chunk_spec(spec:str;fmt:str;max_tokens:int)->ChunkedSpec
+    chunk_yaml_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_gherkin_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_markdown_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_spec(spec:str;fmt:str;max_tokens:int=2000)->ChunkedSpec
     get_chunk_prompt(chunk:Chunk;fmt:str;file_name:str;chunk_num:int;total_chunks:int)->str
     merge_chunk_codes(codes:List[str];file_name:str)->str
-    auto_chunk_reproduce(spec:str;fmt:str;file_name:str;client;model_name:str)->ChunkedResult
+    auto_chunk_reproduce(spec:str;fmt:str;file_name:str;client;model_name:str='default')->ChunkedResult
   __init__.py:
     i: analyzer.{ProjectAnalyzer,analyze_project},generators.{CompactGenerator,MarkdownGenerator},models
     e: analyze_quality,reproduce_project
     analyze_quality(target)->None
     reproduce_project(source:str)->None
   metrics.py:
-    i: re,difflib,hashlib,typing,dataclasses,typing.{Any,Dict,List,Optional,Tuple}
-    e: ReproductionMetrics,analyze_reproduction,compare_formats
-    ReproductionMetrics: __init__(1),analyze(5),_compute_text_metrics(2),_cosine_similarity(2),_compute_structural_metrics(2)  # Analyze reproduction quality with mul...
-    analyze_reproduction(original:str;generated:str;spec:str;format_name:str;verbose:bool)->ReproductionResult
-    compare_formats(original:str;results:Dict[str; Tuple[str; str]];verbose:bool)->Dict[str, Any]
+    i: re,difflib,hashlib,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
+    e: TextMetrics,StructuralMetrics,SemanticMetrics,FormatMetrics,ReproductionResult,ReproductionMetrics,analyze_reproduction,compare_formats
+    TextMetrics:   # Text-level similarity metrics.
+    StructuralMetrics:   # Structural code metrics.
+    SemanticMetrics:   # Semantic preservation metrics.
+    FormatMetrics:   # Format-specific efficiency metrics.
+    ReproductionResult: to_dict(0),to_report(0)  # Complete reproduction analysis result.
+    analyze_reproduction(original:str;generated:str;spec:str='';format_name:str='';verbose:bool=False)->ReproductionResult
+    compare_formats(original:str;results:Dict[str;Tuple[str;str]];verbose:bool=False)->Dict[str,Any]
   refactor.py:
-    i: json,pathlib,typing,dataclasses,dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,List,Optional}
-    e: find_duplicates,analyze_quality,suggest_refactoring,compare_codebases,quick_analyze
-    find_duplicates(project_path:str;threshold:float)->List[DuplicateGroup]
-    analyze_quality(project_path:str;include_security:bool;include_performance:bool)->RefactoringReport
-    suggest_refactoring(project_path:str;use_llm:bool;client:BaseLLMClient)->RefactoringReport
-    compare_codebases(project1:str;project2:str)->Dict[str, Any]
-    quick_analyze(project_path:str)->Dict[str, Any]
+    i: json,analyzer.analyze_project,dataclasses.{asdict,dataclass,field},pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: DuplicateGroup,RefactoringSuggestion,RefactoringReport,find_duplicates,analyze_quality,suggest_refactoring,compare_codebases,quick_analyze
+    DuplicateGroup:   # Group of duplicate functions.
+    RefactoringSuggestion:   # Single refactoring suggestion.
+    RefactoringReport: to_dict(0),to_markdown(0)  # Complete refactoring analysis report.
+    find_duplicates(project_path:str;threshold:float=0.8)->List[DuplicateGroup]
+    analyze_quality(project_path:str;include_security:bool=True;include_performance:bool=True)->RefactoringReport
+    suggest_refactoring(project_path:str;use_llm:bool=False;client:BaseLLMClient=None)->RefactoringReport
+    compare_codebases(project1:str;project2:str)->Dict[str,Any]
+    quick_analyze(project_path:str)->Dict[str,Any]
   logicml.py:
-    i: pathlib,typing,dataclasses,dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,List,Optional,Set}
-    e: LogicMLGenerator,generate_logicml
+    i: dataclasses.dataclass,models.{FunctionInfo,ModuleInfo,ProjectInfo},pathlib.Path,typing.{Any,Dict,List,Optional,Set}
+    e: LogicMLSpec,LogicMLGenerator,generate_logicml
+    LogicMLSpec:   # LogicML specification output.
     LogicMLGenerator: __init__(1),generate(2),_generate_module(2),_generate_imports(1),_generate_class(2)  # Generates LogicML format - optimized...
-    generate_logicml(project:ProjectInfo;detail:str)->str
+    generate_logicml(project:ProjectInfo;detail:str='standard')->str
   utils.py:
-    i: pathlib,shutil,pathlib.Path
+    i: shutil,__future__.annotations,pathlib.Path
     e: estimate_tokens,write_text_atomic,cleanup_generated_root
     estimate_tokens(text:str)->int
     write_text_atomic(path:Path;content:str)->None
     cleanup_generated_root(generated_root:Path;allowed_dirs:set[str])->None
   generators.py:
-    i: json,pathlib,typing,collections,collections.defaultdict,models.{ClassInfo,ModuleInfo,ProjectInfo},pathlib.Path,typing.List
+    i: json,collections.defaultdict,models,pathlib.Path,typing.List
     e: MarkdownGenerator,CompactGenerator,JSONGenerator,YAMLGenerator,CSVGenerator
-    MarkdownGenerator: generate(2),_gen_tree(2),_print_tree(4),_gen_module(4),_gen_class(3)  # Generates Markdown output for project...
+    MarkdownGenerator: generate(1),_gen_tree(2),_print_tree(3),_gen_module(4),_gen_class(3)  # Generates Markdown output for project...
     CompactGenerator: generate(1)  # Generates ultra-compact output for to...
-    JSONGenerator: generate(3),generate_from_module(2),_generate_nested(2),_generate_flat(2),_build_element_row(7)  # Generates JSON output for machine pro...
-    YAMLGenerator: generate(4),generate_schema(1),_generate_compact_schema(0),_generate_full_schema(0),_generate_hybrid_schema(0)  # Generates YAML output for human-reada...
-    CSVGenerator: generate(2),_build_row(7),_build_function_row(7),_build_signature(1),_categorize(1)  # Generates CSV output optimized for LL...
+    JSONGenerator: generate(1),generate_from_module(1),_generate_nested(2),_generate_flat(2),_build_element_row(7)  # Generates JSON output for machine pro...
+    YAMLGenerator: generate(1),generate_schema(0),_generate_compact_schema(0),_generate_full_schema(0),_generate_hybrid_schema(0)  # Generates YAML output for human-reada...
+    CSVGenerator: generate(1),_build_row(7),_build_function_row(7),_build_signature(1),_categorize(1)  # Generates CSV output optimized for LL...
   markdown_format.py:
-    i: os,pathlib,typing,dataclasses,dataclasses.dataclass,models.ProjectInfo,pathlib.Path,typing.{Dict,List,Optional}
-    e: MarkdownHybridGenerator,generate_markdown_hybrid,generate_file_markdown
+    i: os,dataclasses.dataclass,models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo},pathlib.Path,typing.{Dict,List,Optional}
+    e: MarkdownSpec,MarkdownHybridGenerator,generate_markdown_hybrid,generate_file_markdown
+    MarkdownSpec:   # Markdown specification for a project.
     MarkdownHybridGenerator: __init__(1),generate(2),_generate_header(1),_generate_tree(1),_generate_imports(1)  # Generates optimized Markdown hybrid f...
-    generate_markdown_hybrid(project:ProjectInfo;detail:str)->str
+    generate_markdown_hybrid(project:ProjectInfo;detail:str='full')->str
     generate_file_markdown(file_path:str)->str
   similarity.py:
-    i: typing,models.ModuleInfo,typing.{Dict,List}
+    i: models.ModuleInfo,typing.{Dict,List}
     e: SimilarityDetector,is_rapidfuzz_available,get_refactoring_suggestions
     SimilarityDetector: __init__(1),find_similar_functions(1),find_duplicate_signatures(1),_build_signature(3)  # Detects similar functions using fuzzy...
     is_rapidfuzz_available()->bool
-    get_refactoring_suggestions(similar_functions:Dict[str; List[str]])->List[Dict[str, any]]
+    get_refactoring_suggestions(similar_functions:Dict[str;List[str]])->List[Dict[str,any]]
   universal.py:
-    i: os,re,json,hashlib,pathlib,typing,pathlib.Path,typing.{Any,Dict,List}
-    e: ElementType,Language,UniversalParser,CodeGenerator,UniversalReproducer,reproduce_file
+    i: os,re,json,hashlib,pathlib.Path,typing.{Any,Dict,List,Optional,Tuple}
+    e: ElementType,Language,Parameter,CodeElement,CodeLogic,UniversalParser,CodeGenerator,UniversalReproducer
     ElementType:   # Types of code elements.
     Language:   # Supported languages.
-    UniversalParser: detect_language(2),parse(1),_parse_python(3),_parse_js_ts(4),_parse_go(3)  # Parse source code into universal Code...
-    CodeGenerator: generate(2),_generate_python(1),_generate_python_element(2),_generate_typescript(1),_generate_go(1)  # Generate code from CodeLogic in targe...
-    UniversalReproducer: __init__(1),_get_client(0),extract_logic(1),reproduce(4),_generate_with_llm(2)  # Universal code reproduction system.
-    reproduce_file(source_path:str;target_lang:str;output_dir:str;use_llm:bool)->Dict[str, Any]
+    Parameter:   # Function/method parameter.
+    CodeElement:   # Universal representation of a code el...
+    CodeLogic: to_dict(0),_element_to_dict(1),to_compact(0),_element_to_compact(2)  # Universal code logic representation f...
+    reproduce_file(source_path:str;target_lang:str=None;output_dir:str=None;use_llm:bool=True)->Dict[str,Any]
   benchmark.py:
-    i: os,json,time,pathlib,typing,pathlib.Path,typing.{Any,Dict,List,Optional}
-    e: ReproductionBenchmark,run_benchmark
+    i: os,json,time,datetime,dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: FormatResult,BenchmarkResult,ReproductionBenchmark,run_benchmark
+    FormatResult:   # Result for a single format test.
+    BenchmarkResult:   # Complete benchmark result.
     ReproductionBenchmark: __init__(1),generate_spec(3),reproduce_with_format(3),run_single(2),run_all(2)  # Benchmark reproduction quality across...
-    run_benchmark(files:List[str];output_dir:str;provider:str;model:str)->Dict[str, Any]
+    run_benchmark(files:List[str];output_dir:str='benchmark_results';provider:str=None;model:str=None)->Dict[str,Any]
   terminal.py:
-    i: os,re,sys,typing,typing.{Any,Dict,List,Literal,Optional}
-    e: ShellRenderer,get_renderer,set_renderer,RenderAPI
+    i: os,re,sys,typing.{Any,Dict,List,Literal,Optional}
+    e: ShellRenderer,RenderAPI,get_renderer,set_renderer
     ShellRenderer: __init__(2),_supports_colors(0),enable_log(0),get_log(0),clear_log(0)  # Renders colorized markdown output in...
     RenderAPI: heading(2),code(2),codeblock(2),markdown(1),success(1)  # Convenience API for terminal rendering.
-    get_renderer(use_colors:bool;verbose:bool)->ShellRenderer
+    get_renderer(use_colors:bool=True;verbose:bool=True)->ShellRenderer
     set_renderer(renderer:ShellRenderer)->None
   toon_format.py:
-    i: re,typing,models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo},typing.{Any,Dict,List,Optional}
+    i: re,models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo},shared_utils.compact_imports,typing.{Any,Dict,List,Optional}
     e: TOONGenerator,TOONParser,generate_toon,parse_toon
     TOONGenerator: __init__(2),generate(2),_generate_modules(2),_generate_classes(3),_generate_methods(3)  # Generates TOON format output from Pro...
     TOONParser: __init__(0),parse(1),_parse_value(1)  # Parse TOON format back to Python dict.
-    generate_toon(project:ProjectInfo;detail:str;use_tabs:bool)->str
-    parse_toon(content:str)->Dict[str, Any]
+    generate_toon(project:ProjectInfo;detail:str='standard';use_tabs:bool=False)->str
+    parse_toon(content:str)->Dict[str,Any]
   dependency.py:
-    i: pathlib,typing,models.{DependencyNode,ModuleInfo},pathlib.Path,typing.{Dict,List,Optional}
+    i: models.{DependencyNode,ModuleInfo},pathlib.Path,typing.{Dict,List,Optional}
     e: DependencyAnalyzer,is_networkx_available
     DependencyAnalyzer: __init__(0),build_graph(1),analyze_metrics(0),get_entrypoints(0),get_hubs(0)  # Analyzes dependency graphs using Netw...
     is_networkx_available()->bool
   mcp_server.py:
-    i: json,sys,pathlib,typing,__version__,pathlib.Path,typing.Optional
+    i: json,sys,__version__,pathlib.Path,typing.Optional
     e: handle_request,call_tool,run_server
     handle_request(request:dict)->dict
     call_tool(tool_name:str;arguments:dict)->str
     run_server()->None
   reproduction.py:
-    i: re,difflib,pathlib,typing,datetime,pathlib.Path,typing.{Any,Dict,List,Optional}
-    e: generate_file_gherkin,compare_code,extract_code_block,CodeReproducer
+    i: re,difflib,datetime,llm_clients.{BaseLLMClient,get_client},pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: CodeReproducer,generate_file_gherkin,compare_code,extract_code_block
     CodeReproducer: __init__(2),reproduce_file(2),generate_from_gherkin(2),_save_results(2),_generate_report(1)  # Code reproduction workflow using LLM.
     generate_file_gherkin(file_path:Path)->str
-    compare_code(original:str;generated:str)->Dict[str, Any]
-    extract_code_block(text:str;language:str)->str
+    compare_code(original:str;generated:str)->Dict[str,Any]
+    extract_code_block(text:str;language:str='python')->str
   gherkin.py:
-    i: typing,collections,dataclasses,collections.defaultdict,dataclasses.dataclass,typing.{Any,Dict,List,Optional,Set}
-    e: GherkinGenerator,StepDefinitionGenerator,CucumberYAMLGenerator,csv_to_gherkin,gherkin_to_test_data
+    i: re,hashlib,collections.defaultdict,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Set}
+    e: GherkinScenario,GherkinFeature,StepDefinition,GherkinGenerator,StepDefinitionGenerator,CucumberYAMLGenerator,csv_to_gherkin,gherkin_to_test_data
+    GherkinScenario:   # Represents a single Gherkin scenario.
+    GherkinFeature:   # Represents a Gherkin feature file.
+    StepDefinition:   # Represents a step definition.
     GherkinGenerator: __init__(1),generate(3),generate_test_scenarios(2),get_step_definitions(0),_extract_features(2)  # Generates Gherkin feature files from...
     StepDefinitionGenerator: generate_pytest_bdd(1),generate_behave(1),generate_cucumber_js(1),_step_to_func_name(1)  # Generates step definition stubs from...
-    CucumberYAMLGenerator: generate(2),_extract_domain(1),_categorize(1)  # Generates Cucumber YAML configuration...
-    csv_to_gherkin(csv_content:str;language:str)->str
-    gherkin_to_test_data(gherkin_content:str)->Dict[str, Any]
+    csv_to_gherkin(csv_content:str;language:str='en')->str
+    gherkin_to_test_data(gherkin_content:str)->Dict[str,Any]
   schemas/logicml_schema.py:
-    i: dataclasses,typing,re,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
-    e: validate_logicml,parse_logicml_header,extract_logicml_signature
-    validate_logicml(spec:str)->Tuple[bool, List[str]]
-    parse_logicml_header(line:str)->Optional[Dict[str, Any]]
-    extract_logicml_signature(sig_line:str)->Dict[str, Any]
+    i: re,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
+    e: LogicMLMethod,LogicMLClass,LogicMLModule,LogicMLSchema,validate_logicml,parse_logicml_header,extract_logicml_signature
+    LogicMLMethod:   # Schema for LogicML method.
+    LogicMLClass:   # Schema for LogicML class.
+    LogicMLModule:   # Schema for LogicML module.
+    LogicMLSchema:   # Complete LogicML specification schema.
+    validate_logicml(spec:str)->Tuple[bool,List[str]]
+    parse_logicml_header(line:str)->Optional[Dict[str,Any]]
+    extract_logicml_signature(sig_line:str)->Dict[str,Any]
   schemas/yaml_schema.py:
-    i: dataclasses,typing,yaml,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
-    e: validate_yaml
-    validate_yaml(spec:str)->Tuple[bool, List[str]]
+    i: yaml,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
+    e: MethodSchema,ClassSchema,FunctionSchema,ModuleSchema,YAMLSchema,validate_yaml
+    MethodSchema:   # Schema for method definition.
+    ClassSchema:   # Schema for class definition.
+    FunctionSchema:   # Schema for function definition.
+    ModuleSchema:   # Schema for module definition.
+    YAMLSchema:   # Complete YAML specification schema.
+    validate_yaml(spec:str)->Tuple[bool,List[str]]
     _validate_module(module:Dict;index:int)->List[str]
     _validate_class(cls:Dict;prefix:str)->List[str]
   schemas/json_schema.py:
-    i: dataclasses,typing,json,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
-    e: validate_json,parse_json_spec
-    validate_json(spec:str)->Tuple[bool, List[str]]
+    i: json,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
+    e: JSONMethodSchema,JSONClassSchema,JSONFunctionSchema,JSONModuleSchema,JSONSchema,validate_json,parse_json_spec
+    JSONMethodSchema:   # Schema for JSON method definition.
+    JSONClassSchema:   # Schema for JSON class definition.
+    JSONFunctionSchema:   # Schema for JSON function definition.
+    JSONModuleSchema:   # Schema for JSON module definition.
+    JSONSchema:   # Complete JSON specification schema.
+    validate_json(spec:str)->Tuple[bool,List[str]]
     _validate_json_module(module:Dict;index:int)->List[str]
     _validate_json_class(cls:Dict;prefix:str)->List[str]
     parse_json_spec(spec:str)->Optional[JSONSchema]
   schemas/markdown_schema.py:
-    i: dataclasses,typing,re,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
-    e: validate_markdown,extract_markdown_sections
-    validate_markdown(spec:str)->Tuple[bool, List[str]]
-    extract_markdown_sections(spec:str)->Dict[str, Any]
+    i: re,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
+    e: MarkdownMethod,MarkdownClass,MarkdownModule,MarkdownSchema,validate_markdown,extract_markdown_sections
+    MarkdownMethod:   # Schema for Markdown method.
+    MarkdownClass:   # Schema for Markdown class.
+    MarkdownModule:   # Schema for Markdown module.
+    MarkdownSchema:   # Complete Markdown specification schema.
+    validate_markdown(spec:str)->Tuple[bool,List[str]]
+    extract_markdown_sections(spec:str)->Dict[str,Any]
   benchmarks/common.py:
-    i: datetime,pathlib,json,generators.{JSONGenerator,YAMLGenerator},gherkin.GherkinGenerator,logicml.LogicMLGenerator,markdown_format.MarkdownHybridGenerator,pathlib.Path,toon_format.TOONGenerator
+    i: datetime,json,__future__.annotations,generators.{JSONGenerator,YAMLGenerator},gherkin.GherkinGenerator,logicml.LogicMLGenerator,markdown_format.MarkdownHybridGenerator,pathlib.Path,toon_format.TOONGenerator
     e: create_single_project,generate_spec,generate_spec_token,get_async_reproduction_prompt,get_token_reproduction_prompt,get_simple_reproduction_prompt
     create_single_project(module_info;file_path:Path)->ProjectInfo
     generate_spec(project:ProjectInfo;fmt:str)->str
     _generate_token_json(project:ProjectInfo)->str
     _generate_token_json_compact(project:ProjectInfo)->str
     generate_spec_token(project:ProjectInfo;fmt:str)->str
-    get_async_reproduction_prompt(spec:str;fmt:str;file_name:str;with_tests:bool)->str
+    get_async_reproduction_prompt(spec:str;fmt:str;file_name:str;with_tests:bool=False)->str
     get_token_reproduction_prompt(spec:str;fmt:str;file_name:str)->str
     get_simple_reproduction_prompt(spec:str;fmt:str;file_name:str)->str
   benchmarks/runner.py:
-    i: re,sys,time,pathlib,typing,pathlib.Path,typing.{Dict,List,Optional,Tuple}
+    i: re,sys,time,concurrent.futures.ThreadPoolExecutor,pathlib.Path,typing.{Callable,Dict,List,Optional,Tuple}
     e: BenchmarkRunner,run_benchmark
     BenchmarkRunner: __init__(2),_should_use_llm(0),_get_client(0),_template_generate_code(3),run_format_benchmark(4)  # Unified benchmark runner for code2logic.
     _test_python_syntax(code:str)->bool
-    _test_python_runs(code:str;timeout:int)->bool
+    _test_python_runs(code:str;timeout:int=5)->bool
     _extract_code(response:str)->str
-    run_benchmark(source:str;benchmark_type:str;formats:List[str];limit:Optional[int];output:Optional[str];verbose:bool)->BenchmarkResult
+    run_benchmark(source:str;benchmark_type:str='format';formats:List[str]=None;limit:Optional[int]=None;output:Optional[str]=None;verbose:bool=False)->BenchmarkResult
