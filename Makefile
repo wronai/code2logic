@@ -1,7 +1,15 @@
 .PHONY: help install install-dev install-full clean build test lint format typecheck publish publish-test docs docker
 
+POETRY := $(shell command -v poetry 2>/dev/null)
+ifeq ($(POETRY),)
+RUN :=
 PYTHON := python3
 PIP := pip
+else
+RUN := poetry run
+PYTHON := $(RUN) python
+PIP :=
+endif
 
 # Colors for terminal output
 BLUE := \033[34m
@@ -20,19 +28,39 @@ help: ## Show this help message
 # ============================================================================
 
 install: ## Install package (minimal)
-	$(PIP) install -e .
+	@if [ -n "$(POETRY)" ]; then \
+		poetry install; \
+	else \
+		$(PIP) install -e .; \
+	fi
 
 install-dev: ## Install with development dependencies
-	$(PIP) install -e ".[dev]"
+	@if [ -n "$(POETRY)" ]; then \
+		poetry install --with dev; \
+	else \
+		$(PIP) install -e ".[dev]"; \
+	fi
 
 install-full: ## Install with all features
-	$(PIP) install -e ".[full,dev]"
+	@if [ -n "$(POETRY)" ]; then \
+		poetry install --with dev -E full; \
+	else \
+		$(PIP) install -e ".[full,dev]"; \
+	fi
 
 install-docs: ## Install documentation dependencies
-	$(PIP) install -e ".[docs]"
+	@if [ -n "$(POETRY)" ]; then \
+		poetry install --with docs; \
+	else \
+		$(PIP) install -e ".[docs]"; \
+	fi
 
 install-llm: ## Install LLM integration dependencies
-	$(PIP) install httpx litellm python-dotenv
+	@if [ -n "$(POETRY)" ]; then \
+		poetry install -E llm; \
+	else \
+		$(PIP) install httpx litellm python-dotenv; \
+	fi
 
 # ============================================================================
 # Configuration
@@ -65,16 +93,16 @@ config-check: ## Check which providers are configured
 # ============================================================================
 
 test: ## Run tests
-	pytest tests/ -v -p no:aiohttp
+	$(RUN) pytest tests/ -v -p no:aiohttp
 
 test-cov: ## Run tests with coverage
-	pytest tests/ -v -p no:aiohttp --cov=code2logic --cov-report=term-missing --cov-report=html
+	$(RUN) pytest tests/ -v -p no:aiohttp --cov=code2logic --cov-report=term-missing --cov-report=html
 
 test-fast: ## Run tests without coverage (faster)
-	pytest tests/ -v -p no:aiohttp --no-cov
+	$(RUN) pytest tests/ -v -p no:aiohttp --no-cov
 
 test-all: ## Run all tests including integration
-	pytest tests/ -v -p no:aiohttp --cov=code2logic
+	$(RUN) pytest tests/ -v -p no:aiohttp --cov=code2logic
 	@echo "$(GREEN)All tests passed!$(NC)"
 
 # ============================================================================
@@ -82,19 +110,19 @@ test-all: ## Run all tests including integration
 # ============================================================================
 
 lint: ## Run linters
-	ruff check code2logic tests
+	$(RUN) ruff check code2logic tests
 	
 lint-fix: ## Run linters and fix issues
-	ruff check code2logic tests --fix
+	$(RUN) ruff check code2logic tests --fix
 
 format: ## Format code with black
-	black code2logic tests
+	$(RUN) black code2logic tests
 
 format-check: ## Check code formatting
-	black code2logic tests --check
+	$(RUN) black code2logic tests --check
 
 typecheck: ## Run type checking
-	mypy code2logic --ignore-missing-imports
+	$(RUN) mypy code2logic --ignore-missing-imports
 
 quality: lint format-check typecheck ## Run all quality checks
 
@@ -116,7 +144,11 @@ clean: ## Clean build artifacts
 	find . -type f -name "*.pyc" -delete
 
 build: clean ## Build package
-	$(PYTHON) -m build
+	@if [ -n "$(POETRY)" ]; then \
+		poetry build; \
+	else \
+		$(PYTHON) -m build; \
+	fi
 	@echo "$(GREEN)Build complete!$(NC)"
 	@ls -lh dist/
 

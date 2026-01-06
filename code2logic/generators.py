@@ -1004,6 +1004,7 @@ class YAMLGenerator:
         # Build detailed module data with enhanced information
         detailed_modules = []
         for m in project.modules:
+            file_kb = bytes_to_kb(getattr(m, 'file_bytes', 0))
             mod_data = {
                 'p': m.path,  # path
             }
@@ -1033,17 +1034,10 @@ class YAMLGenerator:
                 for const in m.constants:
                     if isinstance(const, str):
                         # Handle string constants (from UniversalParser)
-                        const_dict = {'n': const}
+                        const_data.append({'n': const})
                     else:
                         # Handle ConstantInfo objects (from TreeSitter parser)
-                        const_dict = {'n': const.name}
-                        if const.type_annotation:
-                            const_dict['t'] = const.type_annotation
-                        if const.value_keys:  # For dicts, show keys
-                            const_dict['keys'] = const.value_keys[:10]
-                        elif const.value and len(const.value) <= 100:  # For small values
-                            const_dict['v'] = const.value
-                    const_data.append(const_dict)
+                        const_data.append(self._constant_to_dict(const))
                 if const_data:
                     mod_data['const'] = const_data
             
@@ -1776,7 +1770,9 @@ class YAMLGenerator:
         if len(f.params) > 6:
             params += f', ...+{len(f.params)-6}'
         
-        return params if params else ''
+        if params:
+            return f"({params})"
+        return "()"
 
     def _constants_for_module(self, module: ModuleInfo, limit: int = 10) -> list:
         """Convert module constants into compact dictionaries."""

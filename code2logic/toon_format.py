@@ -85,10 +85,11 @@ class TOONGenerator:
         lines = []
         
         # Module summary as tabular array
-        lines.append(f"modules[{len(modules)}]{{path{self.delim_marker}lang{self.delim_marker}lines}}:")
+        lines.append(f"modules[{len(modules)}]{{path{self.delim_marker}lang{self.delim_marker}lines{self.delim_marker}kb}}:")
         for m in modules:
             path = self._quote(m.path)
-            lines.append(f"  {path}{self.delimiter}{m.language}{self.delimiter}{m.lines_code}")
+            kb = round((getattr(m, 'file_bytes', 0) or 0) / 1024, 1)
+            lines.append(f"  {path}{self.delimiter}{m.language}{self.delimiter}{m.lines_code}{self.delimiter}{kb}")
         
         # Detailed module info
         if detail in ('standard', 'full'):
@@ -107,6 +108,38 @@ class TOONGenerator:
                 if m.exports:
                     exports_str = self.delimiter.join(self._quote(x) for x in m.exports[:10])
                     lines.append(f"    exports[{len(m.exports)}]: {exports_str}")
+
+                # ENHANCED: Add constants with values/keys (critical for reproduction)
+                constants_attr = getattr(m, 'constants', []) or []
+                const_rows = []
+                for c in constants_attr:
+                    if isinstance(c, str):
+                        if c.startswith('conditional:'):
+                            continue
+                        const_rows.append({'n': c, 't': '-', 'v': '-', 'keys': '-'})
+                    else:
+                        keys = getattr(c, 'value_keys', None) or []
+                        v = getattr(c, 'value', None)
+                        t = getattr(c, 'type_annotation', '') or '-'
+                        if keys:
+                            const_rows.append({'n': c.name, 't': t, 'v': '-', 'keys': '|'.join(keys[:10])})
+                        elif v:
+                            v_snip = v.replace('\n', ' ').strip()
+                            if len(v_snip) > 120:
+                                v_snip = v_snip[:117] + '...'
+                            const_rows.append({'n': c.name, 't': t, 'v': v_snip, 'keys': '-'})
+                        else:
+                            const_rows.append({'n': c.name, 't': t, 'v': '-', 'keys': '-'})
+                    if len(const_rows) >= 8:
+                        break
+
+                if const_rows:
+                    header = f"n{self.delim_marker}t{self.delim_marker}v{self.delim_marker}keys"
+                    lines.append(f"    const[{len(const_rows)}]{{{header}}}:")
+                    for r in const_rows:
+                        lines.append(
+                            f"      {self._quote(r['n'])}{self.delimiter}{self._quote(r['t'])}{self.delimiter}{self._quote(r['v'])}{self.delimiter}{self._quote(r['keys'])}"
+                        )
                 
                 # Classes
                 if m.classes:
@@ -152,6 +185,19 @@ class TOONGenerator:
                 if c.properties:
                     props_str = self.delimiter.join(self._quote(x) for x in c.properties[:10])
                     lines.append(f"{ind}    properties[{len(c.properties)}]: {props_str}")
+
+                # ENHANCED: Dataclass fields
+                if getattr(c, 'is_dataclass', False) and getattr(c, 'fields', None):
+                    fields = c.fields[:20]
+                    header = f"n{self.delim_marker}t{self.delim_marker}default{self.delim_marker}factory"
+                    lines.append(f"{ind}    fields[{len(fields)}]{{{header}}}:")
+                    for f in fields:
+                        t = getattr(f, 'type_annotation', '') or '-'
+                        dflt = getattr(f, 'default', None) or '-'
+                        fac = getattr(f, 'default_factory', None) or '-'
+                        lines.append(
+                            f"{ind}      {self._quote(f.name)}{self.delimiter}{self._quote(t)}{self.delimiter}{self._quote(dflt)}{self.delimiter}{self._quote(fac)}"
+                        )
                 
                 # Methods with full details
                 if c.methods:

@@ -1,20 +1,15 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "code2logic"
-version = "1.0.7"
+version = "1.0.8"
 description = "Convert source code to logical representation for LLM analysis"
 readme = "README.md"
-license = {file = "LICENSE"}
-requires-python = ">=3.9"
-authors = [
-    {name = "Softreck", email = "info@softreck.dev"}
-]
-maintainers = [
-    {name = "Softreck", email = "info@softreck.dev"}
-]
+license = "Apache-2.0"
+authors = ["Softreck <info@softreck.dev>"]
+maintainers = ["Softreck <info@softreck.dev>"]
 keywords = [
     "code-analysis",
     "llm",
@@ -43,94 +38,72 @@ classifiers = [
     "Topic :: Text Processing :: Linguistic",
     "Typing :: Typed",
 ]
+packages = [{ include = "code2logic" }]
 
-# No required dependencies - core functionality works without any
-dependencies = []
-
-[project.optional-dependencies]
-# Tree-sitter for high-accuracy AST parsing
-treesitter = [
-    "tree-sitter>=0.21.0",
-    "tree-sitter-python>=0.21.0",
-    "tree-sitter-javascript>=0.21.0",
-    "tree-sitter-typescript>=0.21.0",
-]
-
-# NetworkX for dependency graph analysis
-graph = [
-    "networkx>=3.0",
-]
-
-# Rapidfuzz for similar function detection
-similarity = [
-    "rapidfuzz>=3.0",
-]
-
-# NLP for enhanced intent generation
-nlp = [
-    "nltk>=3.8",
-]
-
-# Full installation with all features
-full = [
-    "tree-sitter>=0.21.0",
-    "tree-sitter-python>=0.21.0",
-    "tree-sitter-javascript>=0.21.0",
-    "tree-sitter-typescript>=0.21.0",
-    "networkx>=3.0",
-    "rapidfuzz>=3.0",
-    "nltk>=3.8",
-    "pyyaml>=6.0",
-]
-
-# LLM integration
-llm = [
-    "httpx>=0.25.0",
-    "litellm>=1.0.0",
-]
-
-# Development dependencies
-dev = [
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-    "black>=23.0",
-    "ruff>=0.1.0",
-    "mypy>=1.0",
-    "pre-commit>=3.0",
-    "build>=1.0.0",
-    "twine>=4.0.0",
-    "bumpver>=2023.1129",
-]
-
-# Documentation
-docs = [
-    "mkdocs>=1.5",
-    "mkdocs-material>=9.0",
-    "mkdocstrings[python]>=0.24",
-]
-
-[project.scripts]
-code2logic = "code2logic.cli:main"
-code2logic-mcp = "code2logic.mcp_server:run_server"
-
-[project.urls]
+[tool.poetry.urls]
 Homepage = "https://github.com/wronai/code2logic"
 Documentation = "https://code2logic.readthedocs.io"
 Repository = "https://github.com/wronai/code2logic.git"
 Issues = "https://github.com/wronai/code2logic/issues"
 Changelog = "https://github.com/wronai/code2logic/blob/main/CHANGELOG.md"
 
-[tool.hatch.build.targets.sdist]
-include = [
-    "/code2logic",
-    "/tests",
-    "/README.md",
-    "/LICENSE",
-    "/CHANGELOG.md",
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+pyyaml = { version = ">=6.0", optional = true }
+
+tree-sitter = { version = ">=0.21.0", optional = true }
+tree-sitter-python = { version = ">=0.21.0", optional = true }
+tree-sitter-javascript = { version = ">=0.21.0", optional = true }
+tree-sitter-typescript = { version = ">=0.21.0", optional = true }
+networkx = { version = ">=3.0", optional = true }
+rapidfuzz = { version = ">=3.0", optional = true }
+nltk = { version = ">=3.8", optional = true }
+httpx = { version = ">=0.25.0", optional = true }
+litellm = { version = ">=1.0.0", optional = true }
+
+[tool.poetry.extras]
+treesitter = [
+    "tree-sitter",
+    "tree-sitter-python",
+    "tree-sitter-javascript",
+    "tree-sitter-typescript",
+]
+graph = ["networkx"]
+similarity = ["rapidfuzz"]
+nlp = ["nltk"]
+llm = ["httpx", "litellm"]
+full = [
+    "pyyaml",
+    "tree-sitter",
+    "tree-sitter-python",
+    "tree-sitter-javascript",
+    "tree-sitter-typescript",
+    "networkx",
+    "rapidfuzz",
+    "nltk",
+    "httpx",
+    "litellm",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["code2logic"]
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.0"
+pytest-cov = ">=4.0"
+black = ">=23.0"
+ruff = ">=0.1.0"
+mypy = ">=1.0"
+pre-commit = ">=3.0"
+build = ">=1.0.0"
+twine = ">=4.0.0"
+bumpver = ">=2023.1129"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = ">=1.5"
+mkdocs-material = ">=9.0"
+mkdocstrings = { version = ">=0.24", extras = ["python"] }
+
+[tool.poetry.scripts]
+code2logic = "code2logic.cli:main"
+code2logic-mcp = "code2logic.mcp_server:run_server"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -208,7 +181,7 @@ module = [
 ignore_missing_imports = true
 
 [tool.bumpver]
-current_version = "1.0.7"
+current_version = "1.0.8"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit = false
 tag = false

@@ -1,8 +1,8 @@
 header:
   project: code2logic
   files: 51
-  lines: 21199
-  kb: 718.4
+  lines: 21241
+  kb: 720.7
   languages:
     python: 51
   modules_count: 51
@@ -32,14 +32,14 @@ M:
 - refactor.py:313:11.4kb
 - logicml.py:281:12.8kb
 - utils.py:16:0.6kb
-- generators.py:1619:79.3kb
+- generators.py:1615:79.0kb
 - markdown_format.py:266:13.9kb
 - models.py:295:10.6kb
 - similarity.py:178:7.8kb
 - universal.py:831:39.7kb
 - benchmark.py:351:14.4kb
 - terminal.py:500:21.6kb
-- toon_format.py:477:25.5kb
+- toon_format.py:518:28.2kb
 - dependency.py:187:7.5kb
 - mcp_server.py:293:12.2kb
 - reproduction.py:333:15.3kb
@@ -123,7 +123,7 @@ modules:
     - 'omission_rate: float'
     m:
     - n: __post_init__
-      sig: ''
+      sig: ()
       d: creates init
   - n: ProfileTestResult
     d: Result of a single profile test.
@@ -141,93 +141,93 @@ modules:
     d: Profile LLM capabilities for code reproduction.
     m:
     - n: __init__
-      sig: client, verbose:bool=True
+      sig: (client, verbose:bool=True)
       d: Initialize profiler.
     - n: run_profile
-      sig: quick:bool=False
+      sig: (quick:bool=False)
       ret: LLMProfile
       d: Run full profiling suite.
     - n: _test_reproduction
-      sig: name:str, code:str
+      sig: (name:str, code:str)
       ret: ProfileTestResult
       d: Test reproduction of a code snippet.
     - n: _code_to_spec
-      sig: code:str
+      sig: (code:str)
       ret: str
       d: Convert code to simple YAML spec.
     - n: _extract_code
-      sig: response:str
+      sig: (response:str)
       ret: str
       d: Extract code from LLM response.
     - n: _check_syntax
-      sig: code:str
+      sig: (code:str)
       ret: bool
       d: Check if code has valid Python syntax.
     - n: _calculate_similarity
-      sig: original:str, reproduced:str
+      sig: (original:str, reproduced:str)
       ret: float
       d: Calculate code similarity.
     - n: _calculate_metrics
-      sig: profile:LLMProfile, results:List[ProfileTestResult]
+      sig: (profile:LLMProfile, results:List[ProfileTestResult])
       ret: LLMProfile
       d: Calculate aggregate metrics from test results.
     - n: _test_consistency
-      sig: profile:LLMProfile
+      sig: (profile:LLMProfile)
       ret: LLMProfile
       d: Test output consistency by running same prompt twi
   - n: AdaptiveChunker
     d: Adaptive chunking based on LLM profile.
     m:
     - n: __init__
-      sig: profile:Optional[LLMProfile]=None
+      sig: (profile:Optional[LLMProfile]=None)
       d: Initialize chunker.
     - n: get_optimal_settings
-      sig: ''
+      sig: ()
       ret: Dict[str,Any]
       d: optimal settings for the profiled model.
     - n: chunk_spec
-      sig: spec:str, format:str='yaml'
+      sig: (spec:str, format:str='yaml')
       ret: List[Dict[str,Any]]
       d: Chunk specification based on profile.
     - n: recommend_format
-      sig: spec_size_tokens:int
+      sig: (spec_size_tokens:int)
       ret: str
       d: Recommend best format based on spec size and model
     - n: estimate_chunks_needed
-      sig: spec_size_tokens:int
+      sig: (spec_size_tokens:int)
       ret: int
       d: Estimate number of chunks needed.
   f:
   - n: _get_profiles_path
-    sig: ''
+    sig: ()
     ret: Path
     d: path to profiles storage.
   - n: load_profiles
-    sig: ''
+    sig: ()
     ret: Dict[str,LLMProfile]
     d: Load all saved profiles.
   - n: save_profile
-    sig: profile:LLMProfile
+    sig: (profile:LLMProfile)
     ret: None
     d: Save a profile to storage.
   - n: get_profile
-    sig: provider:str, model:str
+    sig: (provider:str, model:str)
     ret: Optional[LLMProfile]
     d: profile for a specific model.
   - n: get_or_create_profile
-    sig: provider:str, model:str
+    sig: (provider:str, model:str)
     ret: LLMProfile
     d: existing profile or create default one.
   - n: _create_default_profile
-    sig: provider:str, model:str
+    sig: (provider:str, model:str)
     ret: LLMProfile
     d: default profile based on model characteristics.
   - n: profile_llm
-    sig: client, quick:bool=False
+    sig: (client, quick:bool=False)
     ret: LLMProfile
     d: Profile an LLM client.
   - n: get_adaptive_chunker
-    sig: provider:str, model:str
+    sig: (provider:str, model:str)
     ret: AdaptiveChunker
     d: adaptive chunker for a model.
   const:
@@ -260,59 +260,59 @@ modules:
     - MODEL_VARS
     m:
     - n: __init__
-      sig: env_file:str=None
+      sig: (env_file:str=None)
       d: Initialize configuration.
     - n: _load_env_file
-      sig: env_file:str=None
+      sig: (env_file:str=None)
       d: Load environment variables from .env file.
     - n: _parse_env_file
-      sig: path:Path
+      sig: (path:Path)
       d: Parse .env file and set environment variables.
     - n: _load_config_file
-      sig: ''
+      sig: ()
       d: Load configuration from JSON file.
     - n: get_api_key
-      sig: provider:str
+      sig: (provider:str)
       ret: Optional[str]
       d: API key for a provider.
     - n: get_model
-      sig: provider:str
+      sig: (provider:str)
       ret: str
       d: model for a provider.
     - n: get_ollama_host
-      sig: ''
+      sig: ()
       ret: str
       d: Ollama host URL.
     - n: get_default_provider
-      sig: ''
+      sig: ()
       ret: str
       d: default LLM provider.
     - n: is_verbose
-      sig: ''
+      sig: ()
       ret: bool
       d: Check if verbose mode is enabled.
     - n: get_cache_dir
-      sig: ''
+      sig: ()
       ret: Path
       d: cache directory path.
     - n: list_configured_providers
-      sig: ''
+      sig: ()
       ret: Dict[str,bool]
       d: List all providers and their configuration status.
     - n: to_dict
-      sig: ''
+      sig: ()
       ret: Dict[str,Any]
       d: Export configuration as dictionary.
   f:
   - n: load_env
-    sig: ''
+    sig: ()
     d: Load environment variables from .env file.
   - n: get_api_key
-    sig: provider:str
+    sig: (provider:str)
     ret: Optional[str]
     d: Convenience function to get API key.
   - n: get_model
-    sig: provider:str
+    sig: (provider:str)
     ret: str
     d: Convenience function to get model.
   const:
@@ -333,19 +333,19 @@ modules:
   - generate_file_yaml
   f:
   - n: generate_file_csv
-    sig: file_path:Path
+    sig: (file_path:Path)
     ret: str
     d: Generate detailed CSV specification for a single f
   - n: generate_file_json
-    sig: file_path:Path
+    sig: (file_path:Path)
     ret: str
     d: Generate detailed JSON specification for a single
   - n: generate_file_yaml
-    sig: file_path:Path
+    sig: (file_path:Path)
     ret: str
     d: Generate detailed YAML specification for a single
   - n: _parse_file_elements
-    sig: content:str
+    sig: (content:str)
     ret: Dict[str,Any]
     d: Parse file content to extract code elements.
 - p: project_reproducer.py
@@ -398,34 +398,34 @@ modules:
     d: Multi-file project reproduction system.
     m:
     - n: __init__
-      sig: client:BaseLLMClient=None, max_workers:int=4, target_lang:str=None, use_llm:bool=True
+      sig: (client:BaseLLMClient=None, max_workers:int=4, target_lang:str=None, use_llm:bool=True)
       d: Initialize project reproducer.
     - n: _get_client
-      sig: ''
+      sig: ()
       ret: BaseLLMClient
       d: or create LLM client.
     - n: find_source_files
-      sig: project_path:str, extensions:Set[str]=None, exclude_patterns:List[str]=None
+      sig: (project_path:str, extensions:Set[str]=None, exclude_patterns:List[str]=None)
       ret: List[Path]
       d: Find all source files in project.
     - n: reproduce_file
-      sig: file_path:Path, output_dir:Path
+      sig: (file_path:Path, output_dir:Path)
       ret: FileResult
       d: Reproduce a single file.
     - n: reproduce_project
-      sig: project_path:str, output_dir:str=None, parallel:bool=False
+      sig: (project_path:str, output_dir:str=None, parallel:bool=False)
       ret: ProjectResult
       d: Reproduce entire project.
     - n: _aggregate_results
-      sig: project_path:str, results:List[FileResult]
+      sig: (project_path:str, results:List[FileResult])
       ret: ProjectResult
       d: Aggregate file results into project result.
     - n: _save_report
-      sig: output_dir:Path, result:ProjectResult
+      sig: (output_dir:Path, result:ProjectResult)
       d: Save project reproduction report.
   f:
   - n: reproduce_project
-    sig: project_path:str, output_dir:str=None, target_lang:str=None, parallel:bool=False, use_llm:bool=True
+    sig: (project_path:str, output_dir:str=None, target_lang:str=None, parallel:bool=False, use_llm:bool=True)
     ret: ProjectResult
     d: Convenience function for project reproduction.
   const:
@@ -455,22 +455,22 @@ modules:
     d: Mixin providing verbose logging functionality.
     m:
     - n: __init__
-      sig: ''
+      sig: ()
       d: creates
     - n: log
-      sig: msg:str
+      sig: (msg:str)
       d: logs
     - n: debug
-      sig: msg:str
+      sig: (msg:str)
       d: debug
     - n: info
-      sig: msg:str
+      sig: (msg:str)
       d: info
     - n: warn
-      sig: msg:str
+      sig: (msg:str)
       d: warn
     - n: error
-      sig: msg:str
+      sig: (msg:str)
       d: error
   - n: BaseParser
     b:
@@ -478,13 +478,13 @@ modules:
     d: Base class for code parsers.
     m:
     - n: __init__
-      sig: ''
+      sig: ()
       d: creates
     - n: parse
-      sig: content:str
+      sig: (content:str)
       d: parses
     - n: parse_file
-      sig: path:str
+      sig: (path:str)
       d: parses file
   - n: BaseGenerator
     b:
@@ -492,10 +492,10 @@ modules:
     d: Base class for output generators.
     m:
     - n: __init__
-      sig: ''
+      sig: ()
       d: creates
     - n: generate
-      sig: project
+      sig: (project)
       ret: str
       d: creates
 - p: cli.py
@@ -532,100 +532,100 @@ modules:
     d: Enhanced logger for CLI output.
     m:
     - n: __init__
-      sig: verbose:bool=False, debug:bool=False
+      sig: (verbose:bool=False, debug:bool=False)
       d: creates
     - n: _elapsed
-      sig: ''
+      sig: ()
       ret: str
       d: elapsed time string.
     - n: info
-      sig: msg:str
+      sig: (msg:str)
       d: Print info message.
     - n: success
-      sig: msg:str
+      sig: (msg:str)
       d: Print success message.
     - n: warning
-      sig: msg:str
+      sig: (msg:str)
       d: Print warning message.
     - n: error
-      sig: msg:str
+      sig: (msg:str)
       d: Print error message.
     - n: step
-      sig: msg:str
+      sig: (msg:str)
       d: Print step message with counter.
     - n: detail
-      sig: msg:str
+      sig: (msg:str)
       d: Print detail message (only in verbose mode).
     - n: debug_msg
-      sig: msg:str
+      sig: (msg:str)
       d: Print debug message (only in debug mode).
     - n: stats
-      sig: label:str, value
+      sig: (label:str, value)
       d: Print statistics.
     - n: separator
-      sig: ''
+      sig: ()
       d: Print separator line.
     - n: header
-      sig: msg:str
+      sig: (msg:str)
       d: Print header.
   f:
   - n: ensure_dependencies
-    sig: ''
+    sig: ()
     d: Auto-install optional dependencies for best result
   - n: _get_env_file_path
-    sig: ''
+    sig: ()
     ret: str
     d: retrieves env file path
   - n: _read_text_file
-    sig: path:str
+    sig: (path:str)
     ret: str
     d: retrieves text file
   - n: _write_text_file
-    sig: path:str, content:str
+    sig: (path:str, content:str)
     ret: None
     d: logs text file
   - n: _set_env_var
-    sig: var_name:str, value:str
+    sig: (var_name:str, value:str)
     ret: str
     d: updates env var
   - n: _unset_env_var
-    sig: var_name:str
+    sig: (var_name:str)
     ret: str
     d: unset env var
   - n: _get_litellm_config_path
-    sig: ''
+    sig: ()
     ret: str
     d: retrieves litellm config path
   - n: _get_user_llm_config_path
-    sig: ''
+    sig: ()
     ret: str
     d: retrieves user llm config path
   - n: _load_user_llm_config
-    sig: ''
+    sig: ()
     ret: dict
     d: retrieves user llm config
   - n: _save_user_llm_config
-    sig: data:dict
+    sig: (data:dict)
     ret: str
     d: caches user llm config
   - n: _load_litellm_yaml
-    sig: ''
+    sig: ()
     ret: dict
     d: retrieves litellm yaml
   - n: _save_litellm_yaml
-    sig: data:dict
+    sig: (data:dict)
     ret: str
     d: caches litellm yaml
   - n: _infer_provider_from_litellm_model
-    sig: litellm_model:str
+    sig: (litellm_model:str)
     ret: str
     d: infer provider from litellm model
   - n: _code2logic_llm_cli
-    sig: argv:list[str]
+    sig: (argv:list[str])
     ret: None
     d: code2logic llm cli
   - n: main
-    sig: ''
+    sig: ()
     d: Main CLI entry point.
 - p: llm.py
   l: 376
@@ -657,40 +657,40 @@ modules:
     d: Direct Ollama API client.
     m:
     - n: __init__
-      sig: config:LLMConfig
+      sig: (config:LLMConfig)
       d: creates
     - n: generate
-      sig: prompt:str, system:Optional[str]=None
+      sig: (prompt:str, system:Optional[str]=None)
       ret: str
       d: Generate completion from Ollama.
     - n: chat
-      sig: messages:List[Dict[str,str]]
+      sig: (messages:List[Dict[str,str]])
       ret: str
       d: Chat completion from Ollama.
     - n: is_available
-      sig: ''
+      sig: ()
       ret: bool
       d: Check if Ollama is running.
     - n: list_models
-      sig: ''
+      sig: ()
       ret: List[str]
       d: List available models.
   - n: LiteLLMClient
     d: LiteLLM client for unified API access.
     m:
     - n: __init__
-      sig: config:LLMConfig
+      sig: (config:LLMConfig)
       d: creates
     - n: generate
-      sig: prompt:str, system:Optional[str]=None
+      sig: (prompt:str, system:Optional[str]=None)
       ret: str
       d: Generate completion via LiteLLM.
     - n: chat
-      sig: messages:List[Dict[str,str]]
+      sig: (messages:List[Dict[str,str]])
       ret: str
       d: Chat completion via LiteLLM.
     - n: is_available
-      sig: ''
+      sig: ()
       ret: bool
       d: Check if LiteLLM backend is available.
   - n: CodeAnalyzer
@@ -699,35 +699,35 @@ modules:
     - SYSTEM_PROMPT
     m:
     - n: __init__
-      sig: model:str=None, provider:str=None, base_url:str=None, api_key:str=None
+      sig: (model:str=None, provider:str=None, base_url:str=None, api_key:str=None)
       d: Initialize CodeAnalyzer.
     - n: is_available
-      sig: ''
+      sig: ()
       ret: bool
       d: Check if LLM backend is available.
     - n: suggest_refactoring
-      sig: project
+      sig: (project)
       ret: List[Dict[str,Any]]
       d: Analyze project and suggest refactoring improvemen
     - n: find_semantic_duplicates
-      sig: project
+      sig: (project)
       ret: List[Dict[str,Any]]
       d: Find semantically similar functions using LLM.
     - n: generate_code
-      sig: project, target_lang:str, module_filter:Optional[str]=None
+      sig: (project, target_lang:str, module_filter:Optional[str]=None)
       ret: Dict[str,str]
       d: Generate code in target language from project anal
     - n: translate_function
-      sig: name:str, signature:str, intent:str, source_lang:str, target_lang:str
+      sig: (name:str, signature:str, intent:str, source_lang:str, target_lang:str)
       ret: str
       d: Translate a single function to another language.
     - n: _build_signature
-      sig: f
+      sig: (f)
       ret: str
       d: Build compact signature.
   f:
   - n: get_available_backends
-    sig: ''
+    sig: ()
     ret: Dict[str,bool]
     d: availability status of LLM backends.
 - p: errors.py
@@ -787,7 +787,7 @@ modules:
     - 'suggestion: str'
     m:
     - n: to_dict
-      sig: ''
+      sig: ()
       ret: Dict[str,Any]
       d: converts dict
   - n: AnalysisResult
@@ -801,14 +801,14 @@ modules:
     - 'total_files: int'
     m:
     - n: add_error
-      sig: error:AnalysisError
+      sig: (error:AnalysisError)
       d: Add an error to the result.
     - n: has_errors
-      sig: ''
+      sig: ()
       ret: bool
       d: has errors
     - n: summary
-      sig: ''
+      sig: ()
       ret: str
       d: Generate error summary.
   - n: ErrorHandler
@@ -817,37 +817,37 @@ modules:
     - SUGGESTIONS
     m:
     - n: __init__
-      sig: mode:str='lenient', max_file_size_mb:float=10.0, timeout_seconds:float=30.0, logger:Optional[Any]=None
+      sig: (mode:str='lenient', max_file_size_mb:float=10.0, timeout_seconds:float=30.0, logger:Optional[Any]=None)
       d: creates
     - n: reset
-      sig: ''
+      sig: ()
       d: Reset error state for new analysis.
     - n: handle_error
-      sig: error_type:ErrorType, path:str, message:str, exception:Optional[Exception]=None, severity:Optional[ErrorSeverity]=None
+      sig: (error_type:ErrorType, path:str, message:str, exception:Optional[Exception]=None, severity:Optional[ErrorSeverity]=None)
       ret: bool
       d: Handle an error.
     - n: _default_severity
-      sig: error_type:ErrorType
+      sig: (error_type:ErrorType)
       ret: ErrorSeverity
       d: default severity for error type.
     - n: _log_error
-      sig: error:AnalysisError
+      sig: (error:AnalysisError)
       d: Log an error.
     - n: safe_read_file
-      sig: path:Path
+      sig: (path:Path)
       ret: Optional[str]
       d: Safely read a file with error handling.
     - n: safe_write_file
-      sig: path:Path, content:str
+      sig: (path:Path, content:str)
       ret: bool
       d: Safely write a file with error handling.
     - n: safe_parse
-      sig: path:str, content:str, parser_func:Callable
+      sig: (path:str, content:str, parser_func:Callable)
       ret: Any
       d: Safely parse content with error handling.
   f:
   - n: create_error_handler
-    sig: mode:str='lenient', max_file_size_mb:float=10.0
+    sig: (mode:str='lenient', max_file_size_mb:float=10.0)
     ret: ErrorHandler
     d: an error handler with default settings.
 - p: code_review.py
@@ -866,27 +866,27 @@ modules:
     d: Automated code review with optional LLM enhancement.
     m:
     - n: __init__
-      sig: client=None
+      sig: (client=None)
       d: Initialize reviewer.
     - n: review
-      sig: project, focus:str='all'
+      sig: (project, focus:str='all')
       ret: Dict[str,Any]
       d: Perform code review.
     - n: generate_report
-      sig: results:Dict[str,Any], project_name:str='Project'
+      sig: (results:Dict[str,Any], project_name:str='Project')
       ret: str
       d: Generate markdown review report.
   f:
   - n: analyze_code_quality
-    sig: project
+    sig: (project)
     ret: Dict[str,List[Dict]]
     d: Analyze code quality issues.
   - n: check_security_issues
-    sig: project
+    sig: (project)
     ret: Dict[str,List[Dict]]
     d: Check for security vulnerabilities.
   - n: check_performance_issues
-    sig: project
+    sig: (project)
     ret: Dict[str,List[Dict]]
     d: Check for performance anti-patterns.
   const:
@@ -936,33 +936,33 @@ modules:
     - 'IGNORE_FILES: set'
     m:
     - n: __init__
-      sig: root_path:str, use_treesitter:bool=True, verbose:bool=False, include_private:bool=False
+      sig: (root_path:str, use_treesitter:bool=True, verbose:bool=False, include_private:bool=False)
       d: Initialize the project analyzer.
     - n: _print_status
-      sig: ''
+      sig: ()
       d: Print library availability status.
     - n: analyze
-      sig: ''
+      sig: ()
       ret: ProjectInfo
       d: Analyze the project.
     - n: _scan_files
-      sig: ''
+      sig: ()
       d: Scan and parse all source files.
     - n: _detect_entrypoints
-      sig: ''
+      sig: ()
       ret: List[str]
       d: Detect project entry points.
     - n: get_statistics
-      sig: ''
+      sig: ()
       ret: Dict
       d: analysis statistics.
   f:
   - n: analyze_project
-    sig: path:str, use_treesitter:bool=True, verbose:bool=False
+    sig: (path:str, use_treesitter:bool=True, verbose:bool=False)
     ret: ProjectInfo
     d: Convenience function to analyze a project.
   - n: get_library_status
-    sig: ''
+    sig: ()
     ret: Dict[str,bool]
     d: availability status of optional libraries.
 - p: quality.py
@@ -997,7 +997,7 @@ modules:
     - 'score: float'
     m:
     - n: to_dict
-      sig: ''
+      sig: ()
       ret: Dict[str,Any]
       d: Convert to dictionary.
   - n: QualityAnalyzer
@@ -1006,36 +1006,36 @@ modules:
     - DEFAULT_THRESHOLDS
     m:
     - n: __init__
-      sig: thresholds:Dict[str,int]=None
+      sig: (thresholds:Dict[str,int]=None)
       d: Initialize with custom thresholds.
     - n: analyze
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: QualityReport
       d: Analyze project quality.
     - n: analyze_modules
-      sig: modules:List[ModuleInfo]
+      sig: (modules:List[ModuleInfo])
       ret: QualityReport
       d: Analyze a list of modules.
     - n: _analyze_module
-      sig: module:ModuleInfo, report:QualityReport
+      sig: (module:ModuleInfo, report:QualityReport)
       d: Analyze a single module.
     - n: _check_function
-      sig: func, file_path:str, report:QualityReport
+      sig: (func, file_path:str, report:QualityReport)
       d: Check function quality.
     - n: _check_class
-      sig: file_path:str, report:QualityReport
+      sig: (file_path:str, report:QualityReport)
       d: Check class quality.
     - n: _get_file_recommendation
-      sig: module:ModuleInfo
+      sig: (module:ModuleInfo)
       ret: str
       d: Generate recommendation for long file.
   f:
   - n: analyze_quality
-    sig: project:ProjectInfo, thresholds:Dict[str,int]=None
+    sig: (project:ProjectInfo, thresholds:Dict[str,int]=None)
     ret: QualityReport
     d: Convenience function to analyze project quality.
   - n: get_quality_summary
-    sig: report:QualityReport
+    sig: (report:QualityReport)
     ret: str
     d: Generate human-readable quality summary.
 - p: shared_utils.py
@@ -1058,51 +1058,51 @@ modules:
   - truncate_docstring
   f:
   - n: compact_imports
-    sig: imports:List[str], max_items:int=10
+    sig: (imports:List[str], max_items:int=10)
     ret: List[str]
     d: Compact imports by grouping submodules.
   - n: deduplicate_imports
-    sig: imports:List[str]
+    sig: (imports:List[str])
     ret: List[str]
     d: Remove redundant imports.
   - n: abbreviate_type
-    sig: type_str:str
+    sig: (type_str:str)
     ret: str
     d: Abbreviate type annotations for compactness.
   - n: expand_type
-    sig: abbrev:str
+    sig: (abbrev:str)
     ret: str
     d: Expand abbreviated type back to full form.
   - n: build_signature
-    sig: params:List[str], return_type:Optional[str]=None, include_self:bool=False, abbreviate:bool=False, max_params:int=6
+    sig: (params:List[str], return_type:Optional[str]=None, include_self:bool=False, abbreviate:bool=False, max_params:int=6)
     ret: str
     d: Build compact function signature.
   - n: remove_self_from_params
-    sig: params:List[str]
+    sig: (params:List[str])
     ret: List[str]
     d: Remove 'self' and 'cls' from parameter list.
   - n: categorize_function
-    sig: name:str
+    sig: (name:str)
     ret: str
     d: Categorize function by name pattern.
   - n: extract_domain
-    sig: path:str
+    sig: (path:str)
     ret: str
     d: Extract domain from file path.
   - n: compute_hash
-    sig: name:str, signature:str, length:int=8
+    sig: (name:str, signature:str, length:int=8)
     ret: str
     d: Compute short hash for quick comparison.
   - n: truncate_docstring
-    sig: docstring:Optional[str], max_length:int=60
+    sig: (docstring:Optional[str], max_length:int=60)
     ret: str
     d: Truncate docstring to first sentence or max_length
   - n: escape_for_yaml
-    sig: text:str
+    sig: (text:str)
     ret: str
     d: Escape text for safe YAML inclusion.
   - n: clean_identifier
-    sig: name:str
+    sig: (name:str)
     ret: str
     d: Clean identifier by removing whitespace and specia
   const:
@@ -1149,108 +1149,108 @@ modules:
     d: Parser using Tree-sitter for high-accuracy AST parsing.
     m:
     - n: __init__
-      sig: ''
+      sig: ()
       d: Initialize Tree-sitter parsers for available langu
     - n: _init_parsers
-      sig: ''
+      sig: ()
       d: Initialize parsers for each supported language.
     - n: is_available
-      sig: language:str
+      sig: (language:str)
       ret: bool
       d: Check if Tree-sitter parser is available for a lan
     - n: get_supported_languages
-      sig: ''
+      sig: ()
       ret: List[str]
       d: list of potentially supported languages.
     - n: parse
-      sig: filepath:str, content:str, language:str
+      sig: (filepath:str, content:str, language:str)
       ret: Optional[ModuleInfo]
       d: Parse a source file using Tree-sitter.
     - n: _parse_python
-      sig: filepath:str, content:str, tree
+      sig: (filepath:str, content:str, tree)
       ret: ModuleInfo
       d: Parse Python source using Tree-sitter AST.
     - n: _extract_constants
-      sig: tree, content:str
+      sig: (tree, content:str)
       ret: List[ConstantInfo]
       d: Extract module-level UPPERCASE constants.
     - n: _extract_type_checking_imports
-      sig: tree, content:str
+      sig: (tree, content:str)
       ret: List[str]
       d: Extract TYPE_CHECKING block imports.
     - n: _extract_conditional_imports
-      sig: node, content:str
+      sig: (node, content:str)
       ret: List[str]
       d: Extract imports from try/except blocks.
     - n: _extract_aliases
-      sig: tree, content:str
+      sig: (tree, content:str)
       ret: dict
       d: Extract module aliases (import X as Y).
     - n: _extract_py_function
-      sig: node, content:str, decorated_node=None
+      sig: (node, content:str, decorated_node=None)
       ret: Optional[FunctionInfo]
       d: Extract Python function from AST node.
     - n: _extract_py_class
-      sig: node, content:str
+      sig: (node, content:str)
       ret: Optional[ClassInfo]
       d: Extract Python class from AST node.
   - n: UniversalParser
     d: Fallback parser using Python AST and regex.
     m:
     - n: __init__
-      sig: ''
+      sig: ()
       d: Initialize the universal parser.
     - n: parse
-      sig: filepath:str, content:str, language:str
+      sig: (filepath:str, content:str, language:str)
       ret: Optional[ModuleInfo]
       d: Parse a source file using AST or regex.
     - n: _parse_python
-      sig: filepath:str, content:str
+      sig: (filepath:str, content:str)
       ret: Optional[ModuleInfo]
       d: Parse Python using built-in AST.
     - n: _extract_ast_function
-      sig: node
+      sig: (node)
       ret: FunctionInfo
       d: Extract function from Python AST node.
     - n: _extract_ast_class
-      sig: node:Any
+      sig: (node:Any)
       ret: ClassInfo
       d: Extract class from Python AST node.
     - n: _extract_ast_constant
-      sig: node:Any, content:str
+      sig: (node:Any, content:str)
       ret: Optional[ConstantInfo]
       d: Extract ConstantInfo from an AST assignment node i
     - n: _format_ast_value
-      sig: value_node:Any, content:str
+      sig: (value_node:Any, content:str)
       ret: str
       d: Best-effort string representation of an AST value
     - n: _ann_str
-      sig: node
+      sig: (node)
       ret: str
       d: Convert AST annotation to string.
     - n: _parse_js_ts
-      sig: filepath:str, content:str, language:str
+      sig: (filepath:str, content:str, language:str)
       ret: ModuleInfo
       d: Parse JS/TS using regex patterns.
   f:
   - n: _normalize_import_path
-    sig: import_path:str
+    sig: (import_path:str)
     ret: str
     d: Normalize import path by removing duplicate suffix
   - n: _clean_imports
-    sig: imports:List[str]
+    sig: (imports:List[str])
     ret: List[str]
     d: Deduplicate and normalize import paths while prese
   - n: _combine_import_name
-    sig: module_name:str, identifier:str
+    sig: (module_name:str, identifier:str)
     ret: str
     d: Combine module and identifier while avoiding dupli
   - n: _truncate_constant_value
-    sig: value_text:str, limit:int=400
+    sig: (value_text:str, limit:int=400)
     ret: str
     d: a trimmed single-line snippet for constant values.
   - n: is_tree_sitter_available
-    sig: ''
+    sig: ()
     ret: bool
     d: Check if Tree-sitter is available.
   const:
@@ -1279,72 +1279,72 @@ modules:
     d: Generator intencji z NLP - lemmatyzacja, ekstrakcja z docstr
     m:
     - n: __init__
-      sig: ''
+      sig: ()
       d: creates
     - n: generate
-      sig: name:str
+      sig: (name:str)
       ret: str
       d: creates
     - n: _extract_from_docstring
-      sig: docstring:str
+      sig: (docstring:str)
       ret: Optional[str]
       d: parses from docstring
     - n: _split_name
-      sig: name:str
+      sig: (name:str)
       ret: List[str]
       d: splits name
     - n: get_available_features
-      sig: ''
+      sig: ()
       ret: dict[str, bool]
       d: retrieves available features
   - n: IntentAnalyzer
     d: Analyzes user queries to detect intent and provide suggestio
     m:
     - n: __init__
-      sig: ''
+      sig: ()
       d: creates
     - n: _extract_keywords
-      sig: query:str
+      sig: (query:str)
       ret: List[str]
       d: parses keywords
     - n: _calculate_intent_confidence
-      sig: keywords:List[str], patterns:List[str]
+      sig: (keywords:List[str], patterns:List[str])
       ret: float
       d: processes intent confidence
     - n: _identify_target
-      sig: query:str, project:Any
+      sig: (query:str, project:Any)
       ret: str
       d: identify target
     - n: _generate_description
-      sig: intent_type:IntentType, target:str
+      sig: (intent_type:IntentType, target:str)
       ret: str
       d: creates description
     - n: _generate_suggestions
-      sig: intent_type:IntentType, target:str, project:Any
+      sig: (intent_type:IntentType, target:str, project:Any)
       ret: List[str]
       d: creates suggestions
     - n: analyze_intent
-      sig: query:str, project:Any
+      sig: (query:str, project:Any)
       ret: List[Intent]
       d: processes intent
     - n: detect_code_smells
-      sig: project:Any
+      sig: (project:Any)
       ret: List[dict]
       d: detect code smells
     - n: suggest_refactoring
-      sig: target:str, project:Any
+      sig: (target:str, project:Any)
       ret: List[str]
       d: suggest refactoring
     - n: _find_target_object
-      sig: target:str, project:Any
+      sig: (target:str, project:Any)
       ret: Any
       d: retrieves target object
     - n: _suggest_module_refactoring
-      sig: module:Any
+      sig: (module:Any)
       ret: List[str]
       d: suggest module refactoring
     - n: _suggest_class_refactoring
-      sig: cls:Any
+      sig: (cls:Any)
       ret: List[str]
       d: suggest class refactoring
 - p: adaptive.py
@@ -1390,55 +1390,55 @@ modules:
     d: Adaptive code reproduction with LLM capability detection.
     m:
     - n: __init__
-      sig: client:BaseLLMClient=None, model:str=None
+      sig: (client:BaseLLMClient=None, model:str=None)
       d: Initialize adaptive reproducer.
     - n: _get_capabilities
-      sig: ''
+      sig: ()
       ret: Dict[str,Any]
       d: LLM capabilities for current model.
     - n: select_format
-      sig: file_path:Path, content:str
+      sig: (file_path:Path, content:str)
       ret: str
       d: Select optimal format based on file and LLM capabi
     - n: should_chunk
-      sig: content:str
+      sig: (content:str)
       ret: bool
       d: Determine if content should be chunked.
     - n: chunk_content
-      sig: content:str, file_path:Path
+      sig: (content:str, file_path:Path)
       ret: List[ChunkInfo]
       d: Split content into logical chunks.
     - n: generate_chunk_spec
-      sig: chunk:ChunkInfo, format_name:str
+      sig: (chunk:ChunkInfo, format_name:str)
       ret: str
       d: Generate specification for a single chunk.
     - n: _gherkin_for_chunk
-      sig: chunk:ChunkInfo
+      sig: (chunk:ChunkInfo)
       ret: str
       d: Generate Gherkin for a chunk.
     - n: _yaml_for_chunk
-      sig: chunk:ChunkInfo
+      sig: (chunk:ChunkInfo)
       ret: str
       d: Generate YAML for a chunk.
     - n: _json_for_chunk
-      sig: chunk:ChunkInfo
+      sig: (chunk:ChunkInfo)
       ret: str
       d: Generate JSON for a chunk.
     - n: reproduce
-      sig: file_path:str, output_dir:str=None
+      sig: (file_path:str, output_dir:str=None)
       ret: AdaptiveResult
       d: Reproduce code with adaptive format selection.
     - n: _reproduce_single
-      sig: path:Path, content:str, format_name:str, output_dir:str=None
+      sig: (path:Path, content:str, format_name:str, output_dir:str=None)
       ret: AdaptiveResult
       d: Reproduce without chunking.
     - n: _reproduce_chunked
-      sig: path:Path, content:str, format_name:str, output_dir:str=None
+      sig: (path:Path, content:str, format_name:str, output_dir:str=None)
       ret: AdaptiveResult
       d: Reproduce with chunking.
   f:
   - n: get_llm_capabilities
-    sig: model:str
+    sig: (model:str)
     ret: Dict[str,Any]
     d: capabilities for a specific model.
   const:
@@ -1496,11 +1496,11 @@ modules:
     - 'errors: List[str]'
     m:
     - n: score
-      sig: ''
+      sig: ()
       ret: float
       d: Calculate match score 0-100.
     - n: to_dict
-      sig: ''
+      sig: ()
       ret: Dict[str,Any]
       d: converts dict
   - n: ReproductionResult
@@ -1515,92 +1515,92 @@ modules:
     - 'errors: List[str]'
     m:
     - n: success_rate
-      sig: ''
+      sig: ()
       ret: float
       d: success rate
     - n: average_score
-      sig: ''
+      sig: ()
       ret: float
       d: average score
     - n: summary
-      sig: ''
+      sig: ()
       ret: str
       d: summary
   - n: SpecReproducer
     d: Reproduces code structure from logic specifications.
     m:
     - n: __init__
-      sig: verbose:bool=False
+      sig: (verbose:bool=False)
       d: creates
     - n: reproduce_from_yaml
-      sig: spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None
+      sig: (spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None)
       ret: ReproductionResult
       d: Reproduce files from YAML specification.
     - n: reproduce_from_json
-      sig: spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None
+      sig: (spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None)
       ret: ReproductionResult
       d: Reproduce files from JSON specification.
     - n: _reproduce
-      sig: spec:Dict[str,Any], output_dir:str, filter_paths:Optional[List[str]]=None
+      sig: (spec:Dict[str,Any], output_dir:str, filter_paths:Optional[List[str]]=None)
       ret: ReproductionResult
       d: Internal reproduction logic.
     - n: _generate_file
-      sig: module:Dict[str,Any], output_path:Path
+      sig: (module:Dict[str,Any], output_path:Path)
       ret: bool
       d: Generate a single file from module spec.
     - n: _generate_python
-      sig: module:Dict[str,Any]
+      sig: (module:Dict[str,Any])
       ret: str
       d: Generate Python file content.
     - n: _render_docstring
-      sig: text:str, indent:str
+      sig: (text:str, indent:str)
       ret: List[str]
       d: Render a safe Python docstring or fall back to com
     - n: _sanitize_python_property
-      sig: prop:str
+      sig: (prop:str)
       ret: str
       d: Sanitize a Python class property declaration for v
     - n: _generate_python_class
-      sig: cls:Dict[str,Any]
+      sig: (cls:Dict[str,Any])
       ret: List[str]
       d: Generate Python class.
     - n: _generate_python_method
-      sig: method:Dict[str,Any]
+      sig: (method:Dict[str,Any])
       ret: List[str]
       d: Generate Python method.
     - n: _generate_python_function
-      sig: func:Dict[str,Any]
+      sig: (func:Dict[str,Any])
       ret: List[str]
       d: Generate Python function.
     - n: _generate_typescript
-      sig: module:Dict[str,Any]
+      sig: (module:Dict[str,Any])
       ret: str
       d: Generate TypeScript file content.
   - n: SpecValidator
     d: Validates generated files against logic specification.
     m:
     - n: __init__
-      sig: ''
+      sig: ()
       d: creates
     - n: validate
-      sig: spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None
+      sig: (spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None)
       ret: List[FileValidation]
       d: Validate generated files against spec.
     - n: _validate_file
-      sig: module:Dict[str,Any], base_path:Path
+      sig: (module:Dict[str,Any], base_path:Path)
       ret: FileValidation
       d: Validate a single file.
     - n: _check_python_syntax
-      sig: content:str, validation:FileValidation
+      sig: (content:str, validation:FileValidation)
       ret: bool
       d: Check Python syntax.
   f:
   - n: reproduce_project
-    sig: spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None, validate:bool=True, verbose:bool=True
+    sig: (spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None, validate:bool=True, verbose:bool=True)
     ret: ReproductionResult
     d: Convenience function to reproduce and validate a p
   - n: validate_files
-    sig: spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None
+    sig: (spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None)
     ret: List[FileValidation]
     d: Validate specific files against spec.
 - p: llm_clients.py
@@ -1626,15 +1626,15 @@ modules:
     d: Abstract base class for LLM clients.
     m:
     - n: generate
-      sig: prompt:str, system:str=None, max_tokens:int=4000
+      sig: (prompt:str, system:str=None, max_tokens:int=4000)
       ret: str
       d: Generate completion.
     - n: is_available
-      sig: ''
+      sig: ()
       ret: bool
       d: Check if client is available.
     - n: chat
-      sig: messages:List[Dict[str,str]], max_tokens:int=4000
+      sig: (messages:List[Dict[str,str]], max_tokens:int=4000)
       ret: str
       d: Chat completion (default implementation).
   - n: OpenRouterClient
@@ -1646,18 +1646,18 @@ modules:
     - provider
     m:
     - n: __init__
-      sig: api_key:str=None, model:str=None
+      sig: (api_key:str=None, model:str=None)
       d: Initialize OpenRouter client.
     - n: generate
-      sig: prompt:str, system:str=None, max_tokens:int=4000
+      sig: (prompt:str, system:str=None, max_tokens:int=4000)
       ret: str
       d: Generate completion using OpenRouter.
     - n: is_available
-      sig: ''
+      sig: ()
       ret: bool
       d: Check if OpenRouter is configured.
     - n: list_recommended_models
-      sig: ''
+      sig: ()
       ret: List[tuple]
       d: List recommended models for code tasks.
   - n: OllamaLocalClient
@@ -1668,22 +1668,22 @@ modules:
     - provider
     m:
     - n: __init__
-      sig: model:str=None, host:str=None
+      sig: (model:str=None, host:str=None)
       d: Initialize Ollama client.
     - n: generate
-      sig: prompt:str, system:str=None, max_tokens:int=4000
+      sig: (prompt:str, system:str=None, max_tokens:int=4000)
       ret: str
       d: Generate completion using Ollama.
     - n: is_available
-      sig: ''
+      sig: ()
       ret: bool
       d: Check if Ollama is running.
     - n: list_models
-      sig: ''
+      sig: ()
       ret: List[str]
       d: List available Ollama models.
     - n: list_recommended_models
-      sig: ''
+      sig: ()
       ret: List[tuple]
       d: List recommended models for code tasks.
   - n: LiteLLMClient
@@ -1694,75 +1694,75 @@ modules:
     - provider
     m:
     - n: __init__
-      sig: model:str=None
+      sig: (model:str=None)
       d: Initialize LiteLLM client.
     - n: generate
-      sig: prompt:str, system:str=None, max_tokens:int=4000
+      sig: (prompt:str, system:str=None, max_tokens:int=4000)
       ret: str
       d: Generate completion using LiteLLM.
     - n: is_available
-      sig: ''
+      sig: ()
       ret: bool
       d: Check if LiteLLM is available.
   f:
   - n: _get_user_llm_config_path
-    sig: ''
+    sig: ()
     ret: str
     d: retrieves user llm config path
   - n: _load_user_llm_config
-    sig: ''
+    sig: ()
     ret: Dict[str,Any]
     d: retrieves user llm config
   - n: _get_priority_mode
-    sig: ''
+    sig: ()
     ret: str
     d: retrieves priority mode
   - n: get_priority_mode
-    sig: ''
+    sig: ()
     ret: str
     d: retrieves priority mode
   - n: _get_provider_priority_overrides
-    sig: ''
+    sig: ()
     ret: Dict[str,int]
     d: retrieves provider priority overrides
   - n: _get_model_priority_rules
-    sig: ''
+    sig: ()
     ret: Dict[str,Dict[str,int]]
     d: retrieves model priority rules
   - n: _get_model_priority
-    sig: model_string:str
+    sig: (model_string:str)
     ret: Optional[int]
     d: retrieves model priority
   - n: _get_provider_model_string
-    sig: provider:str
+    sig: (provider:str)
     ret: str
     d: retrieves provider model string
   - n: get_client
-    sig: provider:str=None, model:str=None
+    sig: (provider:str=None, model:str=None)
     ret: BaseLLMClient
     d: appropriate LLM client based on provider.
   - n: _try_client
-    sig: provider:str, model:str=None
+    sig: (provider:str, model:str=None)
     ret: Optional[BaseLLMClient]
     d: try client
   - n: _get_priority_order
-    sig: ''
+    sig: ()
     ret: List[str]
     d: retrieves priority order
   - n: _get_effective_provider_order
-    sig: ''
+    sig: ()
     ret: List[tuple[str,int]]
     d: retrieves effective provider order
   - n: get_effective_provider_priorities
-    sig: ''
+    sig: ()
     ret: Dict[str,int]
     d: retrieves effective provider priorities
   - n: _get_provider_priorities_from_litellm_yaml
-    sig: ''
+    sig: ()
     ret: Dict[str,int]
     d: retrieves provider priorities from litellm yaml
   - n: _candidate_litellm_yaml_paths
-    sig: ''
+    sig: ()
     ret: List[str]
     d: candidate litellm yaml paths
   const:
@@ -1799,15 +1799,15 @@ modules:
   - get_fix_prompt
   f:
   - n: get_reproduction_prompt
-    sig: spec:str, fmt:str, file_name:str, language:str='python', max_spec_length:int=5000
+    sig: (spec:str, fmt:str, file_name:str, language:str='python', max_spec_length:int=5000)
     ret: str
     d: Generate optimized reproduction prompt.
   - n: get_review_prompt
-    sig: code:str, spec:str, fmt:str
+    sig: (code:str, spec:str, fmt:str)
     ret: str
     d: Generate code review prompt.
   - n: get_fix_prompt
-    sig: code:str, issues:list, spec:str
+    sig: (code:str, issues:list, spec:str)
     ret: str
     d: Generate code fix prompt.
 - p: chunked_reproduction.py
@@ -1860,51 +1860,51 @@ modules:
     d: Reproduce code from chunked specifications.
     m:
     - n: __init__
-      sig: client, model_name:str='default'
+      sig: (client, model_name:str='default')
       d: creates
     - n: reproduce
-      sig: spec:str, fmt:str, file_name:str
+      sig: (spec:str, fmt:str, file_name:str)
       ret: ChunkedResult
       d: Reproduce code from specification, chunking if nee
     - n: _extract_code
-      sig: response:str
+      sig: (response:str)
       ret: str
       d: Extract code from LLM response.
   f:
   - n: get_llm_limit
-    sig: model_name:str
+    sig: (model_name:str)
     ret: int
     d: context limit for LLM model.
   - n: chunk_yaml_spec
-    sig: spec:str, max_tokens:int=2000
+    sig: (spec:str, max_tokens:int=2000)
     ret: List[Chunk]
     d: Chunk YAML specification by modules/classes/functi
   - n: chunk_gherkin_spec
-    sig: spec:str, max_tokens:int=2000
+    sig: (spec:str, max_tokens:int=2000)
     ret: List[Chunk]
     d: Chunk Gherkin specification by Features/Scenarios.
   - n: chunk_markdown_spec
-    sig: spec:str, max_tokens:int=2000
+    sig: (spec:str, max_tokens:int=2000)
     ret: List[Chunk]
     d: Chunk Markdown specification by sections.
   - n: chunk_spec
-    sig: spec:str, fmt:str, max_tokens:int=2000
+    sig: (spec:str, fmt:str, max_tokens:int=2000)
     ret: ChunkedSpec
     d: Chunk specification based on format.
   - n: get_chunk_prompt
-    sig: chunk:Chunk, fmt:str, file_name:str, chunk_num:int, total_chunks:int
+    sig: (chunk:Chunk, fmt:str, file_name:str, chunk_num:int, total_chunks:int)
     ret: str
     d: Generate prompt for a single chunk.
   - n: merge_chunk_codes
-    sig: codes:List[str], file_name:str
+    sig: (codes:List[str], file_name:str)
     ret: str
     d: Merge code from multiple chunks.
   - n: auto_chunk_reproduce
-    sig: spec:str, fmt:str, file_name:str, client, model_name:str='default'
+    sig: (spec:str, fmt:str, file_name:str, client, model_name:str='default')
     ret: ChunkedResult
     d: Auto-chunking reproduction with LLM adaptation.
   - n: adaptive_chunk_reproduce
-    sig: spec:str, fmt:str, file_name:str, client, provider:str='unknown', model:str='unknown'
+    sig: (spec:str, fmt:str, file_name:str, client, provider:str='unknown', model:str='unknown')
     ret: ChunkedResult
     d: Adaptive chunking reproduction using LLM profile.
   const:
@@ -1933,10 +1933,10 @@ modules:
   - reproduce_project
   f:
   - n: analyze_quality
-    sig: target
+    sig: (target)
     d: processes quality
   - n: reproduce_project
-    sig: source:str
+    sig: (source:str)
     d: reproduce project
 - p: metrics.py
   l: 447
@@ -2026,62 +2026,62 @@ modules:
     - 'recommendations: List[str]'
     m:
     - n: to_dict
-      sig: ''
+      sig: ()
       ret: Dict[str,Any]
       d: converts dict
     - n: to_report
-      sig: ''
+      sig: ()
       ret: str
       d: Generate detailed markdown report.
   - n: ReproductionMetrics
     d: Analyze reproduction quality with multiple metrics.
     m:
     - n: __init__
-      sig: verbose:bool=False
+      sig: (verbose:bool=False)
       d: creates
     - n: analyze
-      sig: original:str, generated:str, spec:str='', format_name:str='', source_file:str=''
+      sig: (original:str, generated:str, spec:str='', format_name:str='', source_file:str='')
       ret: ReproductionResult
       d: Analyze reproduction quality.
     - n: _compute_text_metrics
-      sig: original:str, generated:str
+      sig: (original:str, generated:str)
       ret: TextMetrics
       d: Compute text-level metrics.
     - n: _cosine_similarity
-      sig: words1:List[str], words2:List[str]
+      sig: (words1:List[str], words2:List[str])
       ret: float
       d: Compute cosine similarity between word lists.
     - n: _compute_structural_metrics
-      sig: original:str, generated:str
+      sig: (original:str, generated:str)
       ret: StructuralMetrics
       d: Compute structural metrics.
     - n: _compute_semantic_metrics
-      sig: original:str, generated:str
+      sig: (original:str, generated:str)
       ret: SemanticMetrics
       d: Compute semantic preservation metrics.
     - n: _compute_format_metrics
-      sig: original:str, generated:str, spec:str, format_name:str
+      sig: (original:str, generated:str, spec:str, format_name:str)
       ret: FormatMetrics
       d: Compute format efficiency metrics.
     - n: _compute_overall_score
-      sig: result:ReproductionResult
+      sig: (result:ReproductionResult)
       ret: float
       d: Compute weighted overall score.
     - n: _get_grade
-      sig: score:float
+      sig: (score:float)
       ret: str
       d: letter grade from score.
     - n: _generate_recommendations
-      sig: result:ReproductionResult
+      sig: (result:ReproductionResult)
       ret: List[str]
       d: Generate improvement recommendations.
   f:
   - n: analyze_reproduction
-    sig: original:str, generated:str, spec:str='', format_name:str='', verbose:bool=False
+    sig: (original:str, generated:str, spec:str='', format_name:str='', verbose:bool=False)
     ret: ReproductionResult
     d: Convenience function for reproduction analysis.
   - n: compare_formats
-    sig: original:str, results:Dict[str,Tuple[str,str]], verbose:bool=False
+    sig: (original:str, results:Dict[str,Tuple[str,str]], verbose:bool=False)
     ret: Dict[str,Any]
     d: Compare reproduction quality across formats.
 - p: __main__.py
@@ -2139,32 +2139,32 @@ modules:
     - 'suggestions: List[RefactoringSuggestion]'
     m:
     - n: to_dict
-      sig: ''
+      sig: ()
       ret: Dict[str,Any]
       d: converts dict
     - n: to_markdown
-      sig: ''
+      sig: ()
       ret: str
       d: Generate markdown report.
   f:
   - n: find_duplicates
-    sig: project_path:str, threshold:float=0.8
+    sig: (project_path:str, threshold:float=0.8)
     ret: List[DuplicateGroup]
     d: Find duplicate functions in a project.
   - n: analyze_quality
-    sig: project_path:str, include_security:bool=True, include_performance:bool=True
+    sig: (project_path:str, include_security:bool=True, include_performance:bool=True)
     ret: RefactoringReport
     d: Analyze code quality and generate refactoring repo
   - n: suggest_refactoring
-    sig: project_path:str, use_llm:bool=False, client:BaseLLMClient=None
+    sig: (project_path:str, use_llm:bool=False, client:BaseLLMClient=None)
     ret: RefactoringReport
     d: Generate refactoring suggestions for a project.
   - n: compare_codebases
-    sig: project1:str, project2:str
+    sig: (project1:str, project2:str)
     ret: Dict[str,Any]
     d: Compare two codebases for similarities and differe
   - n: quick_analyze
-    sig: project_path:str
+    sig: (project_path:str)
     ret: Dict[str,Any]
     d: Quick analysis for a project.
 - p: logicml.py
@@ -2199,40 +2199,40 @@ modules:
     - 'STDLIB_MODULES: Set[str]'
     m:
     - n: __init__
-      sig: verbose:bool=False
+      sig: (verbose:bool=False)
       ret: None
       d: creates
     - n: generate
-      sig: project:ProjectInfo, detail:str='standard'
+      sig: (project:ProjectInfo, detail:str='standard')
       ret: LogicMLSpec
       d: Generate LogicML specification for a project.
     - n: _generate_module
-      sig: module:ModuleInfo, detail:str
+      sig: (module:ModuleInfo, detail:str)
       ret: str
       d: Generate LogicML for a single module.
     - n: _generate_imports
-      sig: imports:List[str]
+      sig: (imports:List[str])
       ret: str
       d: Generate compact imports section.
     - n: _generate_class
-      sig: cls:ClassInfo, detail:str
+      sig: (cls:ClassInfo, detail:str)
       ret: str
       d: Generate LogicML for a class.
     - n: _generate_method
-      sig: method:FunctionInfo, detail:str, indent:int=2
+      sig: (method:FunctionInfo, detail:str, indent:int=2)
       ret: str
       d: Generate LogicML for a method.
     - n: _generate_functions
-      sig: functions:List[FunctionInfo], detail:str
+      sig: (functions:List[FunctionInfo], detail:str)
       ret: str
       d: Generate LogicML for top-level functions.
     - n: _detect_side_effects
-      sig: method:FunctionInfo
+      sig: (method:FunctionInfo)
       ret: Optional[str]
       d: Detect side effects from method calls and name pat
   f:
   - n: generate_logicml
-    sig: project:ProjectInfo, detail:str='standard'
+    sig: (project:ProjectInfo, detail:str='standard')
     ret: str
     d: Convenience function to generate LogicML format.
   const:
@@ -2251,20 +2251,20 @@ modules:
   - cleanup_generated_root
   f:
   - n: estimate_tokens
-    sig: text:str
+    sig: (text:str)
     ret: int
     d: estimate tokens
   - n: write_text_atomic
-    sig: path:Path, content:str
+    sig: (path:Path, content:str)
     ret: None
     d: logs text atomic
   - n: cleanup_generated_root
-    sig: generated_root:Path, allowed_dirs:set[str]
+    sig: (generated_root:Path, allowed_dirs:set[str])
     ret: None
     d: cleanup generated root
 - p: generators.py
-  l: 1619
-  kb: 79.3
+  l: 1615
+  kb: 79.0
   i:
   - json
   - collections.defaultdict
@@ -2284,73 +2284,73 @@ modules:
     d: Generates Markdown output for project analysis.
     m:
     - n: generate
-      sig: project:ProjectInfo, detail_level:str='standard'
+      sig: (project:ProjectInfo, detail_level:str='standard')
       ret: str
       d: Generate Markdown output.
     - n: _gen_tree
-      sig: lines:List[str], project:ProjectInfo
+      sig: (lines:List[str], project:ProjectInfo)
       d: Generate project structure tree.
     - n: _print_tree
-      sig: lines:List[str], tree:dict, prefix:str, depth:int=0
+      sig: (lines:List[str], tree:dict, prefix:str, depth:int=0)
       d: Recursively print tree structure.
     - n: _gen_module
-      sig: lines:List[str], m:ModuleInfo, detail:str, proj:ProjectInfo
+      sig: (lines:List[str], m:ModuleInfo, detail:str, proj:ProjectInfo)
       d: Generate module documentation.
     - n: _gen_class
-      sig: lines:List[str], cls:ClassInfo, detail:str
+      sig: (lines:List[str], cls:ClassInfo, detail:str)
       d: Generate class documentation.
     - n: _sig
-      sig: f:FunctionInfo
+      sig: (f:FunctionInfo)
       ret: str
       d: Generate function signature.
   - n: CompactGenerator
     d: Generates ultra-compact output for token efficiency.
     m:
     - n: generate
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: str
       d: Generate compact output.
   - n: JSONGenerator
     d: Generates JSON output for machine processing.
     m:
     - n: generate
-      sig: project:ProjectInfo, flat:bool=False, detail:str='standard'
+      sig: (project:ProjectInfo, flat:bool=False, detail:str='standard')
       ret: str
       d: Generate JSON output.
     - n: generate_from_module
-      sig: module:ModuleInfo, detail:str='full'
+      sig: (module:ModuleInfo, detail:str='full')
       ret: str
       d: creates from module
     - n: _generate_nested
-      sig: project:ProjectInfo, detail:str
+      sig: (project:ProjectInfo, detail:str)
       ret: str
       d: Generate nested JSON structure.
     - n: _field_to_dict
-      sig: field:FieldInfo
+      sig: (field:FieldInfo)
       ret: dict
       d: Serialize dataclass FieldInfo to dictionary.
     - n: _generate_flat
-      sig: project:ProjectInfo, detail:str
+      sig: (project:ProjectInfo, detail:str)
       ret: str
       d: Generate flat JSON list for comparisons.
     - n: _build_element_row
-      sig: m:ModuleInfo, elem_type:str, name:str, signature:str, f:FunctionInfo, ...+2
+      sig: (m:ModuleInfo, elem_type:str, name:str, signature:str, f:FunctionInfo, ...+2)
       ret: dict
       d: Build a single element row for flat output.
     - n: _build_signature
-      sig: f:FunctionInfo
+      sig: (f:FunctionInfo)
       ret: str
       d: Build compact signature.
     - n: _categorize
-      sig: name:str
+      sig: (name:str)
       ret: str
       d: Categorize by name pattern.
     - n: _extract_domain
-      sig: path:str
+      sig: (path:str)
       ret: str
       d: Extract domain from path.
     - n: _compute_hash
-      sig: name:str, signature:str
+      sig: (name:str, signature:str)
       ret: str
       d: Compute short hash.
   - n: YAMLGenerator
@@ -2359,51 +2359,51 @@ modules:
     - KEY_LEGEND
     m:
     - n: generate
-      sig: project:ProjectInfo, flat:bool=False, detail:str='standard', compact:bool=True
+      sig: (project:ProjectInfo, flat:bool=False, detail:str='standard', compact:bool=True)
       ret: str
       d: Generate YAML output.
     - n: generate_schema
-      sig: format_type:str='compact'
+      sig: (format_type:str='compact')
       ret: str
       d: Generate JSON Schema for the YAML format.
     - n: _generate_compact_schema
-      sig: ''
+      sig: ()
       ret: str
       d: Generate JSON Schema for compact YAML format with
     - n: _generate_full_schema
-      sig: ''
+      sig: ()
       ret: str
       d: Generate JSON Schema for full YAML format.
     - n: _generate_hybrid_schema
-      sig: ''
+      sig: ()
       ret: str
       d: Generate JSON Schema for hybrid format.
     - n: generate_hybrid
-      sig: project:ProjectInfo, detail:str='standard'
+      sig: (project:ProjectInfo, detail:str='standard')
       ret: str
       d: Generate hybrid format combining TOON compactness
     - n: _build_enhanced_signature
-      sig: f:FunctionInfo
+      sig: (f:FunctionInfo)
       ret: str
       d: Build enhanced signature with better parameter han
     - n: _extract_constants
-      sig: module:ModuleInfo
+      sig: (module:ModuleInfo)
       ret: list
       d: Extract constants and type definitions from module
     - n: _extract_dataclasses
-      sig: module:ModuleInfo
+      sig: (module:ModuleInfo)
       ret: list
       d: Extract dataclass information from classes.
     - n: _extract_conditional_imports
-      sig: module:ModuleInfo
+      sig: (module:ModuleInfo)
       ret: list
       d: Extract conditional imports from constants.
     - n: generate_from_module
-      sig: module:ModuleInfo, detail:str='full'
+      sig: (module:ModuleInfo, detail:str='full')
       ret: str
       d: creates from module
     - n: _build_flat_data
-      sig: project:ProjectInfo, detail:str
+      sig: (project:ProjectInfo, detail:str)
       ret: dict
       d: Build flat data structure optimized for comparison
   - n: CSVGenerator
@@ -2412,40 +2412,40 @@ modules:
     - COLUMNS
     m:
     - n: generate
-      sig: project:ProjectInfo, detail:str='standard'
+      sig: (project:ProjectInfo, detail:str='standard')
       ret: str
       d: Generate CSV output.
     - n: _build_row
-      sig: m:ModuleInfo, elem_type:str, name:str, signature:str, calls:list, ...+2
+      sig: (m:ModuleInfo, elem_type:str, name:str, signature:str, calls:list, ...+2)
       ret: dict
       d: Build a single CSV row.
     - n: _build_function_row
-      sig: m:ModuleInfo, elem_type:str, name:str, f:FunctionInfo, deps:str, ...+2
+      sig: (m:ModuleInfo, elem_type:str, name:str, f:FunctionInfo, deps:str, ...+2)
       ret: dict
       d: Build CSV row for function/method.
     - n: _build_signature
-      sig: f:FunctionInfo
+      sig: (f:FunctionInfo)
       ret: str
       d: Build compact signature.
     - n: _categorize
-      sig: name:str
+      sig: (name:str)
       ret: str
       d: Categorize function by name pattern.
     - n: _extract_domain
-      sig: path:str
+      sig: (path:str)
       ret: str
       d: Extract domain from file path.
     - n: _compute_hash
-      sig: name:str, signature:str
+      sig: (name:str, signature:str)
       ret: str
       d: Compute short hash for quick comparison.
     - n: _escape_csv
-      sig: text:str
+      sig: (text:str)
       ret: str
       d: Escape text for CSV (remove newlines, limit commas
   f:
   - n: bytes_to_kb
-    sig: bytes_value:int
+    sig: (bytes_value:int)
     ret: float
     d: Convert bytes to kilobytes with single decimal pre
 - p: markdown_format.py
@@ -2476,43 +2476,43 @@ modules:
     d: Generates optimized Markdown hybrid format.
     m:
     - n: __init__
-      sig: verbose:bool=False
+      sig: (verbose:bool=False)
       d: creates
     - n: generate
-      sig: project:ProjectInfo, detail:str='full'
+      sig: (project:ProjectInfo, detail:str='full')
       ret: MarkdownSpec
       d: Generate Markdown hybrid specification.
     - n: _generate_header
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: str
       d: Generate header section.
     - n: _generate_tree
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: str
       d: Generate file tree section.
     - n: _generate_imports
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: str
       d: Generate imports as YAML for precise reproduction.
     - n: _generate_classes_yaml
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: str
       d: Generate classes as detailed YAML codeblock.
     - n: _generate_functions_gherkin
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: str
       d: Generate functions as detailed Gherkin codeblock.
     - n: _generate_dependencies
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: str
       d: Generate module dependencies section.
   f:
   - n: generate_markdown_hybrid
-    sig: project:ProjectInfo, detail:str='full'
+    sig: (project:ProjectInfo, detail:str='full')
     ret: str
     d: Convenience function to generate Markdown hybrid f
   - n: generate_file_markdown
-    sig: file_path:str
+    sig: (file_path:str)
     ret: str
     d: Generate Markdown hybrid for a single file.
 - p: models.py
@@ -2536,27 +2536,27 @@ modules:
     d: Detects similar functions using fuzzy string matching.
     m:
     - n: __init__
-      sig: threshold:float=80.0
+      sig: (threshold:float=80.0)
       d: Initialize the similarity detector.
     - n: find_similar_functions
-      sig: modules:List[ModuleInfo]
+      sig: (modules:List[ModuleInfo])
       ret: Dict[str,List[str]]
       d: Find similar functions across all modules.
     - n: find_duplicate_signatures
-      sig: modules:List[ModuleInfo]
+      sig: (modules:List[ModuleInfo])
       ret: Dict[str,List[str]]
       d: Find functions with identical signatures.
     - n: _build_signature
-      sig: name:str, params:List[str], return_type:str=None
+      sig: (name:str, params:List[str], return_type:str=None)
       ret: str
       d: Build a normalized signature string.
   f:
   - n: is_rapidfuzz_available
-    sig: ''
+    sig: ()
     ret: bool
     d: Check if Rapidfuzz is available.
   - n: get_refactoring_suggestions
-    sig: similar_functions:Dict[str,List[str]]
+    sig: (similar_functions:Dict[str,List[str]])
     ret: List[Dict[str,any]]
     d: Generate refactoring suggestions based on similar
   const:
@@ -2650,19 +2650,19 @@ modules:
     - 'metadata: Dict[str,Any]'
     m:
     - n: to_dict
-      sig: ''
+      sig: ()
       ret: Dict[str,Any]
       d: Convert to dictionary.
     - n: _element_to_dict
-      sig: elem:CodeElement
+      sig: (elem:CodeElement)
       ret: Dict[str,Any]
       d: Convert element to dictionary.
     - n: to_compact
-      sig: ''
+      sig: ()
       ret: str
       d: Convert to compact string representation.
     - n: _element_to_compact
-      sig: elem:CodeElement, indent:int
+      sig: (elem:CodeElement, indent:int)
       ret: List[str]
       d: Convert element to compact lines.
   - n: UniversalParser
@@ -2671,92 +2671,92 @@ modules:
     - LANG_PATTERNS
     m:
     - n: detect_language
-      sig: content:str, file_ext:str
+      sig: (content:str, file_ext:str)
       ret: Language
       d: Detect programming language from content and exten
     - n: parse
-      sig: file_path:Union[str,Path]
+      sig: (file_path:Union[str,Path])
       ret: CodeLogic
       d: Parse source file into CodeLogic.
     - n: _parse_python
-      sig: path:Path, content:str, hash_:str
+      sig: (path:Path, content:str, hash_:str)
       ret: CodeLogic
       d: Parse Python file.
     - n: _parse_js_ts
-      sig: path:Path, content:str, hash_:str, lang:Language
+      sig: (path:Path, content:str, hash_:str, lang:Language)
       ret: CodeLogic
       d: Parse JavaScript/TypeScript file.
     - n: _parse_go
-      sig: path:Path, content:str, hash_:str
+      sig: (path:Path, content:str, hash_:str)
       ret: CodeLogic
       d: Parse Go file.
     - n: _parse_sql
-      sig: path:Path, content:str, hash_:str
+      sig: (path:Path, content:str, hash_:str)
       ret: CodeLogic
       d: Parse SQL file.
     - n: _parse_generic
-      sig: path:Path, content:str, hash_:str, lang:Language
+      sig: (path:Path, content:str, hash_:str, lang:Language)
       ret: CodeLogic
       d: Generic parser for unknown languages.
   - n: CodeGenerator
     d: Generate code from CodeLogic in target language.
     m:
     - n: generate
-      sig: logic:CodeLogic, target_lang:Language
+      sig: (logic:CodeLogic, target_lang:Language)
       ret: str
       d: Generate code in target language.
     - n: _generate_python
-      sig: logic:CodeLogic
+      sig: (logic:CodeLogic)
       ret: str
       d: Generate Python code.
     - n: _generate_python_element
-      sig: elem:CodeElement, indent:int=0
+      sig: (elem:CodeElement, indent:int=0)
       ret: List[str]
       d: Generate Python code for element.
     - n: _generate_typescript
-      sig: logic:CodeLogic
+      sig: (logic:CodeLogic)
       ret: str
       d: Generate TypeScript code.
     - n: _generate_go
-      sig: logic:CodeLogic
+      sig: (logic:CodeLogic)
       ret: str
       d: Generate Go code.
     - n: _generate_sql
-      sig: logic:CodeLogic
+      sig: (logic:CodeLogic)
       ret: str
       d: Generate SQL code.
     - n: _generate_generic
-      sig: logic:CodeLogic, target:Language
+      sig: (logic:CodeLogic, target:Language)
       ret: str
       d: Generate generic code.
   - n: UniversalReproducer
     d: Universal code reproduction system.
     m:
     - n: __init__
-      sig: client:BaseLLMClient=None
+      sig: (client:BaseLLMClient=None)
       d: Initialize reproducer.
     - n: _get_client
-      sig: ''
+      sig: ()
       ret: BaseLLMClient
       d: or create LLM client.
     - n: extract_logic
-      sig: file_path:str
+      sig: (file_path:str)
       ret: CodeLogic
       d: Extract code logic from file.
     - n: reproduce
-      sig: source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True
+      sig: (source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True)
       ret: Dict[str,Any]
       d: Reproduce code from source file.
     - n: _generate_with_llm
-      sig: logic:CodeLogic, target:Language
+      sig: (logic:CodeLogic, target:Language)
       ret: str
       d: Generate code using LLM.
     - n: _save_result
-      sig: output_dir:Path, original:str, logic:CodeLogic, generated:str, result:Dict[str,Any]
+      sig: (output_dir:Path, original:str, logic:CodeLogic, generated:str, result:Dict[str,Any])
       d: Save reproduction results.
   f:
   - n: reproduce_file
-    sig: source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True
+    sig: (source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True)
     ret: Dict[str,Any]
     d: Convenience function for single file reproduction.
 - p: benchmark.py
@@ -2807,38 +2807,38 @@ modules:
     d: Benchmark reproduction quality across formats.
     m:
     - n: __init__
-      sig: client:BaseLLMClient=None
+      sig: (client:BaseLLMClient=None)
       d: Initialize benchmark.
     - n: generate_spec
-      sig: file_path:Path, format_name:str, detail:str='full'
+      sig: (file_path:Path, format_name:str, detail:str='full')
       ret: str
       d: Generate specification in given format.
     - n: reproduce_with_format
-      sig: file_path:Path, format_name:str, original_code:str
+      sig: (file_path:Path, format_name:str, original_code:str)
       ret: FormatResult
       d: Test reproduction with a specific format.
     - n: run_single
-      sig: file_path:str, formats:List[str]=None
+      sig: (file_path:str, formats:List[str]=None)
       ret: BenchmarkResult
       d: Run benchmark on a single file.
     - n: run_all
-      sig: files:List[str], output_dir:str=None
+      sig: (files:List[str], output_dir:str=None)
       ret: Dict[str,Any]
       d: Run benchmark on multiple files.
     - n: _generate_summary
-      sig: results:List[BenchmarkResult]
+      sig: (results:List[BenchmarkResult])
       ret: Dict[str,Any]
       d: Generate summary from benchmark results.
     - n: _save_results
-      sig: output_dir:Path, results:List[BenchmarkResult], summary:Dict
+      sig: (output_dir:Path, results:List[BenchmarkResult], summary:Dict)
       d: Save benchmark results.
     - n: _generate_report
-      sig: results:List[BenchmarkResult], summary:Dict
+      sig: (results:List[BenchmarkResult], summary:Dict)
       ret: str
       d: Generate markdown benchmark report.
   f:
   - n: run_benchmark
-    sig: files:List[str], output_dir:str='benchmark_results', provider:str=None, model:str=None
+    sig: (files:List[str], output_dir:str='benchmark_results', provider:str=None, model:str=None)
     ret: Dict[str,Any]
     d: Run reproduction benchmark.
   const:
@@ -2867,110 +2867,110 @@ modules:
     d: Renders colorized markdown output in terminal.
     m:
     - n: __init__
-      sig: use_colors:bool=True, verbose:bool=True
+      sig: (use_colors:bool=True, verbose:bool=True)
       d: creates
     - n: _supports_colors
-      sig: ''
+      sig: ()
       ret: bool
       d: Check if terminal supports ANSI colors.
     - n: enable_log
-      sig: ''
+      sig: ()
       ret: None
       d: Enable log buffering for markdown export.
     - n: get_log
-      sig: ''
+      sig: ()
       ret: str
       d: buffered log as clean markdown (no ANSI codes).
     - n: clear_log
-      sig: ''
+      sig: ()
       ret: None
       d: Clear log buffer.
     - n: _log
-      sig: text:str
+      sig: (text:str)
       ret: None
       d: Log a line (strips ANSI codes for markdown).
     - n: _c
-      sig: color:str, text:str
+      sig: (color:str, text:str)
       ret: str
       d: Apply color to text.
     - n: heading
-      sig: level:int, text:str
+      sig: (level:int, text:str)
       ret: None
       d: Print a markdown heading.
     - n: codeblock
-      sig: language:Language, content:str
+      sig: (language:Language, content:str)
       ret: None
       d: Print a syntax-highlighted code block.
     - n: render_markdown
-      sig: text:str
+      sig: (text:str)
       ret: None
       d: Render full markdown text with syntax highlighting
     - n: success
-      sig: message:str
+      sig: (message:str)
       ret: None
       d: Print success message.
     - n: error
-      sig: message:str
+      sig: (message:str)
       ret: None
       d: Print error message.
   - n: RenderAPI
     d: Convenience API for terminal rendering.
     m:
     - n: heading
-      sig: level:int, text:str
+      sig: (level:int, text:str)
       ret: None
       d: heading
     - n: code
-      sig: lang:Language, content:str
+      sig: (lang:Language, content:str)
       ret: None
       d: code
     - n: codeblock
-      sig: lang:Language, content:str
+      sig: (lang:Language, content:str)
       ret: None
       d: codeblock
     - n: markdown
-      sig: text:str
+      sig: (text:str)
       ret: None
       d: markdown
     - n: success
-      sig: message:str
+      sig: (message:str)
       ret: None
       d: success
     - n: error
-      sig: message:str
+      sig: (message:str)
       ret: None
       d: error
     - n: warning
-      sig: message:str
+      sig: (message:str)
       ret: None
       d: warning
     - n: info
-      sig: message:str
+      sig: (message:str)
       ret: None
       d: info
     - n: status
-      sig: icon:str, message:str, type:Literal[info,success,warning,error]='info'
+      sig: (icon:str, message:str, type:Literal[info,success,warning,error]='info')
       ret: None
       d: status
     - n: kv
-      sig: key:str, value:Any
+      sig: (key:str, value:Any)
       ret: None
       d: kv
     - n: progress
-      sig: done:int, total:int, label:str=''
+      sig: (done:int, total:int, label:str='')
       ret: None
       d: progress
     - n: separator
-      sig: char:str='─', width:int=60
+      sig: (char:str='─', width:int=60)
       ret: None
       d: separator
   f:
   - n: get_renderer
-    sig: use_colors:bool=True, verbose:bool=True
+    sig: (use_colors:bool=True, verbose:bool=True)
     ret: ShellRenderer
     d: or create the global renderer instance.
   - n: set_renderer
-    sig: renderer:ShellRenderer
+    sig: (renderer:ShellRenderer)
     ret: None
     d: the global renderer instance.
   const:
@@ -2987,8 +2987,8 @@ modules:
     - yellow
     - blue
 - p: toon_format.py
-  l: 477
-  kb: 25.5
+  l: 518
+  kb: 28.2
   i:
   - re
   - models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
@@ -3007,73 +3007,73 @@ modules:
     - LOOKS_LIKE_LITERAL
     m:
     - n: __init__
-      sig: delimiter:str=',', use_tabs:bool=False
+      sig: (delimiter:str=',', use_tabs:bool=False)
       d: Initialize TOON generator.
     - n: generate
-      sig: project:ProjectInfo, detail:str='standard'
+      sig: (project:ProjectInfo, detail:str='standard')
       ret: str
       d: Generate TOON format from ProjectInfo.
     - n: _generate_modules
-      sig: modules:List[ModuleInfo], detail:str
+      sig: (modules:List[ModuleInfo], detail:str)
       ret: List[str]
       d: Generate modules section.
     - n: _generate_classes
-      sig: classes:List[ClassInfo], detail:str, indent:int=0
+      sig: (classes:List[ClassInfo], detail:str, indent:int=0)
       ret: List[str]
       d: Generate classes in TOON format.
     - n: _generate_methods
-      sig: methods:List[FunctionInfo], detail:str='standard', indent:int=0
+      sig: (methods:List[FunctionInfo], detail:str='standard', indent:int=0)
       ret: List[str]
       d: Generate methods in tabular TOON format.
     - n: _generate_functions
-      sig: functions:List[FunctionInfo], detail:str, indent:int=0
+      sig: (functions:List[FunctionInfo], detail:str, indent:int=0)
       ret: List[str]
       d: Generate functions in tabular TOON format.
     - n: _build_signature
-      sig: f:FunctionInfo
+      sig: (f:FunctionInfo)
       ret: str
       d: Build compact signature string without self/cls.
     - n: _quote
-      sig: value:Any
+      sig: (value:Any)
       ret: str
       d: Quote a value if necessary for TOON format.
     - n: generate_compact
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: str
       d: Generate minimal TOON output.
     - n: generate_full
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: str
       d: Generate detailed TOON output.
     - n: generate_schema
-      sig: format_type:str='standard'
+      sig: (format_type:str='standard')
       ret: str
       d: Generate JSON Schema for the TOON format.
     - n: generate_ultra_compact
-      sig: project:ProjectInfo
+      sig: (project:ProjectInfo)
       ret: str
       d: Generate minimal TOON with abbreviated keys.
   - n: TOONParser
     d: Parse TOON format back to Python dict.
     m:
     - n: __init__
-      sig: ''
+      sig: ()
       d: creates
     - n: parse
-      sig: content:str
+      sig: (content:str)
       ret: Dict[str,Any]
       d: Parse TOON content to dict.
     - n: _parse_value
-      sig: value:str
+      sig: (value:str)
       ret: Any
       d: Parse a TOON value to Python type.
   f:
   - n: generate_toon
-    sig: project:ProjectInfo, detail:str='standard', use_tabs:bool=False
+    sig: (project:ProjectInfo, detail:str='standard', use_tabs:bool=False)
     ret: str
     d: Convenience function to generate TOON format.
   - n: parse_toon
-    sig: content:str
+    sig: (content:str)
     ret: Dict[str,Any]
     d: Convenience function to parse TOON content.
 - p: dependency.py
@@ -3091,47 +3091,47 @@ modules:
     d: Analyzes dependency graphs using NetworkX.
     m:
     - n: __init__
-      sig: ''
+      sig: ()
       d: Initialize the dependency analyzer.
     - n: build_graph
-      sig: modules:List[ModuleInfo]
+      sig: (modules:List[ModuleInfo])
       ret: Dict[str,List[str]]
       d: Build dependency graph from modules.
     - n: analyze_metrics
-      sig: ''
+      sig: ()
       ret: Dict[str,DependencyNode]
       d: Compute metrics for each node in the graph.
     - n: get_entrypoints
-      sig: ''
+      sig: ()
       ret: List[str]
       d: entry points (nodes with no incoming edges).
     - n: get_hubs
-      sig: ''
+      sig: ()
       ret: List[str]
       d: hub modules (high centrality).
     - n: detect_cycles
-      sig: ''
+      sig: ()
       ret: List[List[str]]
       d: Detect dependency cycles.
     - n: get_strongly_connected_components
-      sig: ''
+      sig: ()
       ret: List[List[str]]
       d: strongly connected components.
     - n: _detect_clusters
-      sig: ''
+      sig: ()
       ret: Dict[str,int]
       d: Detect clusters using connected components.
     - n: _module_name
-      sig: path:str
+      sig: (path:str)
       ret: str
       d: Convert file path to module name.
     - n: get_dependency_depth
-      sig: module_path:str
+      sig: (module_path:str)
       ret: int
       d: the maximum depth of dependencies for a module.
   f:
   - n: is_networkx_available
-    sig: ''
+    sig: ()
     ret: bool
     d: Check if NetworkX is available.
   const:
@@ -3152,15 +3152,15 @@ modules:
   - run_server
   f:
   - n: handle_request
-    sig: request:dict
+    sig: (request:dict)
     ret: dict
     d: Handle incoming MCP request.
   - n: call_tool
-    sig: tool_name:str, arguments:dict
+    sig: (tool_name:str, arguments:dict)
     ret: str
     d: Execute a tool and return result.
   - n: run_server
-    sig: ''
+    sig: ()
     d: Run the MCP server.
 - p: reproduction.py
   l: 333
@@ -3182,34 +3182,34 @@ modules:
     d: Code reproduction workflow using LLM.
     m:
     - n: __init__
-      sig: client:BaseLLMClient=None, provider:str=None
+      sig: (client:BaseLLMClient=None, provider:str=None)
       d: Initialize reproducer.
     - n: reproduce_file
-      sig: source_path:str, output_dir:str=None
+      sig: (source_path:str, output_dir:str=None)
       ret: Dict[str,Any]
       d: Reproduce code from a source file.
     - n: generate_from_gherkin
-      sig: gherkin:str, language:str='python'
+      sig: (gherkin:str, language:str='python')
       ret: str
       d: Generate code from Gherkin specification.
     - n: _save_results
-      sig: output_dir:Path, results:Dict[str,Any]
+      sig: (output_dir:Path, results:Dict[str,Any])
       d: Save reproduction results to files.
     - n: _generate_report
-      sig: results:Dict[str,Any]
+      sig: (results:Dict[str,Any])
       ret: str
       d: Generate markdown comparison report.
   f:
   - n: generate_file_gherkin
-    sig: file_path:Path
+    sig: (file_path:Path)
     ret: str
     d: Generate detailed Gherkin specification for a sing
   - n: compare_code
-    sig: original:str, generated:str
+    sig: (original:str, generated:str)
     ret: Dict[str,Any]
     d: Compare original and generated code.
   - n: extract_code_block
-    sig: text:str, language:str='python'
+    sig: (text:str, language:str='python')
     ret: str
     d: Extract code block from LLM response.
 - p: gherkin.py
@@ -3267,93 +3267,93 @@ modules:
     - KEYWORDS
     m:
     - n: __init__
-      sig: language:str='en'
+      sig: (language:str='en')
       d: Initialize GherkinGenerator.
     - n: generate
-      sig: project:ProjectInfo, detail:str='standard', group_by:str='domain'
+      sig: (project:ProjectInfo, detail:str='standard', group_by:str='domain')
       ret: str
       d: Generate Gherkin feature files from project analys
     - n: generate_test_scenarios
-      sig: project:ProjectInfo, group_by:str='domain'
+      sig: (project:ProjectInfo, group_by:str='domain')
       ret: List[GherkinFeature]
       d: Generate structured test scenarios for programmati
     - n: get_step_definitions
-      sig: ''
+      sig: ()
       ret: List[StepDefinition]
       d: all unique step definitions from generated feature
     - n: _extract_features
-      sig: project:ProjectInfo, group_by:str
+      sig: (project:ProjectInfo, group_by:str)
       ret: List[GherkinFeature]
       d: Extract Gherkin features from project.
     - n: _create_feature
-      sig: group_name:str, items:List[dict], project:ProjectInfo, group_by:str
+      sig: (group_name:str, items:List[dict], project:ProjectInfo, group_by:str)
       ret: GherkinFeature
       d: a Gherkin feature from grouped items.
     - n: _create_scenario
-      sig: category:str, items:List[dict], domain:str
+      sig: (category:str, items:List[dict], domain:str)
       ret: GherkinScenario
       d: a scenario from category items.
     - n: _create_edge_case_scenarios
-      sig: category:str, items:List[dict]
+      sig: (category:str, items:List[dict])
       ret: List[GherkinScenario]
       d: edge case scenarios for thorough testing.
     - n: _create_when_step
-      sig: func:FunctionInfo, verb:str
+      sig: (func:FunctionInfo, verb:str)
       ret: str
       d: a When step from function info.
     - n: _create_background
-      sig: domain:str, items:List[dict]
+      sig: (domain:str, items:List[dict])
       ret: Optional[List[str]]
       d: background steps for common setup.
     - n: _create_examples_table
-      sig: items:List[dict]
+      sig: (items:List[dict])
       ret: List[Dict[str,str]]
       d: Examples table for Scenario Outline.
     - n: _extract_param_placeholders
-      sig: func:FunctionInfo
+      sig: (func:FunctionInfo)
       ret: str
       d: Extract parameter placeholders for Gherkin steps.
   - n: StepDefinitionGenerator
     d: Generates step definition stubs from Gherkin features.
     m:
     - n: generate_pytest_bdd
-      sig: features:List[GherkinFeature]
+      sig: (features:List[GherkinFeature])
       ret: str
       d: Generate pytest-bdd step definitions.
     - n: generate_behave
-      sig: features:List[GherkinFeature]
+      sig: (features:List[GherkinFeature])
       ret: str
       d: Generate behave step definitions.
     - n: generate_cucumber_js
-      sig: features:List[GherkinFeature]
+      sig: (features:List[GherkinFeature])
       ret: str
       d: Generate Cucumber.js step definitions.
     - n: _step_to_func_name
-      sig: step:str
+      sig: (step:str)
       ret: str
       d: Convert step text to valid function name.
   - n: CucumberYAMLGenerator
     d: Generates Cucumber YAML configuration and test data.
     m:
     - n: generate
-      sig: project:ProjectInfo, detail:str='standard'
+      sig: (project:ProjectInfo, detail:str='standard')
       ret: str
       d: Generate Cucumber YAML configuration.
     - n: _extract_domain
-      sig: path:str
+      sig: (path:str)
       ret: str
       d: Extract domain from path.
     - n: _categorize
-      sig: name:str
+      sig: (name:str)
       ret: str
       d: Categorize by name pattern.
   f:
   - n: csv_to_gherkin
-    sig: csv_content:str, language:str='en'
+    sig: (csv_content:str, language:str='en')
     ret: str
     d: Convert CSV analysis directly to Gherkin.
   - n: gherkin_to_test_data
-    sig: gherkin_content:str
+    sig: (gherkin_content:str)
     ret: Dict[str,Any]
     d: Extract structured test data from Gherkin for LLM
 - p: schemas/logicml_schema.py
@@ -3414,15 +3414,15 @@ modules:
     - 'function_count: int'
   f:
   - n: validate_logicml
-    sig: spec:str
+    sig: (spec:str)
     ret: Tuple[bool,List[str]]
     d: Validate LogicML specification.
   - n: parse_logicml_header
-    sig: line:str
+    sig: (line:str)
     ret: Optional[Dict[str,Any]]
     d: Parse LogicML header comment.
   - n: extract_logicml_signature
-    sig: sig_line:str
+    sig: (sig_line:str)
     ret: Dict[str,Any]
     d: 'Extract signature components from LogicML sig: lin'
 - p: schemas/__init__.py
@@ -3495,15 +3495,15 @@ modules:
     - 'modules: List[ModuleSchema]'
   f:
   - n: validate_yaml
-    sig: spec:str
+    sig: (spec:str)
     ret: Tuple[bool,List[str]]
     d: Validate YAML specification.
   - n: _validate_module
-    sig: module:Dict, index:int
+    sig: (module:Dict, index:int)
     ret: List[str]
     d: Validate a module definition.
   - n: _validate_class
-    sig: cls:Dict, prefix:str
+    sig: (cls:Dict, prefix:str)
     ret: List[str]
     d: Validate a class definition.
 - p: schemas/json_schema.py
@@ -3569,19 +3569,19 @@ modules:
     - 'modules: List[JSONModuleSchema]'
   f:
   - n: validate_json
-    sig: spec:str
+    sig: (spec:str)
     ret: Tuple[bool,List[str]]
     d: Validate JSON specification.
   - n: _validate_json_module
-    sig: module:Dict, index:int
+    sig: (module:Dict, index:int)
     ret: List[str]
     d: Validate a JSON module definition.
   - n: _validate_json_class
-    sig: cls:Dict, prefix:str
+    sig: (cls:Dict, prefix:str)
     ret: List[str]
     d: Validate a JSON class definition.
   - n: parse_json_spec
-    sig: spec:str
+    sig: (spec:str)
     ret: Optional[JSONSchema]
     d: Parse JSON specification into schema.
 - p: schemas/markdown_schema.py
@@ -3629,11 +3629,11 @@ modules:
     - 'token_estimate: int'
   f:
   - n: validate_markdown
-    sig: spec:str
+    sig: (spec:str)
     ret: Tuple[bool,List[str]]
     d: Validate Markdown specification.
   - n: extract_markdown_sections
-    sig: spec:str
+    sig: (spec:str)
     ret: Dict[str,Any]
     d: Extract sections from Markdown specification.
 - p: benchmarks/common.py
@@ -3659,35 +3659,35 @@ modules:
   - get_simple_reproduction_prompt
   f:
   - n: create_single_project
-    sig: module_info, file_path:Path
+    sig: (module_info, file_path:Path)
     ret: ProjectInfo
     d: creates single project
   - n: generate_spec
-    sig: project:ProjectInfo, fmt:str
+    sig: (project:ProjectInfo, fmt:str)
     ret: str
     d: creates spec
   - n: _generate_token_json
-    sig: project:ProjectInfo
+    sig: (project:ProjectInfo)
     ret: str
     d: Generate compact, token-friendly JSON spec (used b
   - n: _generate_token_json_compact
-    sig: project:ProjectInfo
+    sig: (project:ProjectInfo)
     ret: str
     d: creates token json compact
   - n: generate_spec_token
-    sig: project:ProjectInfo, fmt:str
+    sig: (project:ProjectInfo, fmt:str)
     ret: str
     d: Generate spec optimized for token benchmark (keeps
   - n: get_async_reproduction_prompt
-    sig: spec:str, fmt:str, file_name:str, with_tests:bool=False
+    sig: (spec:str, fmt:str, file_name:str, with_tests:bool=False)
     ret: str
     d: retrieves async reproduction prompt
   - n: get_token_reproduction_prompt
-    sig: spec:str, fmt:str, file_name:str
+    sig: (spec:str, fmt:str, file_name:str)
     ret: str
     d: retrieves token reproduction prompt
   - n: get_simple_reproduction_prompt
-    sig: spec:str, fmt:str, file_name:str
+    sig: (spec:str, fmt:str, file_name:str)
     ret: str
     d: retrieves simple reproduction prompt
 - p: benchmarks/runner.py
@@ -3711,64 +3711,64 @@ modules:
     d: Unified benchmark runner for code2logic.
     m:
     - n: __init__
-      sig: client:Optional[BaseLLMClient]=None, config:Optional[BenchmarkConfig]=None
+      sig: (client:Optional[BaseLLMClient]=None, config:Optional[BenchmarkConfig]=None)
       d: Initialize benchmark runner.
     - n: _should_use_llm
-      sig: ''
+      sig: ()
       ret: bool
       d: whether this runner should call an LLM.
     - n: _get_client
-      sig: ''
+      sig: ()
       ret: BaseLLMClient
       d: or create LLM client.
     - n: _template_generate_code
-      sig: spec:str, fmt:str, file_name:str
+      sig: (spec:str, fmt:str, file_name:str)
       ret: str
       d: Generate minimal Python code without an LLM (fallb
     - n: run_format_benchmark
-      sig: folder:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False
+      sig: (folder:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False)
       ret: BenchmarkResult
       d: Run format comparison benchmark.
     - n: _test_format
-      sig: project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], ...+1
+      sig: (project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], ...+1)
       ret: FormatResult
       d: Test a single format.
     - n: run_file_benchmark
-      sig: file_path:str, formats:List[str]=None, verbose:bool=False
+      sig: (file_path:str, formats:List[str]=None, verbose:bool=False)
       ret: BenchmarkResult
       d: Run benchmark on a single file.
     - n: run_function_benchmark
-      sig: file_path:str, function_names:List[str]=None, limit:Optional[int]=None, verbose:bool=False
+      sig: (file_path:str, function_names:List[str]=None, limit:Optional[int]=None, verbose:bool=False)
       ret: BenchmarkResult
       d: Run function-level reproduction benchmark.
     - n: _test_function
-      sig: func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], ...+1
+      sig: (func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], ...+1)
       ret: FunctionResult
       d: Test reproduction of a single function.
     - n: run_project_benchmark
-      sig: project_path:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False
+      sig: (project_path:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False)
       ret: BenchmarkResult
       d: Run benchmark on entire project.
     - n: _reproduce_module
-      sig: module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False
+      sig: (module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False)
       ret: FileResult
       d: Reproduce a single module.
   f:
   - n: _test_python_syntax
-    sig: code:str
+    sig: (code:str)
     ret: bool
     d: Test if Python code has valid syntax.
   - n: _test_python_runs
-    sig: code:str, timeout:int=5
+    sig: (code:str, timeout:int=5)
     ret: bool
     d: Test if Python code runs without errors.
   - n: _extract_code
-    sig: response:str
+    sig: (response:str)
     ret: str
     d: Extract code from LLM response.
   - n: run_benchmark
-    sig: source:str, benchmark_type:str='format', formats:List[str]=None, limit:Optional[int]=None, output:Optional[str]=None,
-      verbose:bool=False
+    sig: (source:str, benchmark_type:str='format', formats:List[str]=None, limit:Optional[int]=None, output:Optional[str]=None,
+      verbose:bool=False)
     ret: BenchmarkResult
     d: Convenience function to run benchmarks.
 - p: benchmarks/__init__.py

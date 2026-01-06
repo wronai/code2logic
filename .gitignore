@@ -1,3 +1,4 @@
+poetry.lock
 examples/reproduction/*
 examples/output/*
 bdd_output/*
