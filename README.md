@@ -299,28 +299,42 @@ for module in data['modules']:
 ```bash
 git clone https://github.com/wronai/code2logic
 cd code2logic
-pip install -e ".[dev]"
-pre-commit install
+poetry install --with dev -E full
+poetry run pre-commit install
+
+# Alternatively, you can use Makefile targets (prefer Poetry if available)
+make install-full
 ```
 
 ### Tests
 
 ```bash
-pytest
-pytest --cov=code2logic --cov-report=html
+make test
+make test-cov
+
+# Or directly:
+poetry run pytest
+poetry run pytest --cov=code2logic --cov-report=html
 ```
 
 ### Type Checking
 
 ```bash
-mypy code2logic
+make typecheck
+
+# Or directly:
+poetry run mypy code2logic
 ```
 
 ### Linting
 
 ```bash
-ruff check code2logic
-black code2logic
+make lint
+make format
+
+# Or directly:
+poetry run ruff check code2logic
+poetry run black code2logic
 ```
 
 ## 📈 Performance
