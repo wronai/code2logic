@@ -607,6 +607,10 @@ code2logic [path] [options]
         help='Output file path (default: stdout)'
     )
     parser.add_argument(
+        '--function-logic',
+        help='Write detailed function logic to a separate file (LogicML-like)'
+    )
+    parser.add_argument(
         '--flat',
         action='store_true',
         help='Use flat structure (for json/yaml) - better for comparisons'
@@ -717,6 +721,7 @@ code2logic [path] [options]
     from .gherkin import GherkinGenerator
     from .toon_format import TOONGenerator
     from .logicml import LogicMLGenerator
+    from .function_logic import FunctionLogicGenerator
     
     # Status check
     if args.status:
@@ -898,6 +903,15 @@ code2logic [path] [options]
         generator = LogicMLGenerator()
         spec = generator.generate(project, detail=args.detail)
         output = spec.content
+
+    # Optional: write detailed function logic to a separate file
+    if args.function_logic:
+        logic_gen = FunctionLogicGenerator()
+        logic_out = logic_gen.generate(project, detail=args.detail)
+        with open(args.function_logic, 'w', encoding='utf-8') as f:
+            f.write(logic_out)
+        if args.verbose:
+            log.success(f"Function logic written to: {args.function_logic}")
     
     gen_time = time.time() - gen_start
     

@@ -570,7 +570,8 @@ class UniversalValidator:
         
         # Oblicz score
         total_impact = sum(i.impact for i in self.issues)
-        reproduction_score = max(0, 100 - total_impact)
+        normalized_impact = total_impact / max(total, 1)
+        reproduction_score = max(0, 100 - normalized_impact)
         
         # Oblicz pokrycie per język
         coverage = self._calculate_language_coverage()

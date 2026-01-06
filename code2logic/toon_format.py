@@ -10,7 +10,7 @@ See: https://github.com/toon-format/toon
 
 import re
 from typing import List, Dict, Any, Optional
-from .models import ProjectInfo, ModuleInfo, ClassInfo, FunctionInfo
+from .models import ProjectInfo, ModuleInfo, ClassInfo, FunctionInfo, TypeInfo
 from .shared_utils import compact_imports, truncate_docstring
 
 
@@ -140,6 +140,10 @@ class TOONGenerator:
                         lines.append(
                             f"      {self._quote(r['n'])}{self.delimiter}{self._quote(r['t'])}{self.delimiter}{self._quote(r['v'])}{self.delimiter}{self._quote(r['keys'])}"
                         )
+
+                # Types (enums/interfaces/type aliases) - critical for reproduction of enum values
+                if getattr(m, 'types', None):
+                    lines.extend(self._generate_types(m.types, indent=4))
                 
                 # Classes
                 if m.classes:
@@ -149,6 +153,39 @@ class TOONGenerator:
                 if m.functions:
                     lines.extend(self._generate_functions(m.functions, detail, indent=4))
         
+        return lines
+
+    def _generate_types(self, types: List[TypeInfo], indent: int = 0) -> List[str]:
+        """Generate module-level types in TOON format (with enum values where available)."""
+        lines: List[str] = []
+        ind = ' ' * indent
+
+        rows = []
+        for t in types[:25]:
+            kind = getattr(t, 'kind', '') or '-'
+            name = getattr(t, 'name', '') or '-'
+            definition = getattr(t, 'definition', '') or '-'
+            values = getattr(t, 'values', None)
+
+            def_snip = definition.replace('\n', ' ').strip() if definition else '-'
+            if def_snip and len(def_snip) > 120:
+                def_snip = def_snip[:117] + '...'
+
+            values_str = '-'
+            if values:
+                values_str = '|'.join(str(v).replace('\n', ' ').strip() for v in values[:20])
+
+            rows.append({'name': name, 'kind': kind, 'values': values_str, 'def': def_snip or '-'})
+
+        if not rows:
+            return lines
+
+        header = f"name{self.delim_marker}kind{self.delim_marker}values{self.delim_marker}def"
+        lines.append(f"{ind}types[{len(rows)}]{{{header}}}:")
+        for r in rows:
+            lines.append(
+                f"{ind}  {self._quote(r['name'])}{self.delimiter}{self._quote(r['kind'])}{self.delimiter}{self._quote(r['values'])}{self.delimiter}{self._quote(r['def'])}"
+            )
         return lines
     
     def _generate_classes(self, classes: List[ClassInfo], detail: str, indent: int = 0) -> List[str]:
@@ -553,13 +590,10 @@ class TOONParser:
         lines = content.split('\n')
 
         # Best-effort delimiter detection for arrays.
-        # Note: headers always use commas, but row values may use ',', '\t', or '|'.
-        if any('\t' in ln for ln in lines):
-            self.delimiter = '\t'
-        elif any('|' in ln for ln in lines):
-            self.delimiter = '|'
-        else:
-            self.delimiter = ','
+        # Note: in code2logic standard TOON, rows use ',' or '\t'.
+        # '|' is used inside some cell values (e.g., decorators), so it must not be
+        # treated as a delimiter.
+        self.delimiter = '\t' if any('\t' in ln for ln in lines) else ','
         
         import csv
 

@@ -9,7 +9,7 @@ Includes:
 
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from collections import defaultdict
 
 from .models import (
@@ -1008,6 +1008,14 @@ class YAMLGenerator:
             mod_data = {
                 'p': m.path,  # path
             }
+
+            types_by_name = {}
+            for t in getattr(m, 'types', []) or []:
+                try:
+                    if getattr(t, 'name', None):
+                        types_by_name[t.name] = t
+                except Exception:
+                    continue
             
             # Only add language if different from default
             if m.language != default_lang:
@@ -1033,8 +1041,10 @@ class YAMLGenerator:
                 const_data = []
                 for const in m.constants:
                     if isinstance(const, str):
-                        # Handle string constants (from UniversalParser)
-                        const_data.append({'n': const})
+                        if const.startswith('conditional:'):
+                            continue
+                        # Handle string constants (from parsers without values)
+                        const_data.append({'n': const, 't': '-', 'v': '-'})
                     else:
                         # Handle ConstantInfo objects (from TreeSitter parser)
                         const_data.append(self._constant_to_dict(const))
@@ -1075,6 +1085,17 @@ class YAMLGenerator:
                     # Bases
                     if c.bases:
                         cls_data['b'] = c.bases  # bases
+
+                    # Enum values (from module types)
+                    try:
+                        bases = c.bases or []
+                        is_enum = any(b == 'Enum' or b.endswith('.Enum') for b in bases)
+                        if is_enum:
+                            t = types_by_name.get(c.name)
+                            if t and getattr(t, 'kind', None) == 'enum' and getattr(t, 'values', None):
+                                cls_data['values'] = t.values
+                    except Exception:
+                        pass
                     
                     # Enhanced docstring
                     if c.docstring:
@@ -1163,22 +1184,17 @@ class YAMLGenerator:
                 
                 if functions_data:
                     mod_data['f'] = functions_data
-            
-            # Add constants/types information (if available)
-            constants = self._extract_constants(m)
-            if constants:
-                mod_data.setdefault('const', []).extend(constants)
-            
+
             # Add dataclass information
             dataclasses = self._extract_dataclasses(m)
             if dataclasses:
                 mod_data['dataclasses'] = dataclasses
-            
+
             # Add conditional imports information
             conditional_imports = self._extract_conditional_imports(m)
             if conditional_imports:
                 mod_data['conditional_imports'] = conditional_imports
-            
+
             detailed_modules.append(mod_data)
         
         # Build final hybrid structure
@@ -1628,7 +1644,7 @@ class YAMLGenerator:
             
             # Classes with compact format
             if m.classes:
-                mod_data['c'] = [self._compact_class(c, detail) for c in m.classes[:10]]
+                mod_data['c'] = [self._compact_class(c, detail, m.types) for c in m.classes[:10]]
             
             # Functions with compact format
             if m.functions:
@@ -1664,15 +1680,34 @@ class YAMLGenerator:
             return []
         return compact_imports(deduplicate_imports(list(imports)), max_items=10)
     
-    def _compact_class(self, cls: ClassInfo, detail: str) -> dict:
+    def _compact_class(self, cls: ClassInfo, detail: str, module_types: Optional[list] = None) -> dict:
         """Generate compact class representation."""
         data = {
             'n': cls.name,  # name
         }
+
+        types_by_name = {}
+        for t in module_types or []:
+            try:
+                if getattr(t, 'name', None):
+                    types_by_name[t.name] = t
+            except Exception:
+                continue
         
         # Only add bases if non-empty
         if cls.bases:
             data['b'] = cls.bases  # bases
+
+        # Enum values (from module types)
+        try:
+            bases = cls.bases or []
+            is_enum = any(b == 'Enum' or b.endswith('.Enum') for b in bases)
+            if is_enum:
+                t = types_by_name.get(cls.name)
+                if t and getattr(t, 'kind', None) == 'enum' and getattr(t, 'values', None):
+                    data['values'] = t.values
+        except Exception:
+            pass
         
         # Truncated docstring
         if cls.docstring:
@@ -1782,7 +1817,7 @@ class YAMLGenerator:
             if isinstance(const, str):
                 if const.startswith('conditional:'):
                     continue  # handled separately for optional imports
-                constants.append({'n': const})
+                constants.append({'n': const, 't': '-', 'v': '-'})
             else:
                 constants.append(self._constant_to_dict(const))
             if len(constants) >= limit:

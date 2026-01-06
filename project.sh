@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 poetry run code2logic code2logic -f yaml -o project.c2l.yaml --compact --with-schema
 poetry run code2logic code2logic -f yaml -o project.c2l.hybrid.yaml --hybrid --with-schema
 poetry run code2logic code2logic -f toon -o project.c2l.toon --with-schema

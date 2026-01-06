@@ -518,7 +518,7 @@ class FormatValidator(ABC):
         issues = []
         
         # Pusta sygnatura
-        if not sig or sig in ('', '()', '()'):
+        if sig is None or sig == '':
             issues.append(ValidationIssue(
                 severity=Severity.CRITICAL,
                 element_type=ElementType.FUNCTION,
@@ -546,8 +546,9 @@ class FormatValidator(ABC):
                         impact_percent=5.0
                     ))
         
-        # Brak wartości domyślnych
-        if '=' not in sig and func_name not in ('__init__', 'constructor', 'new'):
+        # Brak wartości domyślnych (tylko jeśli są parametry)
+        inner = sig.strip()[1:-1].strip() if sig.strip().startswith('(') and sig.strip().endswith(')') else sig
+        if inner and '=' not in sig and func_name not in ('__init__', 'constructor', 'new'):
             issues.append(ValidationIssue(
                 severity=Severity.MEDIUM,
                 element_type=ElementType.FUNCTION,
@@ -756,7 +757,8 @@ class YAMLValidator(FormatValidator):
         
         # Oblicz score reprodukcji
         total_impact = sum(issue.impact_percent for issue in self.issues)
-        reproduction_score = max(0, 100 - total_impact)
+        normalized_impact = total_impact / max(total, 1)
+        reproduction_score = max(0, 100 - normalized_impact)
         
         return ValidationResult(
             language=self.language,
@@ -817,7 +819,28 @@ class TOONValidator(FormatValidator):
     """Walidator dla formatu TOON."""
     
     def parse(self) -> Dict[str, Any]:
-        """Parsuj TOON (custom format)."""
+        """Parsuj TOON (ultra-compact M/D or standard TOON)."""
+        content = (self.content or '').lstrip()
+        if content.startswith('project:'):
+            return self._parse_standard()
+        return self._parse_ultra_compact()
+
+    def _detect_delimiter(self) -> str:
+        # Standard TOON produced by this project uses either ',' or '\t' as row delimiter.
+        # Note: '|' is used inside some cell values (e.g., decorators), so it must not be
+        # treated as a delimiter.
+        if '\t' in self.content:
+            return '\t'
+        return ','
+
+    def _strip_quotes(self, s: str) -> str:
+        s = (s or '').strip()
+        if len(s) >= 2 and s[0] == '"' and s[-1] == '"':
+            return s[1:-1]
+        return s
+
+    def _parse_ultra_compact(self) -> Dict[str, Any]:
+        """Parsuj ultra-compact TOON (M/D)."""
         data = {
             'modules': [],
             'details': {}
@@ -866,6 +889,143 @@ class TOONValidator(FormatValidator):
                     self._parse_detail_line(line.strip(), data['details'][current_module])
         
         return data
+
+    def _parse_standard(self) -> Dict[str, Any]:
+        """Parsuj standard TOON w wersji generowanej przez code2logic.toon_format.TOONGenerator."""
+        import csv
+
+        delimiter = self._detect_delimiter()
+        lines = self.content.split('\n')
+
+        data: Dict[str, Any] = {'modules': [], 'details': {}}
+        in_module_details = False
+        current_module: Optional[str] = None
+        
+        i = 0
+        while i < len(lines):
+            raw = lines[i].rstrip('\n')
+            i += 1
+
+            if not raw.strip() or raw.lstrip().startswith('#'):
+                continue
+
+            if raw.strip() == 'module_details:':
+                in_module_details = True
+                current_module = None
+                continue
+
+            if not in_module_details:
+                continue
+
+            # Module headers are indented by exactly 2 spaces. Do not match deeper nested blocks.
+            m_mod = re.match(r'^ {2}([^ ].*):\s*$', raw)
+            if m_mod:
+                current_module = self._strip_quotes(m_mod.group(1))
+                data['details'][current_module] = {
+                    'functions': [],
+                    'const': [],
+                    'types': [],
+                    'has_dataclass': False,
+                    'has_dataclass_fields': False,
+                }
+                continue
+
+            if not current_module:
+                continue
+
+            # classes table (detect @dataclass via decorators column)
+            m_classes = re.match(r'^\s{4}classes\[(\d+)\]\{([^}]+)\}:\s*$', raw)
+            if m_classes:
+                n = int(m_classes.group(1))
+                fields = [f.strip() for f in m_classes.group(2).split(',')]
+                for _ in range(n):
+                    if i >= len(lines):
+                        break
+                    row = lines[i].strip()
+                    i += 1
+                    if not row:
+                        continue
+                    values = next(csv.reader([row], delimiter=delimiter, quotechar='"', escapechar='\\'))
+                    row_map: Dict[str, str] = {}
+                    for fi, fn in enumerate(fields):
+                        if fi < len(values):
+                            row_map[fn] = self._strip_quotes(values[fi])
+                    dec = row_map.get('decorators', '')
+                    if dec and dec != '-' and 'dataclass' in dec:
+                        data['details'][current_module]['has_dataclass'] = True
+                continue
+
+            # functions table
+            m_funcs = re.match(r'^\s{4}functions\[(\d+)\]\{([^}]+)\}:\s*$', raw)
+            if m_funcs:
+                n = int(m_funcs.group(1))
+                fields = [f.strip() for f in m_funcs.group(2).split(',')]
+                for _ in range(n):
+                    if i >= len(lines):
+                        break
+                    row = lines[i].strip()
+                    i += 1
+                    if not row:
+                        continue
+                    values = next(csv.reader([row], delimiter=delimiter, quotechar='"', escapechar='\\'))
+                    row_map: Dict[str, str] = {}
+                    for fi, fn in enumerate(fields):
+                        if fi < len(values):
+                            row_map[fn] = self._strip_quotes(values[fi])
+                    name = row_map.get('name') or ''
+                    sig = row_map.get('sig') or ''
+                    if name:
+                        data['details'][current_module]['functions'].append({'name': name, 'sig': sig})
+                continue
+
+            # constants table
+            m_const = re.match(r'^\s{4}const\[(\d+)\]\{([^}]+)\}:\s*$', raw)
+            if m_const:
+                n = int(m_const.group(1))
+                fields = [f.strip() for f in m_const.group(2).split(',')]
+                for _ in range(n):
+                    if i >= len(lines):
+                        break
+                    row = lines[i].strip()
+                    i += 1
+                    if not row:
+                        continue
+                    values = next(csv.reader([row], delimiter=delimiter, quotechar='"', escapechar='\\'))
+                    row_map: Dict[str, str] = {}
+                    for fi, fn in enumerate(fields):
+                        if fi < len(values):
+                            row_map[fn] = self._strip_quotes(values[fi])
+                    name = row_map.get('n') or row_map.get('name') or ''
+                    if name:
+                        data['details'][current_module]['const'].append(row_map)
+                continue
+
+            # types table (enums/interfaces/type aliases)
+            m_types = re.match(r'^\s{4}types\[(\d+)\]\{([^}]+)\}:\s*$', raw)
+            if m_types:
+                n = int(m_types.group(1))
+                fields = [f.strip() for f in m_types.group(2).split(',')]
+                for _ in range(n):
+                    if i >= len(lines):
+                        break
+                    row = lines[i].strip()
+                    i += 1
+                    if not row:
+                        continue
+                    values = next(csv.reader([row], delimiter=delimiter, quotechar='"', escapechar='\\'))
+                    row_map: Dict[str, str] = {}
+                    for fi, fn in enumerate(fields):
+                        if fi < len(values):
+                            row_map[fn] = self._strip_quotes(values[fi])
+                    if row_map.get('name'):
+                        data['details'][current_module]['types'].append(row_map)
+                continue
+
+            # dataclass fields table
+            if re.match(r'^\s{8}fields\[\d+\]\{', raw):
+                data['details'][current_module]['has_dataclass_fields'] = True
+
+        return data
     
     def _parse_detail_line(self, line: str, module_data: Dict):
         """Parsuj linię szczegółów modułu."""
@@ -902,25 +1062,34 @@ class TOONValidator(FormatValidator):
         
         total = 0
         valid = 0
+        constants_total = 0
+        constants_with_value = 0
+        enums_total = 0
+        enums_with_values = 0
+        dataclass_seen = False
+        dataclass_fields_seen = False
         
         for module_path, module_data in data.get('details', {}).items():
             total += 1
-            
-            # Sprawdź funkcje
+
+            # Sprawdź funkcje (standard: sig, ultra: params)
             for func in module_data.get('functions', []):
                 total += 1
                 func_name = func.get('name', '')
-                params = func.get('params', '')
-                
-                # TOON ma tylko count parametrów, nie ich nazwy
-                if not params:
+                sig = func.get('sig')
+                if sig is None:
+                    params = func.get('params', '')
+                    sig = f"({params})"
+
+                # Require the signature field to exist, but allow empty-arg functions.
+                if not sig:
                     self.issues.append(ValidationIssue(
                         severity=Severity.CRITICAL,
                         element_type=ElementType.FUNCTION,
                         element_name=func_name,
-                        issue="TOON shows no parameters",
+                        issue="Missing signature",
                         expected="(param1:type, param2:type)",
-                        actual=f"()",
+                        actual=sig or "(missing)",
                         impact_percent=15.0
                     ))
                 else:
@@ -948,34 +1117,91 @@ class TOONValidator(FormatValidator):
                         ))
                 
                 valid += 1  # Klasa istnieje
+
+            # Stałe (standard TOON)
+            for const in module_data.get('const', []):
+                constants_total += 1
+                name = const.get('n') or const.get('name') or 'unknown'
+                t = const.get('t') or const.get('type')
+                v = const.get('v') or const.get('value')
+                keys = const.get('keys')
+
+                if not t or t == '-':
+                    self.issues.append(ValidationIssue(
+                        severity=Severity.HIGH,
+                        element_type=ElementType.CONSTANT,
+                        element_name=name,
+                        issue="Constant missing type information",
+                        expected="t: Dict[str, str]",
+                        actual="t: (missing)",
+                        impact_percent=5.0
+                    ))
+
+                has_value = bool(v) and v != '-'
+                has_keys = bool(keys) and keys != '-'
+                if has_value or has_keys:
+                    constants_with_value += 1
+                else:
+                    self.issues.append(ValidationIssue(
+                        severity=Severity.CRITICAL,
+                        element_type=ElementType.CONSTANT,
+                        element_name=name,
+                        issue="Constant missing value - cannot reproduce",
+                        expected="v: ... OR keys: [...]",
+                        actual="(missing)",
+                        impact_percent=15.0
+                    ))
+
+            # Types/enums (standard TOON)
+            for t in module_data.get('types', []):
+                kind = (t.get('kind') or '').strip().lower()
+                if kind != 'enum':
+                    continue
+                enums_total += 1
+                name = t.get('name') or 'unknown'
+                values = t.get('values')
+                if values and values != '-':
+                    enums_with_values += 1
+                else:
+                    self.issues.append(ValidationIssue(
+                        severity=Severity.CRITICAL,
+                        element_type=ElementType.ENUM,
+                        element_name=name,
+                        issue="Enum missing values - cannot reproduce",
+                        expected="values: A|B|C or A=1|B=2",
+                        actual=values or "(missing)",
+                        impact_percent=8.0
+                    ))
+
+            # Dataclasses
+            if module_data.get('has_dataclass'):
+                dataclass_seen = True
+            if module_data.get('has_dataclass_fields'):
+                dataclass_fields_seen = True
         
-        # TOON nie ma stałych, dataclasów, enumów z wartościami
-        self.issues.append(ValidationIssue(
-            severity=Severity.CRITICAL,
-            element_type=ElementType.CONSTANT,
-            element_name="*",
-            issue="TOON format does not capture constant values",
-            impact_percent=15.0
-        ))
-        
-        self.issues.append(ValidationIssue(
-            severity=Severity.CRITICAL,
-            element_type=ElementType.DATACLASS,
-            element_name="*",
-            issue="TOON format does not capture dataclass fields",
-            impact_percent=10.0
-        ))
-        
-        self.issues.append(ValidationIssue(
-            severity=Severity.CRITICAL,
-            element_type=ElementType.ENUM,
-            element_name="*",
-            issue="TOON format does not capture enum values",
-            impact_percent=8.0
-        ))
+        # Only report missing sections if they are actually absent/needed
+        if constants_total == 0:
+            self.issues.append(ValidationIssue(
+                severity=Severity.CRITICAL,
+                element_type=ElementType.CONSTANT,
+                element_name="*",
+                issue="TOON format does not capture constant values",
+                impact_percent=15.0
+            ))
+
+        if dataclass_seen and not dataclass_fields_seen:
+            self.issues.append(ValidationIssue(
+                severity=Severity.CRITICAL,
+                element_type=ElementType.DATACLASS,
+                element_name="*",
+                issue="TOON format does not capture dataclass fields",
+                impact_percent=10.0
+            ))
+
         
         total_impact = sum(issue.impact_percent for issue in self.issues)
-        reproduction_score = max(0, 100 - total_impact)
+        normalized_impact = total_impact / max(total, 1)
+        reproduction_score = max(0, 100 - normalized_impact)
         
         return ValidationResult(
             language=self.language,

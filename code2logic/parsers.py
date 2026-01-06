@@ -8,6 +8,7 @@ Includes:
 
 import ast
 import re
+import textwrap
 from typing import Optional, List
 
 from .models import FunctionInfo, ClassInfo, TypeInfo, ModuleInfo, ConstantInfo, FieldInfo, AttributeInfo, OptionalImport
@@ -66,6 +67,145 @@ def _truncate_constant_value(value_text: str, limit: int = 400) -> str:
     if len(snippet) > limit:
         snippet = snippet[: limit - 3].rstrip() + '...'
     return snippet
+
+
+def _py_expr_to_dotted_name(expr) -> str:
+    if isinstance(expr, ast.Name):
+        return expr.id
+    if isinstance(expr, ast.Attribute):
+        base = _py_expr_to_dotted_name(expr.value)
+        return f"{base}.{expr.attr}" if base else expr.attr
+    if isinstance(expr, ast.Call):
+        if isinstance(expr.func, ast.Name) and expr.func.id == 'super':
+            return 'super'
+        return _py_expr_to_dotted_name(expr.func)
+    if isinstance(expr, ast.Subscript):
+        return _py_expr_to_dotted_name(expr.value)
+    return ''
+
+
+class _PyFunctionBodyAnalyzer(ast.NodeVisitor):
+    def __init__(self):
+        self.calls = []
+        self.raises = []
+        self.complexity = 1
+        self._seen_calls = set()
+        self._seen_raises = set()
+
+    def _add_call(self, name: str) -> None:
+        if not name:
+            return
+        if name in self._seen_calls:
+            return
+        if len(self.calls) >= 80:
+            return
+        self._seen_calls.add(name)
+        self.calls.append(name)
+
+    def _add_raise(self, name: str) -> None:
+        if not name:
+            return
+        if name in self._seen_raises:
+            return
+        if len(self.raises) >= 40:
+            return
+        self._seen_raises.add(name)
+        self.raises.append(name)
+
+    def visit_Call(self, node):
+        try:
+            name = _py_expr_to_dotted_name(node.func)
+        except Exception:
+            name = ''
+        if name:
+            self._add_call(name)
+        self.generic_visit(node)
+
+    def visit_Raise(self, node):
+        exc_name = ''
+        try:
+            exc = node.exc
+            if isinstance(exc, ast.Call):
+                exc_name = _py_expr_to_dotted_name(exc.func)
+            elif isinstance(exc, ast.Name):
+                exc_name = exc.id
+            elif isinstance(exc, ast.Attribute):
+                exc_name = _py_expr_to_dotted_name(exc)
+        except Exception:
+            exc_name = ''
+
+        if exc_name:
+            self._add_raise(exc_name)
+        self.generic_visit(node)
+
+    def visit_If(self, node):
+        self.complexity += 1
+        self.generic_visit(node)
+
+    def visit_For(self, node):
+        self.complexity += 1
+        self.generic_visit(node)
+
+    def visit_AsyncFor(self, node):
+        self.complexity += 1
+        self.generic_visit(node)
+
+    def visit_While(self, node):
+        self.complexity += 1
+        self.generic_visit(node)
+
+    def visit_IfExp(self, node):
+        self.complexity += 1
+        self.generic_visit(node)
+
+    def visit_BoolOp(self, node):
+        try:
+            if isinstance(node.op, (ast.And, ast.Or)):
+                self.complexity += max(0, len(getattr(node, 'values', []) or []) - 1)
+        except Exception:
+            pass
+        self.generic_visit(node)
+
+    def visit_Try(self, node):
+        try:
+            self.complexity += len(getattr(node, 'handlers', []) or [])
+        except Exception:
+            pass
+        self.generic_visit(node)
+
+    def visit_comprehension(self, node):
+        self.complexity += 1
+        try:
+            self.complexity += len(getattr(node, 'ifs', []) or [])
+        except Exception:
+            pass
+        self.generic_visit(node)
+
+    def visit_Match(self, node):
+        try:
+            self.complexity += len(getattr(node, 'cases', []) or [])
+        except Exception:
+            pass
+        self.generic_visit(node)
+
+    def visit_FunctionDef(self, node):
+        return
+
+    def visit_AsyncFunctionDef(self, node):
+        return
+
+    def visit_ClassDef(self, node):
+        return
+
+    def visit_Lambda(self, node):
+        return
+
+
+def _analyze_python_function_node(func_node):
+    analyzer = _PyFunctionBodyAnalyzer()
+    for stmt in getattr(func_node, 'body', []) or []:
+        analyzer.visit(stmt)
+    return analyzer.calls, analyzer.raises, max(1, analyzer.complexity)
 
 
 class TreeSitterParser:
@@ -151,7 +291,7 @@ class TreeSitterParser:
     def _parse_python(self, filepath: str, content: str, tree) -> ModuleInfo:
         """Parse Python source using Tree-sitter AST."""
         root = tree.root_node
-        imports, classes, functions, constants, exports = [], [], [], [], []
+        imports, classes, functions, types, constants, exports = [], [], [], [], [], []
         docstring = None
         
         # Track conditional imports (try/except)
@@ -189,9 +329,13 @@ class TreeSitterParser:
                     classes.append(cls)
                     if not cls.name.startswith('_'):
                         exports.append(cls.name)
+
+                    enum_type = self._extract_py_enum(child, content)
+                    if enum_type:
+                        types.append(enum_type)
             # Top-level functions (regular or decorated)
             elif node_type == 'function_definition':
-                func = self._extract_py_function(child, content, filepath, content)
+                func = self._extract_py_function(child, content)
                 if func:
                     functions.append(func)
                     if not func.name.startswith('_'):
@@ -199,7 +343,7 @@ class TreeSitterParser:
             elif node_type == 'decorated_definition':
                 inner_func = self._find_child(child, 'function_definition')
                 if inner_func:
-                    func = self._extract_py_function(inner_func, content, filepath, content, child)
+                    func = self._extract_py_function(inner_func, content, child)
                     if func:
                         functions.append(func)
                         if not func.name.startswith('_'):
@@ -234,7 +378,7 @@ class TreeSitterParser:
             exports=exports,
             classes=classes,
             functions=functions,
-            types=[],
+            types=types,
             constants=enhanced_constants,
             type_checking_imports=type_checking_imports,
             optional_imports=[],  # TODO: implement proper optional import extraction
@@ -370,39 +514,36 @@ class TreeSitterParser:
         if not name_node:
             return None
         name = self._text(name_node, content).strip()
-        
-        # Parameters - try AST parsing first for reliability
-        params = []
+
+        start_line = node.start_point[0] + 1
+        end_line = node.end_point[0] + 1
+        if node.end_point[1] == 0 and end_line > start_line:
+            end_line -= 1
+        line_count = max(1, end_line - start_line + 1)
+
+        calls: List[str] = []
+        raises: List[str] = []
+        complexity = 1
+        is_async = False
+        func_node_for_ast = None
         try:
-            # Try to use UniversalParser's AST-based parameter extraction
-            from .parsers import UniversalParser
-            uni_parser = UniversalParser()
-            
-            # Create a minimal function text for AST parsing
-            lines = content.split('\n')
-            start_line = node.start_point[0]
-            
-            # Extract just the def line
-            def_line = lines[start_line].strip()
-            if def_line.startswith('def '):
-                func_header = def_line
-            else:
-                func_header = def_line
-            
-            # Try to parse with AST
-            import ast
-            try:
-                # Parse the function header
-                tree = ast.parse(func_header)
-                func_node = tree.body[0]
-                
-                # Use UniversalParser's parameter extraction
-                enhanced_params = uni_parser._extract_ast_function(func_node).params
-                params = enhanced_params[:8]
-            except:
-                pass
-        except:
+            func_src = textwrap.dedent(self._text(node, content))
+            is_async = func_src.lstrip().startswith('async def')
+            parsed = ast.parse(func_src)
+            if parsed.body and isinstance(parsed.body[0], (ast.FunctionDef, ast.AsyncFunctionDef)):
+                is_async = isinstance(parsed.body[0], ast.AsyncFunctionDef)
+                func_node_for_ast = parsed.body[0]
+                calls, raises, complexity = _analyze_python_function_node(parsed.body[0])
+        except Exception:
             pass
+        
+        # Parameters - use AST-parsed function (includes defaults) when possible
+        params: List[str] = []
+        if func_node_for_ast is not None:
+            try:
+                params = UniversalParser()._extract_ast_function(func_node_for_ast).params[:8]
+            except Exception:
+                params = []
         
         # If AST parsing failed, fall back to TreeSitter extraction
         if not params:
@@ -433,14 +574,6 @@ class TreeSitterParser:
                     dec_text = self._text(c, content).lstrip('@')
                     decorators.append(dec_text.split('(')[0])
         
-        # Check for async
-        is_async = False
-        if decorated_node:
-            for c in decorated_node.children:
-                if c.type == 'async':
-                    is_async = True
-                    break
-        
         # Return type
         return_type = None
         return_ann = self._find_child(node, 'type')
@@ -462,19 +595,62 @@ class TreeSitterParser:
             params=params[:8],
             return_type=return_type,
             docstring=self._truncate_docstring(docstring),
-            calls=[],
-            raises=[],
-            complexity=1,
-            lines=1,  # Tree-sitter doesn't give us line counts easily
+            calls=calls,
+            raises=raises,
+            complexity=complexity,
+            lines=line_count,
             decorators=decorators,
             is_async=is_async,
             is_static='staticmethod' in decorators,
             is_classmethod='classmethod' in decorators,
             is_property='property' in decorators,
             intent=self.intent_gen.generate(name),
-            start_line=node.start_point[0] + 1,
-            end_line=node.end_point[0] + 1
+            start_line=start_line,
+            end_line=end_line,
+            is_private=name.startswith('_') and not name.startswith('__')
         )
+
+    def _extract_py_enum(self, node, content: str) -> Optional[TypeInfo]:
+        """Extract Python Enum (values) as TypeInfo(kind='enum')."""
+        try:
+            name_node = self._find_child(node, 'identifier')
+            if not name_node:
+                return None
+            name = self._text(name_node, content).strip()
+
+            arg_list = self._find_child(node, 'argument_list')
+            bases = []
+            if arg_list:
+                for c in arg_list.children:
+                    if c.type in ('identifier', 'attribute'):
+                        bases.append(self._text(c, content).strip())
+            if not any(b.endswith('Enum') or b in ('Enum', 'IntEnum', 'StrEnum') for b in bases):
+                return None
+
+            values: List[str] = []
+            body = self._find_child(node, 'block')
+            if body:
+                for child in body.children:
+                    if child.type != 'expression_statement' or not child.children:
+                        continue
+                    expr = child.children[0]
+                    if expr.type != 'assignment':
+                        continue
+                    left = expr.children[0] if expr.children else None
+                    right = expr.children[-1] if len(expr.children) > 1 else None
+                    if not left or left.type != 'identifier':
+                        continue
+                    member = self._text(left, content).strip()
+                    if not member or member.startswith('_'):
+                        continue
+                    val_text = self._text(right, content).strip() if right else ''
+                    values.append(f"{member}={val_text}" if val_text else member)
+                    if len(values) >= 25:
+                        break
+
+            return TypeInfo(name=name, kind='enum', definition='', values=values or None)
+        except Exception:
+            return None
     
     def _extract_py_class(self, node, content: str) -> Optional[ClassInfo]:
         """Extract Python class from AST node."""
@@ -556,6 +732,34 @@ class TreeSitterParser:
     
     def _extract_dataclass_field(self, node, content: str) -> Optional[FieldInfo]:
         """Extract dataclass field from assignment."""
+        # Fallback: parse annotated assignment text (e.g. "x: int = 1")
+        try:
+            raw_stmt = self._text(node, content).strip()
+        except Exception:
+            raw_stmt = ""
+        if raw_stmt:
+            m = re.match(r'^(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*:\s*(?P<typ>[^=]+?)(?:\s*=\s*(?P<rhs>.+))?$', raw_stmt)
+            if m:
+                name = m.group('name')
+                type_annotation = (m.group('typ') or '').strip()
+                rhs = (m.group('rhs') or '').strip()
+
+                default = None
+                default_factory = None
+                if rhs:
+                    if rhs.startswith('field(') and 'default_factory=' in rhs:
+                        factory_match = rhs.split('default_factory=')[1].split(',')[0].split(')')[0]
+                        default_factory = factory_match.strip()
+                    else:
+                        default = rhs
+
+                return FieldInfo(
+                    name=name,
+                    type_annotation=type_annotation,
+                    default=default,
+                    default_factory=default_factory
+                )
+
         if node.children:
             expr = node.children[0]
             if expr.type == 'assignment':
@@ -564,7 +768,7 @@ class TreeSitterParser:
                     name = self._text(left, content)
                     
                     # Check if this looks like a field assignment
-                    right = expr.children[1] if len(expr.children) > 1 else None
+                    right = expr.children[-1] if len(expr.children) > 1 else None
                     if right:
                         right_text = self._text(right, content).strip()
                         
@@ -606,7 +810,7 @@ class TreeSitterParser:
                         
                         # Try to infer type from the assignment
                         type_annotation = ""
-                        right = expr.children[1] if len(expr.children) > 1 else None
+                        right = expr.children[-1] if len(expr.children) > 1 else None
                         if right:
                             right_text = self._text(right, content).strip()
                             # Simple type inference
@@ -674,21 +878,53 @@ class TreeSitterParser:
     
     def _extract_py_constant(self, node, content: str) -> Optional[ConstantInfo]:
         """Extract constant (UPPERCASE assignment) with value."""
+        stmt_text = ''
+        try:
+            stmt_text = self._text(node, content).strip()
+        except Exception:
+            stmt_text = ''
+
         # node is expression_statement, check if it contains assignment
         if node.children:
             expr = node.children[0]
             if expr.type == 'assignment':
                 left = expr.children[0] if expr.children else None
-                right = expr.children[1] if len(expr.children) > 1 else None
+                right = expr.children[-1] if len(expr.children) > 1 else None
                 if left and left.type == 'identifier':
                     name = self._text(left, content)
                     if name.isupper():  # Convention: CONSTANTS are UPPERCASE
                         const = ConstantInfo(name=name)
+
+                        # Best-effort type annotation from annotated assignment: NAME: Type = ...
+                        if stmt_text:
+                            m = re.match(r'^\s*([A-Z][A-Z0-9_]*)\s*:\s*([^=]+?)\s*=\s*.+$', stmt_text)
+                            if m:
+                                const.type_annotation = (m.group(2) or '').strip()
                         
                         # Get the value
                         if right:
                             value_text = self._text(right, content).strip()
                             const.value = _truncate_constant_value(value_text)
+
+                            # Infer type if not provided
+                            if not getattr(const, 'type_annotation', ''):
+                                t = ''
+                                vt = value_text.strip()
+                                if vt.startswith('{'):
+                                    t = 'Dict'
+                                elif vt.startswith('['):
+                                    t = 'List'
+                                elif vt.startswith('('):
+                                    t = 'Tuple'
+                                elif vt in ('True', 'False'):
+                                    t = 'bool'
+                                elif re.match(r'^-?\d+$', vt):
+                                    t = 'int'
+                                elif re.match(r'^-?\d+\.\d+', vt):
+                                    t = 'float'
+                                elif (vt.startswith('"') and vt.endswith('"')) or (vt.startswith("'") and vt.endswith("'")):
+                                    t = 'str'
+                                const.type_annotation = t
                             
                             # For dictionaries, extract keys
                             if value_text.startswith('{') and value_text.endswith('}'):
@@ -982,7 +1218,22 @@ class TreeSitterParser:
         if not name_node:
             return None
         name = self._text(name_node, content)
-        return TypeInfo(name=name, kind='enum', definition='')
+        values: List[str] = []
+        try:
+            text = self._text(node, content)
+            m = re.search(r'\{(?P<body>.*)\}', text, flags=re.S)
+            body = m.group('body') if m else ''
+            for mm in re.finditer(r'\b([A-Za-z_][A-Za-z0-9_]*)\b\s*(?:=\s*([^,\n\r\}]+))?', body):
+                mem = mm.group(1)
+                if mem in ('enum', 'const', 'export'):
+                    continue
+                rhs = (mm.group(2) or '').strip()
+                values.append(f"{mem}={rhs}" if rhs else mem)
+                if len(values) >= 25:
+                    break
+        except Exception:
+            values = []
+        return TypeInfo(name=name, kind='enum', definition='', values=values or None)
     
     def _extract_js_constant(self, node, content: str) -> Optional[str]:
         """Extract constant (UPPERCASE const)."""
@@ -1108,7 +1359,7 @@ class UniversalParser:
                 lines_total=len(lines), lines_code=len([l for l in lines if l.strip()])
             )
         
-        imports, classes, functions, constants = [], [], [], []
+        imports, classes, functions, types, constants = [], [], [], [], []
         
         for node in ast.iter_child_nodes(tree):
             if isinstance(node, ast.Import):
@@ -1123,6 +1374,9 @@ class UniversalParser:
                 cls = self._extract_ast_class(node)
                 if cls:
                     classes.append(cls)
+                enum_type = self._extract_ast_enum(node)
+                if enum_type:
+                    types.append(enum_type)
             elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 func = self._extract_ast_function(node)
                 if func:
@@ -1131,6 +1385,23 @@ class UniversalParser:
                 const = self._extract_ast_constant(node, content)
                 if const:
                     constants.append(const)
+
+            elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+                name = node.target.id
+                if name and name.isupper() and node.value is not None:
+                    const = ConstantInfo(name=name)
+                    try:
+                        const.type_annotation = self._ann_str(node.annotation) if node.annotation else ''
+                    except Exception:
+                        const.type_annotation = ''
+                    try:
+                        const.value = _truncate_constant_value(
+                            ast.unparse(node.value) if hasattr(ast, 'unparse') else ''
+                        )
+                    except Exception:
+                        const.value = None
+                    if const.value:
+                        constants.append(const)
         
         exports = [c.name for c in classes if not c.name.startswith('_')]
         exports += [f.name for f in functions if not f.name.startswith('_')]
@@ -1143,12 +1414,58 @@ class UniversalParser:
             exports=exports,
             classes=classes,
             functions=functions,
-            types=[],
+            types=types,
             constants=constants[:10],
             docstring=ast.get_docstring(tree)[:100] if ast.get_docstring(tree) else None,
             lines_total=len(lines),
             lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('#')])
         )
+
+    def _extract_ast_enum(self, node: ast.ClassDef) -> Optional[TypeInfo]:
+        """Extract Enum values from Python AST class."""
+        try:
+            base_names = []
+            for b in node.bases:
+                if isinstance(b, ast.Name):
+                    base_names.append(b.id)
+                elif isinstance(b, ast.Attribute):
+                    base_names.append(b.attr)
+            if not any(n.endswith('Enum') or n in ('Enum', 'IntEnum', 'StrEnum') for n in base_names):
+                return None
+
+            values: List[str] = []
+            for item in node.body:
+                if isinstance(item, ast.Assign):
+                    for target in item.targets:
+                        if isinstance(target, ast.Name):
+                            mem = target.id
+                            if not mem or mem.startswith('_'):
+                                continue
+                            rhs = ''
+                            try:
+                                rhs = ast.unparse(item.value) if hasattr(ast, 'unparse') else ''
+                            except Exception:
+                                rhs = ''
+                            values.append(f"{mem}={rhs}" if rhs else mem)
+                            if len(values) >= 25:
+                                break
+                elif isinstance(item, ast.AnnAssign) and isinstance(item.target, ast.Name):
+                    mem = item.target.id
+                    if not mem or mem.startswith('_'):
+                        continue
+                    rhs = ''
+                    if item.value is not None:
+                        try:
+                            rhs = ast.unparse(item.value) if hasattr(ast, 'unparse') else ''
+                        except Exception:
+                            rhs = ''
+                    values.append(f"{mem}={rhs}" if rhs else mem)
+                if len(values) >= 25:
+                    break
+
+            return TypeInfo(name=node.name, kind='enum', definition='', values=values or None)
+        except Exception:
+            return None
     
     def _extract_ast_function(self, node) -> FunctionInfo:
         """Extract function from Python AST node."""
@@ -1195,14 +1512,22 @@ class UniversalParser:
                 decorators.append(dec.func.id)
         
         docstring = ast.get_docstring(node)
+
+        calls: List[str] = []
+        raises: List[str] = []
+        complexity = 1
+        try:
+            calls, raises, complexity = _analyze_python_function_node(node)
+        except Exception:
+            pass
         return FunctionInfo(
             name=node.name,
             params=enhanced_params,
             return_type=self._ann_str(node.returns) if node.returns else None,
             docstring=docstring[:100] if docstring else None,
-            calls=[],
-            raises=[],
-            complexity=1,
+            calls=calls,
+            raises=raises,
+            complexity=complexity,
             lines=node.end_lineno - node.lineno + 1 if hasattr(node, 'end_lineno') else 1,
             decorators=decorators,
             is_async=is_async,
@@ -1270,6 +1595,26 @@ class UniversalParser:
             return None
 
         const = ConstantInfo(name=target.id)
+        # Type inference
+        try:
+            v = node.value
+            if isinstance(v, ast.Dict):
+                const.type_annotation = 'Dict'
+            elif isinstance(v, ast.List):
+                const.type_annotation = 'List'
+            elif isinstance(v, ast.Tuple):
+                const.type_annotation = 'Tuple'
+            elif isinstance(v, ast.Constant):
+                if isinstance(v.value, bool):
+                    const.type_annotation = 'bool'
+                elif isinstance(v.value, int):
+                    const.type_annotation = 'int'
+                elif isinstance(v.value, float):
+                    const.type_annotation = 'float'
+                elif isinstance(v.value, str):
+                    const.type_annotation = 'str'
+        except Exception:
+            pass
         value_text = self._format_ast_value(node.value, content)
         if value_text:
             const.value = _truncate_constant_value(value_text)

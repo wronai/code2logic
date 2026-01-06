@@ -18,7 +18,7 @@ Example:
     >>> print(output)
 """
 
-__version__ = "1.0.8"
+__version__ = "1.0.11"
 __author__ = "Softreck"
 __email__ = "info@softreck.dev"
 __license__ = "MIT"
@@ -139,6 +139,9 @@ from .logicml import (
     LogicMLGenerator,
     LogicMLSpec,
     generate_logicml,
+)
+from .function_logic import (
+    FunctionLogicGenerator,
 )
 from .prompts import (
     FORMAT_HINTS,

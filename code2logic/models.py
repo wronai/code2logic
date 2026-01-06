@@ -86,6 +86,7 @@ class TypeInfo:
     name: str
     kind: str  # 'type', 'interface', 'enum', 'struct', 'trait'
     definition: str
+    values: Optional[List[str]] = None
 
 
 @dataclass

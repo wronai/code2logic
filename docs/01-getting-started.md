@@ -17,7 +17,12 @@ pip install code2logic
 ```bash
 git clone https://github.com/wronai/code2logic.git
 cd code2logic
-pip install -e .
+
+# Recommended (Poetry)
+poetry install -E full
+
+# Alternatively (Makefile - prefers Poetry if available)
+make install-full
 ```
 
 ### With Optional Dependencies
@@ -26,8 +31,8 @@ pip install -e .
 # All optional dependencies (recommended)
 pip install code2logic[full]
 
-# Just development tools
-pip install code2logic[dev]
+# Development setup (recommended)
+poetry install --with dev -E full
 ```
 
 ## Quick Start
@@ -76,6 +81,7 @@ for module in project.modules:
 | CSV | `-f csv` | Data analysis |
 | JSON | `-f json` | RAG/Embeddings |
 | YAML | `-f yaml` | Human + LLM |
+| TOON | `-f toon` | Token-efficient specs |
 | Gherkin | `-f gherkin` | LLM code gen (95%) |
 | Compact | `-f compact` | Quick overview |
 
@@ -121,10 +127,12 @@ cp .env.example .env
 ### Makefile Commands
 
 ```bash
-make llm          # Configure LLM providers
-make llm-list     # List available models
-make test         # Run tests
-make lint         # Check code style
+make install       # Install (prefers Poetry if available)
+make install-full  # Install with all features
+make test          # Run tests
+make lint          # Lint
+make format        # Format
+make typecheck     # Type checking
 ```
 
 ## Examples
