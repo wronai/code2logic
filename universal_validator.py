@@ -727,9 +727,16 @@ class UniversalValidator:
     def _validate_signature(self, sig: str, name: str) -> List[ValidationIssue]:
         """Waliduj sygnaturę funkcji/metody."""
         issues = []
+
+        # Normalize to string to avoid YAML edge-cases
+        if sig is not None and not isinstance(sig, str):
+            try:
+                sig = str(sig)
+            except Exception:
+                sig = ''
         
         # Pusta sygnatura
-        if not sig or sig in ('', '()', '()'):
+        if sig is None or sig == '':
             issues.append(ValidationIssue(
                 severity='critical',
                 category='signature',
