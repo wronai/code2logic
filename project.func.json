@@ -1,0 +1,5226 @@
+{
+  "project": "code2logic",
+  "generated_at": "2026-01-06T17:14:49.026609",
+  "modules": [
+    {
+      "path": "llm_profiler.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "_get_profiles_path",
+          "kind": "function",
+          "sig": "() -> Path",
+          "start_line": 171,
+          "end_line": 175,
+          "does": "Get path to profiles storage."
+        },
+        {
+          "name": "load_profiles",
+          "kind": "function",
+          "sig": "() -> Dict[str,LLMProfile]",
+          "start_line": 178,
+          "end_line": 191,
+          "does": "Load all saved profiles."
+        },
+        {
+          "name": "save_profile",
+          "kind": "function",
+          "sig": "(profile:LLMProfile) -> None",
+          "start_line": 194,
+          "end_line": 204,
+          "does": "Save a profile to storage."
+        },
+        {
+          "name": "get_profile",
+          "kind": "function",
+          "sig": "(provider:str, model:str) -> Optional[LLMProfile]",
+          "start_line": 207,
+          "end_line": 211,
+          "does": "Get profile for a specific model."
+        },
+        {
+          "name": "get_or_create_profile",
+          "kind": "function",
+          "sig": "(provider:str, model:str) -> LLMProfile",
+          "start_line": 214,
+          "end_line": 221,
+          "does": "Get existing profile or create default one."
+        },
+        {
+          "name": "_create_default_profile",
+          "kind": "function",
+          "sig": "(provider:str, model:str) -> LLMProfile",
+          "start_line": 224,
+          "end_line": 270,
+          "does": "Create default profile based on model characteristics."
+        },
+        {
+          "name": "profile_llm",
+          "kind": "function",
+          "sig": "(client, quick:bool=False) -> LLMProfile",
+          "start_line": 641,
+          "end_line": 644,
+          "does": "Profile an LLM client."
+        },
+        {
+          "name": "get_adaptive_chunker",
+          "kind": "function",
+          "sig": "(provider:str, model:str) -> AdaptiveChunker",
+          "start_line": 647,
+          "end_line": 650,
+          "does": "Get adaptive chunker for a model."
+        },
+        {
+          "name": "LLMProfile.__post_init__",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 148,
+          "end_line": 154,
+          "does": "creates init"
+        },
+        {
+          "name": "LLMProfiler.__init__",
+          "kind": "method",
+          "sig": "(client, verbose:bool=True) -> None",
+          "start_line": 283,
+          "end_line": 294,
+          "does": "Initialize profiler."
+        },
+        {
+          "name": "LLMProfiler.run_profile",
+          "kind": "method",
+          "sig": "(quick:bool=False) -> LLMProfile",
+          "start_line": 296,
+          "end_line": 348,
+          "does": "Run full profiling suite."
+        },
+        {
+          "name": "LLMProfiler._test_reproduction",
+          "kind": "method",
+          "sig": "(name:str, code:str) -> ProfileTestResult",
+          "start_line": 350,
+          "end_line": 397,
+          "does": "Test reproduction of a code snippet."
+        },
+        {
+          "name": "LLMProfiler._code_to_spec",
+          "kind": "method",
+          "sig": "(code:str) -> str",
+          "start_line": 399,
+          "end_line": 427,
+          "does": "Convert code to simple YAML spec."
+        },
+        {
+          "name": "LLMProfiler._extract_code",
+          "kind": "method",
+          "sig": "(response:str) -> str",
+          "start_line": 429,
+          "end_line": 444,
+          "does": "Extract code from LLM response."
+        },
+        {
+          "name": "LLMProfiler._check_syntax",
+          "kind": "method",
+          "sig": "(code:str) -> bool",
+          "start_line": 446,
+          "end_line": 452,
+          "does": "Check if code has valid Python syntax."
+        },
+        {
+          "name": "LLMProfiler._calculate_similarity",
+          "kind": "method",
+          "sig": "(original:str, reproduced:str) -> float",
+          "start_line": 454,
+          "end_line": 460,
+          "does": "Calculate code similarity."
+        },
+        {
+          "name": "LLMProfiler._calculate_metrics",
+          "kind": "method",
+          "sig": "(profile:LLMProfile, results:List[ProfileTestResult]) -> LLMProfile",
+          "start_line": 462,
+          "end_line": 499,
+          "does": "Calculate aggregate metrics from test results."
+        },
+        {
+          "name": "LLMProfiler._test_consistency",
+          "kind": "method",
+          "sig": "(profile:LLMProfile) -> LLMProfile",
+          "start_line": 501,
+          "end_line": 516,
+          "does": "Test output consistency by running same prompt twice."
+        },
+        {
+          "name": "AdaptiveChunker.__init__",
+          "kind": "method",
+          "sig": "(profile:Optional[LLMProfile]=None) -> None",
+          "start_line": 527,
+          "end_line": 537,
+          "does": "Initialize chunker."
+        },
+        {
+          "name": "AdaptiveChunker.get_optimal_settings",
+          "kind": "method",
+          "sig": "() -> Dict[str,Any]",
+          "start_line": 539,
+          "end_line": 546,
+          "does": "Get optimal settings for the profiled model."
+        },
+        {
+          "name": "AdaptiveChunker.chunk_spec",
+          "kind": "method",
+          "sig": "(spec:str, format:str='yaml') -> List[Dict[str,Any]]",
+          "start_line": 548,
+          "end_line": 606,
+          "does": "Chunk specification based on profile."
+        },
+        {
+          "name": "AdaptiveChunker.recommend_format",
+          "kind": "method",
+          "sig": "(spec_size_tokens:int) -> str",
+          "start_line": 608,
+          "end_line": 631,
+          "does": "Recommend best format based on spec size and model."
+        },
+        {
+          "name": "AdaptiveChunker.estimate_chunks_needed",
+          "kind": "method",
+          "sig": "(spec_size_tokens:int) -> int",
+          "start_line": 633,
+          "end_line": 637,
+          "does": "Estimate number of chunks needed."
+        }
+      ]
+    },
+    {
+      "path": "config.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "load_env",
+          "kind": "function",
+          "sig": "() -> None",
+          "start_line": 184,
+          "end_line": 189,
+          "does": "Load environment variables from .env file."
+        },
+        {
+          "name": "get_api_key",
+          "kind": "function",
+          "sig": "(provider:str) -> Optional[str]",
+          "start_line": 192,
+          "end_line": 194,
+          "does": "Convenience function to get API key."
+        },
+        {
+          "name": "get_model",
+          "kind": "function",
+          "sig": "(provider:str) -> str",
+          "start_line": 197,
+          "end_line": 199,
+          "does": "Convenience function to get model."
+        },
+        {
+          "name": "Config.__init__",
+          "kind": "method",
+          "sig": "(env_file:str=None) -> None",
+          "start_line": 56,
+          "end_line": 64,
+          "does": "Initialize configuration."
+        },
+        {
+          "name": "Config._load_env_file",
+          "kind": "method",
+          "sig": "(env_file:str=None) -> None",
+          "start_line": 66,
+          "end_line": 79,
+          "does": "Load environment variables from .env file."
+        },
+        {
+          "name": "Config._parse_env_file",
+          "kind": "method",
+          "sig": "(path:Path) -> None",
+          "start_line": 81,
+          "end_line": 94,
+          "does": "Parse .env file and set environment variables."
+        },
+        {
+          "name": "Config._load_config_file",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 96,
+          "end_line": 104,
+          "does": "Load configuration from JSON file."
+        },
+        {
+          "name": "Config.get_api_key",
+          "kind": "method",
+          "sig": "(provider:str) -> Optional[str]",
+          "start_line": 106,
+          "end_line": 118,
+          "does": "Get API key for a provider."
+        },
+        {
+          "name": "Config.get_model",
+          "kind": "method",
+          "sig": "(provider:str) -> str",
+          "start_line": 120,
+          "end_line": 142,
+          "does": "Get model for a provider."
+        },
+        {
+          "name": "Config.get_ollama_host",
+          "kind": "method",
+          "sig": "() -> str",
+          "start_line": 144,
+          "end_line": 146,
+          "does": "Get Ollama host URL."
+        },
+        {
+          "name": "Config.get_default_provider",
+          "kind": "method",
+          "sig": "() -> str",
+          "start_line": 148,
+          "end_line": 150,
+          "does": "Get default LLM provider."
+        },
+        {
+          "name": "Config.is_verbose",
+          "kind": "method",
+          "sig": "() -> bool",
+          "start_line": 152,
+          "end_line": 154,
+          "does": "Check if verbose mode is enabled."
+        },
+        {
+          "name": "Config.get_cache_dir",
+          "kind": "method",
+          "sig": "() -> Path",
+          "start_line": 156,
+          "end_line": 159,
+          "does": "Get cache directory path."
+        },
+        {
+          "name": "Config.list_configured_providers",
+          "kind": "method",
+          "sig": "() -> Dict[str,bool]",
+          "start_line": 161,
+          "end_line": 170,
+          "does": "List all providers and their configuration status."
+        },
+        {
+          "name": "Config.to_dict",
+          "kind": "method",
+          "sig": "() -> Dict[str,Any]",
+          "start_line": 172,
+          "end_line": 181,
+          "does": "Export configuration as dictionary."
+        }
+      ]
+    },
+    {
+      "path": "file_formats.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "generate_file_csv",
+          "kind": "function",
+          "sig": "(file_path:Path) -> str",
+          "start_line": 14,
+          "end_line": 67,
+          "does": "Generate detailed CSV specification for a single file."
+        },
+        {
+          "name": "generate_file_json",
+          "kind": "function",
+          "sig": "(file_path:Path) -> str",
+          "start_line": 70,
+          "end_line": 137,
+          "does": "Generate detailed JSON specification for a single file."
+        },
+        {
+          "name": "generate_file_yaml",
+          "kind": "function",
+          "sig": "(file_path:Path) -> str",
+          "start_line": 140,
+          "end_line": 216,
+          "does": "Generate detailed YAML specification for a single file."
+        },
+        {
+          "name": "_parse_file_elements",
+          "kind": "function",
+          "sig": "(content:str) -> Dict[str, Any]",
+          "start_line": 219,
+          "end_line": 352,
+          "does": "Parse file content to extract code elements."
+        }
+      ]
+    },
+    {
+      "path": "project_reproducer.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "reproduce_project",
+          "kind": "function",
+          "sig": "(project_path:str, output_dir:str=None, target_lang:str=None, parallel:bool=False, use_llm:bool=True) -> ProjectResult",
+          "start_line": 382,
+          "end_line": 401,
+          "does": "Convenience function for project reproduction."
+        },
+        {
+          "name": "ProjectReproducer.__init__",
+          "kind": "method",
+          "sig": "(client:BaseLLMClient=None, max_workers:int=4, target_lang:str=None, use_llm:bool=True) -> None",
+          "start_line": 92,
+          "end_line": 111,
+          "does": "Initialize project reproducer."
+        },
+        {
+          "name": "ProjectReproducer._get_client",
+          "kind": "method",
+          "sig": "() -> BaseLLMClient",
+          "start_line": 113,
+          "end_line": 119,
+          "does": "Get or create LLM client."
+        },
+        {
+          "name": "ProjectReproducer.find_source_files",
+          "kind": "method",
+          "sig": "(project_path:str, extensions:Set[str]=None, exclude_patterns:List[str]=None) -> List[Path]",
+          "start_line": 121,
+          "end_line": 160,
+          "does": "Find all source files in project."
+        },
+        {
+          "name": "ProjectReproducer.reproduce_file",
+          "kind": "method",
+          "sig": "(file_path:Path, output_dir:Path) -> FileResult",
+          "start_line": 162,
+          "end_line": 212,
+          "does": "Reproduce a single file."
+        },
+        {
+          "name": "ProjectReproducer.reproduce_project",
+          "kind": "method",
+          "sig": "(project_path:str, output_dir:str=None, parallel:bool=False) -> ProjectResult",
+          "start_line": 214,
+          "end_line": 274,
+          "does": "Reproduce entire project."
+        },
+        {
+          "name": "ProjectReproducer._aggregate_results",
+          "kind": "method",
+          "sig": "(project_path:str, results:List[FileResult]) -> ProjectResult",
+          "start_line": 276,
+          "end_line": 333,
+          "does": "Aggregate file results into project result."
+        },
+        {
+          "name": "ProjectReproducer._save_report",
+          "kind": "method",
+          "sig": "(output_dir:Path, result:ProjectResult) -> None",
+          "start_line": 335,
+          "end_line": 379,
+          "does": "Save project reproduction report."
+        }
+      ]
+    },
+    {
+      "path": "base.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "VerboseMixin.__init__",
+          "kind": "method",
+          "sig": "(verbose:bool=False) -> None",
+          "start_line": 17,
+          "end_line": 21,
+          "does": "creates"
+        },
+        {
+          "name": "VerboseMixin.log",
+          "kind": "method",
+          "sig": "(msg:str, level:str='info') -> None",
+          "start_line": 23,
+          "end_line": 27,
+          "does": "Log message if verbose mode enabled."
+        },
+        {
+          "name": "VerboseMixin.debug",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 29,
+          "end_line": 31,
+          "does": "Log debug message."
+        },
+        {
+          "name": "VerboseMixin.info",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 33,
+          "end_line": 35,
+          "does": "Log info message."
+        },
+        {
+          "name": "VerboseMixin.warn",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 37,
+          "end_line": 39,
+          "does": "Log warning message."
+        },
+        {
+          "name": "VerboseMixin.error",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 41,
+          "end_line": 43,
+          "does": "Log error message."
+        },
+        {
+          "name": "BaseParser.__init__",
+          "kind": "method",
+          "sig": "(verbose:bool=False) -> None",
+          "start_line": 49,
+          "end_line": 50,
+          "does": "creates"
+        },
+        {
+          "name": "BaseParser.parse",
+          "kind": "method",
+          "sig": "(content:str, language:str=None) -> None",
+          "start_line": 52,
+          "end_line": 54,
+          "does": "Parse source code content."
+        },
+        {
+          "name": "BaseParser.parse_file",
+          "kind": "method",
+          "sig": "(path:str) -> None",
+          "start_line": 56,
+          "end_line": 58,
+          "does": "Parse source file."
+        },
+        {
+          "name": "BaseGenerator.__init__",
+          "kind": "method",
+          "sig": "(verbose:bool=False) -> None",
+          "start_line": 64,
+          "end_line": 65,
+          "does": "creates"
+        },
+        {
+          "name": "BaseGenerator.generate",
+          "kind": "method",
+          "sig": "(project, detail:str='full') -> str",
+          "start_line": 67,
+          "end_line": 69,
+          "does": "Generate output from project analysis."
+        }
+      ]
+    },
+    {
+      "path": "cli.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "ensure_dependencies",
+          "kind": "function",
+          "sig": "() -> None",
+          "start_line": 99,
+          "end_line": 135,
+          "does": "Auto-install optional dependencies for best results."
+        },
+        {
+          "name": "_get_env_file_path",
+          "kind": "function",
+          "sig": "() -> str",
+          "start_line": 138,
+          "end_line": 139,
+          "does": "retrieves env file path"
+        },
+        {
+          "name": "_read_text_file",
+          "kind": "function",
+          "sig": "(path:str) -> str",
+          "start_line": 142,
+          "end_line": 147,
+          "does": "retrieves text file"
+        },
+        {
+          "name": "_write_text_file",
+          "kind": "function",
+          "sig": "(path:str, content:str) -> None",
+          "start_line": 150,
+          "end_line": 152,
+          "does": "logs text file"
+        },
+        {
+          "name": "_set_env_var",
+          "kind": "function",
+          "sig": "(var_name:str, value:str) -> str",
+          "start_line": 155,
+          "end_line": 180,
+          "does": "updates env var"
+        },
+        {
+          "name": "_unset_env_var",
+          "kind": "function",
+          "sig": "(var_name:str) -> str",
+          "start_line": 183,
+          "end_line": 192,
+          "does": "unset env var"
+        },
+        {
+          "name": "_get_litellm_config_path",
+          "kind": "function",
+          "sig": "() -> str",
+          "start_line": 195,
+          "end_line": 196,
+          "does": "retrieves litellm config path"
+        },
+        {
+          "name": "_get_user_llm_config_path",
+          "kind": "function",
+          "sig": "() -> str",
+          "start_line": 199,
+          "end_line": 200,
+          "does": "retrieves user llm config path"
+        },
+        {
+          "name": "_load_user_llm_config",
+          "kind": "function",
+          "sig": "() -> dict",
+          "start_line": 203,
+          "end_line": 211,
+          "does": "retrieves user llm config"
+        },
+        {
+          "name": "_save_user_llm_config",
+          "kind": "function",
+          "sig": "(data:dict) -> str",
+          "start_line": 214,
+          "end_line": 219,
+          "does": "caches user llm config"
+        },
+        {
+          "name": "_load_litellm_yaml",
+          "kind": "function",
+          "sig": "() -> dict",
+          "start_line": 222,
+          "end_line": 238,
+          "does": "retrieves litellm yaml"
+        },
+        {
+          "name": "_save_litellm_yaml",
+          "kind": "function",
+          "sig": "(data:dict) -> str",
+          "start_line": 241,
+          "end_line": 250,
+          "does": "caches litellm yaml"
+        },
+        {
+          "name": "_infer_provider_from_litellm_model",
+          "kind": "function",
+          "sig": "(litellm_model:str) -> str",
+          "start_line": 253,
+          "end_line": 258,
+          "does": "infer provider from litellm model"
+        },
+        {
+          "name": "_code2logic_llm_cli",
+          "kind": "function",
+          "sig": "(argv:list[str]) -> None",
+          "start_line": 261,
+          "end_line": 506,
+          "does": "code2logic llm cli"
+        },
+        {
+          "name": "main",
+          "kind": "function",
+          "sig": "() -> None",
+          "start_line": 509,
+          "end_line": 955,
+          "does": "Main CLI entry point."
+        },
+        {
+          "name": "Logger.__init__",
+          "kind": "method",
+          "sig": "(verbose:bool=False, debug:bool=False) -> None",
+          "start_line": 39,
+          "end_line": 43,
+          "does": "creates"
+        },
+        {
+          "name": "Logger._elapsed",
+          "kind": "method",
+          "sig": "() -> str",
+          "start_line": 45,
+          "end_line": 48,
+          "does": "Get elapsed time string."
+        },
+        {
+          "name": "Logger.info",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 50,
+          "end_line": 52,
+          "does": "Print info message."
+        },
+        {
+          "name": "Logger.success",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 54,
+          "end_line": 56,
+          "does": "Print success message."
+        },
+        {
+          "name": "Logger.warning",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 58,
+          "end_line": 60,
+          "does": "Print warning message."
+        },
+        {
+          "name": "Logger.error",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 62,
+          "end_line": 64,
+          "does": "Print error message."
+        },
+        {
+          "name": "Logger.step",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 66,
+          "end_line": 70,
+          "does": "Print step message with counter."
+        },
+        {
+          "name": "Logger.detail",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 72,
+          "end_line": 75,
+          "does": "Print detail message (only in verbose mode)."
+        },
+        {
+          "name": "Logger.debug_msg",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 77,
+          "end_line": 80,
+          "does": "Print debug message (only in debug mode)."
+        },
+        {
+          "name": "Logger.stats",
+          "kind": "method",
+          "sig": "(label:str, value) -> None",
+          "start_line": 82,
+          "end_line": 85,
+          "does": "Print statistics."
+        },
+        {
+          "name": "Logger.separator",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 87,
+          "end_line": 90,
+          "does": "Print separator line."
+        },
+        {
+          "name": "Logger.header",
+          "kind": "method",
+          "sig": "(msg:str) -> None",
+          "start_line": 92,
+          "end_line": 96,
+          "does": "Print header."
+        }
+      ]
+    },
+    {
+      "path": "llm.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "get_available_backends",
+          "kind": "function",
+          "sig": "() -> Dict[str, bool]",
+          "start_line": 463,
+          "end_line": 478,
+          "does": "Get availability status of LLM backends."
+        },
+        {
+          "name": "OllamaClient.__init__",
+          "kind": "method",
+          "sig": "(config:LLMConfig) -> None",
+          "start_line": 60,
+          "end_line": 64,
+          "does": "creates"
+        },
+        {
+          "name": "OllamaClient.generate",
+          "kind": "method",
+          "sig": "(prompt:str, system:Optional[str]=None) -> str",
+          "start_line": 66,
+          "end_line": 86,
+          "does": "Generate completion from Ollama."
+        },
+        {
+          "name": "OllamaClient.chat",
+          "kind": "method",
+          "sig": "(messages:List[Dict[str,str]]) -> str",
+          "start_line": 88,
+          "end_line": 105,
+          "does": "Chat completion from Ollama."
+        },
+        {
+          "name": "OllamaClient.is_available",
+          "kind": "method",
+          "sig": "() -> bool",
+          "start_line": 107,
+          "end_line": 113,
+          "does": "Check if Ollama is running."
+        },
+        {
+          "name": "OllamaClient.list_models",
+          "kind": "method",
+          "sig": "() -> List[str]",
+          "start_line": 115,
+          "end_line": 122,
+          "does": "List available models."
+        },
+        {
+          "name": "LiteLLMClient.__init__",
+          "kind": "method",
+          "sig": "(config:LLMConfig) -> None",
+          "start_line": 128,
+          "end_line": 131,
+          "does": "creates"
+        },
+        {
+          "name": "LiteLLMClient.generate",
+          "kind": "method",
+          "sig": "(prompt:str, system:Optional[str]=None) -> str",
+          "start_line": 133,
+          "end_line": 140,
+          "does": "Generate completion via LiteLLM."
+        },
+        {
+          "name": "LiteLLMClient.chat",
+          "kind": "method",
+          "sig": "(messages:List[Dict[str,str]]) -> str",
+          "start_line": 142,
+          "end_line": 155,
+          "does": "Chat completion via LiteLLM."
+        },
+        {
+          "name": "LiteLLMClient.is_available",
+          "kind": "method",
+          "sig": "() -> bool",
+          "start_line": 157,
+          "end_line": 163,
+          "does": "Check if LiteLLM backend is available."
+        },
+        {
+          "name": "CodeAnalyzer.__init__",
+          "kind": "method",
+          "sig": "(model:str=None, provider:str=None, base_url:str=None, api_key:str=None) -> None",
+          "start_line": 193,
+          "end_line": 237,
+          "does": "Initialize CodeAnalyzer."
+        },
+        {
+          "name": "CodeAnalyzer.is_available",
+          "kind": "method",
+          "sig": "() -> bool",
+          "start_line": 239,
+          "end_line": 241,
+          "does": "Check if LLM backend is available."
+        },
+        {
+          "name": "CodeAnalyzer.suggest_refactoring",
+          "kind": "method",
+          "sig": "(project) -> List[Dict[str, Any]]",
+          "start_line": 243,
+          "end_line": 292,
+          "does": "Analyze project and suggest refactoring improvements."
+        },
+        {
+          "name": "CodeAnalyzer.find_semantic_duplicates",
+          "kind": "method",
+          "sig": "(project) -> List[Dict[str, Any]]",
+          "start_line": 294,
+          "end_line": 352,
+          "does": "Find semantically similar functions using LLM."
+        },
+        {
+          "name": "CodeAnalyzer.generate_code",
+          "kind": "method",
+          "sig": "(project, target_lang:str, module_filter:Optional[str]=None) -> Dict[str, str]",
+          "start_line": 354,
+          "end_line": 416,
+          "does": "Generate code in target language from project analysis."
+        },
+        {
+          "name": "CodeAnalyzer.translate_function",
+          "kind": "method",
+          "sig": "(name:str, signature:str, intent:str, source_lang:str, target_lang:str) -> str",
+          "start_line": 418,
+          "end_line": 452,
+          "does": "Translate a single function to another language."
+        },
+        {
+          "name": "CodeAnalyzer._build_signature",
+          "kind": "method",
+          "sig": "(f) -> str",
+          "start_line": 454,
+          "end_line": 460,
+          "does": "Build compact signature."
+        }
+      ]
+    },
+    {
+      "path": "errors.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "create_error_handler",
+          "kind": "function",
+          "sig": "(mode:str='lenient', max_file_size_mb:float=10.0) -> ErrorHandler",
+          "start_line": 432,
+          "end_line": 437,
+          "does": "Create an error handler with default settings."
+        },
+        {
+          "name": "ErrorHandler.__init__",
+          "kind": "method",
+          "sig": "(mode:str='lenient', max_file_size_mb:float=10.0, timeout_seconds:float=30.0, logger:Optional[Any]=None) -> None",
+          "start_line": 137,
+          "end_line": 148,
+          "does": "creates"
+        },
+        {
+          "name": "ErrorHandler.reset",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 150,
+          "end_line": 152,
+          "does": "Reset error state for new analysis."
+        },
+        {
+          "name": "ErrorHandler.handle_error",
+          "kind": "method",
+          "sig": "(error_type:ErrorType, path:str, message:str, exception:Optional[Exception]=None, severity:Optional[ErrorSeverity]=None) -> bool",
+          "start_line": 154,
+          "end_line": 188,
+          "does": "Handle an error."
+        },
+        {
+          "name": "ErrorHandler._default_severity",
+          "kind": "method",
+          "sig": "(error_type:ErrorType) -> ErrorSeverity",
+          "start_line": 190,
+          "end_line": 206,
+          "does": "Get default severity for error type."
+        },
+        {
+          "name": "ErrorHandler._log_error",
+          "kind": "method",
+          "sig": "(error:AnalysisError) -> None",
+          "start_line": 208,
+          "end_line": 216,
+          "does": "Log an error."
+        },
+        {
+          "name": "ErrorHandler.safe_read_file",
+          "kind": "method",
+          "sig": "(path:Path) -> Optional[str]",
+          "start_line": 218,
+          "end_line": 329,
+          "does": "Safely read a file with error handling."
+        },
+        {
+          "name": "ErrorHandler.safe_write_file",
+          "kind": "method",
+          "sig": "(path:Path, content:str) -> bool",
+          "start_line": 331,
+          "end_line": 376,
+          "does": "Safely write a file with error handling."
+        },
+        {
+          "name": "ErrorHandler.safe_parse",
+          "kind": "method",
+          "sig": "(path:str, content:str, parser_func:Callable) -> Any",
+          "start_line": 378,
+          "end_line": 429,
+          "does": "Safely parse content with error handling."
+        }
+      ]
+    },
+    {
+      "path": "code_review.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "analyze_code_quality",
+          "kind": "function",
+          "sig": "(project) -> Dict[str,List[Dict]]",
+          "start_line": 40,
+          "end_line": 100,
+          "does": "Analyze code quality issues."
+        },
+        {
+          "name": "check_security_issues",
+          "kind": "function",
+          "sig": "(project) -> Dict[str,List[Dict]]",
+          "start_line": 103,
+          "end_line": 139,
+          "does": "Check for security vulnerabilities."
+        },
+        {
+          "name": "check_performance_issues",
+          "kind": "function",
+          "sig": "(project) -> Dict[str,List[Dict]]",
+          "start_line": 142,
+          "end_line": 166,
+          "does": "Check for performance anti-patterns."
+        },
+        {
+          "name": "CodeReviewer.__init__",
+          "kind": "method",
+          "sig": "(client=None) -> None",
+          "start_line": 172,
+          "end_line": 178,
+          "does": "Initialize reviewer."
+        },
+        {
+          "name": "CodeReviewer.review",
+          "kind": "method",
+          "sig": "(project, focus:str='all') -> Dict[str,Any]",
+          "start_line": 180,
+          "end_line": 221,
+          "does": "Perform code review."
+        },
+        {
+          "name": "CodeReviewer.generate_report",
+          "kind": "method",
+          "sig": "(results:Dict[str,Any], project_name:str='Project') -> str",
+          "start_line": 223,
+          "end_line": 272,
+          "does": "Generate markdown review report."
+        }
+      ]
+    },
+    {
+      "path": "analyzer.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "analyze_project",
+          "kind": "function",
+          "sig": "(path:str, use_treesitter:bool=True, verbose:bool=False) -> ProjectInfo",
+          "start_line": 262,
+          "end_line": 284,
+          "does": "Convenience function to analyze a project."
+        },
+        {
+          "name": "get_library_status",
+          "kind": "function",
+          "sig": "() -> Dict[str, bool]",
+          "start_line": 287,
+          "end_line": 300,
+          "does": "Get availability status of optional libraries."
+        },
+        {
+          "name": "ProjectAnalyzer.__init__",
+          "kind": "method",
+          "sig": "(root_path:str, use_treesitter:bool=True, verbose:bool=False, include_private:bool=False) -> None",
+          "start_line": 83,
+          "end_line": 118,
+          "does": "Initialize the project analyzer."
+        },
+        {
+          "name": "ProjectAnalyzer._print_status",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 120,
+          "end_line": 127,
+          "does": "Print library availability status."
+        },
+        {
+          "name": "ProjectAnalyzer.analyze",
+          "kind": "method",
+          "sig": "() -> ProjectInfo",
+          "start_line": 129,
+          "end_line": 162,
+          "does": "Analyze the project."
+        },
+        {
+          "name": "ProjectAnalyzer._scan_files",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 164,
+          "end_line": 216,
+          "does": "Scan and parse all source files."
+        },
+        {
+          "name": "ProjectAnalyzer._detect_entrypoints",
+          "kind": "method",
+          "sig": "() -> List[str]",
+          "start_line": 218,
+          "end_line": 243,
+          "does": "Detect project entry points."
+        },
+        {
+          "name": "ProjectAnalyzer.get_statistics",
+          "kind": "method",
+          "sig": "() -> Dict",
+          "start_line": 245,
+          "end_line": 259,
+          "does": "Get analysis statistics."
+        }
+      ]
+    },
+    {
+      "path": "quality.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "analyze_quality",
+          "kind": "function",
+          "sig": "(project:ProjectInfo, thresholds:Dict[str,int]=None) -> QualityReport",
+          "start_line": 212,
+          "end_line": 224,
+          "does": "Convenience function to analyze project quality."
+        },
+        {
+          "name": "get_quality_summary",
+          "kind": "function",
+          "sig": "(report:QualityReport) -> str",
+          "start_line": 227,
+          "end_line": 264,
+          "does": "Generate human-readable quality summary."
+        },
+        {
+          "name": "QualityAnalyzer.__init__",
+          "kind": "method",
+          "sig": "(thresholds:Dict[str,int]=None) -> None",
+          "start_line": 71,
+          "end_line": 75,
+          "does": "Initialize with custom thresholds."
+        },
+        {
+          "name": "QualityAnalyzer.analyze",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> QualityReport",
+          "start_line": 77,
+          "end_line": 108,
+          "does": "Analyze project quality."
+        },
+        {
+          "name": "QualityAnalyzer.analyze_modules",
+          "kind": "method",
+          "sig": "(modules:List[ModuleInfo]) -> QualityReport",
+          "start_line": 110,
+          "end_line": 129,
+          "does": "Analyze a list of modules."
+        },
+        {
+          "name": "QualityAnalyzer._analyze_module",
+          "kind": "method",
+          "sig": "(module:ModuleInfo, report:QualityReport) -> None",
+          "start_line": 131,
+          "end_line": 152,
+          "does": "Analyze a single module."
+        },
+        {
+          "name": "QualityAnalyzer._check_function",
+          "kind": "method",
+          "sig": "(func, file_path:str, report:QualityReport) -> None",
+          "start_line": 154,
+          "end_line": 179,
+          "does": "Check function quality."
+        },
+        {
+          "name": "QualityAnalyzer._check_class",
+          "kind": "method",
+          "sig": "(file_path:str, report:QualityReport) -> None",
+          "start_line": 181,
+          "end_line": 197,
+          "does": "Check class quality."
+        },
+        {
+          "name": "QualityAnalyzer._get_file_recommendation",
+          "kind": "method",
+          "sig": "(module:ModuleInfo) -> str",
+          "start_line": 199,
+          "end_line": 209,
+          "does": "Generate recommendation for long file."
+        }
+      ]
+    },
+    {
+      "path": "shared_utils.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "compact_imports",
+          "kind": "function",
+          "sig": "(imports:List[str], max_items:int=10) -> List[str]",
+          "start_line": 24,
+          "end_line": 66,
+          "does": "Compact imports by grouping submodules."
+        },
+        {
+          "name": "deduplicate_imports",
+          "kind": "function",
+          "sig": "(imports:List[str]) -> List[str]",
+          "start_line": 69,
+          "end_line": 99,
+          "does": "Remove redundant imports."
+        },
+        {
+          "name": "abbreviate_type",
+          "kind": "function",
+          "sig": "(type_str:str) -> str",
+          "start_line": 128,
+          "end_line": 152,
+          "does": "Abbreviate type annotations for compactness."
+        },
+        {
+          "name": "expand_type",
+          "kind": "function",
+          "sig": "(abbrev:str) -> str",
+          "start_line": 155,
+          "end_line": 173,
+          "does": "Expand abbreviated type back to full form."
+        },
+        {
+          "name": "build_signature",
+          "kind": "function",
+          "sig": "(params:List[str], return_type:Optional[str]=None, include_self:bool=False, abbreviate:bool=False, max_params:int=6) -> str",
+          "start_line": 180,
+          "end_line": 232,
+          "does": "Build compact function signature."
+        },
+        {
+          "name": "remove_self_from_params",
+          "kind": "function",
+          "sig": "(params:List[str]) -> List[str]",
+          "start_line": 235,
+          "end_line": 247,
+          "does": "Remove 'self' and 'cls' from parameter list."
+        },
+        {
+          "name": "categorize_function",
+          "kind": "function",
+          "sig": "(name:str) -> str",
+          "start_line": 268,
+          "end_line": 285,
+          "does": "Categorize function by name pattern."
+        },
+        {
+          "name": "extract_domain",
+          "kind": "function",
+          "sig": "(path:str) -> str",
+          "start_line": 297,
+          "end_line": 315,
+          "does": "Extract domain from file path."
+        },
+        {
+          "name": "compute_hash",
+          "kind": "function",
+          "sig": "(name:str, signature:str, length:int=8) -> str",
+          "start_line": 322,
+          "end_line": 335,
+          "does": "Compute short hash for quick comparison."
+        },
+        {
+          "name": "truncate_docstring",
+          "kind": "function",
+          "sig": "(docstring:Optional[str], max_length:int=60) -> str",
+          "start_line": 342,
+          "end_line": 376,
+          "does": "Truncate docstring to first sentence or max_length."
+        },
+        {
+          "name": "escape_for_yaml",
+          "kind": "function",
+          "sig": "(text:str) -> str",
+          "start_line": 379,
+          "end_line": 399,
+          "does": "Escape text for safe YAML inclusion."
+        },
+        {
+          "name": "clean_identifier",
+          "kind": "function",
+          "sig": "(name:str) -> str",
+          "start_line": 402,
+          "end_line": 414,
+          "does": "Clean identifier by removing whitespace and special characters."
+        }
+      ]
+    },
+    {
+      "path": "parsers.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "_normalize_import_path",
+          "kind": "function",
+          "sig": "(import_path:str) -> str",
+          "start_line": 28,
+          "end_line": 35,
+          "does": "Normalize import path by removing duplicate suffix segments."
+        },
+        {
+          "name": "_clean_imports",
+          "kind": "function",
+          "sig": "(imports:List[str]) -> List[str]",
+          "start_line": 38,
+          "end_line": 49,
+          "does": "Deduplicate and normalize import paths while preserving order."
+        },
+        {
+          "name": "_combine_import_name",
+          "kind": "function",
+          "sig": "(module_name:str, identifier:str) -> str",
+          "start_line": 52,
+          "end_line": 59,
+          "does": "Combine module and identifier while avoiding duplicate suffixes."
+        },
+        {
+          "name": "_truncate_constant_value",
+          "kind": "function",
+          "sig": "(value_text:str, limit:int=400) -> str",
+          "start_line": 62,
+          "end_line": 69,
+          "does": "Return a trimmed single-line snippet for constant values."
+        },
+        {
+          "name": "_py_expr_to_dotted_name",
+          "kind": "function",
+          "sig": "(expr) -> str",
+          "start_line": 72,
+          "end_line": 84,
+          "does": "py expr to dotted name"
+        },
+        {
+          "name": "_analyze_python_function_node",
+          "kind": "function",
+          "sig": "(func_node) -> None",
+          "start_line": 204,
+          "end_line": 208,
+          "does": "processes python function node"
+        },
+        {
+          "name": "is_tree_sitter_available",
+          "kind": "function",
+          "sig": "() -> bool",
+          "start_line": 1763,
+          "end_line": 1765,
+          "does": "Check if Tree-sitter is available."
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.__init__",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 88,
+          "end_line": 93,
+          "does": "creates"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer._add_call",
+          "kind": "method",
+          "sig": "(name:str) -> None",
+          "start_line": 95,
+          "end_line": 103,
+          "does": "creates call"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer._add_raise",
+          "kind": "method",
+          "sig": "(name:str) -> None",
+          "start_line": 105,
+          "end_line": 113,
+          "does": "creates raise"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_Call",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 115,
+          "end_line": 122,
+          "does": "visit call"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_Raise",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 124,
+          "end_line": 139,
+          "does": "visit raise"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_If",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 141,
+          "end_line": 143,
+          "does": "visit if"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_For",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 145,
+          "end_line": 147,
+          "does": "visit for"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_AsyncFor",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 149,
+          "end_line": 151,
+          "does": "visit asyncfor"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_While",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 153,
+          "end_line": 155,
+          "does": "visit while"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_IfExp",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 157,
+          "end_line": 159,
+          "does": "visit ifexp"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_BoolOp",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 161,
+          "end_line": 167,
+          "does": "visit boolop"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_Try",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 169,
+          "end_line": 174,
+          "does": "visit try"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_comprehension",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 176,
+          "end_line": 182,
+          "does": "visit comprehension"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_Match",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 184,
+          "end_line": 189,
+          "does": "visit match"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_FunctionDef",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 191,
+          "end_line": 192,
+          "does": "visit functiondef"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_AsyncFunctionDef",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 194,
+          "end_line": 195,
+          "does": "visit asyncfunctiondef"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_ClassDef",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 197,
+          "end_line": 198,
+          "does": "visit classdef"
+        },
+        {
+          "name": "_PyFunctionBodyAnalyzer.visit_Lambda",
+          "kind": "method",
+          "sig": "(node) -> None",
+          "start_line": 200,
+          "end_line": 201,
+          "does": "visit lambda"
+        },
+        {
+          "name": "TreeSitterParser.__init__",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 224,
+          "end_line": 231,
+          "does": "Initialize Tree-sitter parsers for available languages."
+        },
+        {
+          "name": "TreeSitterParser._init_parsers",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 233,
+          "end_line": 255,
+          "does": "Initialize parsers for each supported language."
+        },
+        {
+          "name": "TreeSitterParser.is_available",
+          "kind": "method",
+          "sig": "(language:str) -> bool",
+          "start_line": 257,
+          "end_line": 259,
+          "does": "Check if Tree-sitter parser is available for a language."
+        },
+        {
+          "name": "TreeSitterParser.get_supported_languages",
+          "kind": "method",
+          "sig": "() -> List[str]",
+          "start_line": 262,
+          "end_line": 264,
+          "does": "Get list of potentially supported languages."
+        },
+        {
+          "name": "TreeSitterParser.parse",
+          "kind": "method",
+          "sig": "(filepath:str, content:str, language:str) -> Optional[ModuleInfo]",
+          "start_line": 266,
+          "end_line": 289,
+          "does": "Parse a source file using Tree-sitter."
+        },
+        {
+          "name": "TreeSitterParser._parse_python",
+          "kind": "method",
+          "sig": "(filepath:str, content:str, tree) -> ModuleInfo",
+          "start_line": 291,
+          "end_line": 390,
+          "does": "Parse Python source using Tree-sitter AST."
+        },
+        {
+          "name": "TreeSitterParser._extract_constants",
+          "kind": "method",
+          "sig": "(tree, content:str) -> List[ConstantInfo]",
+          "start_line": 392,
+          "end_line": 421,
+          "does": "Extract module-level UPPERCASE constants."
+        },
+        {
+          "name": "TreeSitterParser._extract_type_checking_imports",
+          "kind": "method",
+          "sig": "(tree, content:str) -> List[str]",
+          "start_line": 423,
+          "end_line": 446,
+          "does": "Extract TYPE_CHECKING block imports."
+        },
+        {
+          "name": "TreeSitterParser._extract_conditional_imports",
+          "kind": "method",
+          "sig": "(node, content:str) -> List[str]",
+          "start_line": 448,
+          "end_line": 461,
+          "does": "Extract imports from try/except blocks."
+        },
+        {
+          "name": "TreeSitterParser._extract_aliases",
+          "kind": "method",
+          "sig": "(tree, content:str) -> dict",
+          "start_line": 463,
+          "end_line": 508,
+          "does": "Extract module aliases (import X as Y)."
+        },
+        {
+          "name": "TreeSitterParser._extract_py_function",
+          "kind": "method",
+          "sig": "(node, content:str, decorated_node=None) -> Optional[FunctionInfo]",
+          "start_line": 510,
+          "end_line": 611,
+          "does": "Extract Python function from AST node."
+        },
+        {
+          "name": "TreeSitterParser._extract_py_enum",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[TypeInfo]",
+          "start_line": 613,
+          "end_line": 653,
+          "does": "Extract Python Enum (values) as TypeInfo(kind='enum')."
+        },
+        {
+          "name": "TreeSitterParser._extract_py_class",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[ClassInfo]",
+          "start_line": 655,
+          "end_line": 731,
+          "does": "Extract Python class from AST node."
+        },
+        {
+          "name": "TreeSitterParser._extract_dataclass_field",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[FieldInfo]",
+          "start_line": 733,
+          "end_line": 795,
+          "does": "Extract dataclass field from assignment."
+        },
+        {
+          "name": "TreeSitterParser._extract_class_attribute",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[AttributeInfo]",
+          "start_line": 797,
+          "end_line": 825,
+          "does": "Extract class attribute from self.x = ..."
+        },
+        {
+          "name": "TreeSitterParser._extract_py_import",
+          "kind": "method",
+          "sig": "(node, content:str) -> List[str]",
+          "start_line": 827,
+          "end_line": 837,
+          "does": "Extract import statement."
+        },
+        {
+          "name": "TreeSitterParser._extract_py_from_import",
+          "kind": "method",
+          "sig": "(node, content:str) -> List[str]",
+          "start_line": 839,
+          "end_line": 877,
+          "does": "Extract from ..."
+        },
+        {
+          "name": "TreeSitterParser._extract_py_constant",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[ConstantInfo]",
+          "start_line": 879,
+          "end_line": 937,
+          "does": "Extract constant (UPPERCASE assignment) with value."
+        },
+        {
+          "name": "TreeSitterParser._extract_conditional_imports",
+          "kind": "method",
+          "sig": "(node, content:str) -> List[str]",
+          "start_line": 939,
+          "end_line": 952,
+          "does": "Extract imports from try/except blocks."
+        },
+        {
+          "name": "TreeSitterParser._parse_js_ts",
+          "kind": "method",
+          "sig": "(filepath:str, content:str, tree, language:str) -> ModuleInfo",
+          "start_line": 954,
+          "end_line": 1039,
+          "does": "Parse JavaScript/TypeScript source using Tree-sitter AST."
+        },
+        {
+          "name": "TreeSitterParser._extract_js_class",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[ClassInfo]",
+          "start_line": 1041,
+          "end_line": 1075,
+          "does": "Extract JS/TS class from AST node."
+        },
+        {
+          "name": "TreeSitterParser._extract_js_method",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[FunctionInfo]",
+          "start_line": 1077,
+          "end_line": 1116,
+          "does": "Extract JS/TS method from AST node."
+        },
+        {
+          "name": "TreeSitterParser._extract_js_function",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[FunctionInfo]",
+          "start_line": 1118,
+          "end_line": 1152,
+          "does": "Extract JS/TS function from AST node."
+        },
+        {
+          "name": "TreeSitterParser._extract_js_arrow_fn",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[FunctionInfo]",
+          "start_line": 1154,
+          "end_line": 1184,
+          "does": "Extract arrow function assigned to const."
+        },
+        {
+          "name": "TreeSitterParser._extract_js_params",
+          "kind": "method",
+          "sig": "(params_node, content:str) -> List[str]",
+          "start_line": 1186,
+          "end_line": 1204,
+          "does": "Extract JS/TS function parameters."
+        },
+        {
+          "name": "TreeSitterParser._extract_ts_type",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[TypeInfo]",
+          "start_line": 1206,
+          "end_line": 1213,
+          "does": "Extract TypeScript interface or type alias."
+        },
+        {
+          "name": "TreeSitterParser._extract_ts_enum",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[TypeInfo]",
+          "start_line": 1215,
+          "end_line": 1236,
+          "does": "Extract TypeScript enum."
+        },
+        {
+          "name": "TreeSitterParser._extract_js_constant",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[str]",
+          "start_line": 1238,
+          "end_line": 1247,
+          "does": "Extract constant (UPPERCASE const)."
+        },
+        {
+          "name": "TreeSitterParser._extract_js_comment",
+          "kind": "method",
+          "sig": "(node, content:str) -> Optional[str]",
+          "start_line": 1249,
+          "end_line": 1259,
+          "does": "Extract JS comment content."
+        },
+        {
+          "name": "TreeSitterParser._find_child",
+          "kind": "method",
+          "sig": "(node, type_name:str) -> None",
+          "start_line": 1262,
+          "end_line": 1267,
+          "does": "Find first child of given type."
+        },
+        {
+          "name": "TreeSitterParser._text",
+          "kind": "method",
+          "sig": "(node, content:str) -> str",
+          "start_line": 1269,
+          "end_line": 1275,
+          "does": "Get text content of node."
+        },
+        {
+          "name": "TreeSitterParser._extract_string",
+          "kind": "method",
+          "sig": "(node, content:str) -> str",
+          "start_line": 1277,
+          "end_line": 1284,
+          "does": "Extract string content without quotes."
+        },
+        {
+          "name": "TreeSitterParser._truncate_docstring",
+          "kind": "method",
+          "sig": "(docstring:Optional[str], max_len:int=80) -> Optional[str]",
+          "start_line": 1286,
+          "end_line": 1308,
+          "does": "Truncate docstring to first sentence or max_len characters."
+        },
+        {
+          "name": "UniversalParser.__init__",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 1324,
+          "end_line": 1326,
+          "does": "Initialize the universal parser."
+        },
+        {
+          "name": "UniversalParser.parse",
+          "kind": "method",
+          "sig": "(filepath:str, content:str, language:str) -> Optional[ModuleInfo]",
+          "start_line": 1328,
+          "end_line": 1348,
+          "does": "Parse a source file using AST or regex."
+        },
+        {
+          "name": "UniversalParser._parse_python",
+          "kind": "method",
+          "sig": "(filepath:str, content:str) -> Optional[ModuleInfo]",
+          "start_line": 1350,
+          "end_line": 1422,
+          "does": "Parse Python using built-in AST."
+        },
+        {
+          "name": "UniversalParser._extract_ast_enum",
+          "kind": "method",
+          "sig": "(node:Any) -> Optional[TypeInfo]",
+          "start_line": 1424,
+          "end_line": 1468,
+          "does": "Extract Enum values from Python AST class."
+        },
+        {
+          "name": "UniversalParser._extract_ast_function",
+          "kind": "method",
+          "sig": "(node) -> FunctionInfo",
+          "start_line": 1470,
+          "end_line": 1539,
+          "does": "Extract function from Python AST node."
+        },
+        {
+          "name": "UniversalParser._extract_ast_class",
+          "kind": "method",
+          "sig": "(node:Any) -> ClassInfo",
+          "start_line": 1541,
+          "end_line": 1587,
+          "does": "Extract class from Python AST node."
+        },
+        {
+          "name": "UniversalParser._extract_ast_constant",
+          "kind": "method",
+          "sig": "(node:Any, content:str) -> Optional[ConstantInfo]",
+          "start_line": 1589,
+          "end_line": 1629,
+          "does": "Extract ConstantInfo from an AST assignment node if applicable."
+        },
+        {
+          "name": "UniversalParser._format_ast_value",
+          "kind": "method",
+          "sig": "(value_node:Any, content:str) -> str",
+          "start_line": 1631,
+          "end_line": 1649,
+          "does": "Best-effort string representation of an AST value node."
+        },
+        {
+          "name": "UniversalParser._ann_str",
+          "kind": "method",
+          "sig": "(node) -> str",
+          "start_line": 1651,
+          "end_line": 1664,
+          "does": "Convert AST annotation to string."
+        },
+        {
+          "name": "UniversalParser._parse_js_ts",
+          "kind": "method",
+          "sig": "(filepath:str, content:str, language:str) -> ModuleInfo",
+          "start_line": 1666,
+          "end_line": 1760,
+          "does": "Parse JS/TS using regex patterns."
+        }
+      ]
+    },
+    {
+      "path": "intent.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "EnhancedIntentGenerator.__init__",
+          "kind": "method",
+          "sig": "(lang:str='en') -> None",
+          "start_line": 131,
+          "end_line": 163,
+          "does": "Initialize the intent generator."
+        },
+        {
+          "name": "EnhancedIntentGenerator.generate",
+          "kind": "method",
+          "sig": "(name:str, docstring:Optional[str]=None) -> str",
+          "start_line": 165,
+          "end_line": 210,
+          "does": "Generate intent from function name and optional docstring."
+        },
+        {
+          "name": "EnhancedIntentGenerator._extract_from_docstring",
+          "kind": "method",
+          "sig": "(docstring:str) -> Optional[str]",
+          "start_line": 212,
+          "end_line": 230,
+          "does": "Extract intent from docstring's first line."
+        },
+        {
+          "name": "EnhancedIntentGenerator._split_name",
+          "kind": "method",
+          "sig": "(name:str) -> List[str]",
+          "start_line": 232,
+          "end_line": 258,
+          "does": "Split function name into words."
+        },
+        {
+          "name": "EnhancedIntentGenerator.get_available_features",
+          "kind": "method",
+          "sig": "() -> dict[str, bool]",
+          "start_line": 261,
+          "end_line": 271,
+          "does": "Get dictionary of available NLP features."
+        },
+        {
+          "name": "IntentAnalyzer.__init__",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 282,
+          "end_line": 297,
+          "does": "Initialize the intent analyzer with patterns."
+        },
+        {
+          "name": "IntentAnalyzer._extract_keywords",
+          "kind": "method",
+          "sig": "(query:str) -> List[str]",
+          "start_line": 299,
+          "end_line": 304,
+          "does": "Extract keywords from a query string."
+        },
+        {
+          "name": "IntentAnalyzer._calculate_intent_confidence",
+          "kind": "method",
+          "sig": "(keywords:List[str], patterns:List[str]) -> float",
+          "start_line": 306,
+          "end_line": 311,
+          "does": "Calculate confidence score based on keyword matches."
+        },
+        {
+          "name": "IntentAnalyzer._identify_target",
+          "kind": "method",
+          "sig": "(query:str, project:Any) -> str",
+          "start_line": 313,
+          "end_line": 331,
+          "does": "Identify the target of the query (module, function, class, or project)."
+        },
+        {
+          "name": "IntentAnalyzer._generate_description",
+          "kind": "method",
+          "sig": "(intent_type:IntentType, target:str) -> str",
+          "start_line": 333,
+          "end_line": 343,
+          "does": "Generate a description for the detected intent."
+        },
+        {
+          "name": "IntentAnalyzer._generate_suggestions",
+          "kind": "method",
+          "sig": "(intent_type:IntentType, target:str, project:Any) -> List[str]",
+          "start_line": 345,
+          "end_line": 379,
+          "does": "Generate suggestions based on intent type."
+        },
+        {
+          "name": "IntentAnalyzer.analyze_intent",
+          "kind": "method",
+          "sig": "(query:str, project:Any) -> List[Intent]",
+          "start_line": 381,
+          "end_line": 411,
+          "does": "Analyze a query and return detected intents sorted by confidence."
+        },
+        {
+          "name": "IntentAnalyzer.detect_code_smells",
+          "kind": "method",
+          "sig": "(project:Any) -> List[dict]",
+          "start_line": 413,
+          "end_line": 464,
+          "does": "Detect code smells in the project."
+        },
+        {
+          "name": "IntentAnalyzer.suggest_refactoring",
+          "kind": "method",
+          "sig": "(target:str, project:Any) -> List[str]",
+          "start_line": 466,
+          "end_line": 489,
+          "does": "Generate refactoring suggestions for a target."
+        },
+        {
+          "name": "IntentAnalyzer._find_target_object",
+          "kind": "method",
+          "sig": "(target:str, project:Any) -> Any",
+          "start_line": 491,
+          "end_line": 507,
+          "does": "Find the object referenced by target string."
+        },
+        {
+          "name": "IntentAnalyzer._suggest_module_refactoring",
+          "kind": "method",
+          "sig": "(module:Any) -> List[str]",
+          "start_line": 509,
+          "end_line": 523,
+          "does": "Generate refactoring suggestions for a module."
+        },
+        {
+          "name": "IntentAnalyzer._suggest_class_refactoring",
+          "kind": "method",
+          "sig": "(cls:Any) -> List[str]",
+          "start_line": 525,
+          "end_line": 536,
+          "does": "Generate refactoring suggestions for a class."
+        },
+        {
+          "name": "IntentAnalyzer._suggest_function_refactoring",
+          "kind": "method",
+          "sig": "(func:Any) -> List[str]",
+          "start_line": 538,
+          "end_line": 557,
+          "does": "Generate refactoring suggestions for a function."
+        }
+      ]
+    },
+    {
+      "path": "adaptive.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "get_llm_capabilities",
+          "kind": "function",
+          "sig": "(model:str) -> Dict[str,Any]",
+          "start_line": 604,
+          "end_line": 620,
+          "does": "Get capabilities for a specific model."
+        },
+        {
+          "name": "AdaptiveReproducer.__init__",
+          "kind": "method",
+          "sig": "(client:BaseLLMClient=None, model:str=None) -> None",
+          "start_line": 127,
+          "end_line": 136,
+          "does": "Initialize adaptive reproducer."
+        },
+        {
+          "name": "AdaptiveReproducer._get_capabilities",
+          "kind": "method",
+          "sig": "() -> Dict[str,Any]",
+          "start_line": 138,
+          "end_line": 149,
+          "does": "Get LLM capabilities for current model."
+        },
+        {
+          "name": "AdaptiveReproducer.select_format",
+          "kind": "method",
+          "sig": "(file_path:Path, content:str) -> str",
+          "start_line": 151,
+          "end_line": 185,
+          "does": "Select optimal format based on file and LLM capabilities."
+        },
+        {
+          "name": "AdaptiveReproducer.should_chunk",
+          "kind": "method",
+          "sig": "(content:str) -> bool",
+          "start_line": 187,
+          "end_line": 206,
+          "does": "Determine if content should be chunked."
+        },
+        {
+          "name": "AdaptiveReproducer.chunk_content",
+          "kind": "method",
+          "sig": "(content:str, file_path:Path) -> List[ChunkInfo]",
+          "start_line": 208,
+          "end_line": 325,
+          "does": "Split content into logical chunks."
+        },
+        {
+          "name": "AdaptiveReproducer.generate_chunk_spec",
+          "kind": "method",
+          "sig": "(chunk:ChunkInfo, format_name:str) -> str",
+          "start_line": 327,
+          "end_line": 347,
+          "does": "Generate specification for a single chunk."
+        },
+        {
+          "name": "AdaptiveReproducer._gherkin_for_chunk",
+          "kind": "method",
+          "sig": "(chunk:ChunkInfo) -> str",
+          "start_line": 349,
+          "end_line": 380,
+          "does": "Generate Gherkin for a chunk."
+        },
+        {
+          "name": "AdaptiveReproducer._yaml_for_chunk",
+          "kind": "method",
+          "sig": "(chunk:ChunkInfo) -> str",
+          "start_line": 382,
+          "end_line": 394,
+          "does": "Generate YAML for a chunk."
+        },
+        {
+          "name": "AdaptiveReproducer._json_for_chunk",
+          "kind": "method",
+          "sig": "(chunk:ChunkInfo) -> str",
+          "start_line": 396,
+          "end_line": 405,
+          "does": "Generate JSON for a chunk."
+        },
+        {
+          "name": "AdaptiveReproducer.reproduce",
+          "kind": "method",
+          "sig": "(file_path:str, output_dir:str=None) -> AdaptiveResult",
+          "start_line": 407,
+          "end_line": 430,
+          "does": "Reproduce code with adaptive format selection."
+        },
+        {
+          "name": "AdaptiveReproducer._reproduce_single",
+          "kind": "method",
+          "sig": "(path:Path, content:str, format_name:str, output_dir:str=None) -> AdaptiveResult",
+          "start_line": 432,
+          "end_line": 482,
+          "does": "Reproduce without chunking."
+        },
+        {
+          "name": "AdaptiveReproducer._reproduce_chunked",
+          "kind": "method",
+          "sig": "(path:Path, content:str, format_name:str, output_dir:str=None) -> AdaptiveResult",
+          "start_line": 484,
+          "end_line": 532,
+          "does": "Reproduce with chunking."
+        },
+        {
+          "name": "AdaptiveReproducer._generate_from_spec",
+          "kind": "method",
+          "sig": "(spec:str, format_name:str, file_ext:str) -> str",
+          "start_line": 534,
+          "end_line": 565,
+          "does": "Generate code from specification."
+        },
+        {
+          "name": "AdaptiveReproducer._save_result",
+          "kind": "method",
+          "sig": "(output_dir:Path, original:str, spec:str, generated:str, result:AdaptiveResult) -> None",
+          "start_line": 567,
+          "end_line": 601,
+          "does": "Save reproduction results."
+        }
+      ]
+    },
+    {
+      "path": "reproducer.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "reproduce_project",
+          "kind": "function",
+          "sig": "(spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None, validate:bool=True, verbose:bool=True) -> ReproductionResult",
+          "start_line": 633,
+          "end_line": 685,
+          "does": "Convenience function to reproduce and validate a project."
+        },
+        {
+          "name": "validate_files",
+          "kind": "function",
+          "sig": "(spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None) -> List[FileValidation]",
+          "start_line": 688,
+          "end_line": 705,
+          "does": "Validate specific files against spec."
+        },
+        {
+          "name": "SpecReproducer.__init__",
+          "kind": "method",
+          "sig": "(verbose:bool=False) -> None",
+          "start_line": 122,
+          "end_line": 123,
+          "does": "creates"
+        },
+        {
+          "name": "SpecReproducer.reproduce_from_yaml",
+          "kind": "method",
+          "sig": "(spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult",
+          "start_line": 125,
+          "end_line": 142,
+          "does": "Reproduce files from YAML specification."
+        },
+        {
+          "name": "SpecReproducer.reproduce_from_json",
+          "kind": "method",
+          "sig": "(spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult",
+          "start_line": 144,
+          "end_line": 154,
+          "does": "Reproduce files from JSON specification."
+        },
+        {
+          "name": "SpecReproducer._reproduce",
+          "kind": "method",
+          "sig": "(spec:Dict[str,Any], output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult",
+          "start_line": 156,
+          "end_line": 196,
+          "does": "Internal reproduction logic."
+        },
+        {
+          "name": "SpecReproducer._generate_file",
+          "kind": "method",
+          "sig": "(module:Dict[str,Any], output_path:Path) -> bool",
+          "start_line": 198,
+          "end_line": 214,
+          "does": "Generate a single file from module spec."
+        },
+        {
+          "name": "SpecReproducer._generate_python",
+          "kind": "method",
+          "sig": "(module:Dict[str,Any]) -> str",
+          "start_line": 216,
+          "end_line": 261,
+          "does": "Generate Python file content."
+        },
+        {
+          "name": "SpecReproducer._render_docstring",
+          "kind": "method",
+          "sig": "(text:str, indent:str) -> List[str]",
+          "start_line": 263,
+          "end_line": 290,
+          "does": "Render a safe Python docstring or fall back to comments."
+        },
+        {
+          "name": "SpecReproducer._sanitize_python_property",
+          "kind": "method",
+          "sig": "(prop:str) -> str",
+          "start_line": 292,
+          "end_line": 320,
+          "does": "Sanitize a Python class property declaration for valid syntax."
+        },
+        {
+          "name": "SpecReproducer._generate_python_class",
+          "kind": "method",
+          "sig": "(cls:Dict[str,Any]) -> List[str]",
+          "start_line": 322,
+          "end_line": 363,
+          "does": "Generate Python class."
+        },
+        {
+          "name": "SpecReproducer._generate_python_method",
+          "kind": "method",
+          "sig": "(method:Dict[str,Any]) -> List[str]",
+          "start_line": 365,
+          "end_line": 391,
+          "does": "Generate Python method."
+        },
+        {
+          "name": "SpecReproducer._generate_python_function",
+          "kind": "method",
+          "sig": "(func:Dict[str,Any]) -> List[str]",
+          "start_line": 393,
+          "end_line": 412,
+          "does": "Generate Python function."
+        },
+        {
+          "name": "SpecReproducer._generate_typescript",
+          "kind": "method",
+          "sig": "(module:Dict[str,Any]) -> str",
+          "start_line": 414,
+          "end_line": 442,
+          "does": "Generate TypeScript file content."
+        },
+        {
+          "name": "SpecReproducer._generate_ts_class",
+          "kind": "method",
+          "sig": "(cls:Dict[str,Any]) -> List[str]",
+          "start_line": 444,
+          "end_line": 466,
+          "does": "Generate TypeScript class."
+        },
+        {
+          "name": "SpecReproducer._generate_ts_method",
+          "kind": "method",
+          "sig": "(method:Dict[str,Any]) -> List[str]",
+          "start_line": 468,
+          "end_line": 481,
+          "does": "Generate TypeScript method."
+        },
+        {
+          "name": "SpecReproducer._generate_ts_function",
+          "kind": "method",
+          "sig": "(func:Dict[str,Any]) -> List[str]",
+          "start_line": 483,
+          "end_line": 496,
+          "does": "Generate TypeScript function."
+        },
+        {
+          "name": "SpecReproducer._parse_signature",
+          "kind": "method",
+          "sig": "(sig:str) -> str",
+          "start_line": 498,
+          "end_line": 513,
+          "does": "Parse and clean signature."
+        },
+        {
+          "name": "SpecValidator.__init__",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 529,
+          "end_line": 530,
+          "does": "creates"
+        },
+        {
+          "name": "SpecValidator.validate",
+          "kind": "method",
+          "sig": "(spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None) -> List[FileValidation]",
+          "start_line": 532,
+          "end_line": 568,
+          "does": "Validate generated files against spec."
+        },
+        {
+          "name": "SpecValidator._validate_file",
+          "kind": "method",
+          "sig": "(module:Dict[str,Any], base_path:Path) -> FileValidation",
+          "start_line": 570,
+          "end_line": 621,
+          "does": "Validate a single file."
+        },
+        {
+          "name": "SpecValidator._check_python_syntax",
+          "kind": "method",
+          "sig": "(content:str, validation:FileValidation) -> bool",
+          "start_line": 623,
+          "end_line": 630,
+          "does": "Check Python syntax."
+        }
+      ]
+    },
+    {
+      "path": "llm_clients.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "_get_user_llm_config_path",
+          "kind": "function",
+          "sig": "() -> str",
+          "start_line": 75,
+          "end_line": 76,
+          "does": "retrieves user llm config path"
+        },
+        {
+          "name": "_load_user_llm_config",
+          "kind": "function",
+          "sig": "() -> Dict[str,Any]",
+          "start_line": 79,
+          "end_line": 87,
+          "does": "retrieves user llm config"
+        },
+        {
+          "name": "_get_priority_mode",
+          "kind": "function",
+          "sig": "() -> str",
+          "start_line": 90,
+          "end_line": 92,
+          "does": "retrieves priority mode"
+        },
+        {
+          "name": "get_priority_mode",
+          "kind": "function",
+          "sig": "() -> str",
+          "start_line": 95,
+          "end_line": 96,
+          "does": "retrieves priority mode"
+        },
+        {
+          "name": "_get_provider_priority_overrides",
+          "kind": "function",
+          "sig": "() -> Dict[str,int]",
+          "start_line": 99,
+          "end_line": 108,
+          "does": "retrieves provider priority overrides"
+        },
+        {
+          "name": "_get_model_priority_rules",
+          "kind": "function",
+          "sig": "() -> Dict[str,Dict[str,int]]",
+          "start_line": 111,
+          "end_line": 131,
+          "does": "retrieves model priority rules"
+        },
+        {
+          "name": "_get_model_priority",
+          "kind": "function",
+          "sig": "(model_string:str) -> Optional[int]",
+          "start_line": 134,
+          "end_line": 150,
+          "does": "retrieves model priority"
+        },
+        {
+          "name": "_get_provider_model_string",
+          "kind": "function",
+          "sig": "(provider:str) -> str",
+          "start_line": 153,
+          "end_line": 172,
+          "does": "retrieves provider model string"
+        },
+        {
+          "name": "get_client",
+          "kind": "function",
+          "sig": "(provider:str=None, model:str=None) -> BaseLLMClient",
+          "start_line": 380,
+          "end_line": 411,
+          "does": "Get appropriate LLM client based on provider."
+        },
+        {
+          "name": "_try_client",
+          "kind": "function",
+          "sig": "(provider:str, model:str=None) -> Optional[BaseLLMClient]",
+          "start_line": 414,
+          "end_line": 428,
+          "does": "try client"
+        },
+        {
+          "name": "_get_priority_order",
+          "kind": "function",
+          "sig": "() -> List[str]",
+          "start_line": 431,
+          "end_line": 432,
+          "does": "retrieves priority order"
+        },
+        {
+          "name": "_get_effective_provider_order",
+          "kind": "function",
+          "sig": "() -> List[tuple[str,int]]",
+          "start_line": 435,
+          "end_line": 486,
+          "does": "retrieves effective provider order"
+        },
+        {
+          "name": "get_effective_provider_priorities",
+          "kind": "function",
+          "sig": "() -> Dict[str,int]",
+          "start_line": 489,
+          "end_line": 490,
+          "does": "retrieves effective provider priorities"
+        },
+        {
+          "name": "_get_provider_priorities_from_litellm_yaml",
+          "kind": "function",
+          "sig": "() -> Dict[str,int]",
+          "start_line": 493,
+          "end_line": 517,
+          "does": "retrieves provider priorities from litellm yaml"
+        },
+        {
+          "name": "_candidate_litellm_yaml_paths",
+          "kind": "function",
+          "sig": "() -> List[str]",
+          "start_line": 520,
+          "end_line": 526,
+          "does": "candidate litellm yaml paths"
+        },
+        {
+          "name": "BaseLLMClient.generate",
+          "kind": "method",
+          "sig": "(prompt:str, system:str=None, max_tokens:int=4000) -> str",
+          "start_line": 190,
+          "end_line": 192,
+          "does": "Generate completion."
+        },
+        {
+          "name": "BaseLLMClient.is_available",
+          "kind": "method",
+          "sig": "() -> bool",
+          "start_line": 195,
+          "end_line": 197,
+          "does": "Check if client is available."
+        },
+        {
+          "name": "BaseLLMClient.chat",
+          "kind": "method",
+          "sig": "(messages:List[Dict[str,str]], max_tokens:int=4000) -> str",
+          "start_line": 199,
+          "end_line": 209,
+          "does": "Chat completion (default implementation)."
+        },
+        {
+          "name": "OpenRouterClient.__init__",
+          "kind": "method",
+          "sig": "(api_key:str=None, model:str=None) -> None",
+          "start_line": 218,
+          "end_line": 226,
+          "does": "Initialize OpenRouter client."
+        },
+        {
+          "name": "OpenRouterClient.generate",
+          "kind": "method",
+          "sig": "(prompt:str, system:str=None, max_tokens:int=4000) -> str",
+          "start_line": 228,
+          "end_line": 264,
+          "does": "Generate completion using OpenRouter."
+        },
+        {
+          "name": "OpenRouterClient.is_available",
+          "kind": "method",
+          "sig": "() -> bool",
+          "start_line": 266,
+          "end_line": 268,
+          "does": "Check if OpenRouter is configured."
+        },
+        {
+          "name": "OpenRouterClient.list_recommended_models",
+          "kind": "method",
+          "sig": "() -> List[tuple]",
+          "start_line": 271,
+          "end_line": 273,
+          "does": "List recommended models for code tasks."
+        },
+        {
+          "name": "OllamaLocalClient.__init__",
+          "kind": "method",
+          "sig": "(model:str=None, host:str=None) -> None",
+          "start_line": 281,
+          "end_line": 289,
+          "does": "Initialize Ollama client."
+        },
+        {
+          "name": "OllamaLocalClient.generate",
+          "kind": "method",
+          "sig": "(prompt:str, system:str=None, max_tokens:int=4000) -> str",
+          "start_line": 291,
+          "end_line": 310,
+          "does": "Generate completion using Ollama."
+        },
+        {
+          "name": "OllamaLocalClient.is_available",
+          "kind": "method",
+          "sig": "() -> bool",
+          "start_line": 312,
+          "end_line": 320,
+          "does": "Check if Ollama is running."
+        },
+        {
+          "name": "OllamaLocalClient.list_models",
+          "kind": "method",
+          "sig": "() -> List[str]",
+          "start_line": 322,
+          "end_line": 333,
+          "does": "List available Ollama models."
+        },
+        {
+          "name": "OllamaLocalClient.list_recommended_models",
+          "kind": "method",
+          "sig": "() -> List[tuple]",
+          "start_line": 336,
+          "end_line": 338,
+          "does": "List recommended models for code tasks."
+        },
+        {
+          "name": "LiteLLMClient.__init__",
+          "kind": "method",
+          "sig": "(model:str=None) -> None",
+          "start_line": 346,
+          "end_line": 352,
+          "does": "Initialize LiteLLM client."
+        },
+        {
+          "name": "LiteLLMClient.generate",
+          "kind": "method",
+          "sig": "(prompt:str, system:str=None, max_tokens:int=4000) -> str",
+          "start_line": 354,
+          "end_line": 373,
+          "does": "Generate completion using LiteLLM."
+        },
+        {
+          "name": "LiteLLMClient.is_available",
+          "kind": "method",
+          "sig": "() -> bool",
+          "start_line": 375,
+          "end_line": 377,
+          "does": "Check if LiteLLM is available."
+        }
+      ]
+    },
+    {
+      "path": "prompts.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "get_reproduction_prompt",
+          "kind": "function",
+          "sig": "(spec:str, fmt:str, file_name:str, language:str='python', max_spec_length:int=5000) -> str",
+          "start_line": 57,
+          "end_line": 91,
+          "does": "Generate optimized reproduction prompt."
+        },
+        {
+          "name": "get_review_prompt",
+          "kind": "function",
+          "sig": "(code:str, spec:str, fmt:str) -> str",
+          "start_line": 94,
+          "end_line": 126,
+          "does": "Generate code review prompt."
+        },
+        {
+          "name": "get_fix_prompt",
+          "kind": "function",
+          "sig": "(code:str, issues:list, spec:str) -> str",
+          "start_line": 129,
+          "end_line": 156,
+          "does": "Generate code fix prompt."
+        }
+      ]
+    },
+    {
+      "path": "chunked_reproduction.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "get_llm_limit",
+          "kind": "function",
+          "sig": "(model_name:str) -> int",
+          "start_line": 71,
+          "end_line": 79,
+          "does": "Get context limit for LLM model."
+        },
+        {
+          "name": "chunk_yaml_spec",
+          "kind": "function",
+          "sig": "(spec:str, max_tokens:int=2000) -> List[Chunk]",
+          "start_line": 82,
+          "end_line": 144,
+          "does": "Chunk YAML specification by modules/classes/functions."
+        },
+        {
+          "name": "chunk_gherkin_spec",
+          "kind": "function",
+          "sig": "(spec:str, max_tokens:int=2000) -> List[Chunk]",
+          "start_line": 147,
+          "end_line": 225,
+          "does": "Chunk Gherkin specification by Features/Scenarios."
+        },
+        {
+          "name": "chunk_markdown_spec",
+          "kind": "function",
+          "sig": "(spec:str, max_tokens:int=2000) -> List[Chunk]",
+          "start_line": 228,
+          "end_line": 276,
+          "does": "Chunk Markdown specification by sections."
+        },
+        {
+          "name": "chunk_spec",
+          "kind": "function",
+          "sig": "(spec:str, fmt:str, max_tokens:int=2000) -> ChunkedSpec",
+          "start_line": 279,
+          "end_line": 298,
+          "does": "Chunk specification based on format."
+        },
+        {
+          "name": "get_chunk_prompt",
+          "kind": "function",
+          "sig": "(chunk:Chunk, fmt:str, file_name:str, chunk_num:int, total_chunks:int) -> str",
+          "start_line": 301,
+          "end_line": 319,
+          "does": "Generate prompt for a single chunk."
+        },
+        {
+          "name": "merge_chunk_codes",
+          "kind": "function",
+          "sig": "(codes:List[str], file_name:str) -> str",
+          "start_line": 322,
+          "end_line": 348,
+          "does": "Merge code from multiple chunks."
+        },
+        {
+          "name": "auto_chunk_reproduce",
+          "kind": "function",
+          "sig": "(spec:str, fmt:str, file_name:str, client, model_name:str='default') -> ChunkedResult",
+          "start_line": 431,
+          "end_line": 440,
+          "does": "Auto-chunking reproduction with LLM adaptation."
+        },
+        {
+          "name": "adaptive_chunk_reproduce",
+          "kind": "function",
+          "sig": "(spec:str, fmt:str, file_name:str, client, provider:str='unknown', model:str='unknown') -> ChunkedResult",
+          "start_line": 443,
+          "end_line": 479,
+          "does": "Adaptive chunking reproduction using LLM profile."
+        },
+        {
+          "name": "ChunkedReproducer.__init__",
+          "kind": "method",
+          "sig": "(client, model_name:str='default') -> None",
+          "start_line": 354,
+          "end_line": 357,
+          "does": "creates"
+        },
+        {
+          "name": "ChunkedReproducer.reproduce",
+          "kind": "method",
+          "sig": "(spec:str, fmt:str, file_name:str) -> ChunkedResult",
+          "start_line": 359,
+          "end_line": 420,
+          "does": "Reproduce code from specification, chunking if needed."
+        },
+        {
+          "name": "ChunkedReproducer._extract_code",
+          "kind": "method",
+          "sig": "(response:str) -> str",
+          "start_line": 422,
+          "end_line": 428,
+          "does": "Extract code from LLM response."
+        }
+      ]
+    },
+    {
+      "path": "__init__.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "analyze_quality",
+          "kind": "function",
+          "sig": "(target) -> None",
+          "start_line": 188,
+          "end_line": 191,
+          "does": "processes quality"
+        },
+        {
+          "name": "reproduce_project",
+          "kind": "function",
+          "sig": "(source:str) -> None",
+          "start_line": 194,
+          "end_line": 198,
+          "does": "reproduce project"
+        }
+      ]
+    },
+    {
+      "path": "metrics.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "analyze_reproduction",
+          "kind": "function",
+          "sig": "(original:str, generated:str, spec:str='', format_name:str='', verbose:bool=False) -> ReproductionResult",
+          "start_line": 530,
+          "end_line": 550,
+          "does": "Convenience function for reproduction analysis."
+        },
+        {
+          "name": "compare_formats",
+          "kind": "function",
+          "sig": "(original:str, results:Dict[str,Tuple[str,str]], verbose:bool=False) -> Dict[str, Any]",
+          "start_line": 553,
+          "end_line": 597,
+          "does": "Compare reproduction quality across formats."
+        },
+        {
+          "name": "ReproductionMetrics.__init__",
+          "kind": "method",
+          "sig": "(verbose:bool=False) -> None",
+          "start_line": 186,
+          "end_line": 189,
+          "does": "creates"
+        },
+        {
+          "name": "ReproductionMetrics.analyze",
+          "kind": "method",
+          "sig": "(original:str, generated:str, spec:str='', format_name:str='', source_file:str='') -> ReproductionResult",
+          "start_line": 191,
+          "end_line": 244,
+          "does": "Analyze reproduction quality."
+        },
+        {
+          "name": "ReproductionMetrics._compute_text_metrics",
+          "kind": "method",
+          "sig": "(original:str, generated:str) -> TextMetrics",
+          "start_line": 246,
+          "end_line": 288,
+          "does": "Compute text-level metrics."
+        },
+        {
+          "name": "ReproductionMetrics._cosine_similarity",
+          "kind": "method",
+          "sig": "(words1:List[str], words2:List[str]) -> float",
+          "start_line": 290,
+          "end_line": 304,
+          "does": "Compute cosine similarity between word lists."
+        },
+        {
+          "name": "ReproductionMetrics._compute_structural_metrics",
+          "kind": "method",
+          "sig": "(original:str, generated:str) -> StructuralMetrics",
+          "start_line": 306,
+          "end_line": 359,
+          "does": "Compute structural metrics."
+        },
+        {
+          "name": "ReproductionMetrics._compute_semantic_metrics",
+          "kind": "method",
+          "sig": "(original:str, generated:str) -> SemanticMetrics",
+          "start_line": 361,
+          "end_line": 417,
+          "does": "Compute semantic preservation metrics."
+        },
+        {
+          "name": "ReproductionMetrics._compute_format_metrics",
+          "kind": "method",
+          "sig": "(original:str, generated:str, spec:str, format_name:str) -> FormatMetrics",
+          "start_line": 419,
+          "end_line": 453,
+          "does": "Compute format efficiency metrics."
+        },
+        {
+          "name": "ReproductionMetrics._compute_overall_score",
+          "kind": "method",
+          "sig": "(result:ReproductionResult) -> float",
+          "start_line": 455,
+          "end_line": 484,
+          "does": "Compute weighted overall score."
+        },
+        {
+          "name": "ReproductionMetrics._get_grade",
+          "kind": "method",
+          "sig": "(score:float) -> str",
+          "start_line": 486,
+          "end_line": 497,
+          "does": "Get letter grade from score."
+        },
+        {
+          "name": "ReproductionMetrics._generate_recommendations",
+          "kind": "method",
+          "sig": "(result:ReproductionResult) -> List[str]",
+          "start_line": 499,
+          "end_line": 527,
+          "does": "Generate improvement recommendations."
+        }
+      ]
+    },
+    {
+      "path": "refactor.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "find_duplicates",
+          "kind": "function",
+          "sig": "(project_path:str, threshold:float=0.8) -> List[DuplicateGroup]",
+          "start_line": 112,
+          "end_line": 167,
+          "does": "Find duplicate functions in a project."
+        },
+        {
+          "name": "analyze_quality",
+          "kind": "function",
+          "sig": "(project_path:str, include_security:bool=True, include_performance:bool=True) -> RefactoringReport",
+          "start_line": 170,
+          "end_line": 229,
+          "does": "Analyze code quality and generate refactoring report."
+        },
+        {
+          "name": "suggest_refactoring",
+          "kind": "function",
+          "sig": "(project_path:str, use_llm:bool=False, client:BaseLLMClient=None) -> RefactoringReport",
+          "start_line": 232,
+          "end_line": 294,
+          "does": "Generate refactoring suggestions for a project."
+        },
+        {
+          "name": "compare_codebases",
+          "kind": "function",
+          "sig": "(project1:str, project2:str) -> Dict[str, Any]",
+          "start_line": 297,
+          "end_line": 350,
+          "does": "Compare two codebases for similarities and differences."
+        },
+        {
+          "name": "quick_analyze",
+          "kind": "function",
+          "sig": "(project_path:str) -> Dict[str, Any]",
+          "start_line": 353,
+          "end_line": 388,
+          "does": "Quick analysis for a project."
+        }
+      ]
+    },
+    {
+      "path": "logicml.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "generate_logicml",
+          "kind": "function",
+          "sig": "(project:ProjectInfo, detail:str='standard') -> str",
+          "start_line": 340,
+          "end_line": 344,
+          "does": "Convenience function to generate LogicML format."
+        },
+        {
+          "name": "LogicMLGenerator.__init__",
+          "kind": "method",
+          "sig": "(verbose:bool=False) -> None",
+          "start_line": 80,
+          "end_line": 81,
+          "does": "creates"
+        },
+        {
+          "name": "LogicMLGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='standard') -> LogicMLSpec",
+          "start_line": 83,
+          "end_line": 105,
+          "does": "Generate LogicML specification for a project."
+        },
+        {
+          "name": "LogicMLGenerator._generate_module",
+          "kind": "method",
+          "sig": "(module:ModuleInfo, detail:str) -> str",
+          "start_line": 107,
+          "end_line": 165,
+          "does": "Generate LogicML for a single module."
+        },
+        {
+          "name": "LogicMLGenerator._generate_imports",
+          "kind": "method",
+          "sig": "(imports:List[str]) -> str",
+          "start_line": 167,
+          "end_line": 193,
+          "does": "Generate compact imports section."
+        },
+        {
+          "name": "LogicMLGenerator._generate_class",
+          "kind": "method",
+          "sig": "(cls:ClassInfo, detail:str) -> str",
+          "start_line": 195,
+          "end_line": 247,
+          "does": "Generate LogicML for a class."
+        },
+        {
+          "name": "LogicMLGenerator._generate_method",
+          "kind": "method",
+          "sig": "(method:FunctionInfo, detail:str, indent:int=2) -> str",
+          "start_line": 249,
+          "end_line": 295,
+          "does": "Generate LogicML for a method."
+        },
+        {
+          "name": "LogicMLGenerator._generate_functions",
+          "kind": "method",
+          "sig": "(functions:List[FunctionInfo], detail:str) -> str",
+          "start_line": 297,
+          "end_line": 305,
+          "does": "Generate LogicML for top-level functions."
+        },
+        {
+          "name": "LogicMLGenerator._detect_side_effects",
+          "kind": "method",
+          "sig": "(method:FunctionInfo) -> Optional[str]",
+          "start_line": 307,
+          "end_line": 337,
+          "does": "Detect side effects from method calls and name patterns."
+        }
+      ]
+    },
+    {
+      "path": "function_logic.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "FunctionLogicGenerator.__init__",
+          "kind": "method",
+          "sig": "(verbose:bool=False) -> None",
+          "start_line": 13,
+          "end_line": 14,
+          "does": "creates"
+        },
+        {
+          "name": "FunctionLogicGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='full') -> str",
+          "start_line": 16,
+          "end_line": 42,
+          "does": "creates"
+        },
+        {
+          "name": "FunctionLogicGenerator.generate_json",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='full') -> str",
+          "start_line": 44,
+          "end_line": 50,
+          "does": "creates json"
+        },
+        {
+          "name": "FunctionLogicGenerator.generate_yaml",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='full') -> str",
+          "start_line": 52,
+          "end_line": 60,
+          "does": "creates yaml"
+        },
+        {
+          "name": "FunctionLogicGenerator.generate_toon",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='full') -> str",
+          "start_line": 62,
+          "end_line": 126,
+          "does": "creates toon"
+        },
+        {
+          "name": "FunctionLogicGenerator._build_data",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str) -> dict",
+          "start_line": 128,
+          "end_line": 145,
+          "does": "creates data"
+        },
+        {
+          "name": "FunctionLogicGenerator._module_items",
+          "kind": "method",
+          "sig": "(module) -> List[Tuple[str, str, FunctionInfo]]",
+          "start_line": 147,
+          "end_line": 157,
+          "does": "module items"
+        },
+        {
+          "name": "FunctionLogicGenerator._build_sig",
+          "kind": "method",
+          "sig": "(func:FunctionInfo, include_async_prefix:bool=True) -> str",
+          "start_line": 159,
+          "end_line": 166,
+          "does": "creates sig"
+        },
+        {
+          "name": "FunctionLogicGenerator._build_loc",
+          "kind": "method",
+          "sig": "(func:FunctionInfo) -> str",
+          "start_line": 168,
+          "end_line": 173,
+          "does": "creates loc"
+        },
+        {
+          "name": "FunctionLogicGenerator._build_does",
+          "kind": "method",
+          "sig": "(func:FunctionInfo) -> str",
+          "start_line": 175,
+          "end_line": 179,
+          "does": "creates does"
+        },
+        {
+          "name": "FunctionLogicGenerator._item_to_dict",
+          "kind": "method",
+          "sig": "(kind:str, qualified_name:str, func:FunctionInfo, detail:str) -> dict",
+          "start_line": 181,
+          "end_line": 218,
+          "does": "item to dict"
+        },
+        {
+          "name": "FunctionLogicGenerator._format_function",
+          "kind": "method",
+          "sig": "(kind:str, qualified_name:str, func:FunctionInfo, detail:str, indent:int) -> List[str]",
+          "start_line": 220,
+          "end_line": 267,
+          "does": "formats function"
+        }
+      ]
+    },
+    {
+      "path": "utils.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "estimate_tokens",
+          "kind": "function",
+          "sig": "(text:str) -> int",
+          "start_line": 7,
+          "end_line": 8,
+          "does": "estimate tokens"
+        },
+        {
+          "name": "write_text_atomic",
+          "kind": "function",
+          "sig": "(path:Path, content:str) -> None",
+          "start_line": 11,
+          "end_line": 15,
+          "does": "logs text atomic"
+        },
+        {
+          "name": "cleanup_generated_root",
+          "kind": "function",
+          "sig": "(generated_root:Path, allowed_dirs:set[str]) -> None",
+          "start_line": 18,
+          "end_line": 24,
+          "does": "cleanup generated root"
+        }
+      ]
+    },
+    {
+      "path": "generators.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "bytes_to_kb",
+          "kind": "function",
+          "sig": "(bytes_value:int) -> float",
+          "start_line": 22,
+          "end_line": 26,
+          "does": "Convert bytes to kilobytes with single decimal precision."
+        },
+        {
+          "name": "MarkdownGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail_level:str='standard') -> str",
+          "start_line": 45,
+          "end_line": 143,
+          "does": "Generate Markdown output."
+        },
+        {
+          "name": "MarkdownGenerator._gen_tree",
+          "kind": "method",
+          "sig": "(lines:List[str], project:ProjectInfo) -> None",
+          "start_line": 145,
+          "end_line": 169,
+          "does": "Generate project structure tree."
+        },
+        {
+          "name": "MarkdownGenerator._print_tree",
+          "kind": "method",
+          "sig": "(lines:List[str], tree:dict, prefix:str, depth:int=0) -> None",
+          "start_line": 171,
+          "end_line": 186,
+          "does": "Recursively print tree structure."
+        },
+        {
+          "name": "MarkdownGenerator._gen_module",
+          "kind": "method",
+          "sig": "(lines:List[str], m:ModuleInfo, detail:str, proj:ProjectInfo) -> None",
+          "start_line": 188,
+          "end_line": 243,
+          "does": "Generate module documentation."
+        },
+        {
+          "name": "MarkdownGenerator._gen_class",
+          "kind": "method",
+          "sig": "(lines:List[str], cls:ClassInfo, detail:str) -> None",
+          "start_line": 245,
+          "end_line": 269,
+          "does": "Generate class documentation."
+        },
+        {
+          "name": "MarkdownGenerator._sig",
+          "kind": "method",
+          "sig": "(f:FunctionInfo) -> str",
+          "start_line": 271,
+          "end_line": 288,
+          "does": "Generate function signature."
+        },
+        {
+          "name": "CompactGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 304,
+          "end_line": 352,
+          "does": "Generate compact output."
+        },
+        {
+          "name": "JSONGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, flat:bool=False, detail:str='standard') -> str",
+          "start_line": 370,
+          "end_line": 385,
+          "does": "Generate JSON output."
+        },
+        {
+          "name": "JSONGenerator.generate_from_module",
+          "kind": "method",
+          "sig": "(module:ModuleInfo, detail:str='full') -> str",
+          "start_line": 387,
+          "end_line": 401,
+          "does": "creates from module"
+        },
+        {
+          "name": "JSONGenerator._generate_nested",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str) -> str",
+          "start_line": 403,
+          "end_line": 468,
+          "does": "Generate nested JSON structure."
+        },
+        {
+          "name": "JSONGenerator._field_to_dict",
+          "kind": "method",
+          "sig": "(field:FieldInfo) -> dict",
+          "start_line": 470,
+          "end_line": 479,
+          "does": "Serialize dataclass FieldInfo to dictionary."
+        },
+        {
+          "name": "JSONGenerator._generate_flat",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str) -> str",
+          "start_line": 481,
+          "end_line": 516,
+          "does": "Generate flat JSON list for comparisons."
+        },
+        {
+          "name": "JSONGenerator._build_element_row",
+          "kind": "method",
+          "sig": "(m:ModuleInfo, elem_type:str, name:str, signature:str, f:FunctionInfo, deps:list, detail:str) -> dict",
+          "start_line": 518,
+          "end_line": 545,
+          "does": "Build a single element row for flat output."
+        },
+        {
+          "name": "JSONGenerator._build_signature",
+          "kind": "method",
+          "sig": "(f:FunctionInfo) -> str",
+          "start_line": 547,
+          "end_line": 556,
+          "does": "Build compact signature."
+        },
+        {
+          "name": "JSONGenerator._categorize",
+          "kind": "method",
+          "sig": "(name:str) -> str",
+          "start_line": 558,
+          "end_line": 560,
+          "does": "Categorize by name pattern."
+        },
+        {
+          "name": "JSONGenerator._extract_domain",
+          "kind": "method",
+          "sig": "(path:str) -> str",
+          "start_line": 562,
+          "end_line": 564,
+          "does": "Extract domain from path."
+        },
+        {
+          "name": "JSONGenerator._compute_hash",
+          "kind": "method",
+          "sig": "(name:str, signature:str) -> str",
+          "start_line": 566,
+          "end_line": 568,
+          "does": "Compute short hash."
+        },
+        {
+          "name": "YAMLGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, flat:bool=False, detail:str='standard', compact:bool=True) -> str",
+          "start_line": 605,
+          "end_line": 638,
+          "does": "Generate YAML output."
+        },
+        {
+          "name": "YAMLGenerator.generate_schema",
+          "kind": "method",
+          "sig": "(format_type:str='compact') -> str",
+          "start_line": 640,
+          "end_line": 655,
+          "does": "Generate JSON Schema for the YAML format."
+        },
+        {
+          "name": "YAMLGenerator._generate_compact_schema",
+          "kind": "method",
+          "sig": "() -> str",
+          "start_line": 657,
+          "end_line": 781,
+          "does": "Generate JSON Schema for compact YAML format with meta.legend."
+        },
+        {
+          "name": "YAMLGenerator._generate_full_schema",
+          "kind": "method",
+          "sig": "() -> str",
+          "start_line": 783,
+          "end_line": 861,
+          "does": "Generate JSON Schema for full YAML format."
+        },
+        {
+          "name": "YAMLGenerator._generate_hybrid_schema",
+          "kind": "method",
+          "sig": "() -> str",
+          "start_line": 863,
+          "end_line": 978,
+          "does": "Generate JSON Schema for hybrid format."
+        },
+        {
+          "name": "YAMLGenerator.generate_hybrid",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='standard') -> str",
+          "start_line": 980,
+          "end_line": 1229,
+          "does": "Generate hybrid format combining TOON compactness with YAML completeness."
+        },
+        {
+          "name": "YAMLGenerator._build_enhanced_signature",
+          "kind": "method",
+          "sig": "(f:FunctionInfo) -> str",
+          "start_line": 1231,
+          "end_line": 1250,
+          "does": "Build enhanced signature with better parameter handling."
+        },
+        {
+          "name": "YAMLGenerator._extract_constants",
+          "kind": "method",
+          "sig": "(module:ModuleInfo) -> list",
+          "start_line": 1252,
+          "end_line": 1265,
+          "does": "Extract constants and type definitions from module."
+        },
+        {
+          "name": "YAMLGenerator._extract_dataclasses",
+          "kind": "method",
+          "sig": "(module:ModuleInfo) -> list",
+          "start_line": 1267,
+          "end_line": 1276,
+          "does": "Extract dataclass information from classes."
+        },
+        {
+          "name": "YAMLGenerator._extract_conditional_imports",
+          "kind": "method",
+          "sig": "(module:ModuleInfo) -> list",
+          "start_line": 1278,
+          "end_line": 1288,
+          "does": "Extract conditional imports from constants."
+        },
+        {
+          "name": "YAMLGenerator.generate_from_module",
+          "kind": "method",
+          "sig": "(module:ModuleInfo, detail:str='full') -> str",
+          "start_line": 1290,
+          "end_line": 1304,
+          "does": "creates from module"
+        },
+        {
+          "name": "YAMLGenerator._build_flat_data",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str) -> dict",
+          "start_line": 1306,
+          "end_line": 1340,
+          "does": "Build flat data structure optimized for comparisons."
+        },
+        {
+          "name": "YAMLGenerator._build_nested_data",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str) -> dict",
+          "start_line": 1342,
+          "end_line": 1414,
+          "does": "Build nested hierarchical data structure."
+        },
+        {
+          "name": "YAMLGenerator._constants_for_module_verbose",
+          "kind": "method",
+          "sig": "(module:ModuleInfo, limit:int=12) -> list",
+          "start_line": 1416,
+          "end_line": 1443,
+          "does": "constants for module verbose"
+        },
+        {
+          "name": "YAMLGenerator._build_row",
+          "kind": "method",
+          "sig": "(path:str, elem_type:str, name:str, signature:str, language:str, detail:str, project:ProjectInfo) -> dict",
+          "start_line": 1445,
+          "end_line": 1455,
+          "does": "Build a single row for flat output."
+        },
+        {
+          "name": "YAMLGenerator._build_function_row",
+          "kind": "method",
+          "sig": "(path:str, f:FunctionInfo, language:str, detail:str, project:ProjectInfo, imports:list) -> dict",
+          "start_line": 1457,
+          "end_line": 1483,
+          "does": "Build row for standalone function."
+        },
+        {
+          "name": "YAMLGenerator._build_method_row",
+          "kind": "method",
+          "sig": "(path:str, class_name:str, f:FunctionInfo, language:str, detail:str, project:ProjectInfo, imports:list) -> dict",
+          "start_line": 1485,
+          "end_line": 1512,
+          "does": "Build row for class method."
+        },
+        {
+          "name": "YAMLGenerator._function_to_dict",
+          "kind": "method",
+          "sig": "(f:FunctionInfo, detail:str) -> dict",
+          "start_line": 1514,
+          "end_line": 1530,
+          "does": "Convert function to dict for nested output."
+        },
+        {
+          "name": "YAMLGenerator._method_to_dict",
+          "kind": "method",
+          "sig": "(f:FunctionInfo, detail:str) -> dict",
+          "start_line": 1532,
+          "end_line": 1571,
+          "does": "Convert method to dictionary for YAML output."
+        },
+        {
+          "name": "YAMLGenerator._build_signature",
+          "kind": "method",
+          "sig": "(f:FunctionInfo) -> str",
+          "start_line": 1573,
+          "end_line": 1590,
+          "does": "Build compact signature string."
+        },
+        {
+          "name": "YAMLGenerator._categorize",
+          "kind": "method",
+          "sig": "(name:str) -> str",
+          "start_line": 1592,
+          "end_line": 1594,
+          "does": "Categorize function by name pattern."
+        },
+        {
+          "name": "YAMLGenerator._extract_domain",
+          "kind": "method",
+          "sig": "(path:str) -> str",
+          "start_line": 1596,
+          "end_line": 1598,
+          "does": "Extract domain from file path."
+        },
+        {
+          "name": "YAMLGenerator._compute_hash",
+          "kind": "method",
+          "sig": "(name:str, signature:str) -> str",
+          "start_line": 1600,
+          "end_line": 1602,
+          "does": "Compute short hash for quick comparison."
+        },
+        {
+          "name": "YAMLGenerator._generate_simple_yaml",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, flat:bool, detail:str) -> str",
+          "start_line": 1604,
+          "end_line": 1640,
+          "does": "Fallback YAML generation without pyyaml."
+        },
+        {
+          "name": "YAMLGenerator._build_compact_data",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str) -> dict",
+          "start_line": 1642,
+          "end_line": 1709,
+          "does": "Build compact data structure with short keys."
+        },
+        {
+          "name": "YAMLGenerator._compact_imports",
+          "kind": "method",
+          "sig": "(imports:list) -> list",
+          "start_line": 1711,
+          "end_line": 1715,
+          "does": "Deduplicate and compact imports (typing.Dict, typing.List -> typing.{Dict,List})..."
+        },
+        {
+          "name": "YAMLGenerator._compact_class",
+          "kind": "method",
+          "sig": "(cls:ClassInfo, detail:str, module_types:Optional[list]=None) -> dict",
+          "start_line": 1717,
+          "end_line": 1791,
+          "does": "Generate compact class representation."
+        },
+        {
+          "name": "YAMLGenerator._compact_function",
+          "kind": "method",
+          "sig": "(f:FunctionInfo, detail:str) -> dict",
+          "start_line": 1793,
+          "end_line": 1823,
+          "does": "Generate compact function representation."
+        },
+        {
+          "name": "YAMLGenerator._compact_method",
+          "kind": "method",
+          "sig": "(f:FunctionInfo, detail:str) -> dict",
+          "start_line": 1825,
+          "end_line": 1827,
+          "does": "Generate compact method representation (same as function)."
+        },
+        {
+          "name": "YAMLGenerator._build_compact_signature",
+          "kind": "method",
+          "sig": "(f:FunctionInfo) -> str",
+          "start_line": 1829,
+          "end_line": 1844,
+          "does": "Build compact signature without 'self' and with clean formatting."
+        },
+        {
+          "name": "YAMLGenerator._constants_for_module_verbose",
+          "kind": "method",
+          "sig": "(module:ModuleInfo, limit:int=10) -> list",
+          "start_line": 1846,
+          "end_line": 1869,
+          "does": "Convert module constants into verbose dictionaries."
+        },
+        {
+          "name": "YAMLGenerator._constants_for_module",
+          "kind": "method",
+          "sig": "(module:ModuleInfo, limit:int=10) -> list",
+          "start_line": 1871,
+          "end_line": 1884,
+          "does": "Convert module constants into compact dictionaries."
+        },
+        {
+          "name": "YAMLGenerator._constant_to_dict",
+          "kind": "method",
+          "sig": "(constant:ConstantInfo) -> dict",
+          "start_line": 1886,
+          "end_line": 1898,
+          "does": "Serialize ConstantInfo into a compact dictionary."
+        },
+        {
+          "name": "CSVGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='standard') -> str",
+          "start_line": 1932,
+          "end_line": 1983,
+          "does": "Generate CSV output."
+        },
+        {
+          "name": "CSVGenerator._build_row",
+          "kind": "method",
+          "sig": "(m:ModuleInfo, elem_type:str, name:str, signature:str, calls:list, deps:str, detail:str) -> dict",
+          "start_line": 1985,
+          "end_line": 2012,
+          "does": "Build a single CSV row."
+        },
+        {
+          "name": "CSVGenerator._build_function_row",
+          "kind": "method",
+          "sig": "(m:ModuleInfo, elem_type:str, name:str, f:FunctionInfo, deps:str, detail:str, project:ProjectInfo) -> dict",
+          "start_line": 2014,
+          "end_line": 2043,
+          "does": "Build CSV row for function/method."
+        },
+        {
+          "name": "CSVGenerator._build_signature",
+          "kind": "method",
+          "sig": "(f:FunctionInfo) -> str",
+          "start_line": 2045,
+          "end_line": 2057,
+          "does": "Build compact signature."
+        },
+        {
+          "name": "CSVGenerator._categorize",
+          "kind": "method",
+          "sig": "(name:str) -> str",
+          "start_line": 2059,
+          "end_line": 2061,
+          "does": "Categorize function by name pattern."
+        },
+        {
+          "name": "CSVGenerator._extract_domain",
+          "kind": "method",
+          "sig": "(path:str) -> str",
+          "start_line": 2063,
+          "end_line": 2065,
+          "does": "Extract domain from file path."
+        },
+        {
+          "name": "CSVGenerator._compute_hash",
+          "kind": "method",
+          "sig": "(name:str, signature:str) -> str",
+          "start_line": 2067,
+          "end_line": 2071,
+          "does": "Compute short hash for quick comparison."
+        },
+        {
+          "name": "CSVGenerator._escape_csv",
+          "kind": "method",
+          "sig": "(text:str) -> str",
+          "start_line": 2073,
+          "end_line": 2077,
+          "does": "Escape text for CSV (remove newlines, limit commas)."
+        }
+      ]
+    },
+    {
+      "path": "markdown_format.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "generate_markdown_hybrid",
+          "kind": "function",
+          "sig": "(project:ProjectInfo, detail:str='full') -> str",
+          "start_line": 344,
+          "end_line": 348,
+          "does": "Convenience function to generate Markdown hybrid format."
+        },
+        {
+          "name": "generate_file_markdown",
+          "kind": "function",
+          "sig": "(file_path:str) -> str",
+          "start_line": 351,
+          "end_line": 365,
+          "does": "Generate Markdown hybrid for a single file."
+        },
+        {
+          "name": "MarkdownHybridGenerator.__init__",
+          "kind": "method",
+          "sig": "(verbose:bool=False) -> None",
+          "start_line": 45,
+          "end_line": 48,
+          "does": "creates"
+        },
+        {
+          "name": "MarkdownHybridGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='full') -> MarkdownSpec",
+          "start_line": 50,
+          "end_line": 92,
+          "does": "Generate Markdown hybrid specification."
+        },
+        {
+          "name": "MarkdownHybridGenerator._generate_header",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 94,
+          "end_line": 101,
+          "does": "Generate header section."
+        },
+        {
+          "name": "MarkdownHybridGenerator._generate_tree",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 103,
+          "end_line": 124,
+          "does": "Generate file tree section."
+        },
+        {
+          "name": "MarkdownHybridGenerator._generate_imports",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 126,
+          "end_line": 165,
+          "does": "Generate imports as YAML for precise reproduction."
+        },
+        {
+          "name": "MarkdownHybridGenerator._generate_classes_yaml",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 167,
+          "end_line": 241,
+          "does": "Generate classes as detailed YAML codeblock."
+        },
+        {
+          "name": "MarkdownHybridGenerator._generate_functions_gherkin",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 243,
+          "end_line": 313,
+          "does": "Generate functions as detailed Gherkin codeblock."
+        },
+        {
+          "name": "MarkdownHybridGenerator._generate_dependencies",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 315,
+          "end_line": 341,
+          "does": "Generate module dependencies section."
+        }
+      ]
+    },
+    {
+      "path": "similarity.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "is_rapidfuzz_available",
+          "kind": "function",
+          "sig": "() -> bool",
+          "start_line": 163,
+          "end_line": 165,
+          "does": "Check if Rapidfuzz is available."
+        },
+        {
+          "name": "get_refactoring_suggestions",
+          "kind": "function",
+          "sig": "(similar_functions:Dict[str,List[str]]) -> List[Dict[str,any]]",
+          "start_line": 168,
+          "end_line": 238,
+          "does": "Generate refactoring suggestions based on similar functions."
+        },
+        {
+          "name": "SimilarityDetector.__init__",
+          "kind": "method",
+          "sig": "(threshold:float=80.0) -> None",
+          "start_line": 38,
+          "end_line": 45,
+          "does": "Initialize the similarity detector."
+        },
+        {
+          "name": "SimilarityDetector.find_similar_functions",
+          "kind": "method",
+          "sig": "(modules:List[ModuleInfo]) -> Dict[str,List[str]]",
+          "start_line": 47,
+          "end_line": 107,
+          "does": "Find similar functions across all modules."
+        },
+        {
+          "name": "SimilarityDetector.find_duplicate_signatures",
+          "kind": "method",
+          "sig": "(modules:List[ModuleInfo]) -> Dict[str,List[str]]",
+          "start_line": 109,
+          "end_line": 142,
+          "does": "Find functions with identical signatures."
+        },
+        {
+          "name": "SimilarityDetector._build_signature",
+          "kind": "method",
+          "sig": "(name:str, params:List[str], return_type:str=None) -> str",
+          "start_line": 144,
+          "end_line": 160,
+          "does": "Build a normalized signature string."
+        }
+      ]
+    },
+    {
+      "path": "universal.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "reproduce_file",
+          "kind": "function",
+          "sig": "(source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True) -> Dict[str, Any]",
+          "start_line": 1056,
+          "end_line": 1074,
+          "does": "Convenience function for single file reproduction."
+        },
+        {
+          "name": "UniversalParser.detect_language",
+          "kind": "method",
+          "sig": "(content:str, file_ext:str) -> Language",
+          "start_line": 239,
+          "end_line": 262,
+          "does": "Detect programming language from content and extension."
+        },
+        {
+          "name": "UniversalParser.parse",
+          "kind": "method",
+          "sig": "(file_path:Union[str,Path]) -> CodeLogic",
+          "start_line": 264,
+          "end_line": 282,
+          "does": "Parse source file into CodeLogic."
+        },
+        {
+          "name": "UniversalParser._parse_python",
+          "kind": "method",
+          "sig": "(path:Path, content:str, hash_:str) -> CodeLogic",
+          "start_line": 284,
+          "end_line": 406,
+          "does": "Parse Python file."
+        },
+        {
+          "name": "UniversalParser._parse_js_ts",
+          "kind": "method",
+          "sig": "(path:Path, content:str, hash_:str, lang:Language) -> CodeLogic",
+          "start_line": 408,
+          "end_line": 577,
+          "does": "Parse JavaScript/TypeScript file."
+        },
+        {
+          "name": "UniversalParser._parse_go",
+          "kind": "method",
+          "sig": "(path:Path, content:str, hash_:str) -> CodeLogic",
+          "start_line": 579,
+          "end_line": 639,
+          "does": "Parse Go file."
+        },
+        {
+          "name": "UniversalParser._parse_sql",
+          "kind": "method",
+          "sig": "(path:Path, content:str, hash_:str) -> CodeLogic",
+          "start_line": 641,
+          "end_line": 683,
+          "does": "Parse SQL file."
+        },
+        {
+          "name": "UniversalParser._parse_generic",
+          "kind": "method",
+          "sig": "(path:Path, content:str, hash_:str, lang:Language) -> CodeLogic",
+          "start_line": 685,
+          "end_line": 706,
+          "does": "Generic parser for unknown languages."
+        },
+        {
+          "name": "CodeGenerator.generate",
+          "kind": "method",
+          "sig": "(logic:CodeLogic, target_lang:Language) -> str",
+          "start_line": 712,
+          "end_line": 723,
+          "does": "Generate code in target language."
+        },
+        {
+          "name": "CodeGenerator._generate_python",
+          "kind": "method",
+          "sig": "(logic:CodeLogic) -> str",
+          "start_line": 725,
+          "end_line": 756,
+          "does": "Generate Python code."
+        },
+        {
+          "name": "CodeGenerator._generate_python_element",
+          "kind": "method",
+          "sig": "(elem:CodeElement, indent:int=0) -> List[str]",
+          "start_line": 758,
+          "end_line": 814,
+          "does": "Generate Python code for element."
+        },
+        {
+          "name": "CodeGenerator._generate_typescript",
+          "kind": "method",
+          "sig": "(logic:CodeLogic) -> str",
+          "start_line": 816,
+          "end_line": 855,
+          "does": "Generate TypeScript code."
+        },
+        {
+          "name": "CodeGenerator._generate_go",
+          "kind": "method",
+          "sig": "(logic:CodeLogic) -> str",
+          "start_line": 857,
+          "end_line": 878,
+          "does": "Generate Go code."
+        },
+        {
+          "name": "CodeGenerator._generate_sql",
+          "kind": "method",
+          "sig": "(logic:CodeLogic) -> str",
+          "start_line": 880,
+          "end_line": 894,
+          "does": "Generate SQL code."
+        },
+        {
+          "name": "CodeGenerator._generate_generic",
+          "kind": "method",
+          "sig": "(logic:CodeLogic, target:Language) -> str",
+          "start_line": 896,
+          "end_line": 898,
+          "does": "Generate generic code."
+        },
+        {
+          "name": "UniversalReproducer.__init__",
+          "kind": "method",
+          "sig": "(client:BaseLLMClient=None) -> None",
+          "start_line": 904,
+          "end_line": 908,
+          "does": "Initialize reproducer."
+        },
+        {
+          "name": "UniversalReproducer._get_client",
+          "kind": "method",
+          "sig": "() -> BaseLLMClient",
+          "start_line": 910,
+          "end_line": 914,
+          "does": "Get or create LLM client."
+        },
+        {
+          "name": "UniversalReproducer.extract_logic",
+          "kind": "method",
+          "sig": "(file_path:str) -> CodeLogic",
+          "start_line": 916,
+          "end_line": 918,
+          "does": "Extract code logic from file."
+        },
+        {
+          "name": "UniversalReproducer.reproduce",
+          "kind": "method",
+          "sig": "(source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True) -> Dict[str, Any]",
+          "start_line": 920,
+          "end_line": 983,
+          "does": "Reproduce code from source file."
+        },
+        {
+          "name": "UniversalReproducer._generate_with_llm",
+          "kind": "method",
+          "sig": "(logic:CodeLogic, target:Language) -> str",
+          "start_line": 985,
+          "end_line": 1018,
+          "does": "Generate code using LLM."
+        },
+        {
+          "name": "UniversalReproducer._save_result",
+          "kind": "method",
+          "sig": "(output_dir:Path, original:str, logic:CodeLogic, generated:str, result:Dict[str,Any]) -> None",
+          "start_line": 1020,
+          "end_line": 1053,
+          "does": "Save reproduction results."
+        }
+      ]
+    },
+    {
+      "path": "benchmark.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "run_benchmark",
+          "kind": "function",
+          "sig": "(files:List[str], output_dir:str='benchmark_results', provider:str=None, model:str=None) -> Dict[str,Any]",
+          "start_line": 430,
+          "end_line": 449,
+          "does": "Run reproduction benchmark."
+        },
+        {
+          "name": "ReproductionBenchmark.__init__",
+          "kind": "method",
+          "sig": "(client:BaseLLMClient=None) -> None",
+          "start_line": 140,
+          "end_line": 153,
+          "does": "Initialize benchmark."
+        },
+        {
+          "name": "ReproductionBenchmark.generate_spec",
+          "kind": "method",
+          "sig": "(file_path:Path, format_name:str, detail:str='full') -> str",
+          "start_line": 155,
+          "end_line": 179,
+          "does": "Generate specification in given format."
+        },
+        {
+          "name": "ReproductionBenchmark.reproduce_with_format",
+          "kind": "method",
+          "sig": "(file_path:Path, format_name:str, original_code:str) -> FormatResult",
+          "start_line": 181,
+          "end_line": 252,
+          "does": "Test reproduction with a specific format."
+        },
+        {
+          "name": "ReproductionBenchmark.run_single",
+          "kind": "method",
+          "sig": "(file_path:str, formats:List[str]=None) -> BenchmarkResult",
+          "start_line": 254,
+          "end_line": 304,
+          "does": "Run benchmark on a single file."
+        },
+        {
+          "name": "ReproductionBenchmark.run_all",
+          "kind": "method",
+          "sig": "(files:List[str], output_dir:str=None) -> Dict[str,Any]",
+          "start_line": 306,
+          "end_line": 337,
+          "does": "Run benchmark on multiple files."
+        },
+        {
+          "name": "ReproductionBenchmark._generate_summary",
+          "kind": "method",
+          "sig": "(results:List[BenchmarkResult]) -> Dict[str,Any]",
+          "start_line": 339,
+          "end_line": 362,
+          "does": "Generate summary from benchmark results."
+        },
+        {
+          "name": "ReproductionBenchmark._save_results",
+          "kind": "method",
+          "sig": "(output_dir:Path, results:List[BenchmarkResult], summary:Dict) -> None",
+          "start_line": 364,
+          "end_line": 379,
+          "does": "Save benchmark results."
+        },
+        {
+          "name": "ReproductionBenchmark._generate_report",
+          "kind": "method",
+          "sig": "(results:List[BenchmarkResult], summary:Dict) -> str",
+          "start_line": 381,
+          "end_line": 427,
+          "does": "Generate markdown benchmark report."
+        }
+      ]
+    },
+    {
+      "path": "terminal.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "get_renderer",
+          "kind": "function",
+          "sig": "(use_colors:bool=True, verbose:bool=True) -> ShellRenderer",
+          "start_line": 578,
+          "end_line": 583,
+          "does": "Get or create the global renderer instance."
+        },
+        {
+          "name": "set_renderer",
+          "kind": "function",
+          "sig": "(renderer:ShellRenderer) -> None",
+          "start_line": 586,
+          "end_line": 589,
+          "does": "Set the global renderer instance."
+        },
+        {
+          "name": "ShellRenderer.__init__",
+          "kind": "method",
+          "sig": "(use_colors:bool=True, verbose:bool=True) -> None",
+          "start_line": 99,
+          "end_line": 104,
+          "does": "creates"
+        },
+        {
+          "name": "ShellRenderer._supports_colors",
+          "kind": "method",
+          "sig": "() -> bool",
+          "start_line": 106,
+          "end_line": 117,
+          "does": "Check if terminal supports ANSI colors."
+        },
+        {
+          "name": "ShellRenderer.enable_log",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 119,
+          "end_line": 122,
+          "does": "Enable log buffering for markdown export."
+        },
+        {
+          "name": "ShellRenderer.get_log",
+          "kind": "method",
+          "sig": "() -> str",
+          "start_line": 124,
+          "end_line": 126,
+          "does": "Get buffered log as clean markdown (no ANSI codes)."
+        },
+        {
+          "name": "ShellRenderer.clear_log",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 128,
+          "end_line": 130,
+          "does": "Clear log buffer."
+        },
+        {
+          "name": "ShellRenderer._log",
+          "kind": "method",
+          "sig": "(text:str) -> None",
+          "start_line": 132,
+          "end_line": 140,
+          "does": "Log a line (strips ANSI codes for markdown)."
+        },
+        {
+          "name": "ShellRenderer._c",
+          "kind": "method",
+          "sig": "(color:str, text:str) -> str",
+          "start_line": 142,
+          "end_line": 147,
+          "does": "Apply color to text."
+        },
+        {
+          "name": "ShellRenderer.heading",
+          "kind": "method",
+          "sig": "(level:int, text:str) -> None",
+          "start_line": 153,
+          "end_line": 156,
+          "does": "Print a markdown heading."
+        },
+        {
+          "name": "ShellRenderer.codeblock",
+          "kind": "method",
+          "sig": "(language:Language, content:str) -> None",
+          "start_line": 158,
+          "end_line": 171,
+          "does": "Print a syntax-highlighted code block."
+        },
+        {
+          "name": "ShellRenderer.render_markdown",
+          "kind": "method",
+          "sig": "(text:str) -> None",
+          "start_line": 173,
+          "end_line": 209,
+          "does": "Render full markdown text with syntax highlighting."
+        },
+        {
+          "name": "ShellRenderer.success",
+          "kind": "method",
+          "sig": "(message:str) -> None",
+          "start_line": 215,
+          "end_line": 217,
+          "does": "Print success message."
+        },
+        {
+          "name": "ShellRenderer.error",
+          "kind": "method",
+          "sig": "(message:str) -> None",
+          "start_line": 219,
+          "end_line": 221,
+          "does": "Print error message."
+        },
+        {
+          "name": "ShellRenderer.warning",
+          "kind": "method",
+          "sig": "(message:str) -> None",
+          "start_line": 223,
+          "end_line": 225,
+          "does": "Print warning message."
+        },
+        {
+          "name": "ShellRenderer.info",
+          "kind": "method",
+          "sig": "(message:str) -> None",
+          "start_line": 227,
+          "end_line": 229,
+          "does": "Print info message."
+        },
+        {
+          "name": "ShellRenderer.status",
+          "kind": "method",
+          "sig": "(icon:str, message:str, type:Literal[info,success,warning,error]='info') -> None",
+          "start_line": 231,
+          "end_line": 240,
+          "does": "Print status message with icon."
+        },
+        {
+          "name": "ShellRenderer.kv",
+          "kind": "method",
+          "sig": "(key:str, value:Any) -> None",
+          "start_line": 246,
+          "end_line": 248,
+          "does": "Print key-value pair."
+        },
+        {
+          "name": "ShellRenderer.progress",
+          "kind": "method",
+          "sig": "(done:int, total:int, label:str='') -> None",
+          "start_line": 250,
+          "end_line": 259,
+          "does": "Print progress bar."
+        },
+        {
+          "name": "ShellRenderer.separator",
+          "kind": "method",
+          "sig": "(char:str='─', width:int=60) -> None",
+          "start_line": 261,
+          "end_line": 263,
+          "does": "Print separator line."
+        },
+        {
+          "name": "ShellRenderer.table",
+          "kind": "method",
+          "sig": "(headers:List[str], rows:List[List[Any]], widths:Optional[List[int]]=None) -> None",
+          "start_line": 265,
+          "end_line": 284,
+          "does": "Print a simple table."
+        },
+        {
+          "name": "ShellRenderer.task",
+          "kind": "method",
+          "sig": "(name:str, status:Literal[pending,running,done,failed], duration:Optional[float]=None) -> None",
+          "start_line": 286,
+          "end_line": 307,
+          "does": "Print task status."
+        },
+        {
+          "name": "ShellRenderer.inline",
+          "kind": "method",
+          "sig": "(text:str) -> str",
+          "start_line": 309,
+          "end_line": 311,
+          "does": "Return inline code styled text."
+        },
+        {
+          "name": "ShellRenderer.print",
+          "kind": "method",
+          "sig": "(text:str, color:Optional[str]=None) -> None",
+          "start_line": 313,
+          "end_line": 315,
+          "does": "Print raw text with optional color."
+        },
+        {
+          "name": "ShellRenderer.newline",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 317,
+          "end_line": 319,
+          "does": "Print empty line."
+        },
+        {
+          "name": "ShellRenderer._highlight_line",
+          "kind": "method",
+          "sig": "(line:str, language:str) -> str",
+          "start_line": 325,
+          "end_line": 346,
+          "does": "Apply syntax highlighting to a line."
+        },
+        {
+          "name": "ShellRenderer._highlight_yaml",
+          "kind": "method",
+          "sig": "(line:str) -> str",
+          "start_line": 348,
+          "end_line": 381,
+          "does": "Highlight YAML syntax."
+        },
+        {
+          "name": "ShellRenderer._highlight_json",
+          "kind": "method",
+          "sig": "(line:str) -> str",
+          "start_line": 383,
+          "end_line": 409,
+          "does": "Highlight JSON syntax."
+        },
+        {
+          "name": "ShellRenderer._highlight_python",
+          "kind": "method",
+          "sig": "(line:str) -> str",
+          "start_line": 411,
+          "end_line": 443,
+          "does": "Highlight Python syntax."
+        },
+        {
+          "name": "ShellRenderer._highlight_bash",
+          "kind": "method",
+          "sig": "(line:str) -> str",
+          "start_line": 445,
+          "end_line": 463,
+          "does": "Highlight Bash syntax."
+        },
+        {
+          "name": "ShellRenderer._highlight_js",
+          "kind": "method",
+          "sig": "(line:str) -> str",
+          "start_line": 465,
+          "end_line": 493,
+          "does": "Highlight JavaScript/TypeScript syntax."
+        },
+        {
+          "name": "ShellRenderer._highlight_gherkin",
+          "kind": "method",
+          "sig": "(line:str) -> str",
+          "start_line": 495,
+          "end_line": 519,
+          "does": "Highlight Gherkin/BDD syntax."
+        },
+        {
+          "name": "ShellRenderer._highlight_log",
+          "kind": "method",
+          "sig": "(line:str) -> str",
+          "start_line": 521,
+          "end_line": 540,
+          "does": "Highlight log messages."
+        },
+        {
+          "name": "ShellRenderer._highlight_markdown",
+          "kind": "method",
+          "sig": "(line:str) -> str",
+          "start_line": 542,
+          "end_line": 561,
+          "does": "Highlight Markdown syntax."
+        },
+        {
+          "name": "ShellRenderer.save_log",
+          "kind": "method",
+          "sig": "(filepath:str) -> None",
+          "start_line": 563,
+          "end_line": 568,
+          "does": "Save log buffer to file as markdown."
+        },
+        {
+          "name": "RenderAPI.heading",
+          "kind": "method",
+          "sig": "(level:int, text:str) -> None",
+          "start_line": 596,
+          "end_line": 597,
+          "does": "heading"
+        },
+        {
+          "name": "RenderAPI.code",
+          "kind": "method",
+          "sig": "(lang:Language, content:str) -> None",
+          "start_line": 600,
+          "end_line": 601,
+          "does": "code"
+        },
+        {
+          "name": "RenderAPI.codeblock",
+          "kind": "method",
+          "sig": "(lang:Language, content:str) -> None",
+          "start_line": 604,
+          "end_line": 605,
+          "does": "codeblock"
+        },
+        {
+          "name": "RenderAPI.markdown",
+          "kind": "method",
+          "sig": "(text:str) -> None",
+          "start_line": 608,
+          "end_line": 609,
+          "does": "markdown"
+        },
+        {
+          "name": "RenderAPI.success",
+          "kind": "method",
+          "sig": "(message:str) -> None",
+          "start_line": 612,
+          "end_line": 613,
+          "does": "success"
+        },
+        {
+          "name": "RenderAPI.error",
+          "kind": "method",
+          "sig": "(message:str) -> None",
+          "start_line": 616,
+          "end_line": 617,
+          "does": "error"
+        },
+        {
+          "name": "RenderAPI.warning",
+          "kind": "method",
+          "sig": "(message:str) -> None",
+          "start_line": 620,
+          "end_line": 621,
+          "does": "warning"
+        },
+        {
+          "name": "RenderAPI.info",
+          "kind": "method",
+          "sig": "(message:str) -> None",
+          "start_line": 624,
+          "end_line": 625,
+          "does": "info"
+        },
+        {
+          "name": "RenderAPI.status",
+          "kind": "method",
+          "sig": "(icon:str, message:str, type:Literal[info,success,warning,error]='info') -> None",
+          "start_line": 628,
+          "end_line": 630,
+          "does": "status"
+        },
+        {
+          "name": "RenderAPI.kv",
+          "kind": "method",
+          "sig": "(key:str, value:Any) -> None",
+          "start_line": 633,
+          "end_line": 634,
+          "does": "kv"
+        },
+        {
+          "name": "RenderAPI.progress",
+          "kind": "method",
+          "sig": "(done:int, total:int, label:str='') -> None",
+          "start_line": 637,
+          "end_line": 638,
+          "does": "progress"
+        },
+        {
+          "name": "RenderAPI.separator",
+          "kind": "method",
+          "sig": "(char:str='─', width:int=60) -> None",
+          "start_line": 641,
+          "end_line": 642,
+          "does": "separator"
+        },
+        {
+          "name": "RenderAPI.table",
+          "kind": "method",
+          "sig": "(headers:List[str], rows:List[List[Any]], widths:Optional[List[int]]=None) -> None",
+          "start_line": 645,
+          "end_line": 647,
+          "does": "table"
+        },
+        {
+          "name": "RenderAPI.task",
+          "kind": "method",
+          "sig": "(name:str, status:Literal[pending,running,done,failed], duration:Optional[float]=None) -> None",
+          "start_line": 650,
+          "end_line": 653,
+          "does": "task"
+        },
+        {
+          "name": "RenderAPI.inline",
+          "kind": "method",
+          "sig": "(text:str) -> str",
+          "start_line": 656,
+          "end_line": 657,
+          "does": "inline"
+        },
+        {
+          "name": "RenderAPI.print",
+          "kind": "method",
+          "sig": "(text:str, color:Optional[str]=None) -> None",
+          "start_line": 660,
+          "end_line": 661,
+          "does": "logs"
+        },
+        {
+          "name": "RenderAPI.newline",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 664,
+          "end_line": 665,
+          "does": "newline"
+        }
+      ]
+    },
+    {
+      "path": "toon_format.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "generate_toon",
+          "kind": "function",
+          "sig": "(project:ProjectInfo, detail:str='standard', use_tabs:bool=False) -> str",
+          "start_line": 692,
+          "end_line": 705,
+          "does": "Convenience function to generate TOON format."
+        },
+        {
+          "name": "parse_toon",
+          "kind": "function",
+          "sig": "(content:str) -> Dict[str, Any]",
+          "start_line": 708,
+          "end_line": 710,
+          "does": "Convenience function to parse TOON content."
+        },
+        {
+          "name": "TOONGenerator.__init__",
+          "kind": "method",
+          "sig": "(delimiter:str=',', use_tabs:bool=False) -> None",
+          "start_line": 35,
+          "end_line": 46,
+          "does": "Initialize TOON generator."
+        },
+        {
+          "name": "TOONGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='standard') -> str",
+          "start_line": 48,
+          "end_line": 81,
+          "does": "Generate TOON format from ProjectInfo."
+        },
+        {
+          "name": "TOONGenerator._generate_modules",
+          "kind": "method",
+          "sig": "(modules:List[ModuleInfo], detail:str) -> List[str]",
+          "start_line": 83,
+          "end_line": 156,
+          "does": "Generate modules section."
+        },
+        {
+          "name": "TOONGenerator._generate_types",
+          "kind": "method",
+          "sig": "(types:List[TypeInfo], indent:int=0) -> List[str]",
+          "start_line": 158,
+          "end_line": 189,
+          "does": "Generate module-level types in TOON format (with enum values where available)."
+        },
+        {
+          "name": "TOONGenerator._generate_classes",
+          "kind": "method",
+          "sig": "(classes:List[ClassInfo], detail:str, indent:int=0) -> List[str]",
+          "start_line": 191,
+          "end_line": 243,
+          "does": "Generate classes in TOON format."
+        },
+        {
+          "name": "TOONGenerator._generate_methods",
+          "kind": "method",
+          "sig": "(methods:List[FunctionInfo], detail:str='standard', indent:int=0) -> List[str]",
+          "start_line": 245,
+          "end_line": 271,
+          "does": "Generate methods in tabular TOON format."
+        },
+        {
+          "name": "TOONGenerator._generate_functions",
+          "kind": "method",
+          "sig": "(functions:List[FunctionInfo], detail:str, indent:int=0) -> List[str]",
+          "start_line": 273,
+          "end_line": 302,
+          "does": "Generate functions in tabular TOON format."
+        },
+        {
+          "name": "TOONGenerator._build_signature",
+          "kind": "method",
+          "sig": "(f:FunctionInfo) -> str",
+          "start_line": 304,
+          "end_line": 327,
+          "does": "Build compact signature string without self/cls."
+        },
+        {
+          "name": "TOONGenerator._quote",
+          "kind": "method",
+          "sig": "(value:Any) -> str",
+          "start_line": 329,
+          "end_line": 354,
+          "does": "Quote a value if necessary for TOON format."
+        },
+        {
+          "name": "TOONGenerator.generate_compact",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 356,
+          "end_line": 358,
+          "does": "Generate minimal TOON output."
+        },
+        {
+          "name": "TOONGenerator.generate_full",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 360,
+          "end_line": 362,
+          "does": "Generate detailed TOON output."
+        },
+        {
+          "name": "TOONGenerator.generate_schema",
+          "kind": "method",
+          "sig": "(format_type:str='standard') -> str",
+          "start_line": 364,
+          "end_line": 515,
+          "does": "Generate JSON Schema for the TOON format."
+        },
+        {
+          "name": "TOONGenerator.generate_ultra_compact",
+          "kind": "method",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 517,
+          "end_line": 573,
+          "does": "Generate minimal TOON with abbreviated keys."
+        },
+        {
+          "name": "TOONParser.__init__",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 584,
+          "end_line": 585,
+          "does": "creates"
+        },
+        {
+          "name": "TOONParser.parse",
+          "kind": "method",
+          "sig": "(content:str) -> Dict[str, Any]",
+          "start_line": 587,
+          "end_line": 659,
+          "does": "Parse TOON content to dict."
+        },
+        {
+          "name": "TOONParser._parse_value",
+          "kind": "method",
+          "sig": "(value:str) -> Any",
+          "start_line": 661,
+          "end_line": 689,
+          "does": "Parse a TOON value to Python type."
+        }
+      ]
+    },
+    {
+      "path": "dependency.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "is_networkx_available",
+          "kind": "function",
+          "sig": "() -> bool",
+          "start_line": 244,
+          "end_line": 246,
+          "does": "Check if NetworkX is available."
+        },
+        {
+          "name": "DependencyAnalyzer.__init__",
+          "kind": "method",
+          "sig": "() -> None",
+          "start_line": 39,
+          "end_line": 43,
+          "does": "Initialize the dependency analyzer."
+        },
+        {
+          "name": "DependencyAnalyzer.build_graph",
+          "kind": "method",
+          "sig": "(modules:List[ModuleInfo]) -> Dict[str,List[str]]",
+          "start_line": 45,
+          "end_line": 88,
+          "does": "Build dependency graph from modules."
+        },
+        {
+          "name": "DependencyAnalyzer.analyze_metrics",
+          "kind": "method",
+          "sig": "() -> Dict[str,DependencyNode]",
+          "start_line": 90,
+          "end_line": 128,
+          "does": "Compute metrics for each node in the graph."
+        },
+        {
+          "name": "DependencyAnalyzer.get_entrypoints",
+          "kind": "method",
+          "sig": "() -> List[str]",
+          "start_line": 130,
+          "end_line": 139,
+          "does": "Get entry points (nodes with no incoming edges)."
+        },
+        {
+          "name": "DependencyAnalyzer.get_hubs",
+          "kind": "method",
+          "sig": "() -> List[str]",
+          "start_line": 141,
+          "end_line": 149,
+          "does": "Get hub modules (high centrality)."
+        },
+        {
+          "name": "DependencyAnalyzer.detect_cycles",
+          "kind": "method",
+          "sig": "() -> List[List[str]]",
+          "start_line": 151,
+          "end_line": 165,
+          "does": "Detect dependency cycles."
+        },
+        {
+          "name": "DependencyAnalyzer.get_strongly_connected_components",
+          "kind": "method",
+          "sig": "() -> List[List[str]]",
+          "start_line": 167,
+          "end_line": 181,
+          "does": "Get strongly connected components."
+        },
+        {
+          "name": "DependencyAnalyzer._detect_clusters",
+          "kind": "method",
+          "sig": "() -> Dict[str,int]",
+          "start_line": 183,
+          "end_line": 199,
+          "does": "Detect clusters using connected components."
+        },
+        {
+          "name": "DependencyAnalyzer._module_name",
+          "kind": "method",
+          "sig": "(path:str) -> str",
+          "start_line": 201,
+          "end_line": 207,
+          "does": "Convert file path to module name."
+        },
+        {
+          "name": "DependencyAnalyzer.get_dependency_depth",
+          "kind": "method",
+          "sig": "(module_path:str) -> int",
+          "start_line": 209,
+          "end_line": 241,
+          "does": "Get the maximum depth of dependencies for a module."
+        }
+      ]
+    },
+    {
+      "path": "mcp_server.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "handle_request",
+          "kind": "function",
+          "sig": "(request:dict) -> dict",
+          "start_line": 36,
+          "end_line": 175,
+          "does": "Handle incoming MCP request."
+        },
+        {
+          "name": "call_tool",
+          "kind": "function",
+          "sig": "(tool_name:str, arguments:dict) -> str",
+          "start_line": 178,
+          "end_line": 330,
+          "does": "Execute a tool and return result."
+        },
+        {
+          "name": "run_server",
+          "kind": "function",
+          "sig": "() -> None",
+          "start_line": 333,
+          "end_line": 352,
+          "does": "Run the MCP server."
+        }
+      ]
+    },
+    {
+      "path": "reproduction.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "generate_file_gherkin",
+          "kind": "function",
+          "sig": "(file_path:Path) -> str",
+          "start_line": 26,
+          "end_line": 222,
+          "does": "Generate detailed Gherkin specification for a single file with types."
+        },
+        {
+          "name": "compare_code",
+          "kind": "function",
+          "sig": "(original:str, generated:str) -> Dict[str, Any]",
+          "start_line": 225,
+          "end_line": 278,
+          "does": "Compare original and generated code."
+        },
+        {
+          "name": "extract_code_block",
+          "kind": "function",
+          "sig": "(text:str, language:str='python') -> str",
+          "start_line": 281,
+          "end_line": 311,
+          "does": "Extract code block from LLM response."
+        },
+        {
+          "name": "CodeReproducer.__init__",
+          "kind": "method",
+          "sig": "(client:BaseLLMClient=None, provider:str=None) -> None",
+          "start_line": 317,
+          "end_line": 324,
+          "does": "Initialize reproducer."
+        },
+        {
+          "name": "CodeReproducer.reproduce_file",
+          "kind": "method",
+          "sig": "(source_path:str, output_dir:str=None) -> Dict[str, Any]",
+          "start_line": 326,
+          "end_line": 363,
+          "does": "Reproduce code from a source file."
+        },
+        {
+          "name": "CodeReproducer.generate_from_gherkin",
+          "kind": "method",
+          "sig": "(gherkin:str, language:str='python') -> str",
+          "start_line": 365,
+          "end_line": 396,
+          "does": "Generate code from Gherkin specification."
+        },
+        {
+          "name": "CodeReproducer._save_results",
+          "kind": "method",
+          "sig": "(output_dir:Path, results:Dict[str,Any]) -> None",
+          "start_line": 398,
+          "end_line": 408,
+          "does": "Save reproduction results to files."
+        },
+        {
+          "name": "CodeReproducer._generate_report",
+          "kind": "method",
+          "sig": "(results:Dict[str,Any]) -> str",
+          "start_line": 410,
+          "end_line": 440,
+          "does": "Generate markdown comparison report."
+        }
+      ]
+    },
+    {
+      "path": "gherkin.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "csv_to_gherkin",
+          "kind": "function",
+          "sig": "(csv_content:str, language:str='en') -> str",
+          "start_line": 875,
+          "end_line": 940,
+          "does": "Convert CSV analysis directly to Gherkin."
+        },
+        {
+          "name": "gherkin_to_test_data",
+          "kind": "function",
+          "sig": "(gherkin_content:str) -> Dict[str, Any]",
+          "start_line": 943,
+          "end_line": 979,
+          "does": "Extract structured test data from Gherkin for LLM processing."
+        },
+        {
+          "name": "GherkinGenerator.__init__",
+          "kind": "method",
+          "sig": "(language:str='en') -> None",
+          "start_line": 164,
+          "end_line": 173,
+          "does": "Initialize GherkinGenerator."
+        },
+        {
+          "name": "GherkinGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='standard', group_by:str='domain') -> str",
+          "start_line": 175,
+          "end_line": 189,
+          "does": "Generate Gherkin feature files from project analysis."
+        },
+        {
+          "name": "GherkinGenerator.generate_test_scenarios",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, group_by:str='domain') -> List[GherkinFeature]",
+          "start_line": 191,
+          "end_line": 203,
+          "does": "Generate structured test scenarios for programmatic use."
+        },
+        {
+          "name": "GherkinGenerator.get_step_definitions",
+          "kind": "method",
+          "sig": "() -> List[StepDefinition]",
+          "start_line": 205,
+          "end_line": 207,
+          "does": "Get all unique step definitions from generated features."
+        },
+        {
+          "name": "GherkinGenerator._extract_features",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, group_by:str) -> List[GherkinFeature]",
+          "start_line": 209,
+          "end_line": 259,
+          "does": "Extract Gherkin features from project."
+        },
+        {
+          "name": "GherkinGenerator._create_feature",
+          "kind": "method",
+          "sig": "(group_name:str, items:List[dict], project:ProjectInfo, group_by:str) -> GherkinFeature",
+          "start_line": 261,
+          "end_line": 306,
+          "does": "Create a Gherkin feature from grouped items."
+        },
+        {
+          "name": "GherkinGenerator._create_scenario",
+          "kind": "method",
+          "sig": "(category:str, items:List[dict], domain:str) -> GherkinScenario",
+          "start_line": 308,
+          "end_line": 358,
+          "does": "Create a scenario from category items."
+        },
+        {
+          "name": "GherkinGenerator._create_edge_case_scenarios",
+          "kind": "method",
+          "sig": "(category:str, items:List[dict]) -> List[GherkinScenario]",
+          "start_line": 360,
+          "end_line": 386,
+          "does": "Create edge case scenarios for thorough testing."
+        },
+        {
+          "name": "GherkinGenerator._create_when_step",
+          "kind": "method",
+          "sig": "(func:FunctionInfo, verb:str) -> str",
+          "start_line": 388,
+          "end_line": 403,
+          "does": "Create a When step from function info."
+        },
+        {
+          "name": "GherkinGenerator._create_background",
+          "kind": "method",
+          "sig": "(domain:str, items:List[dict]) -> Optional[List[str]]",
+          "start_line": 405,
+          "end_line": 421,
+          "does": "Create background steps for common setup."
+        },
+        {
+          "name": "GherkinGenerator._create_examples_table",
+          "kind": "method",
+          "sig": "(items:List[dict]) -> List[Dict[str, str]]",
+          "start_line": 423,
+          "end_line": 442,
+          "does": "Create Examples table for Scenario Outline."
+        },
+        {
+          "name": "GherkinGenerator._extract_param_placeholders",
+          "kind": "method",
+          "sig": "(func:FunctionInfo) -> str",
+          "start_line": 444,
+          "end_line": 451,
+          "does": "Extract parameter placeholders for Gherkin steps."
+        },
+        {
+          "name": "GherkinGenerator._register_step",
+          "kind": "method",
+          "sig": "(step_type:str, pattern:str, func:FunctionInfo) -> None",
+          "start_line": 453,
+          "end_line": 466,
+          "does": "Register a step definition for later generation."
+        },
+        {
+          "name": "GherkinGenerator._render_features",
+          "kind": "method",
+          "sig": "(features:List[GherkinFeature], detail:str) -> str",
+          "start_line": 468,
+          "end_line": 482,
+          "does": "Render features to Gherkin text."
+        },
+        {
+          "name": "GherkinGenerator._render_feature",
+          "kind": "method",
+          "sig": "(feature:GherkinFeature, detail:str) -> str",
+          "start_line": 484,
+          "end_line": 511,
+          "does": "Render a single feature."
+        },
+        {
+          "name": "GherkinGenerator._render_scenario",
+          "kind": "method",
+          "sig": "(scenario:GherkinScenario, detail:str) -> str",
+          "start_line": 513,
+          "end_line": 556,
+          "does": "Render a single scenario."
+        },
+        {
+          "name": "GherkinGenerator._categorize",
+          "kind": "method",
+          "sig": "(name:str) -> str",
+          "start_line": 558,
+          "end_line": 577,
+          "does": "Categorize function by name pattern."
+        },
+        {
+          "name": "GherkinGenerator._extract_domain",
+          "kind": "method",
+          "sig": "(path:str) -> str",
+          "start_line": 579,
+          "end_line": 588,
+          "does": "Extract domain from file path."
+        },
+        {
+          "name": "GherkinGenerator._name_to_readable",
+          "kind": "method",
+          "sig": "(name:str) -> str",
+          "start_line": 590,
+          "end_line": 596,
+          "does": "Convert function name to readable text."
+        },
+        {
+          "name": "GherkinGenerator._step_to_func_name",
+          "kind": "method",
+          "sig": "(step:str) -> str",
+          "start_line": 598,
+          "end_line": 602,
+          "does": "Convert step text to valid function name."
+        },
+        {
+          "name": "StepDefinitionGenerator.generate_pytest_bdd",
+          "kind": "method",
+          "sig": "(features:List[GherkinFeature]) -> str",
+          "start_line": 616,
+          "end_line": 677,
+          "does": "Generate pytest-bdd step definitions."
+        },
+        {
+          "name": "StepDefinitionGenerator.generate_behave",
+          "kind": "method",
+          "sig": "(features:List[GherkinFeature]) -> str",
+          "start_line": 679,
+          "end_line": 717,
+          "does": "Generate behave step definitions."
+        },
+        {
+          "name": "StepDefinitionGenerator.generate_cucumber_js",
+          "kind": "method",
+          "sig": "(features:List[GherkinFeature]) -> str",
+          "start_line": 719,
+          "end_line": 761,
+          "does": "Generate Cucumber.js step definitions."
+        },
+        {
+          "name": "StepDefinitionGenerator._step_to_func_name",
+          "kind": "method",
+          "sig": "(step:str) -> str",
+          "start_line": 763,
+          "end_line": 767,
+          "does": "Convert step text to valid function name."
+        },
+        {
+          "name": "CucumberYAMLGenerator.generate",
+          "kind": "method",
+          "sig": "(project:ProjectInfo, detail:str='standard') -> str",
+          "start_line": 777,
+          "end_line": 842,
+          "does": "Generate Cucumber YAML configuration."
+        },
+        {
+          "name": "CucumberYAMLGenerator._extract_domain",
+          "kind": "method",
+          "sig": "(path:str) -> str",
+          "start_line": 844,
+          "end_line": 855,
+          "does": "Extract domain from path."
+        },
+        {
+          "name": "CucumberYAMLGenerator._categorize",
+          "kind": "method",
+          "sig": "(name:str) -> str",
+          "start_line": 857,
+          "end_line": 872,
+          "does": "Categorize by name pattern."
+        }
+      ]
+    },
+    {
+      "path": "schemas/logicml_schema.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "validate_logicml",
+          "kind": "function",
+          "sig": "(spec:str) -> Tuple[bool, List[str]]",
+          "start_line": 111,
+          "end_line": 206,
+          "does": "Validate LogicML specification."
+        },
+        {
+          "name": "parse_logicml_header",
+          "kind": "function",
+          "sig": "(line:str) -> Optional[Dict[str, Any]]",
+          "start_line": 209,
+          "end_line": 219,
+          "does": "Parse LogicML header comment."
+        },
+        {
+          "name": "extract_logicml_signature",
+          "kind": "function",
+          "sig": "(sig_line:str) -> Dict[str, Any]",
+          "start_line": 222,
+          "end_line": 250,
+          "does": "Extract signature components from LogicML sig: line."
+        }
+      ]
+    },
+    {
+      "path": "schemas/yaml_schema.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "validate_yaml",
+          "kind": "function",
+          "sig": "(spec:str) -> Tuple[bool, List[str]]",
+          "start_line": 94,
+          "end_line": 148,
+          "does": "Validate YAML specification."
+        },
+        {
+          "name": "_validate_module",
+          "kind": "function",
+          "sig": "(module:Dict, index:int) -> List[str]",
+          "start_line": 151,
+          "end_line": 183,
+          "does": "Validate a module definition."
+        },
+        {
+          "name": "_validate_class",
+          "kind": "function",
+          "sig": "(cls:Dict, prefix:str) -> List[str]",
+          "start_line": 186,
+          "end_line": 214,
+          "does": "Validate a class definition."
+        }
+      ]
+    },
+    {
+      "path": "schemas/json_schema.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "validate_json",
+          "kind": "function",
+          "sig": "(spec:str) -> Tuple[bool, List[str]]",
+          "start_line": 110,
+          "end_line": 143,
+          "does": "Validate JSON specification."
+        },
+        {
+          "name": "_validate_json_module",
+          "kind": "function",
+          "sig": "(module:Dict, index:int) -> List[str]",
+          "start_line": 146,
+          "end_line": 171,
+          "does": "Validate a JSON module definition."
+        },
+        {
+          "name": "_validate_json_class",
+          "kind": "function",
+          "sig": "(cls:Dict, prefix:str) -> List[str]",
+          "start_line": 174,
+          "end_line": 195,
+          "does": "Validate a JSON class definition."
+        },
+        {
+          "name": "parse_json_spec",
+          "kind": "function",
+          "sig": "(spec:str) -> Optional[JSONSchema]",
+          "start_line": 198,
+          "end_line": 257,
+          "does": "Parse JSON specification into schema."
+        }
+      ]
+    },
+    {
+      "path": "schemas/markdown_schema.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "validate_markdown",
+          "kind": "function",
+          "sig": "(spec:str) -> Tuple[bool, List[str]]",
+          "start_line": 89,
+          "end_line": 150,
+          "does": "Validate Markdown specification."
+        },
+        {
+          "name": "extract_markdown_sections",
+          "kind": "function",
+          "sig": "(spec:str) -> Dict[str, Any]",
+          "start_line": 153,
+          "end_line": 174,
+          "does": "Extract sections from Markdown specification."
+        }
+      ]
+    },
+    {
+      "path": "benchmarks/common.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "create_single_project",
+          "kind": "function",
+          "sig": "(module_info, file_path:Path) -> ProjectInfo",
+          "start_line": 15,
+          "end_line": 28,
+          "does": "creates single project"
+        },
+        {
+          "name": "generate_spec",
+          "kind": "function",
+          "sig": "(project:ProjectInfo, fmt:str) -> str",
+          "start_line": 31,
+          "end_line": 52,
+          "does": "creates spec"
+        },
+        {
+          "name": "_generate_token_json",
+          "kind": "function",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 55,
+          "end_line": 108,
+          "does": "Generate compact, token-friendly JSON spec (used by examples/11_token_benchmark...."
+        },
+        {
+          "name": "_generate_token_json_compact",
+          "kind": "function",
+          "sig": "(project:ProjectInfo) -> str",
+          "start_line": 111,
+          "end_line": 113,
+          "does": "creates token json compact"
+        },
+        {
+          "name": "generate_spec_token",
+          "kind": "function",
+          "sig": "(project:ProjectInfo, fmt:str) -> str",
+          "start_line": 116,
+          "end_line": 127,
+          "does": "Generate spec optimized for token benchmark (keeps historical behavior)."
+        },
+        {
+          "name": "get_async_reproduction_prompt",
+          "kind": "function",
+          "sig": "(spec:str, fmt:str, file_name:str, with_tests:bool=False) -> str",
+          "start_line": 130,
+          "end_line": 174,
+          "does": "retrieves async reproduction prompt"
+        },
+        {
+          "name": "get_token_reproduction_prompt",
+          "kind": "function",
+          "sig": "(spec:str, fmt:str, file_name:str) -> str",
+          "start_line": 177,
+          "end_line": 226,
+          "does": "retrieves token reproduction prompt"
+        },
+        {
+          "name": "get_simple_reproduction_prompt",
+          "kind": "function",
+          "sig": "(spec:str, fmt:str, file_name:str) -> str",
+          "start_line": 229,
+          "end_line": 258,
+          "does": "retrieves simple reproduction prompt"
+        }
+      ]
+    },
+    {
+      "path": "benchmarks/runner.py",
+      "language": "python",
+      "functions": [
+        {
+          "name": "_test_python_syntax",
+          "kind": "function",
+          "sig": "(code:str) -> bool",
+          "start_line": 43,
+          "end_line": 49,
+          "does": "Test if Python code has valid syntax."
+        },
+        {
+          "name": "_test_python_runs",
+          "kind": "function",
+          "sig": "(code:str, timeout:int=5) -> bool",
+          "start_line": 52,
+          "end_line": 67,
+          "does": "Test if Python code runs without errors."
+        },
+        {
+          "name": "_extract_code",
+          "kind": "function",
+          "sig": "(response:str) -> str",
+          "start_line": 70,
+          "end_line": 86,
+          "does": "Extract code from LLM response."
+        },
+        {
+          "name": "run_benchmark",
+          "kind": "function",
+          "sig": "(source:str, benchmark_type:str='format', formats:List[str]=None, limit:Optional[int]=None, output:Optional[str]=None, verbose:bool=False) -> BenchmarkResult",
+          "start_line": 782,
+          "end_line": 824,
+          "does": "Convenience function to run benchmarks."
+        },
+        {
+          "name": "BenchmarkRunner.__init__",
+          "kind": "method",
+          "sig": "(client:Optional[BaseLLMClient]=None, config:Optional[BenchmarkConfig]=None) -> None",
+          "start_line": 97,
+          "end_line": 111,
+          "does": "Initialize benchmark runner."
+        },
+        {
+          "name": "BenchmarkRunner._should_use_llm",
+          "kind": "method",
+          "sig": "() -> bool",
+          "start_line": 113,
+          "end_line": 115,
+          "does": "Return whether this runner should call an LLM."
+        },
+        {
+          "name": "BenchmarkRunner._get_client",
+          "kind": "method",
+          "sig": "() -> BaseLLMClient",
+          "start_line": 117,
+          "end_line": 123,
+          "does": "Get or create LLM client."
+        },
+        {
+          "name": "BenchmarkRunner._template_generate_code",
+          "kind": "method",
+          "sig": "(spec:str, fmt:str, file_name:str) -> str",
+          "start_line": 125,
+          "end_line": 182,
+          "does": "Generate minimal Python code without an LLM (fallback mode)."
+        },
+        {
+          "name": "BenchmarkRunner.run_format_benchmark",
+          "kind": "method",
+          "sig": "(folder:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult",
+          "start_line": 184,
+          "end_line": 292,
+          "does": "Run format comparison benchmark."
+        },
+        {
+          "name": "BenchmarkRunner._test_format",
+          "kind": "method",
+          "sig": "(project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FormatResult",
+          "start_line": 294,
+          "end_line": 354,
+          "does": "Test a single format."
+        },
+        {
+          "name": "BenchmarkRunner.run_file_benchmark",
+          "kind": "method",
+          "sig": "(file_path:str, formats:List[str]=None, verbose:bool=False) -> BenchmarkResult",
+          "start_line": 356,
+          "end_line": 454,
+          "does": "Run benchmark on a single file."
+        },
+        {
+          "name": "BenchmarkRunner.run_function_benchmark",
+          "kind": "method",
+          "sig": "(file_path:str, function_names:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult",
+          "start_line": 456,
+          "end_line": 527,
+          "does": "Run function-level reproduction benchmark."
+        },
+        {
+          "name": "BenchmarkRunner._test_function",
+          "kind": "method",
+          "sig": "(func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], verbose:bool=False) -> FunctionResult",
+          "start_line": 529,
+          "end_line": 617,
+          "does": "Test reproduction of a single function."
+        },
+        {
+          "name": "BenchmarkRunner.run_project_benchmark",
+          "kind": "method",
+          "sig": "(project_path:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult",
+          "start_line": 619,
+          "end_line": 716,
+          "does": "Run benchmark on entire project."
+        },
+        {
+          "name": "BenchmarkRunner._reproduce_module",
+          "kind": "method",
+          "sig": "(module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FileResult",
+          "start_line": 718,
+          "end_line": 779,
+          "does": "Reproduce a single module."
+        }
+      ]
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 header:
   project: code2logic
   files: 52
-  lines: 21770
-  kb: 740.5
+  lines: 22012
+  kb: 749.8
   languages:
     python: 52
   modules_count: 52
@@ -12,7 +12,7 @@ M:
 - file_formats.py:279:12.3kb
 - project_reproducer.py:322:12.2kb
 - base.py:50:1.8kb
-- cli.py:779:33.1kb
+- cli.py:788:33.6kb
 - llm.py:376:14.6kb
 - errors.py:372:13.7kb
 - code_review.py:205:9.0kb
@@ -28,12 +28,12 @@ M:
 - chunked_reproduction.py:357:14.2kb
 - __init__.py:323:7.7kb
 - metrics.py:447:22.7kb
-- __main__.py:9:0.2kb
+- __main__.py:12:0.3kb
 - refactor.py:313:11.4kb
 - logicml.py:281:12.8kb
-- function_logic.py:71:3.2kb
+- function_logic.py:209:9.3kb
 - utils.py:16:0.6kb
-- generators.py:1646:80.4kb
+- generators.py:1703:83.0kb
 - markdown_format.py:266:13.9kb
 - models.py:296:10.6kb
 - similarity.py:178:7.8kb
@@ -503,8 +503,8 @@ modules:
       ret: str
       d: creates
 - p: cli.py
-  l: 779
-  kb: 33.1
+  l: 788
+  kb: 33.6
   i:
   - argparse
   - os
@@ -1960,8 +1960,8 @@ modules:
     ret: Dict[str, Any]
     d: compare formats
 - p: __main__.py
-  l: 9
-  kb: 0.2
+  l: 12
+  kb: 0.3
   i:
   - cli.main
 - p: refactor.py
@@ -2076,11 +2076,12 @@ modules:
     t: str
     v: '''\n# sample_class.py | Calculator | 74 lines\n\nimports:\n  stdlib: [typing.List, typing.Optional]\n\nCalculator:\n  ...'
 - p: function_logic.py
-  l: 71
-  kb: 3.2
+  l: 209
+  kb: 9.3
   i:
   - models.{FunctionInfo,ProjectInfo}
   - shared_utils.{remove_self_from_params,truncate_docstring}
+  - toon_format.TOONGenerator
   - typing.{List,Tuple}
   e:
   - FunctionLogicGenerator
@@ -2095,6 +2096,42 @@ modules:
       sig: (project:ProjectInfo, detail:str='full')
       ret: str
       d: creates
+    - n: generate_json
+      sig: (project:ProjectInfo, detail:str='full')
+      ret: str
+      d: creates json
+    - n: generate_yaml
+      sig: (project:ProjectInfo, detail:str='full')
+      ret: str
+      d: creates yaml
+    - n: generate_toon
+      sig: (project:ProjectInfo, detail:str='full')
+      ret: str
+      d: creates toon
+    - n: _build_data
+      sig: (project:ProjectInfo, detail:str)
+      ret: dict
+      d: creates data
+    - n: _module_items
+      sig: (module)
+      ret: List[Tuple[str, str, FunctionInfo]]
+      d: module items
+    - n: _build_sig
+      sig: (func:FunctionInfo, include_async_prefix:bool=True)
+      ret: str
+      d: creates sig
+    - n: _build_loc
+      sig: (func:FunctionInfo)
+      ret: str
+      d: creates loc
+    - n: _build_does
+      sig: (func:FunctionInfo)
+      ret: str
+      d: creates does
+    - n: _item_to_dict
+      sig: (kind:str, qualified_name:str, func:FunctionInfo, detail:str)
+      ret: dict
+      d: item to dict
     - n: _format_function
       sig: (kind:str, qualified_name:str, func:FunctionInfo, detail:str, indent:int)
       ret: List[str]
@@ -2123,8 +2160,8 @@ modules:
     ret: None
     d: cleanup generated root
 - p: generators.py
-  l: 1646
-  kb: 80.4
+  l: 1703
+  kb: 83.0
   i:
   - json
   - collections.defaultdict

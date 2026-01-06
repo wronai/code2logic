@@ -1,9 +1,9 @@
 project: code2logic
 root: /home/tom/github/wronai/code2logic/code2logic
-generated: 2026-01-06T15:07:09.265484
+generated: 2026-01-06T17:14:34.436783
 stats:
   files: 52
-  lines: 21770
+  lines: 22012
   languages[1]: python:52
 
 modules[52]{path,lang,lines,kb}:
@@ -12,7 +12,7 @@ modules[52]{path,lang,lines,kb}:
   file_formats.py,python,279,12.3
   project_reproducer.py,python,322,12.2
   base.py,python,50,1.8
-  cli.py,python,779,33.1
+  cli.py,python,788,33.6
   llm.py,python,376,14.6
   errors.py,python,372,13.7
   code_review.py,python,205,9.0
@@ -28,12 +28,12 @@ modules[52]{path,lang,lines,kb}:
   chunked_reproduction.py,python,357,14.2
   __init__.py,python,323,7.7
   metrics.py,python,447,22.7
-  __main__.py,python,9,0.2
+  __main__.py,python,12,0.3
   refactor.py,python,313,11.4
   logicml.py,python,281,12.8
-  function_logic.py,python,71,3.2
+  function_logic.py,python,209,9.3
   utils.py,python,16,0.6
-  generators.py,python,1646,80.4
+  generators.py,python,1703,83.0
   markdown_format.py,python,266,13.9
   models.py,python,296,10.6
   similarity.py,python,178,7.8
@@ -259,7 +259,7 @@ module_details:
       _save_litellm_yaml,"(data:dict)->str",-,false,-,10
       _infer_provider_from_litellm_model,"(litellm_model:str)->str",-,false,-,6
       _code2logic_llm_cli,"(argv:list[str])->None",-,false,-,246
-      main,()->None,-,false,-,438
+      main,()->None,-,false,-,447
     function_docs:
       ensure_dependencies: ensure dependencies
       _get_env_file_path: retrieves env file path
@@ -872,16 +872,25 @@ module_details:
     function_docs:
       generate_logicml: Convenience function to generate LogicML format.
   function_logic.py:
-    imports[6]: typing.List,typing.Tuple,models.ProjectInfo,models.FunctionInfo,shared_utils.remove_self_from_params,shared_utils.truncate_docstring
+    imports[7]: typing.List,typing.Tuple,models.ProjectInfo,models.FunctionInfo,shared_utils.remove_self_from_params,shared_utils.truncate_docstring,toon_format.TOONGenerator
     exports[1]: FunctionLogicGenerator
     classes[1]{name,bases,decorators,props,methods}:
-      FunctionLogicGenerator,-,-,0,3
+      FunctionLogicGenerator,-,-,0,12
     class_details:
       FunctionLogicGenerator:
-        methods[3]{name,sig,decorators,async,lines}:
+        methods[12]{name,sig,decorators,async,lines}:
           __init__,"(verbose:bool=False)->None",-,false,2
-          generate,"(project:ProjectInfo;detail:str='full')->str",-,false,25
-          _format_function,"(kind:str;qualified_name:str;func:FunctionInfo;detail:str;indent:int)->List[str]",-,false,56
+          generate,"(project:ProjectInfo;detail:str='full')->str",-,false,27
+          generate_json,"(project:ProjectInfo;detail:str='full')->str",-,false,7
+          generate_yaml,"(project:ProjectInfo;detail:str='full')->str",-,false,9
+          generate_toon,"(project:ProjectInfo;detail:str='full')->str",-,false,65
+          _build_data,"(project:ProjectInfo;detail:str)->dict",-,false,18
+          _module_items,"(module)->List[Tuple[str, str, FunctionInfo]]",-,false,11
+          _build_sig,"(func:FunctionInfo;include_async_prefix:bool=True)->str",-,false,8
+          _build_loc,"(func:FunctionInfo)->str",-,false,6
+          _build_does,"(func:FunctionInfo)->str",-,false,5
+          _item_to_dict,"(kind:str;qualified_name:str;func:FunctionInfo;detail:str)->dict",-,false,38
+          _format_function,"(kind:str;qualified_name:str;func:FunctionInfo;detail:str;indent:int)->List[str]",-,false,48
   utils.py:
     imports[2]: pathlib.Path,shutil
     exports[3]: estimate_tokens,write_text_atomic,cleanup_generated_root
@@ -900,7 +909,7 @@ module_details:
       MarkdownGenerator,-,-,0,6
       CompactGenerator,-,-,0,1
       JSONGenerator,-,-,0,10
-      YAMLGenerator,-,-,0,31
+      YAMLGenerator,-,-,0,33
       CSVGenerator,-,-,0,8
     class_details:
       MarkdownGenerator:
@@ -921,8 +930,8 @@ module_details:
         methods[10]{name,sig,decorators,async,lines}:
           generate,"(project:ProjectInfo;flat:bool=False;detail:str='standard')->str",-,false,16
           generate_from_module,"(module:ModuleInfo;detail:str='full')->str",-,false,15
-          _generate_nested,"(project:ProjectInfo;detail:str)->str",-,false,17
-          _field_to_dict,"(field:FieldInfo)->dict",-,false,54
+          _generate_nested,"(project:ProjectInfo;detail:str)->str",-,false,66
+          _field_to_dict,"(field:FieldInfo)->dict",-,false,10
           _generate_flat,"(project:ProjectInfo;detail:str)->str",-,false,36
           _build_element_row,"(m:ModuleInfo;elem_type:str;name:str;signature:str;f:FunctionInfo;deps:list)->dict",-,false,28
           _build_signature,"(f:FunctionInfo)->str",-,false,10
@@ -931,7 +940,7 @@ module_details:
           _compute_hash,"(name:str;signature:str)->str",-,false,3
       YAMLGenerator:
         doc: Generates YAML output for human-readable representation.
-        methods[31]{name,sig,decorators,async,lines}:
+        methods[33]{name,sig,decorators,async,lines}:
           generate,"(project:ProjectInfo;flat:bool=False;detail:str='standard';compact:bool=True)->str",-,false,34
           generate_schema,"(format_type:str='compact')->str",-,false,16
           _generate_compact_schema,()->str,-,false,125
@@ -945,6 +954,7 @@ module_details:
           generate_from_module,"(module:ModuleInfo;detail:str='full')->str",-,false,15
           _build_flat_data,"(project:ProjectInfo;detail:str)->dict",-,false,35
           _build_nested_data,"(project:ProjectInfo;detail:str)->dict",-,false,73
+          _constants_for_module_verbose,"(module:ModuleInfo;limit:int=12)->list",-,false,28
           _build_row,"(path:str;elem_type:str;name:str;signature:str;language:str;detail:str)->dict",-,false,11
           _build_function_row,"(path:str;f:FunctionInfo;language:str;detail:str;project:ProjectInfo;imports:list)->dict",-,false,27
           _build_method_row,"(path:str;class_name:str;f:FunctionInfo;language:str;detail:str;project:ProjectInfo)->dict",-,false,28
@@ -961,6 +971,7 @@ module_details:
           _compact_function,"(f:FunctionInfo;detail:str)->dict",-,false,31
           _compact_method,"(f:FunctionInfo;detail:str)->dict",-,false,3
           _build_compact_signature,"(f:FunctionInfo)->str",-,false,16
+          _constants_for_module_verbose,"(module:ModuleInfo;limit:int=10)->list",-,false,24
           _constants_for_module,"(module:ModuleInfo;limit:int=10)->list",-,false,14
           _constant_to_dict,"(constant:ConstantInfo)->dict",-,false,13
       CSVGenerator:

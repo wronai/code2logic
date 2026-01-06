@@ -1,0 +1,762 @@
+project: code2logic
+generated: "2026-01-06T17:15:01.997687"
+modules[52]{path,lang,items}:
+  llm_profiler.py,python,23
+  config.py,python,15
+  file_formats.py,python,4
+  project_reproducer.py,python,8
+  base.py,python,11
+  cli.py,python,27
+  llm.py,python,17
+  errors.py,python,9
+  code_review.py,python,6
+  analyzer.py,python,8
+  quality.py,python,9
+  shared_utils.py,python,12
+  parsers.py,python,68
+  intent.py,python,18
+  adaptive.py,python,15
+  reproducer.py,python,22
+  llm_clients.py,python,30
+  prompts.py,python,3
+  chunked_reproduction.py,python,12
+  __init__.py,python,2
+  metrics.py,python,12
+  __main__.py,python,0
+  refactor.py,python,5
+  logicml.py,python,9
+  function_logic.py,python,12
+  utils.py,python,3
+  generators.py,python,59
+  markdown_format.py,python,10
+  models.py,python,0
+  similarity.py,python,6
+  universal.py,python,21
+  benchmark.py,python,9
+  terminal.py,python,52
+  toon_format.py,python,18
+  dependency.py,python,11
+  mcp_server.py,python,3
+  reproduction.py,python,8
+  gherkin.py,python,29
+  schemas/logicml_schema.py,python,3
+  schemas/__init__.py,python,0
+  schemas/yaml_schema.py,python,3
+  schemas/json_schema.py,python,4
+  schemas/markdown_schema.py,python,2
+  benchmarks/common.py,python,8
+  benchmarks/runner.py,python,15
+  benchmarks/__init__.py,python,0
+  benchmarks/results.py,python,0
+  core/__init__.py,python,0
+  formats/__init__.py,python,0
+  tools/__init__.py,python,0
+  llm/__init__.py,python,0
+  integrations/__init__.py,python,0
+
+function_details:
+  llm_profiler.py:
+    functions[23]{name,kind,sig,loc,async,lines,cc,does}:
+      _get_profiles_path,function,() -> Path,171-175,false,5,1,Get path to profiles storage.
+      load_profiles,function,"() -> Dict[str,LLMProfile]",178-191,false,14,4,Load all saved profiles.
+      save_profile,function,"(profile:LLMProfile) -> None",194-204,false,11,2,Save a profile to storage.
+      get_profile,function,"(provider:str, model:str) -> Optional[LLMProfile]",207-211,false,5,1,Get profile for a specific model.
+      get_or_create_profile,function,"(provider:str, model:str) -> LLMProfile",214-221,false,8,2,Get existing profile or create default one.
+      _create_default_profile,function,"(provider:str, model:str) -> LLMProfile",224-270,false,47,11,Create default profile based on model characteristics.
+      profile_llm,function,"(client, quick:bool=False) -> LLMProfile",641-644,false,4,1,Profile an LLM client.
+      get_adaptive_chunker,function,"(provider:str, model:str) -> AdaptiveChunker",647-650,false,4,1,Get adaptive chunker for a model.
+      LLMProfile.__post_init__,method,() -> None,148-154,false,7,3,creates init
+      LLMProfiler.__init__,method,"(client, verbose:bool=True) -> None",283-294,false,12,1,Initialize profiler.
+      LLMProfiler.run_profile,method,"(quick:bool=False) -> LLMProfile",296-348,false,53,9,Run full profiling suite.
+      LLMProfiler._test_reproduction,method,"(name:str, code:str) -> ProfileTestResult",350-397,false,48,2,Test reproduction of a code snippet.
+      LLMProfiler._code_to_spec,method,"(code:str) -> str",399-427,false,29,7,Convert code to simple YAML spec.
+      LLMProfiler._extract_code,method,"(response:str) -> str",429-444,false,16,5,Extract code from LLM response.
+      LLMProfiler._check_syntax,method,"(code:str) -> bool",446-452,false,7,2,Check if code has valid Python syntax.
+      LLMProfiler._calculate_similarity,method,"(original:str, reproduced:str) -> float",454-460,false,7,1,Calculate code similarity.
+      LLMProfiler._calculate_metrics,method,"(profile:LLMProfile, results:List[ProfileTestResult]) -> LLMProfile",462-499,false,38,9,Calculate aggregate metrics from test results.
+      LLMProfiler._test_consistency,method,"(profile:LLMProfile) -> LLMProfile",501-516,false,16,3,Test output consistency by running same prompt twice.
+      AdaptiveChunker.__init__,method,"(profile:Optional[LLMProfile]=None) -> None",527-537,false,11,2,Initialize chunker.
+      AdaptiveChunker.get_optimal_settings,method,"() -> Dict[str,Any]",539-546,false,8,1,Get optimal settings for the profiled model.
+      AdaptiveChunker.chunk_spec,method,"(spec:str, format:str='yaml') -> List[Dict[str,Any]]",548-606,false,59,5,Chunk specification based on profile.
+      AdaptiveChunker.recommend_format,method,"(spec_size_tokens:int) -> str",608-631,false,24,4,Recommend best format based on spec size and model.
+      AdaptiveChunker.estimate_chunks_needed,method,"(spec_size_tokens:int) -> int",633-637,false,5,2,Estimate number of chunks needed.
+  config.py:
+    functions[15]{name,kind,sig,loc,async,lines,cc,does}:
+      load_env,function,() -> None,184-189,false,6,1,Load environment variables from .env file.
+      get_api_key,function,"(provider:str) -> Optional[str]",192-194,false,3,1,Convenience function to get API key.
+      get_model,function,"(provider:str) -> str",197-199,false,3,1,Convenience function to get model.
+      Config.__init__,method,"(env_file:str=None) -> None",56-64,false,9,1,Initialize configuration.
+      Config._load_env_file,method,"(env_file:str=None) -> None",66-79,false,14,4,Load environment variables from .env file.
+      Config._parse_env_file,method,"(path:Path) -> None",81-94,false,14,9,Parse .env file and set environment variables.
+      Config._load_config_file,method,() -> None,96-104,false,9,3,Load configuration from JSON file.
+      Config.get_api_key,method,"(provider:str) -> Optional[str]",106-118,false,13,2,Get API key for a provider.
+      Config.get_model,method,"(provider:str) -> str",120-142,false,23,5,Get model for a provider.
+      Config.get_ollama_host,method,() -> str,144-146,false,3,1,Get Ollama host URL.
+      Config.get_default_provider,method,() -> str,148-150,false,3,1,Get default LLM provider.
+      Config.is_verbose,method,() -> bool,152-154,false,3,1,Check if verbose mode is enabled.
+      Config.get_cache_dir,method,() -> Path,156-159,false,4,1,Get cache directory path.
+      Config.list_configured_providers,method,"() -> Dict[str,bool]",161-170,false,10,2,List all providers and their configuration status.
+      Config.to_dict,method,"() -> Dict[str,Any]",172-181,false,10,2,Export configuration as dictionary.
+  file_formats.py:
+    functions[4]{name,kind,sig,loc,async,lines,cc,does}:
+      generate_file_csv,function,"(file_path:Path) -> str",14-67,false,54,10,Generate detailed CSV specification for a single file.
+      generate_file_json,function,"(file_path:Path) -> str",70-137,false,68,10,Generate detailed JSON specification for a single file.
+      generate_file_yaml,function,"(file_path:Path) -> str",140-216,false,77,22,Generate detailed YAML specification for a single file.
+      _parse_file_elements,function,"(content:str) -> Dict[str, Any]",219-352,false,134,45,Parse file content to extract code elements.
+  project_reproducer.py:
+    functions[8]{name,kind,sig,loc,async,lines,cc,does}:
+      reproduce_project,function,"(project_path:str, output_dir:str=None, target_lang:str=None, parallel:bool=False, use_llm:bool=True) -> ProjectResult",382-401,false,20,1,Convenience function for project reproduction.
+      ProjectReproducer.__init__,method,"(client:BaseLLMClient=None, max_workers:int=4, target_lang:str=None, use_llm:bool=True) -> None",92-111,false,20,1,Initialize project reproducer.
+      ProjectReproducer._get_client,method,() -> BaseLLMClient,113-119,false,7,2,Get or create LLM client.
+      ProjectReproducer.find_source_files,method,"(project_path:str, extensions:Set[str]=None, exclude_patterns:List[str]=None) -> List[Path]",121-160,false,40,8,Find all source files in project.
+      ProjectReproducer.reproduce_file,method,"(file_path:Path, output_dir:Path) -> FileResult",162-212,false,51,3,Reproduce a single file.
+      ProjectReproducer.reproduce_project,method,"(project_path:str, output_dir:str=None, parallel:bool=False) -> ProjectResult",214-274,false,61,10,Reproduce entire project.
+      ProjectReproducer._aggregate_results,method,"(project_path:str, results:List[FileResult]) -> ProjectResult",276-333,false,58,17,Aggregate file results into project result.
+      ProjectReproducer._save_report,method,"(output_dir:Path, result:ProjectResult) -> None",335-379,false,45,4,Save project reproduction report.
+  base.py:
+    functions[11]{name,kind,sig,loc,async,lines,cc,does}:
+      VerboseMixin.__init__,method,"(verbose:bool=False) -> None",17-21,false,5,2,creates
+      VerboseMixin.log,method,"(msg:str, level:str='info') -> None",23-27,false,5,2,Log message if verbose mode enabled.
+      VerboseMixin.debug,method,"(msg:str) -> None",29-31,false,3,1,Log debug message.
+      VerboseMixin.info,method,"(msg:str) -> None",33-35,false,3,1,Log info message.
+      VerboseMixin.warn,method,"(msg:str) -> None",37-39,false,3,1,Log warning message.
+      VerboseMixin.error,method,"(msg:str) -> None",41-43,false,3,1,Log error message.
+      BaseParser.__init__,method,"(verbose:bool=False) -> None",49-50,false,2,1,creates
+      BaseParser.parse,method,"(content:str, language:str=None) -> None",52-54,false,3,1,Parse source code content.
+      BaseParser.parse_file,method,"(path:str) -> None",56-58,false,3,1,Parse source file.
+      BaseGenerator.__init__,method,"(verbose:bool=False) -> None",64-65,false,2,1,creates
+      BaseGenerator.generate,method,"(project, detail:str='full') -> str",67-69,false,3,1,Generate output from project analysis.
+  cli.py:
+    functions[27]{name,kind,sig,loc,async,lines,cc,does}:
+      ensure_dependencies,function,() -> None,99-135,false,37,6,Auto-install optional dependencies for best results.
+      _get_env_file_path,function,() -> str,138-139,false,2,1,retrieves env file path
+      _read_text_file,function,"(path:str) -> str",142-147,false,6,2,retrieves text file
+      _write_text_file,function,"(path:str, content:str) -> None",150-152,false,3,1,logs text file
+      _set_env_var,function,"(var_name:str, value:str) -> str",155-180,false,26,5,updates env var
+      _unset_env_var,function,"(var_name:str) -> str",183-192,false,10,4,unset env var
+      _get_litellm_config_path,function,() -> str,195-196,false,2,1,retrieves litellm config path
+      _get_user_llm_config_path,function,() -> str,199-200,false,2,1,retrieves user llm config path
+      _load_user_llm_config,function,() -> dict,203-211,false,9,4,retrieves user llm config
+      _save_user_llm_config,function,"(data:dict) -> str",214-219,false,6,1,caches user llm config
+      _load_litellm_yaml,function,() -> dict,222-238,false,17,6,retrieves litellm yaml
+      _save_litellm_yaml,function,"(data:dict) -> str",241-250,false,10,2,caches litellm yaml
+      _infer_provider_from_litellm_model,function,"(litellm_model:str) -> str",253-258,false,6,3,infer provider from litellm model
+      _code2logic_llm_cli,function,"(argv:list[str]) -> None",261-506,false,246,34,code2logic llm cli
+      main,function,() -> None,509-955,false,447,68,Main CLI entry point.
+      Logger.__init__,method,"(verbose:bool=False, debug:bool=False) -> None",39-43,false,5,1,creates
+      Logger._elapsed,method,() -> str,45-48,false,4,1,Get elapsed time string.
+      Logger.info,method,"(msg:str) -> None",50-52,false,3,1,Print info message.
+      Logger.success,method,"(msg:str) -> None",54-56,false,3,1,Print success message.
+      Logger.warning,method,"(msg:str) -> None",58-60,false,3,1,Print warning message.
+      Logger.error,method,"(msg:str) -> None",62-64,false,3,1,Print error message.
+      Logger.step,method,"(msg:str) -> None",66-70,false,5,2,Print step message with counter.
+      Logger.detail,method,"(msg:str) -> None",72-75,false,4,2,Print detail message (only in verbose mode).
+      Logger.debug_msg,method,"(msg:str) -> None",77-80,false,4,2,Print debug message (only in debug mode).
+      Logger.stats,method,"(label:str, value) -> None",82-85,false,4,2,Print statistics.
+      Logger.separator,method,() -> None,87-90,false,4,2,Print separator line.
+      Logger.header,method,"(msg:str) -> None",92-96,false,5,2,Print header.
+  llm.py:
+    functions[17]{name,kind,sig,loc,async,lines,cc,does}:
+      get_available_backends,function,"() -> Dict[str, bool]",463-478,false,16,3,Get availability status of LLM backends.
+      OllamaClient.__init__,method,"(config:LLMConfig) -> None",60-64,false,5,2,creates
+      OllamaClient.generate,method,"(prompt:str, system:Optional[str]=None) -> str",66-86,false,21,2,Generate completion from Ollama.
+      OllamaClient.chat,method,"(messages:List[Dict[str,str]]) -> str",88-105,false,18,1,Chat completion from Ollama.
+      OllamaClient.is_available,method,() -> bool,107-113,false,7,2,Check if Ollama is running.
+      OllamaClient.list_models,method,"() -> List[str]",115-122,false,8,3,List available models.
+      LiteLLMClient.__init__,method,"(config:LLMConfig) -> None",128-131,false,4,2,creates
+      LiteLLMClient.generate,method,"(prompt:str, system:Optional[str]=None) -> str",133-140,false,8,2,Generate completion via LiteLLM.
+      LiteLLMClient.chat,method,"(messages:List[Dict[str,str]]) -> str",142-155,false,14,2,Chat completion via LiteLLM.
+      LiteLLMClient.is_available,method,() -> bool,157-163,false,7,2,Check if LiteLLM backend is available.
+      CodeAnalyzer.__init__,method,"(model:str=None, provider:str=None, base_url:str=None, api_key:str=None) -> None",193-237,false,45,8,Initialize CodeAnalyzer.
+      CodeAnalyzer.is_available,method,() -> bool,239-241,false,3,1,Check if LLM backend is available.
+      CodeAnalyzer.suggest_refactoring,method,"(project) -> List[Dict[str, Any]]",243-292,false,50,5,Analyze project and suggest refactoring improvements.
+      CodeAnalyzer.find_semantic_duplicates,method,"(project) -> List[Dict[str, Any]]",294-352,false,59,11,Find semantically similar functions using LLM.
+      CodeAnalyzer.generate_code,method,"(project, target_lang:str, module_filter:Optional[str]=None) -> Dict[str, str]",354-416,false,63,11,Generate code in target language from project analysis.
+      CodeAnalyzer.translate_function,method,"(name:str, signature:str, intent:str, source_lang:str, target_lang:str) -> str",418-452,false,35,1,Translate a single function to another language.
+      CodeAnalyzer._build_signature,method,(f) -> str,454-460,false,7,3,Build compact signature.
+  errors.py:
+    functions[9]{name,kind,sig,loc,async,lines,cc,does}:
+      create_error_handler,function,"(mode:str='lenient', max_file_size_mb:float=10.0) -> ErrorHandler",432-437,false,6,1,Create an error handler with default settings.
+      ErrorHandler.__init__,method,"(mode:str='lenient', max_file_size_mb:float=10.0, timeout_seconds:float=30.0, logger:Optional[Any]=None) -> None",137-148,false,12,2,creates
+      ErrorHandler.reset,method,() -> None,150-152,false,3,1,Reset error state for new analysis.
+      ErrorHandler.handle_error,method,"(error_type:ErrorType, path:str, message:str, exception:Optional[Exception]=None, severity:Optional[ErrorSeverity]=None) -> bool",154-188,false,35,6,Handle an error.
+      ErrorHandler._default_severity,method,"(error_type:ErrorType) -> ErrorSeverity",190-206,false,17,3,Get default severity for error type.
+      ErrorHandler._log_error,method,"(error:AnalysisError) -> None",208-216,false,9,3,Log an error.
+      ErrorHandler.safe_read_file,method,"(path:Path) -> Optional[str]",218-329,false,112,14,Safely read a file with error handling.
+      ErrorHandler.safe_write_file,method,"(path:Path, content:str) -> bool",331-376,false,46,5,Safely write a file with error handling.
+      ErrorHandler.safe_parse,method,"(path:str, content:str, parser_func:Callable) -> Any",378-429,false,52,5,Safely parse content with error handling.
+  code_review.py:
+    functions[6]{name,kind,sig,loc,async,lines,cc,does}:
+      analyze_code_quality,function,"(project) -> Dict[str,List[Dict]]",40-100,false,61,15,Analyze code quality issues.
+      check_security_issues,function,"(project) -> Dict[str,List[Dict]]",103-139,false,37,13,Check for security vulnerabilities.
+      check_performance_issues,function,"(project) -> Dict[str,List[Dict]]",142-166,false,25,7,Check for performance anti-patterns.
+      CodeReviewer.__init__,method,(client=None) -> None,172-178,false,7,1,Initialize reviewer.
+      CodeReviewer.review,method,"(project, focus:str='all') -> Dict[str,Any]",180-221,false,42,7,Perform code review.
+      CodeReviewer.generate_report,method,"(results:Dict[str,Any], project_name:str='Project') -> str",223-272,false,50,9,Generate markdown review report.
+  analyzer.py:
+    functions[8]{name,kind,sig,loc,async,lines,cc,does}:
+      analyze_project,function,"(path:str, use_treesitter:bool=True, verbose:bool=False) -> ProjectInfo",262-284,false,23,1,Convenience function to analyze a project.
+      get_library_status,function,"() -> Dict[str, bool]",287-300,false,14,1,Get availability status of optional libraries.
+      ProjectAnalyzer.__init__,method,"(root_path:str, use_treesitter:bool=True, verbose:bool=False, include_private:bool=False) -> None",83-118,false,36,4,Initialize the project analyzer.
+      ProjectAnalyzer._print_status,method,() -> None,120-127,false,8,6,Print library availability status.
+      ProjectAnalyzer.analyze,method,() -> ProjectInfo,129-162,false,34,3,Analyze the project.
+      ProjectAnalyzer._scan_files,method,() -> None,164-216,false,53,17,Scan and parse all source files.
+      ProjectAnalyzer._detect_entrypoints,method,"() -> List[str]",218-243,false,26,8,Detect project entry points.
+      ProjectAnalyzer.get_statistics,method,() -> Dict,245-259,false,15,5,Get analysis statistics.
+  quality.py:
+    functions[9]{name,kind,sig,loc,async,lines,cc,does}:
+      analyze_quality,function,"(project:ProjectInfo, thresholds:Dict[str,int]=None) -> QualityReport",212-224,false,13,1,Convenience function to analyze project quality.
+      get_quality_summary,function,"(report:QualityReport) -> str",227-264,false,38,12,Generate human-readable quality summary.
+      QualityAnalyzer.__init__,method,"(thresholds:Dict[str,int]=None) -> None",71-75,false,5,2,Initialize with custom thresholds.
+      QualityAnalyzer.analyze,method,"(project:ProjectInfo) -> QualityReport",77-108,false,32,5,Analyze project quality.
+      QualityAnalyzer.analyze_modules,method,"(modules:List[ModuleInfo]) -> QualityReport",110-129,false,20,6,Analyze a list of modules.
+      QualityAnalyzer._analyze_module,method,"(module:ModuleInfo, report:QualityReport) -> None",131-152,false,22,5,Analyze a single module.
+      QualityAnalyzer._check_function,method,"(func, file_path:str, report:QualityReport) -> None",154-179,false,26,4,Check function quality.
+      QualityAnalyzer._check_class,method,"(file_path:str, report:QualityReport) -> None",181-197,false,17,3,Check class quality.
+      QualityAnalyzer._get_file_recommendation,method,"(module:ModuleInfo) -> str",199-209,false,11,3,Generate recommendation for long file.
+  shared_utils.py:
+    functions[12]{name,kind,sig,loc,async,lines,cc,does}:
+      compact_imports,function,"(imports:List[str], max_items:int=10) -> List[str]",24-66,false,43,10,Compact imports by grouping submodules.
+      deduplicate_imports,function,"(imports:List[str]) -> List[str]",69-99,false,31,5,Remove redundant imports.
+      abbreviate_type,function,"(type_str:str) -> str",128-152,false,25,3,Abbreviate type annotations for compactness.
+      expand_type,function,"(abbrev:str) -> str",155-173,false,19,3,Expand abbreviated type back to full form.
+      build_signature,function,"(params:List[str], return_type:Optional[str]=None, include_self:bool=False, abbreviate:bool=False, max_params:int=6) -> str",180-232,false,53,12,Build compact function signature.
+      remove_self_from_params,function,"(params:List[str]) -> List[str]",235-247,false,13,4,Remove 'self' and 'cls' from parameter list.
+      categorize_function,function,"(name:str) -> str",268-285,false,18,4,Categorize function by name pattern.
+      extract_domain,function,"(path:str) -> str",297-315,false,19,5,Extract domain from file path.
+      compute_hash,function,"(name:str, signature:str, length:int=8) -> str",322-335,false,14,1,Compute short hash for quick comparison.
+      truncate_docstring,function,"(docstring:Optional[str], max_length:int=60) -> str",342-376,false,35,5,Truncate docstring to first sentence or max_length.
+      escape_for_yaml,function,"(text:str) -> str",379-399,false,21,4,Escape text for safe YAML inclusion.
+      clean_identifier,function,"(name:str) -> str",402-414,false,13,2,Clean identifier by removing whitespace and special characters.
+  parsers.py:
+    functions[68]{name,kind,sig,loc,async,lines,cc,does}:
+      _normalize_import_path,function,"(import_path:str) -> str",28-35,false,8,4,Normalize import path by removing duplicate suffix segments.
+      _clean_imports,function,"(imports:List[str]) -> List[str]",38-49,false,12,5,Deduplicate and normalize import paths while preserving order.
+      _combine_import_name,function,"(module_name:str, identifier:str) -> str",52-59,false,8,3,Combine module and identifier while avoiding duplicate suffixes.
+      _truncate_constant_value,function,"(value_text:str, limit:int=400) -> str",62-69,false,8,3,Return a trimmed single-line snippet for constant values.
+      _py_expr_to_dotted_name,function,(expr) -> str,72-84,false,13,8,py expr to dotted name
+      _analyze_python_function_node,function,(func_node) -> None,204-208,false,5,3,processes python function node
+      is_tree_sitter_available,function,() -> bool,1763-1765,false,3,1,Check if Tree-sitter is available.
+      _PyFunctionBodyAnalyzer.__init__,method,() -> None,88-93,false,6,1,creates
+      _PyFunctionBodyAnalyzer._add_call,method,"(name:str) -> None",95-103,false,9,4,creates call
+      _PyFunctionBodyAnalyzer._add_raise,method,"(name:str) -> None",105-113,false,9,4,creates raise
+      _PyFunctionBodyAnalyzer.visit_Call,method,(node) -> None,115-122,false,8,3,visit call
+      _PyFunctionBodyAnalyzer.visit_Raise,method,(node) -> None,124-139,false,16,6,visit raise
+      _PyFunctionBodyAnalyzer.visit_If,method,(node) -> None,141-143,false,3,1,visit if
+      _PyFunctionBodyAnalyzer.visit_For,method,(node) -> None,145-147,false,3,1,visit for
+      _PyFunctionBodyAnalyzer.visit_AsyncFor,method,(node) -> None,149-151,false,3,1,visit asyncfor
+      _PyFunctionBodyAnalyzer.visit_While,method,(node) -> None,153-155,false,3,1,visit while
+      _PyFunctionBodyAnalyzer.visit_IfExp,method,(node) -> None,157-159,false,3,1,visit ifexp
+      _PyFunctionBodyAnalyzer.visit_BoolOp,method,(node) -> None,161-167,false,7,4,visit boolop
+      _PyFunctionBodyAnalyzer.visit_Try,method,(node) -> None,169-174,false,6,3,visit try
+      _PyFunctionBodyAnalyzer.visit_comprehension,method,(node) -> None,176-182,false,7,3,visit comprehension
+      _PyFunctionBodyAnalyzer.visit_Match,method,(node) -> None,184-189,false,6,3,visit match
+      _PyFunctionBodyAnalyzer.visit_FunctionDef,method,(node) -> None,191-192,false,2,1,visit functiondef
+      _PyFunctionBodyAnalyzer.visit_AsyncFunctionDef,method,(node) -> None,194-195,false,2,1,visit asyncfunctiondef
+      _PyFunctionBodyAnalyzer.visit_ClassDef,method,(node) -> None,197-198,false,2,1,visit classdef
+      _PyFunctionBodyAnalyzer.visit_Lambda,method,(node) -> None,200-201,false,2,1,visit lambda
+      TreeSitterParser.__init__,method,() -> None,224-231,false,8,2,Initialize Tree-sitter parsers for available languages.
+      TreeSitterParser._init_parsers,method,() -> None,233-255,false,23,3,Initialize parsers for each supported language.
+      TreeSitterParser.is_available,method,"(language:str) -> bool",257-259,false,3,1,Check if Tree-sitter parser is available for a language.
+      TreeSitterParser.get_supported_languages,method,"() -> List[str]",262-264,false,3,1,Get list of potentially supported languages.
+      TreeSitterParser.parse,method,"(filepath:str, content:str, language:str) -> Optional[ModuleInfo]",266-289,false,24,4,Parse a source file using Tree-sitter.
+      TreeSitterParser._parse_python,method,"(filepath:str, content:str, tree) -> ModuleInfo",291-390,false,100,30,Parse Python source using Tree-sitter AST.
+      TreeSitterParser._extract_constants,method,"(tree, content:str) -> List[ConstantInfo]",392-421,false,30,18,Extract module-level UPPERCASE constants.
+      TreeSitterParser._extract_type_checking_imports,method,"(tree, content:str) -> List[str]",423-446,false,24,9,Extract TYPE_CHECKING block imports.
+      TreeSitterParser._extract_conditional_imports,method,"(node, content:str) -> List[str]",448-461,false,14,5,Extract imports from try/except blocks.
+      TreeSitterParser._extract_aliases,method,"(tree, content:str) -> dict",463-508,false,46,23,Extract module aliases (import X as Y).
+      TreeSitterParser._extract_py_function,method,"(node, content:str, decorated_node=None) -> Optional[FunctionInfo]",510-611,false,102,30,Extract Python function from AST node.
+      TreeSitterParser._extract_py_enum,method,"(node, content:str) -> Optional[TypeInfo]",613-653,false,41,24,Extract Python Enum (values) as TypeInfo(kind='enum').
+      TreeSitterParser._extract_py_class,method,"(node, content:str) -> Optional[ClassInfo]",655-731,false,77,29,Extract Python class from AST node.
+      TreeSitterParser._extract_dataclass_field,method,"(node, content:str) -> Optional[FieldInfo]",733-795,false,63,18,Extract dataclass field from assignment.
+      TreeSitterParser._extract_class_attribute,method,"(node, content:str) -> Optional[AttributeInfo]",797-825,false,29,16,Extract class attribute from self.x = ...
+      TreeSitterParser._extract_py_import,method,"(node, content:str) -> List[str]",827-837,false,11,5,Extract import statement.
+      TreeSitterParser._extract_py_from_import,method,"(node, content:str) -> List[str]",839-877,false,39,14,Extract from ...
+      TreeSitterParser._extract_py_constant,method,"(node, content:str) -> Optional[ConstantInfo]",879-937,false,59,29,Extract constant (UPPERCASE assignment) with value.
+      TreeSitterParser._extract_conditional_imports,method,"(node, content:str) -> List[str]",939-952,false,14,5,Extract imports from try/except blocks.
+      TreeSitterParser._parse_js_ts,method,"(filepath:str, content:str, tree, language:str) -> ModuleInfo",954-1039,false,86,32,Parse JavaScript/TypeScript source using Tree-sitter AST.
+      TreeSitterParser._extract_js_class,method,"(node, content:str) -> Optional[ClassInfo]",1041-1075,false,35,10,Extract JS/TS class from AST node.
+      TreeSitterParser._extract_js_method,method,"(node, content:str) -> Optional[FunctionInfo]",1077-1116,false,40,7,Extract JS/TS method from AST node.
+      TreeSitterParser._extract_js_function,method,"(node, content:str) -> Optional[FunctionInfo]",1118-1152,false,35,4,Extract JS/TS function from AST node.
+      TreeSitterParser._extract_js_arrow_fn,method,"(node, content:str) -> Optional[FunctionInfo]",1154-1184,false,31,6,Extract arrow function assigned to const.
+      TreeSitterParser._extract_js_params,method,"(params_node, content:str) -> List[str]",1186-1204,false,19,8,Extract JS/TS function parameters.
+      TreeSitterParser._extract_ts_type,method,"(node, content:str) -> Optional[TypeInfo]",1206-1213,false,8,4,Extract TypeScript interface or type alias.
+      TreeSitterParser._extract_ts_enum,method,"(node, content:str) -> Optional[TypeInfo]",1215-1236,false,22,10,Extract TypeScript enum.
+      TreeSitterParser._extract_js_constant,method,"(node, content:str) -> Optional[str]",1238-1247,false,10,5,Extract constant (UPPERCASE const).
+      TreeSitterParser._extract_js_comment,method,"(node, content:str) -> Optional[str]",1249-1259,false,11,7,Extract JS comment content.
+      TreeSitterParser._find_child,method,"(node, type_name:str) -> None",1262-1267,false,6,3,Find first child of given type.
+      TreeSitterParser._text,method,"(node, content:str) -> str",1269-1275,false,7,1,Get text content of node.
+      TreeSitterParser._extract_string,method,"(node, content:str) -> str",1277-1284,false,8,5,Extract string content without quotes.
+      TreeSitterParser._truncate_docstring,method,"(docstring:Optional[str], max_len:int=80) -> Optional[str]",1286-1308,false,23,6,Truncate docstring to first sentence or max_len characters.
+      UniversalParser.__init__,method,() -> None,1324-1326,false,3,1,Initialize the universal parser.
+      UniversalParser.parse,method,"(filepath:str, content:str, language:str) -> Optional[ModuleInfo]",1328-1348,false,21,7,Parse a source file using AST or regex.
+      UniversalParser._parse_python,method,"(filepath:str, content:str) -> Optional[ModuleInfo]",1350-1422,false,73,36,Parse Python using built-in AST.
+      UniversalParser._extract_ast_enum,method,"(node:Any) -> Optional[TypeInfo]",1424-1468,false,45,28,Extract Enum values from Python AST class.
+      UniversalParser._extract_ast_function,method,(node) -> FunctionInfo,1470-1539,false,70,21,Extract function from Python AST node.
+      UniversalParser._extract_ast_class,method,"(node:Any) -> ClassInfo",1541-1587,false,47,23,Extract class from Python AST node.
+      UniversalParser._extract_ast_constant,method,"(node:Any, content:str) -> Optional[ConstantInfo]",1589-1629,false,41,19,Extract ConstantInfo from an AST assignment node if applicable.
+      UniversalParser._format_ast_value,method,"(value_node:Any, content:str) -> str",1631-1649,false,19,7,Best-effort string representation of an AST value node.
+      UniversalParser._ann_str,method,(node) -> str,1651-1664,false,14,6,Convert AST annotation to string.
+      UniversalParser._parse_js_ts,method,"(filepath:str, content:str, language:str) -> ModuleInfo",1666-1760,false,95,15,Parse JS/TS using regex patterns.
+  intent.py:
+    functions[18]{name,kind,sig,loc,async,lines,cc,does}:
+      EnhancedIntentGenerator.__init__,method,"(lang:str='en') -> None",131-163,false,33,8,Initialize the intent generator.
+      EnhancedIntentGenerator.generate,method,"(name:str, docstring:Optional[str]=None) -> str",165-210,false,46,12,Generate intent from function name and optional docstring.
+      EnhancedIntentGenerator._extract_from_docstring,method,"(docstring:str) -> Optional[str]",212-230,false,19,5,Extract intent from docstring's first line.
+      EnhancedIntentGenerator._split_name,method,"(name:str) -> List[str]",232-258,false,27,6,Split function name into words.
+      EnhancedIntentGenerator.get_available_features,method,"() -> dict[str, bool]",261-271,false,11,1,Get dictionary of available NLP features.
+      IntentAnalyzer.__init__,method,() -> None,282-297,false,16,1,Initialize the intent analyzer with patterns.
+      IntentAnalyzer._extract_keywords,method,"(query:str) -> List[str]",299-304,false,6,3,Extract keywords from a query string.
+      IntentAnalyzer._calculate_intent_confidence,method,"(keywords:List[str], patterns:List[str]) -> float",306-311,false,6,4,Calculate confidence score based on keyword matches.
+      IntentAnalyzer._identify_target,method,"(query:str, project:Any) -> str",313-331,false,19,8,"Identify the target of the query (module, function, class, or project)."
+      IntentAnalyzer._generate_description,method,"(intent_type:IntentType, target:str) -> str",333-343,false,11,1,Generate a description for the detected intent.
+      IntentAnalyzer._generate_suggestions,method,"(intent_type:IntentType, target:str, project:Any) -> List[str]",345-379,false,35,1,Generate suggestions based on intent type.
+      IntentAnalyzer.analyze_intent,method,"(query:str, project:Any) -> List[Intent]",381-411,false,31,3,Analyze a query and return detected intents sorted by confidence.
+      IntentAnalyzer.detect_code_smells,method,"(project:Any) -> List[dict]",413-464,false,52,10,Detect code smells in the project.
+      IntentAnalyzer.suggest_refactoring,method,"(target:str, project:Any) -> List[str]",466-489,false,24,6,Generate refactoring suggestions for a target.
+      IntentAnalyzer._find_target_object,method,"(target:str, project:Any) -> Any",491-507,false,17,9,Find the object referenced by target string.
+      IntentAnalyzer._suggest_module_refactoring,method,"(module:Any) -> List[str]",509-523,false,15,6,Generate refactoring suggestions for a module.
+      IntentAnalyzer._suggest_class_refactoring,method,"(cls:Any) -> List[str]",525-536,false,12,5,Generate refactoring suggestions for a class.
+      IntentAnalyzer._suggest_function_refactoring,method,"(func:Any) -> List[str]",538-557,false,20,8,Generate refactoring suggestions for a function.
+  adaptive.py:
+    functions[15]{name,kind,sig,loc,async,lines,cc,does}:
+      get_llm_capabilities,function,"(model:str) -> Dict[str,Any]",604-620,false,17,5,Get capabilities for a specific model.
+      AdaptiveReproducer.__init__,method,"(client:BaseLLMClient=None, model:str=None) -> None",127-136,false,10,3,Initialize adaptive reproducer.
+      AdaptiveReproducer._get_capabilities,method,"() -> Dict[str,Any]",138-149,false,12,5,Get LLM capabilities for current model.
+      AdaptiveReproducer.select_format,method,"(file_path:Path, content:str) -> str",151-185,false,35,9,Select optimal format based on file and LLM capabilities.
+      AdaptiveReproducer.should_chunk,method,"(content:str) -> bool",187-206,false,20,2,Determine if content should be chunked.
+      AdaptiveReproducer.chunk_content,method,"(content:str, file_path:Path) -> List[ChunkInfo]",208-325,false,118,21,Split content into logical chunks.
+      AdaptiveReproducer.generate_chunk_spec,method,"(chunk:ChunkInfo, format_name:str) -> str",327-347,false,21,4,Generate specification for a single chunk.
+      AdaptiveReproducer._gherkin_for_chunk,method,"(chunk:ChunkInfo) -> str",349-380,false,32,8,Generate Gherkin for a chunk.
+      AdaptiveReproducer._yaml_for_chunk,method,"(chunk:ChunkInfo) -> str",382-394,false,13,2,Generate YAML for a chunk.
+      AdaptiveReproducer._json_for_chunk,method,"(chunk:ChunkInfo) -> str",396-405,false,10,1,Generate JSON for a chunk.
+      AdaptiveReproducer.reproduce,method,"(file_path:str, output_dir:str=None) -> AdaptiveResult",407-430,false,24,2,Reproduce code with adaptive format selection.
+      AdaptiveReproducer._reproduce_single,method,"(path:Path, content:str, format_name:str, output_dir:str=None) -> AdaptiveResult",432-482,false,51,6,Reproduce without chunking.
+      AdaptiveReproducer._reproduce_chunked,method,"(path:Path, content:str, format_name:str, output_dir:str=None) -> AdaptiveResult",484-532,false,49,3,Reproduce with chunking.
+      AdaptiveReproducer._generate_from_spec,method,"(spec:str, format_name:str, file_ext:str) -> str",534-565,false,32,1,Generate code from specification.
+      AdaptiveReproducer._save_result,method,"(output_dir:Path, original:str, spec:str, generated:str, result:AdaptiveResult) -> None",567-601,false,35,1,Save reproduction results.
+  reproducer.py:
+    functions[22]{name,kind,sig,loc,async,lines,cc,does}:
+      reproduce_project,function,"(spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None, validate:bool=True, verbose:bool=True) -> ReproductionResult",633-685,false,53,11,Convenience function to reproduce and validate a project.
+      validate_files,function,"(spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None) -> List[FileValidation]",688-705,false,18,1,Validate specific files against spec.
+      SpecReproducer.__init__,method,"(verbose:bool=False) -> None",122-123,false,2,1,creates
+      SpecReproducer.reproduce_from_yaml,method,"(spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult",125-142,false,18,1,Reproduce files from YAML specification.
+      SpecReproducer.reproduce_from_json,method,"(spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult",144-154,false,11,1,Reproduce files from JSON specification.
+      SpecReproducer._reproduce,method,"(spec:Dict[str,Any], output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult",156-196,false,41,10,Internal reproduction logic.
+      SpecReproducer._generate_file,method,"(module:Dict[str,Any], output_path:Path) -> bool",198-214,false,17,3,Generate a single file from module spec.
+      SpecReproducer._generate_python,method,"(module:Dict[str,Any]) -> str",216-261,false,46,10,Generate Python file content.
+      SpecReproducer._render_docstring,method,"(text:str, indent:str) -> List[str]",263-290,false,28,8,Render a safe Python docstring or fall back to comments.
+      SpecReproducer._sanitize_python_property,method,"(prop:str) -> str",292-320,false,29,2,Sanitize a Python class property declaration for valid syntax.
+      SpecReproducer._generate_python_class,method,"(cls:Dict[str,Any]) -> List[str]",322-363,false,42,11,Generate Python class.
+      SpecReproducer._generate_python_method,method,"(method:Dict[str,Any]) -> List[str]",365-391,false,27,4,Generate Python method.
+      SpecReproducer._generate_python_function,method,"(func:Dict[str,Any]) -> List[str]",393-412,false,20,3,Generate Python function.
+      SpecReproducer._generate_typescript,method,"(module:Dict[str,Any]) -> str",414-442,false,29,7,Generate TypeScript file content.
+      SpecReproducer._generate_ts_class,method,"(cls:Dict[str,Any]) -> List[str]",444-466,false,23,5,Generate TypeScript class.
+      SpecReproducer._generate_ts_method,method,"(method:Dict[str,Any]) -> List[str]",468-481,false,14,2,Generate TypeScript method.
+      SpecReproducer._generate_ts_function,method,"(func:Dict[str,Any]) -> List[str]",483-496,false,14,2,Generate TypeScript function.
+      SpecReproducer._parse_signature,method,"(sig:str) -> str",498-513,false,16,4,Parse and clean signature.
+      SpecValidator.__init__,method,() -> None,529-530,false,2,1,creates
+      SpecValidator.validate,method,"(spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None) -> List[FileValidation]",532-568,false,37,6,Validate generated files against spec.
+      SpecValidator._validate_file,method,"(module:Dict[str,Any], base_path:Path) -> FileValidation",570-621,false,52,10,Validate a single file.
+      SpecValidator._check_python_syntax,method,"(content:str, validation:FileValidation) -> bool",623-630,false,8,2,Check Python syntax.
+  llm_clients.py:
+    functions[30]{name,kind,sig,loc,async,lines,cc,does}:
+      _get_user_llm_config_path,function,() -> str,75-76,false,2,1,retrieves user llm config path
+      _load_user_llm_config,function,"() -> Dict[str,Any]",79-87,false,9,4,retrieves user llm config
+      _get_priority_mode,function,() -> str,90-92,false,3,2,retrieves priority mode
+      get_priority_mode,function,() -> str,95-96,false,2,1,retrieves priority mode
+      _get_provider_priority_overrides,function,"() -> Dict[str,int]",99-108,false,10,4,retrieves provider priority overrides
+      _get_model_priority_rules,function,"() -> Dict[str,Dict[str,int]]",111-131,false,21,8,retrieves model priority rules
+      _get_model_priority,function,"(model_string:str) -> Optional[int]",134-150,false,17,6,retrieves model priority
+      _get_provider_model_string,function,"(provider:str) -> str",153-172,false,20,4,retrieves provider model string
+      get_client,function,"(provider:str=None, model:str=None) -> BaseLLMClient",380-411,false,32,10,Get appropriate LLM client based on provider.
+      _try_client,function,"(provider:str, model:str=None) -> Optional[BaseLLMClient]",414-428,false,15,6,try client
+      _get_priority_order,function,"() -> List[str]",431-432,false,2,2,retrieves priority order
+      _get_effective_provider_order,function,"() -> List[tuple[str,int]]",435-486,false,52,9,retrieves effective provider order
+      get_effective_provider_priorities,function,"() -> Dict[str,int]",489-490,false,2,2,retrieves effective provider priorities
+      _get_provider_priorities_from_litellm_yaml,function,"() -> Dict[str,int]",493-517,false,25,13,retrieves provider priorities from litellm yaml
+      _candidate_litellm_yaml_paths,function,"() -> List[str]",520-526,false,7,1,candidate litellm yaml paths
+      BaseLLMClient.generate,method,"(prompt:str, system:str=None, max_tokens:int=4000) -> str",190-192,false,3,1,Generate completion.
+      BaseLLMClient.is_available,method,() -> bool,195-197,false,3,1,Check if client is available.
+      BaseLLMClient.chat,method,"(messages:List[Dict[str,str]], max_tokens:int=4000) -> str",199-209,false,11,3,Chat completion (default implementation).
+      OpenRouterClient.__init__,method,"(api_key:str=None, model:str=None) -> None",218-226,false,9,3,Initialize OpenRouter client.
+      OpenRouterClient.generate,method,"(prompt:str, system:str=None, max_tokens:int=4000) -> str",228-264,false,37,7,Generate completion using OpenRouter.
+      OpenRouterClient.is_available,method,() -> bool,266-268,false,3,1,Check if OpenRouter is configured.
+      OpenRouterClient.list_recommended_models,method,"() -> List[tuple]",271-273,false,3,1,List recommended models for code tasks.
+      OllamaLocalClient.__init__,method,"(model:str=None, host:str=None) -> None",281-289,false,9,3,Initialize Ollama client.
+      OllamaLocalClient.generate,method,"(prompt:str, system:str=None, max_tokens:int=4000) -> str",291-310,false,20,4,Generate completion using Ollama.
+      OllamaLocalClient.is_available,method,() -> bool,312-320,false,9,3,Check if Ollama is running.
+      OllamaLocalClient.list_models,method,"() -> List[str]",322-333,false,12,5,List available Ollama models.
+      OllamaLocalClient.list_recommended_models,method,"() -> List[tuple]",336-338,false,3,1,List recommended models for code tasks.
+      LiteLLMClient.__init__,method,"(model:str=None) -> None",346-352,false,7,2,Initialize LiteLLM client.
+      LiteLLMClient.generate,method,"(prompt:str, system:str=None, max_tokens:int=4000) -> str",354-373,false,20,4,Generate completion using LiteLLM.
+      LiteLLMClient.is_available,method,() -> bool,375-377,false,3,1,Check if LiteLLM is available.
+  prompts.py:
+    functions[3]{name,kind,sig,loc,async,lines,cc,does}:
+      get_reproduction_prompt,function,"(spec:str, fmt:str, file_name:str, language:str='python', max_spec_length:int=5000) -> str",57-91,false,35,2,Generate optimized reproduction prompt.
+      get_review_prompt,function,"(code:str, spec:str, fmt:str) -> str",94-126,false,33,1,Generate code review prompt.
+      get_fix_prompt,function,"(code:str, issues:list, spec:str) -> str",129-156,false,28,2,Generate code fix prompt.
+  chunked_reproduction.py:
+    functions[12]{name,kind,sig,loc,async,lines,cc,does}:
+      get_llm_limit,function,"(model_name:str) -> int",71-79,false,9,3,Get context limit for LLM model.
+      chunk_yaml_spec,function,"(spec:str, max_tokens:int=2000) -> List[Chunk]",82-144,false,63,13,Chunk YAML specification by modules/classes/functions.
+      chunk_gherkin_spec,function,"(spec:str, max_tokens:int=2000) -> List[Chunk]",147-225,false,79,13,Chunk Gherkin specification by Features/Scenarios.
+      chunk_markdown_spec,function,"(spec:str, max_tokens:int=2000) -> List[Chunk]",228-276,false,49,7,Chunk Markdown specification by sections.
+      chunk_spec,function,"(spec:str, fmt:str, max_tokens:int=2000) -> ChunkedSpec",279-298,false,20,5,Chunk specification based on format.
+      get_chunk_prompt,function,"(chunk:Chunk, fmt:str, file_name:str, chunk_num:int, total_chunks:int) -> str",301-319,false,19,2,Generate prompt for a single chunk.
+      merge_chunk_codes,function,"(codes:List[str], file_name:str) -> str",322-348,false,27,8,Merge code from multiple chunks.
+      auto_chunk_reproduce,function,"(spec:str, fmt:str, file_name:str, client, model_name:str='default') -> ChunkedResult",431-440,false,10,1,Auto-chunking reproduction with LLM adaptation.
+      adaptive_chunk_reproduce,function,"(spec:str, fmt:str, file_name:str, client, provider:str='unknown', model:str='unknown') -> ChunkedResult",443-479,false,37,1,Adaptive chunking reproduction using LLM profile.
+      ChunkedReproducer.__init__,method,"(client, model_name:str='default') -> None",354-357,false,4,1,creates
+      ChunkedReproducer.reproduce,method,"(spec:str, fmt:str, file_name:str) -> ChunkedResult",359-420,false,62,6,"Reproduce code from specification, chunking if needed."
+      ChunkedReproducer._extract_code,method,"(response:str) -> str",422-428,false,7,3,Extract code from LLM response.
+  __init__.py:
+    functions[2]{name,kind,sig,loc,async,lines,cc,does}:
+      analyze_quality,function,(target) -> None,188-191,false,4,2,processes quality
+      reproduce_project,function,"(source:str) -> None",194-198,false,5,2,reproduce project
+  metrics.py:
+    functions[12]{name,kind,sig,loc,async,lines,cc,does}:
+      analyze_reproduction,function,"(original:str, generated:str, spec:str='', format_name:str='', verbose:bool=False) -> ReproductionResult",530-550,false,21,1,Convenience function for reproduction analysis.
+      compare_formats,function,"(original:str, results:Dict[str,Tuple[str,str]], verbose:bool=False) -> Dict[str, Any]",553-597,false,45,5,Compare reproduction quality across formats.
+      ReproductionMetrics.__init__,method,"(verbose:bool=False) -> None",186-189,false,4,2,creates
+      ReproductionMetrics.analyze,method,"(original:str, generated:str, spec:str='', format_name:str='', source_file:str='') -> ReproductionResult",191-244,false,54,2,Analyze reproduction quality.
+      ReproductionMetrics._compute_text_metrics,method,"(original:str, generated:str) -> TextMetrics",246-288,false,43,12,Compute text-level metrics.
+      ReproductionMetrics._cosine_similarity,method,"(words1:List[str], words2:List[str]) -> float",290-304,false,15,5,Compute cosine similarity between word lists.
+      ReproductionMetrics._compute_structural_metrics,method,"(original:str, generated:str) -> StructuralMetrics",306-359,false,54,2,Compute structural metrics.
+      ReproductionMetrics._compute_semantic_metrics,method,"(original:str, generated:str) -> SemanticMetrics",361-417,false,57,7,Compute semantic preservation metrics.
+      ReproductionMetrics._compute_format_metrics,method,"(original:str, generated:str, spec:str, format_name:str) -> FormatMetrics",419-453,false,35,4,Compute format efficiency metrics.
+      ReproductionMetrics._compute_overall_score,method,"(result:ReproductionResult) -> float",455-484,false,30,1,Compute weighted overall score.
+      ReproductionMetrics._get_grade,method,"(score:float) -> str",486-497,false,12,5,Get letter grade from score.
+      ReproductionMetrics._generate_recommendations,method,"(result:ReproductionResult) -> List[str]",499-527,false,29,9,Generate improvement recommendations.
+  refactor.py:
+    functions[5]{name,kind,sig,loc,async,lines,cc,does}:
+      find_duplicates,function,"(project_path:str, threshold:float=0.8) -> List[DuplicateGroup]",112-167,false,56,10,Find duplicate functions in a project.
+      analyze_quality,function,"(project_path:str, include_security:bool=True, include_performance:bool=True) -> RefactoringReport",170-229,false,60,8,Analyze code quality and generate refactoring report.
+      suggest_refactoring,function,"(project_path:str, use_llm:bool=False, client:BaseLLMClient=None) -> RefactoringReport",232-294,false,63,6,Generate refactoring suggestions for a project.
+      compare_codebases,function,"(project1:str, project2:str) -> Dict[str, Any]",297-350,false,54,1,Compare two codebases for similarities and differences.
+      quick_analyze,function,"(project_path:str) -> Dict[str, Any]",353-388,false,36,8,Quick analysis for a project.
+  logicml.py:
+    functions[9]{name,kind,sig,loc,async,lines,cc,does}:
+      generate_logicml,function,"(project:ProjectInfo, detail:str='standard') -> str",340-344,false,5,1,Convenience function to generate LogicML format.
+      LogicMLGenerator.__init__,method,"(verbose:bool=False) -> None",80-81,false,2,1,creates
+      LogicMLGenerator.generate,method,"(project:ProjectInfo, detail:str='standard') -> LogicMLSpec",83-105,false,23,3,Generate LogicML specification for a project.
+      LogicMLGenerator._generate_module,method,"(module:ModuleInfo, detail:str) -> str",107-165,false,59,19,Generate LogicML for a single module.
+      LogicMLGenerator._generate_imports,method,"(imports:List[str]) -> str",167-193,false,27,8,Generate compact imports section.
+      LogicMLGenerator._generate_class,method,"(cls:ClassInfo, detail:str) -> str",195-247,false,53,20,Generate LogicML for a class.
+      LogicMLGenerator._generate_method,method,"(method:FunctionInfo, detail:str, indent:int=2) -> str",249-295,false,47,15,Generate LogicML for a method.
+      LogicMLGenerator._generate_functions,method,"(functions:List[FunctionInfo], detail:str) -> str",297-305,false,9,2,Generate LogicML for top-level functions.
+      LogicMLGenerator._detect_side_effects,method,"(method:FunctionInfo) -> Optional[str]",307-337,false,31,7,Detect side effects from method calls and name patterns.
+  function_logic.py:
+    functions[12]{name,kind,sig,loc,async,lines,cc,does}:
+      FunctionLogicGenerator.__init__,method,"(verbose:bool=False) -> None",13-14,false,2,1,creates
+      FunctionLogicGenerator.generate,method,"(project:ProjectInfo, detail:str='full') -> str",16-42,false,27,8,creates
+      FunctionLogicGenerator.generate_json,method,"(project:ProjectInfo, detail:str='full') -> str",44-50,false,7,2,creates json
+      FunctionLogicGenerator.generate_yaml,method,"(project:ProjectInfo, detail:str='full') -> str",52-60,false,9,3,creates yaml
+      FunctionLogicGenerator.generate_toon,method,"(project:ProjectInfo, detail:str='full') -> str",62-126,false,65,21,creates toon
+      FunctionLogicGenerator._build_data,method,"(project:ProjectInfo, detail:str) -> dict",128-145,false,18,5,creates data
+      FunctionLogicGenerator._module_items,method,"(module) -> List[Tuple[str, str, FunctionInfo]]",147-157,false,11,7,module items
+      FunctionLogicGenerator._build_sig,method,"(func:FunctionInfo, include_async_prefix:bool=True) -> str",159-166,false,8,6,creates sig
+      FunctionLogicGenerator._build_loc,method,"(func:FunctionInfo) -> str",168-173,false,6,5,creates loc
+      FunctionLogicGenerator._build_does,method,"(func:FunctionInfo) -> str",175-179,false,5,5,creates does
+      FunctionLogicGenerator._item_to_dict,method,"(kind:str, qualified_name:str, func:FunctionInfo, detail:str) -> dict",181-218,false,38,17,item to dict
+      FunctionLogicGenerator._format_function,method,"(kind:str, qualified_name:str, func:FunctionInfo, detail:str, indent:int) -> List[str]",220-267,false,48,15,formats function
+  utils.py:
+    functions[3]{name,kind,sig,loc,async,lines,cc,does}:
+      estimate_tokens,function,"(text:str) -> int",7-8,false,2,1,estimate tokens
+      write_text_atomic,function,"(path:Path, content:str) -> None",11-15,false,5,1,logs text atomic
+      cleanup_generated_root,function,"(generated_root:Path, allowed_dirs:set[str]) -> None",18-24,false,7,5,cleanup generated root
+  generators.py:
+    functions[59]{name,kind,sig,loc,async,lines,cc,does}:
+      bytes_to_kb,function,"(bytes_value:int) -> float",22-26,false,5,2,Convert bytes to kilobytes with single decimal precision.
+      MarkdownGenerator.generate,method,"(project:ProjectInfo, detail_level:str='standard') -> str",45-143,false,99,26,Generate Markdown output.
+      MarkdownGenerator._gen_tree,method,"(lines:List[str], project:ProjectInfo) -> None",145-169,false,25,8,Generate project structure tree.
+      MarkdownGenerator._print_tree,method,"(lines:List[str], tree:dict, prefix:str, depth:int=0) -> None",171-186,false,16,6,Recursively print tree structure.
+      MarkdownGenerator._gen_module,method,"(lines:List[str], m:ModuleInfo, detail:str, proj:ProjectInfo) -> None",188-243,false,56,18,Generate module documentation.
+      MarkdownGenerator._gen_class,method,"(lines:List[str], cls:ClassInfo, detail:str) -> None",245-269,false,25,12,Generate class documentation.
+      MarkdownGenerator._sig,method,"(f:FunctionInfo) -> str",271-288,false,18,7,Generate function signature.
+      CompactGenerator.generate,method,"(project:ProjectInfo) -> str",304-352,false,49,16,Generate compact output.
+      JSONGenerator.generate,method,"(project:ProjectInfo, flat:bool=False, detail:str='standard') -> str",370-385,false,16,2,Generate JSON output.
+      JSONGenerator.generate_from_module,method,"(module:ModuleInfo, detail:str='full') -> str",387-401,false,15,1,creates from module
+      JSONGenerator._generate_nested,method,"(project:ProjectInfo, detail:str) -> str",403-468,false,66,3,Generate nested JSON structure.
+      JSONGenerator._field_to_dict,method,"(field:FieldInfo) -> dict",470-479,false,10,4,Serialize dataclass FieldInfo to dictionary.
+      JSONGenerator._generate_flat,method,"(project:ProjectInfo, detail:str) -> str",481-516,false,36,7,Generate flat JSON list for comparisons.
+      JSONGenerator._build_element_row,method,"(m:ModuleInfo, elem_type:str, name:str, signature:str, f:FunctionInfo, deps:list, detail:str) -> dict",518-545,false,28,9,Build a single element row for flat output.
+      JSONGenerator._build_signature,method,"(f:FunctionInfo) -> str",547-556,false,10,7,Build compact signature.
+      JSONGenerator._categorize,method,"(name:str) -> str",558-560,false,3,1,Categorize by name pattern.
+      JSONGenerator._extract_domain,method,"(path:str) -> str",562-564,false,3,1,Extract domain from path.
+      JSONGenerator._compute_hash,method,"(name:str, signature:str) -> str",566-568,false,3,1,Compute short hash.
+      YAMLGenerator.generate,method,"(project:ProjectInfo, flat:bool=False, detail:str='standard', compact:bool=True) -> str",605-638,false,34,4,Generate YAML output.
+      YAMLGenerator.generate_schema,method,"(format_type:str='compact') -> str",640-655,false,16,3,Generate JSON Schema for the YAML format.
+      YAMLGenerator._generate_compact_schema,method,() -> str,657-781,false,125,1,Generate JSON Schema for compact YAML format with meta.legend.
+      YAMLGenerator._generate_full_schema,method,() -> str,783-861,false,79,1,Generate JSON Schema for full YAML format.
+      YAMLGenerator._generate_hybrid_schema,method,() -> str,863-978,false,116,1,Generate JSON Schema for hybrid format.
+      YAMLGenerator.generate_hybrid,method,"(project:ProjectInfo, detail:str='standard') -> str",980-1229,false,250,79,Generate hybrid format combining TOON compactness with YAML completeness.
+      YAMLGenerator._build_enhanced_signature,method,"(f:FunctionInfo) -> str",1231-1250,false,20,8,Build enhanced signature with better parameter handling.
+      YAMLGenerator._extract_constants,method,"(module:ModuleInfo) -> list",1252-1265,false,14,4,Extract constants and type definitions from module.
+      YAMLGenerator._extract_dataclasses,method,"(module:ModuleInfo) -> list",1267-1276,false,10,3,Extract dataclass information from classes.
+      YAMLGenerator._extract_conditional_imports,method,"(module:ModuleInfo) -> list",1278-1288,false,11,4,Extract conditional imports from constants.
+      YAMLGenerator.generate_from_module,method,"(module:ModuleInfo, detail:str='full') -> str",1290-1304,false,15,1,creates from module
+      YAMLGenerator._build_flat_data,method,"(project:ProjectInfo, detail:str) -> dict",1306-1340,false,35,8,Build flat data structure optimized for comparisons.
+      YAMLGenerator._build_nested_data,method,"(project:ProjectInfo, detail:str) -> dict",1342-1414,false,73,19,Build nested hierarchical data structure.
+      YAMLGenerator._constants_for_module_verbose,method,"(module:ModuleInfo, limit:int=12) -> list",1416-1443,false,28,11,constants for module verbose
+      YAMLGenerator._build_row,method,"(path:str, elem_type:str, name:str, signature:str, language:str, detail:str, project:ProjectInfo) -> dict",1445-1455,false,11,1,Build a single row for flat output.
+      YAMLGenerator._build_function_row,method,"(path:str, f:FunctionInfo, language:str, detail:str, project:ProjectInfo, imports:list) -> dict",1457-1483,false,27,4,Build row for standalone function.
+      YAMLGenerator._build_method_row,method,"(path:str, class_name:str, f:FunctionInfo, language:str, detail:str, project:ProjectInfo, imports:list) -> dict",1485-1512,false,28,4,Build row for class method.
+      YAMLGenerator._function_to_dict,method,"(f:FunctionInfo, detail:str) -> dict",1514-1530,false,17,5,Convert function to dict for nested output.
+      YAMLGenerator._method_to_dict,method,"(f:FunctionInfo, detail:str) -> dict",1532-1571,false,40,15,Convert method to dictionary for YAML output.
+      YAMLGenerator._build_signature,method,"(f:FunctionInfo) -> str",1573-1590,false,18,9,Build compact signature string.
+      YAMLGenerator._categorize,method,"(name:str) -> str",1592-1594,false,3,1,Categorize function by name pattern.
+      YAMLGenerator._extract_domain,method,"(path:str) -> str",1596-1598,false,3,1,Extract domain from file path.
+      YAMLGenerator._compute_hash,method,"(name:str, signature:str) -> str",1600-1602,false,3,1,Compute short hash for quick comparison.
+      YAMLGenerator._generate_simple_yaml,method,"(project:ProjectInfo, flat:bool, detail:str) -> str",1604-1640,false,37,11,Fallback YAML generation without pyyaml.
+      YAMLGenerator._build_compact_data,method,"(project:ProjectInfo, detail:str) -> dict",1642-1709,false,68,15,Build compact data structure with short keys.
+      YAMLGenerator._compact_imports,method,"(imports:list) -> list",1711-1715,false,5,2,"Deduplicate and compact imports (typing.Dict, typing.List -> typing.{Dict,List})..."
+      YAMLGenerator._compact_class,method,"(cls:ClassInfo, detail:str, module_types:Optional[list]=None) -> dict",1717-1791,false,75,32,Generate compact class representation.
+      YAMLGenerator._compact_function,method,"(f:FunctionInfo, detail:str) -> dict",1793-1823,false,31,11,Generate compact function representation.
+      YAMLGenerator._compact_method,method,"(f:FunctionInfo, detail:str) -> dict",1825-1827,false,3,1,Generate compact method representation (same as function).
+      YAMLGenerator._build_compact_signature,method,"(f:FunctionInfo) -> str",1829-1844,false,16,7,Build compact signature without 'self' and with clean formatting.
+      YAMLGenerator._constants_for_module_verbose,method,"(module:ModuleInfo, limit:int=10) -> list",1846-1869,false,24,10,Convert module constants into verbose dictionaries.
+      YAMLGenerator._constants_for_module,method,"(module:ModuleInfo, limit:int=10) -> list",1871-1884,false,14,6,Convert module constants into compact dictionaries.
+      YAMLGenerator._constant_to_dict,method,"(constant:ConstantInfo) -> dict",1886-1898,false,13,5,Serialize ConstantInfo into a compact dictionary.
+      CSVGenerator.generate,method,"(project:ProjectInfo, detail:str='standard') -> str",1932-1983,false,52,7,Generate CSV output.
+      CSVGenerator._build_row,method,"(m:ModuleInfo, elem_type:str, name:str, signature:str, calls:list, deps:str, detail:str) -> dict",1985-2012,false,28,3,Build a single CSV row.
+      CSVGenerator._build_function_row,method,"(m:ModuleInfo, elem_type:str, name:str, f:FunctionInfo, deps:str, detail:str, project:ProjectInfo) -> dict",2014-2043,false,30,4,Build CSV row for function/method.
+      CSVGenerator._build_signature,method,"(f:FunctionInfo) -> str",2045-2057,false,13,9,Build compact signature.
+      CSVGenerator._categorize,method,"(name:str) -> str",2059-2061,false,3,1,Categorize function by name pattern.
+      CSVGenerator._extract_domain,method,"(path:str) -> str",2063-2065,false,3,1,Extract domain from file path.
+      CSVGenerator._compute_hash,method,"(name:str, signature:str) -> str",2067-2071,false,5,1,Compute short hash for quick comparison.
+      CSVGenerator._escape_csv,method,"(text:str) -> str",2073-2077,false,5,2,"Escape text for CSV (remove newlines, limit commas)."
+  markdown_format.py:
+    functions[10]{name,kind,sig,loc,async,lines,cc,does}:
+      generate_markdown_hybrid,function,"(project:ProjectInfo, detail:str='full') -> str",344-348,false,5,1,Convenience function to generate Markdown hybrid format.
+      generate_file_markdown,function,"(file_path:str) -> str",351-365,false,15,3,Generate Markdown hybrid for a single file.
+      MarkdownHybridGenerator.__init__,method,"(verbose:bool=False) -> None",45-48,false,4,1,creates
+      MarkdownHybridGenerator.generate,method,"(project:ProjectInfo, detail:str='full') -> MarkdownSpec",50-92,false,43,1,Generate Markdown hybrid specification.
+      MarkdownHybridGenerator._generate_header,method,"(project:ProjectInfo) -> str",94-101,false,8,3,Generate header section.
+      MarkdownHybridGenerator._generate_tree,method,"(project:ProjectInfo) -> str",103-124,false,22,8,Generate file tree section.
+      MarkdownHybridGenerator._generate_imports,method,"(project:ProjectInfo) -> str",126-165,false,40,9,Generate imports as YAML for precise reproduction.
+      MarkdownHybridGenerator._generate_classes_yaml,method,"(project:ProjectInfo) -> str",167-241,false,75,23,Generate classes as detailed YAML codeblock.
+      MarkdownHybridGenerator._generate_functions_gherkin,method,"(project:ProjectInfo) -> str",243-313,false,71,18,Generate functions as detailed Gherkin codeblock.
+      MarkdownHybridGenerator._generate_dependencies,method,"(project:ProjectInfo) -> str",315-341,false,27,9,Generate module dependencies section.
+  similarity.py:
+    functions[6]{name,kind,sig,loc,async,lines,cc,does}:
+      is_rapidfuzz_available,function,() -> bool,163-165,false,3,1,Check if Rapidfuzz is available.
+      get_refactoring_suggestions,function,"(similar_functions:Dict[str,List[str]]) -> List[Dict[str,any]]",168-238,false,71,15,Generate refactoring suggestions based on similar functions.
+      SimilarityDetector.__init__,method,"(threshold:float=80.0) -> None",38-45,false,8,1,Initialize the similarity detector.
+      SimilarityDetector.find_similar_functions,method,"(modules:List[ModuleInfo]) -> Dict[str,List[str]]",47-107,false,61,16,Find similar functions across all modules.
+      SimilarityDetector.find_duplicate_signatures,method,"(modules:List[ModuleInfo]) -> Dict[str,List[str]]",109-142,false,34,9,Find functions with identical signatures.
+      SimilarityDetector._build_signature,method,"(name:str, params:List[str], return_type:str=None) -> str",144-160,false,17,4,Build a normalized signature string.
+  universal.py:
+    functions[21]{name,kind,sig,loc,async,lines,cc,does}:
+      reproduce_file,function,"(source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True) -> Dict[str, Any]",1056-1074,false,19,1,Convenience function for single file reproduction.
+      UniversalParser.detect_language,method,"(content:str, file_ext:str) -> Language",239-262,false,24,6,Detect programming language from content and extension.
+      UniversalParser.parse,method,"(file_path:Union[str,Path]) -> CodeLogic",264-282,false,19,5,Parse source file into CodeLogic.
+      UniversalParser._parse_python,method,"(path:Path, content:str, hash_:str) -> CodeLogic",284-406,false,123,48,Parse Python file.
+      UniversalParser._parse_js_ts,method,"(path:Path, content:str, hash_:str, lang:Language) -> CodeLogic",408-577,false,170,49,Parse JavaScript/TypeScript file.
+      UniversalParser._parse_go,method,"(path:Path, content:str, hash_:str) -> CodeLogic",579-639,false,61,17,Parse Go file.
+      UniversalParser._parse_sql,method,"(path:Path, content:str, hash_:str) -> CodeLogic",641-683,false,43,5,Parse SQL file.
+      UniversalParser._parse_generic,method,"(path:Path, content:str, hash_:str, lang:Language) -> CodeLogic",685-706,false,22,3,Generic parser for unknown languages.
+      CodeGenerator.generate,method,"(logic:CodeLogic, target_lang:Language) -> str",712-723,false,12,5,Generate code in target language.
+      CodeGenerator._generate_python,method,"(logic:CodeLogic) -> str",725-756,false,32,9,Generate Python code.
+      CodeGenerator._generate_python_element,method,"(elem:CodeElement, indent:int=0) -> List[str]",758-814,false,57,19,Generate Python code for element.
+      CodeGenerator._generate_typescript,method,"(logic:CodeLogic) -> str",816-855,false,40,15,Generate TypeScript code.
+      CodeGenerator._generate_go,method,"(logic:CodeLogic) -> str",857-878,false,22,6,Generate Go code.
+      CodeGenerator._generate_sql,method,"(logic:CodeLogic) -> str",880-894,false,15,5,Generate SQL code.
+      CodeGenerator._generate_generic,method,"(logic:CodeLogic, target:Language) -> str",896-898,false,3,1,Generate generic code.
+      UniversalReproducer.__init__,method,"(client:BaseLLMClient=None) -> None",904-908,false,5,1,Initialize reproducer.
+      UniversalReproducer._get_client,method,() -> BaseLLMClient,910-914,false,5,2,Get or create LLM client.
+      UniversalReproducer.extract_logic,method,"(file_path:str) -> CodeLogic",916-918,false,3,1,Extract code logic from file.
+      UniversalReproducer.reproduce,method,"(source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True) -> Dict[str, Any]",920-983,false,64,5,Reproduce code from source file.
+      UniversalReproducer._generate_with_llm,method,"(logic:CodeLogic, target:Language) -> str",985-1018,false,34,1,Generate code using LLM.
+      UniversalReproducer._save_result,method,"(output_dir:Path, original:str, logic:CodeLogic, generated:str, result:Dict[str,Any]) -> None",1020-1053,false,34,1,Save reproduction results.
+  benchmark.py:
+    functions[9]{name,kind,sig,loc,async,lines,cc,does}:
+      run_benchmark,function,"(files:List[str], output_dir:str='benchmark_results', provider:str=None, model:str=None) -> Dict[str,Any]",430-449,false,20,1,Run reproduction benchmark.
+      ReproductionBenchmark.__init__,method,"(client:BaseLLMClient=None) -> None",140-153,false,14,2,Initialize benchmark.
+      ReproductionBenchmark.generate_spec,method,"(file_path:Path, format_name:str, detail:str='full') -> str",155-179,false,25,5,Generate specification in given format.
+      ReproductionBenchmark.reproduce_with_format,method,"(file_path:Path, format_name:str, original_code:str) -> FormatResult",181-252,false,72,3,Test reproduction with a specific format.
+      ReproductionBenchmark.run_single,method,"(file_path:str, formats:List[str]=None) -> BenchmarkResult",254-304,false,51,7,Run benchmark on a single file.
+      ReproductionBenchmark.run_all,method,"(files:List[str], output_dir:str=None) -> Dict[str,Any]",306-337,false,32,4,Run benchmark on multiple files.
+      ReproductionBenchmark._generate_summary,method,"(results:List[BenchmarkResult]) -> Dict[str,Any]",339-362,false,24,8,Generate summary from benchmark results.
+      ReproductionBenchmark._save_results,method,"(output_dir:Path, results:List[BenchmarkResult], summary:Dict) -> None",364-379,false,16,2,Save benchmark results.
+      ReproductionBenchmark._generate_report,method,"(results:List[BenchmarkResult], summary:Dict) -> str",381-427,false,47,7,Generate markdown benchmark report.
+  terminal.py:
+    functions[52]{name,kind,sig,loc,async,lines,cc,does}:
+      get_renderer,function,"(use_colors:bool=True, verbose:bool=True) -> ShellRenderer",578-583,false,6,2,Get or create the global renderer instance.
+      set_renderer,function,"(renderer:ShellRenderer) -> None",586-589,false,4,1,Set the global renderer instance.
+      ShellRenderer.__init__,method,"(use_colors:bool=True, verbose:bool=True) -> None",99-104,false,6,2,creates
+      ShellRenderer._supports_colors,method,() -> bool,106-117,false,12,4,Check if terminal supports ANSI colors.
+      ShellRenderer.enable_log,method,() -> None,119-122,false,4,1,Enable log buffering for markdown export.
+      ShellRenderer.get_log,method,() -> str,124-126,false,3,1,Get buffered log as clean markdown (no ANSI codes).
+      ShellRenderer.clear_log,method,() -> None,128-130,false,3,1,Clear log buffer.
+      ShellRenderer._log,method,"(text:str) -> None",132-140,false,9,3,Log a line (strips ANSI codes for markdown).
+      ShellRenderer._c,method,"(color:str, text:str) -> str",142-147,false,6,2,Apply color to text.
+      ShellRenderer.heading,method,"(level:int, text:str) -> None",153-156,false,4,1,Print a markdown heading.
+      ShellRenderer.codeblock,method,"(language:Language, content:str) -> None",158-171,false,14,2,Print a syntax-highlighted code block.
+      ShellRenderer.render_markdown,method,"(text:str) -> None",173-209,false,37,7,Render full markdown text with syntax highlighting.
+      ShellRenderer.success,method,"(message:str) -> None",215-217,false,3,1,Print success message.
+      ShellRenderer.error,method,"(message:str) -> None",219-221,false,3,1,Print error message.
+      ShellRenderer.warning,method,"(message:str) -> None",223-225,false,3,1,Print warning message.
+      ShellRenderer.info,method,"(message:str) -> None",227-229,false,3,1,Print info message.
+      ShellRenderer.status,method,"(icon:str, message:str, type:Literal[info,success,warning,error]='info') -> None",231-240,false,10,1,Print status message with icon.
+      ShellRenderer.kv,method,"(key:str, value:Any) -> None",246-248,false,3,1,Print key-value pair.
+      ShellRenderer.progress,method,"(done:int, total:int, label:str='') -> None",250-259,false,10,3,Print progress bar.
+      ShellRenderer.separator,method,"(char:str='─', width:int=60) -> None",261-263,false,3,1,Print separator line.
+      ShellRenderer.table,method,"(headers:List[str], rows:List[List[Any]], widths:Optional[List[int]]=None) -> None",265-284,false,20,8,Print a simple table.
+      ShellRenderer.task,method,"(name:str, status:Literal[pending,running,done,failed], duration:Optional[float]=None) -> None",286-307,false,22,2,Print task status.
+      ShellRenderer.inline,method,"(text:str) -> str",309-311,false,3,1,Return inline code styled text.
+      ShellRenderer.print,method,"(text:str, color:Optional[str]=None) -> None",313-315,false,3,2,Print raw text with optional color.
+      ShellRenderer.newline,method,() -> None,317-319,false,3,1,Print empty line.
+      ShellRenderer._highlight_line,method,"(line:str, language:str) -> str",325-346,false,22,9,Apply syntax highlighting to a line.
+      ShellRenderer._highlight_yaml,method,"(line:str) -> str",348-381,false,34,11,Highlight YAML syntax.
+      ShellRenderer._highlight_json,method,"(line:str) -> str",383-409,false,27,1,Highlight JSON syntax.
+      ShellRenderer._highlight_python,method,"(line:str) -> str",411-443,false,33,3,Highlight Python syntax.
+      ShellRenderer._highlight_bash,method,"(line:str) -> str",445-463,false,19,5,Highlight Bash syntax.
+      ShellRenderer._highlight_js,method,"(line:str) -> str",465-493,false,29,3,Highlight JavaScript/TypeScript syntax.
+      ShellRenderer._highlight_gherkin,method,"(line:str) -> str",495-519,false,25,12,Highlight Gherkin/BDD syntax.
+      ShellRenderer._highlight_log,method,"(line:str) -> str",521-540,false,20,15,Highlight log messages.
+      ShellRenderer._highlight_markdown,method,"(line:str) -> str",542-561,false,20,5,Highlight Markdown syntax.
+      ShellRenderer.save_log,method,"(filepath:str) -> None",563-568,false,6,1,Save log buffer to file as markdown.
+      RenderAPI.heading,method,"(level:int, text:str) -> None",596-597,false,2,1,heading
+      RenderAPI.code,method,"(lang:Language, content:str) -> None",600-601,false,2,1,code
+      RenderAPI.codeblock,method,"(lang:Language, content:str) -> None",604-605,false,2,1,codeblock
+      RenderAPI.markdown,method,"(text:str) -> None",608-609,false,2,1,markdown
+      RenderAPI.success,method,"(message:str) -> None",612-613,false,2,1,success
+      RenderAPI.error,method,"(message:str) -> None",616-617,false,2,1,error
+      RenderAPI.warning,method,"(message:str) -> None",620-621,false,2,1,warning
+      RenderAPI.info,method,"(message:str) -> None",624-625,false,2,1,info
+      RenderAPI.status,method,"(icon:str, message:str, type:Literal[info,success,warning,error]='info') -> None",628-630,false,3,1,status
+      RenderAPI.kv,method,"(key:str, value:Any) -> None",633-634,false,2,1,kv
+      RenderAPI.progress,method,"(done:int, total:int, label:str='') -> None",637-638,false,2,1,progress
+      RenderAPI.separator,method,"(char:str='─', width:int=60) -> None",641-642,false,2,1,separator
+      RenderAPI.table,method,"(headers:List[str], rows:List[List[Any]], widths:Optional[List[int]]=None) -> None",645-647,false,3,1,table
+      RenderAPI.task,method,"(name:str, status:Literal[pending,running,done,failed], duration:Optional[float]=None) -> None",650-653,false,4,1,task
+      RenderAPI.inline,method,"(text:str) -> str",656-657,false,2,1,inline
+      RenderAPI.print,method,"(text:str, color:Optional[str]=None) -> None",660-661,false,2,1,logs
+      RenderAPI.newline,method,() -> None,664-665,false,2,1,newline
+  toon_format.py:
+    functions[18]{name,kind,sig,loc,async,lines,cc,does}:
+      generate_toon,function,"(project:ProjectInfo, detail:str='standard', use_tabs:bool=False) -> str",692-705,false,14,1,Convenience function to generate TOON format.
+      parse_toon,function,"(content:str) -> Dict[str, Any]",708-710,false,3,1,Convenience function to parse TOON content.
+      TOONGenerator.__init__,method,"(delimiter:str=',', use_tabs:bool=False) -> None",35-46,false,12,2,Initialize TOON generator.
+      TOONGenerator.generate,method,"(project:ProjectInfo, detail:str='standard') -> str",48-81,false,34,4,Generate TOON format from ProjectInfo.
+      TOONGenerator._generate_modules,method,"(modules:List[ModuleInfo], detail:str) -> List[str]",83-156,false,74,24,Generate modules section.
+      TOONGenerator._generate_types,method,"(types:List[TypeInfo], indent:int=0) -> List[str]",158-189,false,32,13,Generate module-level types in TOON format (with enum values where available).
+      TOONGenerator._generate_classes,method,"(classes:List[ClassInfo], detail:str, indent:int=0) -> List[str]",191-243,false,53,18,Generate classes in TOON format.
+      TOONGenerator._generate_methods,method,"(methods:List[FunctionInfo], detail:str='standard', indent:int=0) -> List[str]",245-271,false,27,12,Generate methods in tabular TOON format.
+      TOONGenerator._generate_functions,method,"(functions:List[FunctionInfo], detail:str, indent:int=0) -> List[str]",273-302,false,30,14,Generate functions in tabular TOON format.
+      TOONGenerator._build_signature,method,"(f:FunctionInfo) -> str",304-327,false,24,7,Build compact signature string without self/cls.
+      TOONGenerator._quote,method,"(value:Any) -> str",329-354,false,26,8,Quote a value if necessary for TOON format.
+      TOONGenerator.generate_compact,method,"(project:ProjectInfo) -> str",356-358,false,3,1,Generate minimal TOON output.
+      TOONGenerator.generate_full,method,"(project:ProjectInfo) -> str",360-362,false,3,1,Generate detailed TOON output.
+      TOONGenerator.generate_schema,method,"(format_type:str='standard') -> str",364-515,false,152,2,Generate JSON Schema for the TOON format.
+      TOONGenerator.generate_ultra_compact,method,"(project:ProjectInfo) -> str",517-573,false,57,15,Generate minimal TOON with abbreviated keys.
+      TOONParser.__init__,method,() -> None,584-585,false,2,1,creates
+      TOONParser.parse,method,"(content:str) -> Dict[str, Any]",587-659,false,73,16,Parse TOON content to dict.
+      TOONParser._parse_value,method,"(value:str) -> Any",661-689,false,29,10,Parse a TOON value to Python type.
+  dependency.py:
+    functions[11]{name,kind,sig,loc,async,lines,cc,does}:
+      is_networkx_available,function,() -> bool,244-246,false,3,1,Check if NetworkX is available.
+      DependencyAnalyzer.__init__,method,() -> None,39-43,false,5,2,Initialize the dependency analyzer.
+      DependencyAnalyzer.build_graph,method,"(modules:List[ModuleInfo]) -> Dict[str,List[str]]",45-88,false,44,10,Build dependency graph from modules.
+      DependencyAnalyzer.analyze_metrics,method,"() -> Dict[str,DependencyNode]",90-128,false,39,7,Compute metrics for each node in the graph.
+      DependencyAnalyzer.get_entrypoints,method,"() -> List[str]",130-139,false,10,4,Get entry points (nodes with no incoming edges).
+      DependencyAnalyzer.get_hubs,method,"() -> List[str]",141-149,false,9,3,Get hub modules (high centrality).
+      DependencyAnalyzer.detect_cycles,method,"() -> List[List[str]]",151-165,false,15,3,Detect dependency cycles.
+      DependencyAnalyzer.get_strongly_connected_components,method,"() -> List[List[str]]",167-181,false,15,5,Get strongly connected components.
+      DependencyAnalyzer._detect_clusters,method,"() -> Dict[str,int]",183-199,false,17,5,Detect clusters using connected components.
+      DependencyAnalyzer._module_name,method,"(path:str) -> str",201-207,false,7,3,Convert file path to module name.
+      DependencyAnalyzer.get_dependency_depth,method,"(module_path:str) -> int",209-241,false,33,9,Get the maximum depth of dependencies for a module.
+  mcp_server.py:
+    functions[3]{name,kind,sig,loc,async,lines,cc,does}:
+      handle_request,function,"(request:dict) -> dict",36-175,false,140,5,Handle incoming MCP request.
+      call_tool,function,"(tool_name:str, arguments:dict) -> str",178-330,false,153,27,Execute a tool and return result.
+      run_server,function,() -> None,333-352,false,20,5,Run the MCP server.
+  reproduction.py:
+    functions[8]{name,kind,sig,loc,async,lines,cc,does}:
+      generate_file_gherkin,function,"(file_path:Path) -> str",26-222,false,197,63,Generate detailed Gherkin specification for a single file with types.
+      compare_code,function,"(original:str, generated:str) -> Dict[str, Any]",225-278,false,54,6,Compare original and generated code.
+      extract_code_block,function,"(text:str, language:str='python') -> str",281-311,false,31,9,Extract code block from LLM response.
+      CodeReproducer.__init__,method,"(client:BaseLLMClient=None, provider:str=None) -> None",317-324,false,8,2,Initialize reproducer.
+      CodeReproducer.reproduce_file,method,"(source_path:str, output_dir:str=None) -> Dict[str, Any]",326-363,false,38,2,Reproduce code from a source file.
+      CodeReproducer.generate_from_gherkin,method,"(gherkin:str, language:str='python') -> str",365-396,false,32,1,Generate code from Gherkin specification.
+      CodeReproducer._save_results,method,"(output_dir:Path, results:Dict[str,Any]) -> None",398-408,false,11,1,Save reproduction results to files.
+      CodeReproducer._generate_report,method,"(results:Dict[str,Any]) -> str",410-440,false,31,4,Generate markdown comparison report.
+  gherkin.py:
+    functions[29]{name,kind,sig,loc,async,lines,cc,does}:
+      csv_to_gherkin,function,"(csv_content:str, language:str='en') -> str",875-940,false,66,6,Convert CSV analysis directly to Gherkin.
+      gherkin_to_test_data,function,"(gherkin_content:str) -> Dict[str, Any]",943-979,false,37,10,Extract structured test data from Gherkin for LLM processing.
+      GherkinGenerator.__init__,method,"(language:str='en') -> None",164-173,false,10,1,Initialize GherkinGenerator.
+      GherkinGenerator.generate,method,"(project:ProjectInfo, detail:str='standard', group_by:str='domain') -> str",175-189,false,15,1,Generate Gherkin feature files from project analysis.
+      GherkinGenerator.generate_test_scenarios,method,"(project:ProjectInfo, group_by:str='domain') -> List[GherkinFeature]",191-203,false,13,1,Generate structured test scenarios for programmatic use.
+      GherkinGenerator.get_step_definitions,method,"() -> List[StepDefinition]",205-207,false,3,1,Get all unique step definitions from generated features.
+      GherkinGenerator._extract_features,method,"(project:ProjectInfo, group_by:str) -> List[GherkinFeature]",209-259,false,51,12,Extract Gherkin features from project.
+      GherkinGenerator._create_feature,method,"(group_name:str, items:List[dict], project:ProjectInfo, group_by:str) -> GherkinFeature",261-306,false,46,8,Create a Gherkin feature from grouped items.
+      GherkinGenerator._create_scenario,method,"(category:str, items:List[dict], domain:str) -> GherkinScenario",308-358,false,51,13,Create a scenario from category items.
+      GherkinGenerator._create_edge_case_scenarios,method,"(category:str, items:List[dict]) -> List[GherkinScenario]",360-386,false,27,5,Create edge case scenarios for thorough testing.
+      GherkinGenerator._create_when_step,method,"(func:FunctionInfo, verb:str) -> str",388-403,false,16,4,Create a When step from function info.
+      GherkinGenerator._create_background,method,"(domain:str, items:List[dict]) -> Optional[List[str]]",405-421,false,17,7,Create background steps for common setup.
+      GherkinGenerator._create_examples_table,method,"(items:List[dict]) -> List[Dict[str, str]]",423-442,false,20,6,Create Examples table for Scenario Outline.
+      GherkinGenerator._extract_param_placeholders,method,"(func:FunctionInfo) -> str",444-451,false,8,4,Extract parameter placeholders for Gherkin steps.
+      GherkinGenerator._register_step,method,"(step_type:str, pattern:str, func:FunctionInfo) -> None",453-466,false,14,3,Register a step definition for later generation.
+      GherkinGenerator._render_features,method,"(features:List[GherkinFeature], detail:str) -> str",468-482,false,15,2,Render features to Gherkin text.
+      GherkinGenerator._render_feature,method,"(feature:GherkinFeature, detail:str) -> str",484-511,false,28,9,Render a single feature.
+      GherkinGenerator._render_scenario,method,"(scenario:GherkinScenario, detail:str) -> str",513-556,false,44,16,Render a single scenario.
+      GherkinGenerator._categorize,method,"(name:str) -> str",558-577,false,20,4,Categorize function by name pattern.
+      GherkinGenerator._extract_domain,method,"(path:str) -> str",579-588,false,10,5,Extract domain from file path.
+      GherkinGenerator._name_to_readable,method,"(name:str) -> str",590-596,false,7,1,Convert function name to readable text.
+      GherkinGenerator._step_to_func_name,method,"(step:str) -> str",598-602,false,5,1,Convert step text to valid function name.
+      StepDefinitionGenerator.generate_pytest_bdd,method,"(features:List[GherkinFeature]) -> str",616-677,false,62,6,Generate pytest-bdd step definitions.
+      StepDefinitionGenerator.generate_behave,method,"(features:List[GherkinFeature]) -> str",679-717,false,39,6,Generate behave step definitions.
+      StepDefinitionGenerator.generate_cucumber_js,method,"(features:List[GherkinFeature]) -> str",719-761,false,43,7,Generate Cucumber.js step definitions.
+      StepDefinitionGenerator._step_to_func_name,method,"(step:str) -> str",763-767,false,5,1,Convert step text to valid function name.
+      CucumberYAMLGenerator.generate,method,"(project:ProjectInfo, detail:str='standard') -> str",777-842,false,66,19,Generate Cucumber YAML configuration.
+      CucumberYAMLGenerator._extract_domain,method,"(path:str) -> str",844-855,false,12,5,Extract domain from path.
+      CucumberYAMLGenerator._categorize,method,"(name:str) -> str",857-872,false,16,11,Categorize by name pattern.
+  schemas/logicml_schema.py:
+    functions[3]{name,kind,sig,loc,async,lines,cc,does}:
+      validate_logicml,function,"(spec:str) -> Tuple[bool, List[str]]",111-206,false,96,29,Validate LogicML specification.
+      parse_logicml_header,function,"(line:str) -> Optional[Dict[str, Any]]",209-219,false,11,3,Parse LogicML header comment.
+      extract_logicml_signature,function,"(sig_line:str) -> Dict[str, Any]",222-250,false,29,7,"Extract signature components from LogicML sig: line."
+  schemas/yaml_schema.py:
+    functions[3]{name,kind,sig,loc,async,lines,cc,does}:
+      validate_yaml,function,"(spec:str) -> Tuple[bool, List[str]]",94-148,false,55,16,Validate YAML specification.
+      _validate_module,function,"(module:Dict, index:int) -> List[str]",151-183,false,33,13,Validate a module definition.
+      _validate_class,function,"(cls:Dict, prefix:str) -> List[str]",186-214,false,29,12,Validate a class definition.
+  schemas/json_schema.py:
+    functions[4]{name,kind,sig,loc,async,lines,cc,does}:
+      validate_json,function,"(spec:str) -> Tuple[bool, List[str]]",110-143,false,34,8,Validate JSON specification.
+      _validate_json_module,function,"(module:Dict, index:int) -> List[str]",146-171,false,26,8,Validate a JSON module definition.
+      _validate_json_class,function,"(cls:Dict, prefix:str) -> List[str]",174-195,false,22,8,Validate a JSON class definition.
+      parse_json_spec,function,"(spec:str) -> Optional[JSONSchema]",198-257,false,60,7,Parse JSON specification into schema.
+  schemas/markdown_schema.py:
+    functions[2]{name,kind,sig,loc,async,lines,cc,does}:
+      validate_markdown,function,"(spec:str) -> Tuple[bool, List[str]]",89-150,false,62,16,Validate Markdown specification.
+      extract_markdown_sections,function,"(spec:str) -> Dict[str, Any]",153-174,false,22,5,Extract sections from Markdown specification.
+  benchmarks/common.py:
+    functions[8]{name,kind,sig,loc,async,lines,cc,does}:
+      create_single_project,function,"(module_info, file_path:Path) -> ProjectInfo",15-28,false,14,1,creates single project
+      generate_spec,function,"(project:ProjectInfo, fmt:str) -> str",31-52,false,22,7,creates spec
+      _generate_token_json,function,"(project:ProjectInfo) -> str",55-108,false,54,12,"Generate compact, token-friendly JSON spec (used by examples/11_token_benchmark...."
+      _generate_token_json_compact,function,"(project:ProjectInfo) -> str",111-113,false,3,1,creates token json compact
+      generate_spec_token,function,"(project:ProjectInfo, fmt:str) -> str",116-127,false,12,3,Generate spec optimized for token benchmark (keeps historical behavior).
+      get_async_reproduction_prompt,function,"(spec:str, fmt:str, file_name:str, with_tests:bool=False) -> str",130-174,false,45,2,retrieves async reproduction prompt
+      get_token_reproduction_prompt,function,"(spec:str, fmt:str, file_name:str) -> str",177-226,false,50,2,retrieves token reproduction prompt
+      get_simple_reproduction_prompt,function,"(spec:str, fmt:str, file_name:str) -> str",229-258,false,30,1,retrieves simple reproduction prompt
+  benchmarks/runner.py:
+    functions[15]{name,kind,sig,loc,async,lines,cc,does}:
+      _test_python_syntax,function,"(code:str) -> bool",43-49,false,7,2,Test if Python code has valid syntax.
+      _test_python_runs,function,"(code:str, timeout:int=5) -> bool",52-67,false,16,2,Test if Python code runs without errors.
+      _extract_code,function,"(response:str) -> str",70-86,false,17,7,Extract code from LLM response.
+      run_benchmark,function,"(source:str, benchmark_type:str='format', formats:List[str]=None, limit:Optional[int]=None, output:Optional[str]=None, verbose:bool=False) -> BenchmarkResult",782-824,false,43,6,Convenience function to run benchmarks.
+      BenchmarkRunner.__init__,method,"(client:Optional[BaseLLMClient]=None, config:Optional[BenchmarkConfig]=None) -> None",97-111,false,15,2,Initialize benchmark runner.
+      BenchmarkRunner._should_use_llm,method,() -> bool,113-115,false,3,1,Return whether this runner should call an LLM.
+      BenchmarkRunner._get_client,method,() -> BaseLLMClient,117-123,false,7,3,Get or create LLM client.
+      BenchmarkRunner._template_generate_code,method,"(spec:str, fmt:str, file_name:str) -> str",125-182,false,58,11,Generate minimal Python code without an LLM (fallback mode).
+      BenchmarkRunner.run_format_benchmark,method,"(folder:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult",184-292,false,109,20,Run format comparison benchmark.
+      BenchmarkRunner._test_format,method,"(project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FormatResult",294-354,false,61,13,Test a single format.
+      BenchmarkRunner.run_file_benchmark,method,"(file_path:str, formats:List[str]=None, verbose:bool=False) -> BenchmarkResult",356-454,false,99,16,Run benchmark on a single file.
+      BenchmarkRunner.run_function_benchmark,method,"(file_path:str, function_names:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult",456-527,false,72,12,Run function-level reproduction benchmark.
+      BenchmarkRunner._test_function,method,"(func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], verbose:bool=False) -> FunctionResult",529-617,false,89,20,Test reproduction of a single function.
+      BenchmarkRunner.run_project_benchmark,method,"(project_path:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult",619-716,false,98,23,Run benchmark on entire project.
+      BenchmarkRunner._reproduce_module,method,"(module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FileResult",718-779,false,62,4,Reproduce a single module.
