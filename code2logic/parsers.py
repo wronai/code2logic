@@ -341,6 +341,7 @@ class TreeSitterParser:
                     if not func.name.startswith('_'):
                         exports.append(func.name)
             elif node_type == 'decorated_definition':
+                # Handle decorated functions
                 inner_func = self._find_child(child, 'function_definition')
                 if inner_func:
                     func = self._extract_py_function(inner_func, content, child)
@@ -348,6 +349,19 @@ class TreeSitterParser:
                         functions.append(func)
                         if not func.name.startswith('_'):
                             exports.append(func.name)
+                
+                # Handle decorated classes (e.g., @dataclass)
+                inner_class = self._find_child(child, 'class_definition')
+                if inner_class:
+                    cls = self._extract_py_class(inner_class, content, decorated_node=child)
+                    if cls:
+                        classes.append(cls)
+                        if not cls.name.startswith('_'):
+                            exports.append(cls.name)
+                        
+                        enum_type = self._extract_py_enum(inner_class, content)
+                        if enum_type:
+                            types.append(enum_type)
             
             # Constants with enhanced extraction
             if node_type == 'expression_statement':
@@ -652,7 +666,7 @@ class TreeSitterParser:
         except Exception:
             return None
     
-    def _extract_py_class(self, node, content: str) -> Optional[ClassInfo]:
+    def _extract_py_class(self, node, content: str, decorated_node=None) -> Optional[ClassInfo]:
         """Extract Python class from AST node."""
         name_node = self._find_child(node, 'identifier')
         if not name_node:
@@ -670,10 +684,10 @@ class TreeSitterParser:
         # Check for dataclass decorator
         decorators = []
         is_dataclass = False
-        # Look for parent decorated_definition
-        parent = getattr(node, 'parent', None)
-        if parent and parent.type == 'decorated_definition':
-            for c in parent.children:
+        # Use provided decorated_node or try to find parent
+        dec_source = decorated_node or getattr(node, 'parent', None)
+        if dec_source and dec_source.type == 'decorated_definition':
+            for c in dec_source.children:
                 if c.type == 'decorator':
                     dec_text = self._text(c, content).lstrip('@')
                     decorators.append(dec_text.split('(')[0])
@@ -685,6 +699,7 @@ class TreeSitterParser:
         methods = []
         fields = []
         attributes = []
+        properties = []
         body = self._find_child(node, 'block')
         if body:
             for i, child in enumerate(body.children):
@@ -697,6 +712,10 @@ class TreeSitterParser:
                     m = self._extract_py_function(child, content)
                     if m:
                         methods.append(m)
+                        # Extract self.x = ... from __init__ method
+                        if m.name == '__init__' and not is_dataclass:
+                            init_attrs = self._extract_init_attributes(child, content)
+                            attributes.extend(init_attrs)
                 elif child.type == 'decorated_definition':
                     inner = self._find_child(child, 'function_definition')
                     if inner:
@@ -704,17 +723,18 @@ class TreeSitterParser:
                         if m:
                             methods.append(m)
                 
-                # Extract dataclass fields
+                # Extract dataclass fields (class-level annotated assignments)
                 elif is_dataclass and child.type == 'expression_statement':
                     field = self._extract_dataclass_field(child, content)
                     if field:
                         fields.append(field)
                 
-                # Extract instance attributes (self.x = ...)
+                # Extract class-level properties (annotated assignments without dataclass)
                 elif child.type == 'expression_statement' and not is_dataclass:
-                    attr = self._extract_class_attribute(child, content)
-                    if attr:
-                        attributes.append(attr)
+                    # Check for annotated assignment like "x: int" or "x: int = 5"
+                    prop = self._extract_class_property(child, content)
+                    if prop:
+                        properties.append(prop)
         
         return ClassInfo(
             name=name,
@@ -724,6 +744,7 @@ class TreeSitterParser:
             is_dataclass=is_dataclass,
             fields=fields,
             attributes=attributes,
+            properties=properties,
             methods=methods,
             is_interface=False,
             is_abstract='ABC' in bases or 'ABCMeta' in bases,
@@ -822,6 +843,46 @@ class TreeSitterParser:
                             type_annotation=type_annotation,
                             set_in_init=True
                         )
+        return None
+    
+    def _extract_init_attributes(self, func_node, content: str) -> List[AttributeInfo]:
+        """Extract self.x = ... assignments from __init__ method body."""
+        attributes = []
+        seen_names = set()
+        
+        def scan_block(block_node):
+            """Recursively scan block for self.x assignments."""
+            if not block_node:
+                return
+            for child in block_node.children:
+                if child.type == 'expression_statement':
+                    attr = self._extract_class_attribute(child, content)
+                    if attr and attr.name not in seen_names:
+                        seen_names.add(attr.name)
+                        attributes.append(attr)
+                # Also scan nested blocks (if/for/while/try)
+                elif child.type in ('if_statement', 'for_statement', 'while_statement', 'try_statement'):
+                    for sub in child.children:
+                        if sub.type == 'block':
+                            scan_block(sub)
+        
+        body = self._find_child(func_node, 'block')
+        scan_block(body)
+        return attributes[:15]  # Limit to 15 attributes
+    
+    def _extract_class_property(self, node, content: str) -> Optional[str]:
+        """Extract class-level property from annotated assignment."""
+        try:
+            stmt_text = self._text(node, content).strip()
+        except Exception:
+            return None
+        
+        # Match annotated assignment: "name: Type" or "name: Type = value"
+        m = re.match(r'^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*([^=]+?)(?:\s*=.*)?$', stmt_text)
+        if m:
+            name = m.group(1)
+            type_ann = m.group(2).strip()
+            return f"{name}: {type_ann}"
         return None
     
     def _extract_py_import(self, node, content: str) -> List[str]:
@@ -1575,14 +1636,26 @@ class UniversalParser:
                     if isinstance(target, ast.Name):
                         properties.append(target.id)
         
+        # Extract decorators
+        decorators = []
+        for dec in node.decorator_list:
+            if isinstance(dec, ast.Name):
+                decorators.append(dec.id)
+            elif isinstance(dec, ast.Call) and isinstance(dec.func, ast.Name):
+                decorators.append(dec.func.id)
+            elif isinstance(dec, ast.Attribute):
+                decorators.append(dec.attr)
+        
         return ClassInfo(
             name=node.name,
             bases=bases,
+            decorators=decorators,
             docstring=ast.get_docstring(node)[:100] if ast.get_docstring(node) else None,
+            is_dataclass=is_dataclass,
             methods=methods,
             properties=properties,
             is_interface=False,
-            is_abstract='ABC' in bases or is_dataclass,
+            is_abstract='ABC' in bases,
             generic_params=[]
         )
 

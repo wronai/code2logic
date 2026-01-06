@@ -1897,6 +1897,17 @@ class YAMLGenerator:
             data['v'] = snippet
         return data
 
+    def _field_to_dict(self, field: FieldInfo) -> dict:
+        """Serialize dataclass FieldInfo to dictionary."""
+        data = {'name': field.name}
+        if getattr(field, 'type_annotation', None):
+            data['type'] = field.type_annotation
+        if getattr(field, 'default', None):
+            data['default'] = field.default
+        if getattr(field, 'default_factory', None):
+            data['factory'] = field.default_factory
+        return data
+
 
 # ============================================================================
 # CSV Generator  

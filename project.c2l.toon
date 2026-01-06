@@ -1,9 +1,9 @@
 project: code2logic
 root: /home/tom/github/wronai/code2logic/code2logic
-generated: 2026-01-06T17:14:34.436783
+generated: 2026-01-06T18:38:42.811291
 stats:
   files: 52
-  lines: 22012
+  lines: 22116
   languages[1]: python:52
 
 modules[52]{path,lang,lines,kb}:
@@ -12,14 +12,14 @@ modules[52]{path,lang,lines,kb}:
   file_formats.py,python,279,12.3
   project_reproducer.py,python,322,12.2
   base.py,python,50,1.8
-  cli.py,python,788,33.6
+  cli.py,python,803,34.5
   llm.py,python,376,14.6
   errors.py,python,372,13.7
   code_review.py,python,205,9.0
   analyzer.py,python,235,9.6
   quality.py,python,212,8.8
   shared_utils.py,python,279,11.6
-  parsers.py,python,1473,70.4
+  parsers.py,python,1531,73.8
   intent.py,python,429,20.5
   adaptive.py,python,475,19.9
   reproducer.py,python,534,22.0
@@ -33,7 +33,7 @@ modules[52]{path,lang,lines,kb}:
   logicml.py,python,281,12.8
   function_logic.py,python,209,9.3
   utils.py,python,16,0.6
-  generators.py,python,1703,83.0
+  generators.py,python,1713,83.4
   markdown_format.py,python,266,13.9
   models.py,python,296,10.6
   similarity.py,python,178,7.8
@@ -67,8 +67,8 @@ module_details:
     const[1]{n,t,v,keys}:
       PROFILE_TEST_CASES,Dict,"-",simple_function|class_with_methods|async_function|decorator_usage|complex_logic
     classes[4]{name,bases,decorators,props,methods}:
-      LLMProfile,-,-,22,1
-      ProfileTestResult,-,-,9,0
+      LLMProfile,-,dataclass,22,1
+      ProfileTestResult,-,dataclass,9,0
       LLMProfiler,-,-,0,9
       AdaptiveChunker,-,-,0,5
     class_details:
@@ -169,8 +169,8 @@ module_details:
     const[1]{n,t,v,keys}:
       SUPPORTED_EXTENSIONS,Dict,"-",.py|.js|.ts|.tsx|.go|.rs|.java|.sql|.cs
     classes[3]{name,bases,decorators,props,methods}:
-      FileResult,-,-,10,0
-      ProjectResult,-,-,12,0
+      FileResult,-,dataclass,10,0
+      ProjectResult,-,dataclass,12,0
       ProjectReproducer,-,-,0,7
     class_details:
       FileResult:
@@ -259,7 +259,7 @@ module_details:
       _save_litellm_yaml,"(data:dict)->str",-,false,-,10
       _infer_provider_from_litellm_model,"(litellm_model:str)->str",-,false,-,6
       _code2logic_llm_cli,"(argv:list[str])->None",-,false,-,246
-      main,()->None,-,false,-,447
+      main,()->None,-,false,-,467
     function_docs:
       ensure_dependencies: ensure dependencies
       _get_env_file_path: retrieves env file path
@@ -278,12 +278,23 @@ module_details:
       main: main
   llm.py:
     imports[14]: json,os,typing.Optional,typing.List,typing.Dict,typing.Any,dataclasses.dataclass,httpx,litellm.completion,llm_clients.BaseLLMClient,llm_clients.OpenRouterClient,llm_clients.OllamaLocalClient,llm_clients.LiteLLMClient,llm_clients.get_client
-    exports[4]: OllamaClient,LiteLLMClient,CodeAnalyzer,get_available_backends
-    classes[3]{name,bases,decorators,props,methods}:
+    exports[5]: LLMConfig,OllamaClient,LiteLLMClient,CodeAnalyzer,get_available_backends
+    classes[4]{name,bases,decorators,props,methods}:
+      LLMConfig,-,dataclass,0,0
       OllamaClient,-,-,0,5
       LiteLLMClient,-,-,0,4
       CodeAnalyzer,-,-,0,7
     class_details:
+      LLMConfig:
+        doc: Configuration for LLM backend.
+        fields[7]{n,t,default,factory}:
+          provider,str,"\"ollama\"","-"
+          model,str,"\"qwen2.5-coder:7b\"","-"
+          base_url,str,"\"http://localhost:11434\"","-"
+          api_key,"Optional[str]",None,"-"
+          timeout,int,"120","-"
+          temperature,float,"0.7","-"
+          max_tokens,int,"2000","-"
       OllamaClient:
         doc: Direct Ollama API client.
         methods[5]{name,sig,decorators,async,lines}:
@@ -315,19 +326,45 @@ module_details:
       get_available_backends: retrieves available backends
   errors.py:
     imports[11]: dataclasses.dataclass,dataclasses.field,enum.Enum,pathlib.Path,typing.List,typing.Dict,typing.Any,typing.Optional,typing.Callable,logging,traceback
-    exports[4]: ErrorSeverity,ErrorType,ErrorHandler,create_error_handler
+    exports[6]: ErrorSeverity,ErrorType,AnalysisError,AnalysisResult,ErrorHandler,create_error_handler
     types[2]{name,kind,values,def}:
       ErrorSeverity,enum,"WARNING=\"warning\"|ERROR=\"error\"|CRITICAL=\"critical\"","-"
       ErrorType,enum,"FILE_NOT_FOUND=\"file_not_found\"|PERMISSION_DENIED=\"permission_denied\"|FILE_TOO_LARGE=\"file_too_large\"|ENCODING_ERROR=\"encoding_error\"|SYMLINK_LOOP=\"symlink_loop\"|DISK_FULL=\"disk_full\"|PATH_TOO_LONG=\"path_too_long\"|SYNTAX_ERROR=\"syntax_error\"|PARSE_TIMEOUT=\"parse_timeout\"|UNSUPPORTED_LANGUAGE=\"unsupported_language\"|BINARY_FILE=\"binary_file\"|EMPTY_FILE=\"empty_file\"|YAML_SERIALIZATION=\"yaml_serialization\"|JSON_SERIALIZATION=\"json_serialization\"|OUTPUT_WRITE_ERROR=\"output_write_error\"|MEMORY_ERROR=\"memory_error\"|TIMEOUT=\"timeout\"|UNKNOWN=\"unknown\"","-"
-    classes[3]{name,bases,decorators,props,methods}:
+    classes[5]{name,bases,decorators,props,methods}:
       ErrorSeverity,Enum,-,0,0
       ErrorType,Enum,-,0,0
+      AnalysisError,-,dataclass,0,1
+      AnalysisResult,-,dataclass,0,3
       ErrorHandler,-,-,0,8
     class_details:
       ErrorSeverity:
         doc: Error severity levels.
       ErrorType:
         doc: Types of errors that can occur during analysis.
+      AnalysisError:
+        doc: Represents an error during analysis.
+        fields[6]{n,t,default,factory}:
+          type,ErrorType,"-","-"
+          severity,ErrorSeverity,"-","-"
+          path,str,"-","-"
+          message,str,"-","-"
+          exception,"Optional[str]",None,"-"
+          suggestion,str,"\"\"","-"
+        methods[1]{name,sig,decorators,async,lines}:
+          to_dict,"()->Dict[str, Any]",-,false,9
+      AnalysisResult:
+        doc: Result of analysis with errors tracked.
+        fields[6]{n,t,default,factory}:
+          success,bool,True,"-"
+          errors,"List[AnalysisError]","-",list
+          warnings,"List[AnalysisError]","-",list
+          skipped_files,"List[str]","-",list
+          processed_files,int,"0","-"
+          total_files,int,"0","-"
+        methods[3]{name,sig,decorators,async,lines}:
+          add_error,"(error:AnalysisError)->None",-,false,8
+          has_errors,()->bool,-,false,2
+          summary,()->str,-,false,9
       ErrorHandler:
         doc: Handles errors during analysis with configurable behavior.
         methods[8]{name,sig,decorators,async,lines}:
@@ -393,10 +430,30 @@ module_details:
       get_library_status: retrieves library status
   quality.py:
     imports[7]: dataclasses.dataclass,dataclasses.field,typing.List,typing.Dict,typing.Any,models.ModuleInfo,models.ProjectInfo
-    exports[3]: QualityAnalyzer,analyze_quality,get_quality_summary
-    classes[1]{name,bases,decorators,props,methods}:
+    exports[5]: QualityIssue,QualityReport,QualityAnalyzer,analyze_quality,get_quality_summary
+    classes[3]{name,bases,decorators,props,methods}:
+      QualityIssue,-,dataclass,0,0
+      QualityReport,-,dataclass,0,1
       QualityAnalyzer,-,-,0,7
     class_details:
+      QualityIssue:
+        doc: Represents a code quality issue.
+        fields[7]{n,t,default,factory}:
+          type,str,"-","-"
+          severity,str,"-","-"
+          file,str,"-","-"
+          name,str,"-","-"
+          value,int,"-","-"
+          threshold,int,"-","-"
+          recommendation,str,"-","-"
+      QualityReport:
+        doc: Complete quality analysis report.
+        fields[3]{n,t,default,factory}:
+          issues,"List[QualityIssue]","-",list
+          metrics,"Dict[str, Any]","-",dict
+          score,float,"100.0","-"
+        methods[1]{name,sig,decorators,async,lines}:
+          to_dict,"()->Dict[str, Any]",-,false,19
       QualityAnalyzer:
         doc: Analyzes code quality and generates recommendations.
         methods[7]{name,sig,decorators,async,lines}:
@@ -453,7 +510,7 @@ module_details:
       TREE_SITTER_AVAILABLE,bool,False,"-"
     classes[3]{name,bases,decorators,props,methods}:
       _PyFunctionBodyAnalyzer,NodeVisitor,-,0,18
-      TreeSitterParser,-,-,0,33
+      TreeSitterParser,-,-,0,35
       UniversalParser,-,-,0,10
     class_details:
       _PyFunctionBodyAnalyzer:
@@ -478,22 +535,24 @@ module_details:
           visit_Lambda,(node)->None,-,false,2
       TreeSitterParser:
         doc: "Parser using Tree-sitter for high-accuracy AST parsing.  Supports Python, JavaScript, and TypeScript"
-        methods[33]{name,sig,decorators,async,lines}:
+        methods[35]{name,sig,decorators,async,lines}:
           __init__,()->None,-,false,8
           _init_parsers,()->None,-,false,23
           is_available,"(language:str)->bool",-,false,3
           get_supported_languages,"()->List[str]",classmethod,false,3
           parse,"(filepath:str;content:str;language:str)->Optional[ModuleInfo]",-,false,24
-          _parse_python,"(filepath:str;content:str;tree)->ModuleInfo",-,false,100
+          _parse_python,"(filepath:str;content:str;tree)->ModuleInfo",-,false,114
           _extract_constants,"(tree;content:str)->List[ConstantInfo]",-,false,30
           _extract_type_checking_imports,"(tree;content:str)->List[str]",-,false,24
           _extract_conditional_imports,"(node;content:str)->List[str]",-,false,14
           _extract_aliases,"(tree;content:str)->dict",-,false,46
           _extract_py_function,"(node;content:str;decorated_node=None)->Optional[FunctionInfo]",-,false,102
           _extract_py_enum,"(node;content:str)->Optional[TypeInfo]",-,false,41
-          _extract_py_class,"(node;content:str)->Optional[ClassInfo]",-,false,77
+          _extract_py_class,"(node;content:str;decorated_node=None)->Optional[ClassInfo]",-,false,84
           _extract_dataclass_field,"(node;content:str)->Optional[FieldInfo]",-,false,63
           _extract_class_attribute,"(node;content:str)->Optional[AttributeInfo]",-,false,29
+          _extract_init_attributes,"(func_node;content:str)->List[AttributeInfo]",-,false,24
+          _extract_class_property,"(node;content:str)->Optional[str]",-,false,14
           _extract_py_import,"(node;content:str)->List[str]",-,false,11
           _extract_py_from_import,"(node;content:str)->List[str]",-,false,39
           _extract_py_constant,"(node;content:str)->Optional[ConstantInfo]",-,false,59
@@ -520,7 +579,7 @@ module_details:
           _parse_python,"(filepath:str;content:str)->Optional[ModuleInfo]",-,false,73
           _extract_ast_enum,"(node:Any)->Optional[TypeInfo]",-,false,45
           _extract_ast_function,(node)->FunctionInfo,-,false,70
-          _extract_ast_class,"(node:Any)->ClassInfo",-,false,47
+          _extract_ast_class,"(node:Any)->ClassInfo",-,false,59
           _extract_ast_constant,"(node:Any;content:str)->Optional[ConstantInfo]",-,false,41
           _format_ast_value,"(value_node:Any;content:str)->str",-,false,19
           _ann_str,(node)->str,-,false,14
@@ -543,16 +602,25 @@ module_details:
       is_tree_sitter_available: Check if Tree-sitter is available.
   intent.py:
     imports[13]: re,dataclasses.dataclass,dataclasses.field,enum.Enum,enum.auto,typing.Optional,typing.List,typing.Tuple,typing.Any,typing.TYPE_CHECKING,nltk,nltk.stem.WordNetLemmatizer,spacy
-    exports[3]: IntentType,EnhancedIntentGenerator,IntentAnalyzer
+    exports[4]: IntentType,Intent,EnhancedIntentGenerator,IntentAnalyzer
     types[1]{name,kind,values,def}:
       IntentType,enum,REFACTOR=auto()|ANALYZE=auto()|OPTIMIZE=auto()|DEBUG=auto()|DOCUMENT=auto()|TEST=auto(),"-"
-    classes[3]{name,bases,decorators,props,methods}:
+    classes[4]{name,bases,decorators,props,methods}:
       IntentType,Enum,-,0,0
+      Intent,-,dataclass,0,0
       EnhancedIntentGenerator,-,-,0,5
       IntentAnalyzer,-,-,0,13
     class_details:
       IntentType:
         doc: Types of user intents for code analysis.
+      Intent:
+        doc: Represents a detected user intent.
+        fields[5]{n,t,default,factory}:
+          type,IntentType,"-","-"
+          confidence,float,"-","-"
+          target,str,"-","-"
+          description,str,"-","-"
+          suggestions,"List[str]","-",list
       EnhancedIntentGenerator:
         doc: "Generator intencji z NLP - lemmatyzacja, ekstrakcja z docstringów."
         methods[5]{name,sig,decorators,async,lines}:
@@ -583,8 +651,8 @@ module_details:
     const[1]{n,t,v,keys}:
       LLM_CAPABILITIES,Dict,"-","qwen/qwen-2.5-coder-32b-instruct|nvidia/nemotron-3-nano-30b-a3b:free|meta-llama/llama-3.3-70b-instruct:free|deepseek/deepseek-coder-33b-instruct|qwen2.5-coder:14b|qwen2.5-coder:7b|codellama:7b-instruct|default"
     classes[3]{name,bases,decorators,props,methods}:
-      ChunkInfo,-,-,5,0
-      AdaptiveResult,-,-,10,0
+      ChunkInfo,-,dataclass,5,0
+      AdaptiveResult,-,dataclass,10,0
       AdaptiveReproducer,-,-,0,14
     class_details:
       ChunkInfo:
@@ -616,16 +684,47 @@ module_details:
       get_llm_capabilities: capabilities for a specific model.
   reproducer.py:
     imports[13]: os,yaml,json,re,pathlib.Path,dataclasses.dataclass,dataclasses.field,typing.List,typing.Dict,typing.Any,typing.Optional,typing.Callable,enum.Enum
-    exports[5]: ReproductionStatus,SpecReproducer,SpecValidator,reproduce_project,validate_files
+    exports[7]: ReproductionStatus,FileValidation,ReproductionResult,SpecReproducer,SpecValidator,reproduce_project,validate_files
     types[1]{name,kind,values,def}:
       ReproductionStatus,enum,"SUCCESS=\"success\"|PARTIAL=\"partial\"|FAILED=\"failed\"|SKIPPED=\"skipped\"","-"
-    classes[3]{name,bases,decorators,props,methods}:
+    classes[5]{name,bases,decorators,props,methods}:
       ReproductionStatus,Enum,-,0,0
+      FileValidation,-,dataclass,0,2
+      ReproductionResult,-,dataclass,0,3
       SpecReproducer,-,-,0,16
       SpecValidator,-,-,0,4
     class_details:
       ReproductionStatus:
         doc: Status of file reproduction.
+      FileValidation:
+        doc: Validation result for a single file.
+        fields[9]{n,t,default,factory}:
+          path,str,"-","-"
+          exists,bool,False,"-"
+          syntax_ok,bool,False,"-"
+          structure_match,bool,False,"-"
+          classes_match,int,"0","-"
+          classes_expected,int,"0","-"
+          functions_match,int,"0","-"
+          functions_expected,int,"0","-"
+          errors,"List[str]","-",list
+        methods[2]{name,sig,decorators,async,lines}:
+          score,()->float,property,false,16
+          to_dict,"()->Dict[str, Any]",-,false,10
+      ReproductionResult:
+        doc: Result of reproduction process.
+        fields[7]{n,t,default,factory}:
+          output_dir,str,"-","-"
+          total_files,int,"0","-"
+          generated_files,int,"0","-"
+          failed_files,int,"0","-"
+          skipped_files,int,"0","-"
+          validations,"List[FileValidation]","-",list
+          errors,"List[str]","-",list
+        methods[3]{name,sig,decorators,async,lines}:
+          success_rate,()->float,property,false,4
+          average_score,()->float,property,false,4
+          summary,()->str,-,false,13
       SpecReproducer:
         doc: Reproduces code structure from logic specifications.
         methods[16]{name,sig,decorators,async,lines}:
@@ -752,9 +851,9 @@ module_details:
     const[1]{n,t,v,keys}:
       LLM_CONTEXT_LIMITS,Dict,"-",gpt-4|gpt-4-turbo|gpt-3.5-turbo|claude-3|claude-2|llama-7b|llama-13b|llama-70b|mistral-7b|mixtral-8x7b
     classes[4]{name,bases,decorators,props,methods}:
-      Chunk,-,-,5,0
-      ChunkedSpec,-,-,4,0
-      ChunkedResult,-,-,6,0
+      Chunk,-,dataclass,5,0
+      ChunkedSpec,-,dataclass,4,0
+      ChunkedResult,-,dataclass,6,0
       ChunkedReproducer,-,-,0,3
     class_details:
       Chunk:
@@ -803,10 +902,85 @@ module_details:
       reproduce_project: reproduce project
   metrics.py:
     imports[13]: re,difflib,hashlib,typing.Dict,typing.Any,typing.List,typing.Tuple,typing.Optional,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,collections.Counter,logging
-    exports[3]: ReproductionMetrics,analyze_reproduction,compare_formats
-    classes[1]{name,bases,decorators,props,methods}:
+    exports[8]: TextMetrics,StructuralMetrics,SemanticMetrics,FormatMetrics,ReproductionResult,ReproductionMetrics,analyze_reproduction,compare_formats
+    classes[6]{name,bases,decorators,props,methods}:
+      TextMetrics,-,dataclass,0,0
+      StructuralMetrics,-,dataclass,0,0
+      SemanticMetrics,-,dataclass,0,0
+      FormatMetrics,-,dataclass,0,0
+      ReproductionResult,-,dataclass,0,2
       ReproductionMetrics,-,-,0,10
     class_details:
+      TextMetrics:
+        doc: Text-level similarity metrics.
+        fields[9]{n,t,default,factory}:
+          char_similarity,float,"0.0","-"
+          line_similarity,float,"0.0","-"
+          word_similarity,float,"0.0","-"
+          levenshtein_ratio,float,"0.0","-"
+          jaccard_similarity,float,"0.0","-"
+          cosine_similarity,float,"0.0","-"
+          diff_added,int,"0","-"
+          diff_removed,int,"0","-"
+          diff_changed,int,"0","-"
+      StructuralMetrics:
+        doc: Structural code metrics.
+        fields[17]{n,t,default,factory}:
+          classes_original,int,"0","-"
+          classes_generated,int,"0","-"
+          classes_match,bool,False,"-"
+          functions_original,int,"0","-"
+          functions_generated,int,"0","-"
+          functions_match,bool,False,"-"
+          methods_original,int,"0","-"
+          methods_generated,int,"0","-"
+          methods_match,bool,False,"-"
+          imports_original,int,"0","-"
+          imports_generated,int,"0","-"
+          imports_match,bool,False,"-"
+          attributes_original,int,"0","-"
+          attributes_generated,int,"0","-"
+          attributes_match,bool,False,"-"
+          structural_score,float,"0.0","-"
+          element_coverage,float,"0.0","-"
+      SemanticMetrics:
+        doc: Semantic preservation metrics.
+        fields[6]{n,t,default,factory}:
+          naming_similarity,float,"0.0","-"
+          docstring_present,float,"0.0","-"
+          type_hints_present,float,"0.0","-"
+          decorator_match,float,"0.0","-"
+          signature_match,float,"0.0","-"
+          intent_score,float,"0.0","-"
+      FormatMetrics:
+        doc: Format-specific efficiency metrics.
+        fields[10]{n,t,default,factory}:
+          format_name,str,"\"\"","-"
+          spec_chars,int,"0","-"
+          spec_lines,int,"0","-"
+          spec_tokens,int,"0","-"
+          original_chars,int,"0","-"
+          generated_chars,int,"0","-"
+          compression_ratio,float,"0.0","-"
+          expansion_ratio,float,"0.0","-"
+          efficiency_score,float,"0.0","-"
+          token_cost_estimate,float,"0.0","-"
+      ReproductionResult:
+        doc: Complete reproduction analysis result.
+        fields[10]{n,t,default,factory}:
+          source_file,str,"\"\"","-"
+          format_used,str,"\"\"","-"
+          timestamp,str,"\"\"","-"
+          text,TextMetrics,"-",TextMetrics
+          structural,StructuralMetrics,"-",StructuralMetrics
+          semantic,SemanticMetrics,"-",SemanticMetrics
+          format,FormatMetrics,"-",FormatMetrics
+          overall_score,float,"0.0","-"
+          quality_grade,str,"\"\"","-"
+          recommendations,"List[str]","-",list
+        methods[2]{name,sig,decorators,async,lines}:
+          to_dict,"()->Dict[str, Any]",-,false,2
+          to_report,()->str,-,false,61
       ReproductionMetrics:
         doc: Analyze reproduction quality with multiple metrics.
         methods[10]{name,sig,decorators,async,lines}:
@@ -830,7 +1004,41 @@ module_details:
     imports[1]: cli.main
   refactor.py:
     imports[16]: json,pathlib.Path,typing.Dict,typing.List,typing.Any,typing.Optional,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,analyzer.analyze_project,similarity.SimilarityDetector,code_review.analyze_code_quality,code_review.check_security_issues,code_review.check_performance_issues,llm_clients.get_client
-    exports[5]: find_duplicates,analyze_quality,suggest_refactoring,compare_codebases,quick_analyze
+    exports[8]: DuplicateGroup,RefactoringSuggestion,RefactoringReport,find_duplicates,analyze_quality,suggest_refactoring,compare_codebases,quick_analyze
+    classes[3]{name,bases,decorators,props,methods}:
+      DuplicateGroup,-,dataclass,0,0
+      RefactoringSuggestion,-,dataclass,0,0
+      RefactoringReport,-,dataclass,0,2
+    class_details:
+      DuplicateGroup:
+        doc: Group of duplicate functions.
+        fields[4]{n,t,default,factory}:
+          hash,str,"-","-"
+          functions,"List[str]","-","-"
+          suggestion,str,"-","-"
+          effort,str,"\"low\"","-"
+      RefactoringSuggestion:
+        doc: Single refactoring suggestion.
+        fields[6]{n,t,default,factory}:
+          type,str,"-","-"
+          severity,str,"-","-"
+          location,str,"-","-"
+          description,str,"-","-"
+          suggestion,str,"-","-"
+          effort,str,"-","-"
+      RefactoringReport:
+        doc: Complete refactoring analysis report.
+        fields[7]{n,t,default,factory}:
+          project_path,str,"-","-"
+          total_files,int,"-","-"
+          total_functions,int,"-","-"
+          duplicates,"List[DuplicateGroup]","-",list
+          quality_issues,"List[RefactoringSuggestion]","-",list
+          security_issues,"List[RefactoringSuggestion]","-",list
+          suggestions,"List[RefactoringSuggestion]","-",list
+        methods[2]{name,sig,decorators,async,lines}:
+          to_dict,"()->Dict[str, Any]",-,false,2
+          to_markdown,()->str,-,false,42
     functions[5]{name,sig,decorators,async,category,lines}:
       find_duplicates,"(project_path:str;threshold:float=0.8)->List[DuplicateGroup]",-,false,-,56
       analyze_quality,"(project_path:str;include_security:bool=True;include_performance:bool=True)->RefactoringReport",-,false,-,60
@@ -849,7 +1057,7 @@ module_details:
     const[1]{n,t,v,keys}:
       LOGICML_EXAMPLE,str,"'\\n# sample_class.py | Calculator | 74 lines\\n\\nimports:\\n  stdlib: [typing.List, typing.Optional]\\n\\nCalculator:\\n  ...","-"
     classes[2]{name,bases,decorators,props,methods}:
-      LogicMLSpec,-,-,5,0
+      LogicMLSpec,-,dataclass,5,0
       LogicMLGenerator,-,-,5,8
     class_details:
       LogicMLSpec:
@@ -875,9 +1083,10 @@ module_details:
     imports[7]: typing.List,typing.Tuple,models.ProjectInfo,models.FunctionInfo,shared_utils.remove_self_from_params,shared_utils.truncate_docstring,toon_format.TOONGenerator
     exports[1]: FunctionLogicGenerator
     classes[1]{name,bases,decorators,props,methods}:
-      FunctionLogicGenerator,-,-,0,12
+      FunctionLogicGenerator,-,-,1,12
     class_details:
       FunctionLogicGenerator:
+        properties[1]: "FILE_EXTENSION: str"
         methods[12]{name,sig,decorators,async,lines}:
           __init__,"(verbose:bool=False)->None",-,false,2
           generate,"(project:ProjectInfo;detail:str='full')->str",-,false,27
@@ -909,7 +1118,7 @@ module_details:
       MarkdownGenerator,-,-,0,6
       CompactGenerator,-,-,0,1
       JSONGenerator,-,-,0,10
-      YAMLGenerator,-,-,0,33
+      YAMLGenerator,-,-,0,34
       CSVGenerator,-,-,0,8
     class_details:
       MarkdownGenerator:
@@ -940,7 +1149,7 @@ module_details:
           _compute_hash,"(name:str;signature:str)->str",-,false,3
       YAMLGenerator:
         doc: Generates YAML output for human-readable representation.
-        methods[33]{name,sig,decorators,async,lines}:
+        methods[34]{name,sig,decorators,async,lines}:
           generate,"(project:ProjectInfo;flat:bool=False;detail:str='standard';compact:bool=True)->str",-,false,34
           generate_schema,"(format_type:str='compact')->str",-,false,16
           _generate_compact_schema,()->str,-,false,125
@@ -974,6 +1183,7 @@ module_details:
           _constants_for_module_verbose,"(module:ModuleInfo;limit:int=10)->list",-,false,24
           _constants_for_module,"(module:ModuleInfo;limit:int=10)->list",-,false,14
           _constant_to_dict,"(constant:ConstantInfo)->dict",-,false,13
+          _field_to_dict,"(field:FieldInfo)->dict",-,false,10
       CSVGenerator:
         doc: Generates CSV output optimized for LLM processing.
         methods[8]{name,sig,decorators,async,lines}:
@@ -991,10 +1201,18 @@ module_details:
       bytes_to_kb: bytes to kb
   markdown_format.py:
     imports[12]: os,pathlib.Path,typing.Dict,typing.List,typing.Optional,dataclasses.dataclass,models.ProjectInfo,models.ModuleInfo,models.FunctionInfo,models.ClassInfo,gherkin.GherkinGenerator,generators.YAMLGenerator
-    exports[3]: MarkdownHybridGenerator,generate_markdown_hybrid,generate_file_markdown
-    classes[1]{name,bases,decorators,props,methods}:
+    exports[4]: MarkdownSpec,MarkdownHybridGenerator,generate_markdown_hybrid,generate_file_markdown
+    classes[2]{name,bases,decorators,props,methods}:
+      MarkdownSpec,-,dataclass,0,0
       MarkdownHybridGenerator,-,-,0,8
     class_details:
+      MarkdownSpec:
+        doc: Markdown specification for a project.
+        fields[4]{n,t,default,factory}:
+          content,str,"-","-"
+          file_count,int,"-","-"
+          total_chars,int,"-","-"
+          sections,"Dict[str, int]","-","-"
       MarkdownHybridGenerator:
         doc: Generates optimized Markdown hybrid format.
         methods[8]{name,sig,decorators,async,lines}:
@@ -1014,6 +1232,189 @@ module_details:
       generate_file_markdown: creates file markdown
   models.py:
     imports[5]: dataclasses.dataclass,dataclasses.field,typing.Optional,typing.List,typing.Dict
+    exports[14]: FunctionInfo,ClassInfo,TypeInfo,ModuleInfo,DependencyNode,ProjectInfo,ConstantInfo,FieldInfo,AttributeInfo,PropertyInfo
+    classes[14]{name,bases,decorators,props,methods}:
+      FunctionInfo,-,dataclass,0,0
+      ClassInfo,-,dataclass,0,0
+      TypeInfo,-,dataclass,0,0
+      ModuleInfo,-,dataclass,0,0
+      DependencyNode,-,dataclass,0,0
+      ProjectInfo,-,dataclass,0,0
+      ConstantInfo,-,dataclass,0,0
+      FieldInfo,-,dataclass,0,0
+      AttributeInfo,-,dataclass,0,0
+      PropertyInfo,-,dataclass,0,0
+      OptionalImport,-,dataclass,0,0
+      ClassInfo,-,dataclass,0,0
+      FunctionInfo,-,dataclass,0,0
+      ModuleInfo,-,dataclass,0,0
+    class_details:
+      FunctionInfo:
+        doc: Information about a function or method.
+        fields[15]{n,t,default,factory}:
+          name,str,"-","-"
+          params,"List[str]","-","-"
+          return_type,"Optional[str]","-","-"
+          docstring,"Optional[str]","-","-"
+          calls,"List[str]","-","-"
+          raises,"List[str]","-","-"
+          complexity,int,"-","-"
+          lines,int,"-","-"
+          decorators,"List[str]","-","-"
+          is_async,bool,"-","-"
+          is_static,bool,"-","-"
+          is_private,bool,"-","-"
+          intent,str,"-","-"
+          start_line,int,"0","-"
+          end_line,int,"0","-"
+      ClassInfo:
+        doc: Information about a class or interface.
+        fields[9]{n,t,default,factory}:
+          name,str,"-","-"
+          bases,"List[str]","-","-"
+          docstring,"Optional[str]","-","-"
+          methods,"List[FunctionInfo]","-","-"
+          properties,"List[str]","-","-"
+          is_interface,bool,"-","-"
+          is_abstract,bool,"-","-"
+          generic_params,"List[str]","-","-"
+          is_dataclass,bool,False,"-"
+      TypeInfo:
+        doc: "Information about a type alias, interface, or enum."
+        fields[4]{n,t,default,factory}:
+          name,str,"-","-"
+          kind,str,"-","-"
+          definition,str,"-","-"
+          values,"Optional[List[str]]",None,"-"
+      ModuleInfo:
+        doc: Information about a source file/module.
+        fields[11]{n,t,default,factory}:
+          path,str,"-","-"
+          language,str,"-","-"
+          imports,"List[str]","-","-"
+          exports,"List[str]","-","-"
+          classes,"List[ClassInfo]","-","-"
+          functions,"List[FunctionInfo]","-","-"
+          types,"List[TypeInfo]","-","-"
+          constants,"List[ConstantInfo]","-","-"
+          docstring,"Optional[str]","-","-"
+          lines_total,int,"-","-"
+          lines_code,int,"-","-"
+      DependencyNode:
+        doc: Node in the dependency graph with metrics.
+        fields[6]{n,t,default,factory}:
+          path,str,"-","-"
+          in_degree,int,"0","-"
+          out_degree,int,"0","-"
+          pagerank,float,"0.0","-"
+          is_hub,bool,False,"-"
+          cluster,int,"0","-"
+      ProjectInfo:
+        doc: Complete project analysis results.
+        fields[12]{n,t,default,factory}:
+          name,str,"-","-"
+          root_path,str,"-","-"
+          languages,"Dict[str, int]","-","-"
+          modules,"List[ModuleInfo]","-","-"
+          dependency_graph,"Dict[str, List[str]]","-","-"
+          dependency_metrics,"Dict[str, DependencyNode]","-","-"
+          entrypoints,"List[str]","-","-"
+          similar_functions,"Dict[str, List[str]]","-","-"
+          total_files,int,"-","-"
+          total_lines,int,"-","-"
+          total_bytes,int,"0","-"
+          generated_at,str,"\"\"","-"
+      ConstantInfo:
+        doc: Module-level constant information.
+        fields[4]{n,t,default,factory}:
+          name,str,"-","-"
+          type_annotation,str,"\"\"","-"
+          value,"Optional[str]",None,"-"
+          value_keys,"Optional[List[str]]",None,"-"
+      FieldInfo:
+        doc: Dataclass field information.
+        fields[4]{n,t,default,factory}:
+          name,str,"-","-"
+          type_annotation,str,"-","-"
+          default,"Optional[str]",None,"-"
+          default_factory,"Optional[str]",None,"-"
+      AttributeInfo:
+        doc: Instance attribute information (self.x = ...).
+        fields[3]{n,t,default,factory}:
+          name,str,"-","-"
+          type_annotation,str,"\"\"","-"
+          set_in_init,bool,True,"-"
+      PropertyInfo:
+        doc: "Property information (@property, @x.setter)."
+        fields[5]{n,t,default,factory}:
+          name,str,"-","-"
+          type_annotation,str,"\"\"","-"
+          has_getter,bool,False,"-"
+          has_setter,bool,False,"-"
+          docstring,str,"\"\"","-"
+      OptionalImport:
+        doc: Try/except import block information.
+        fields[5]{n,t,default,factory}:
+          module,str,"-","-"
+          from_module,"Optional[str]",None,"-"
+          imports,"List[str]","-",list
+          flag_name,str,"\"\"","-"
+          fallback_value,bool,False,"-"
+      ClassInfo:
+        doc: Information about a class or interface.
+        fields[12]{n,t,default,factory}:
+          name,str,"-","-"
+          bases,"List[str]","-",list
+          decorators,"List[str]","-",list
+          docstring,"Optional[str]",None,"-"
+          is_dataclass,bool,False,"-"
+          fields,"List[FieldInfo]","-",list
+          attributes,"List[AttributeInfo]","-",list
+          properties,"List[PropertyInfo]","-",list
+          methods,"List[FunctionInfo]","-",list
+          is_interface,bool,False,"-"
+          is_abstract,bool,False,"-"
+          generic_params,"List[str]","-",list
+      FunctionInfo:
+        doc: Information about a function or method.
+        fields[19]{n,t,default,factory}:
+          name,str,"-","-"
+          params,"List[str]","-",list
+          params_with_defaults,"Dict[str, str]","-",dict
+          return_type,str,"\"\"","-"
+          docstring,"Optional[str]",None,"-"
+          docstring_full,"Optional[str]",None,"-"
+          calls,"List[str]","-",list
+          raises,"List[str]","-",list
+          decorators,"List[str]","-",list
+          complexity,int,"1","-"
+          lines,int,"0","-"
+          is_async,bool,False,"-"
+          is_static,bool,False,"-"
+          is_classmethod,bool,False,"-"
+          is_property,bool,False,"-"
+          intent,str,"\"\"","-"
+          start_line,int,"0","-"
+          end_line,int,"0","-"
+          is_private,bool,False,"-"
+      ModuleInfo:
+        doc: Information about a source file/module.
+        fields[15]{n,t,default,factory}:
+          path,str,"-","-"
+          language,str,"\"python\"","-"
+          imports,"List[str]","-",list
+          exports,"List[str]","-",list
+          constants,"List[ConstantInfo]","-",list
+          type_checking_imports,"List[str]","-",list
+          optional_imports,"List[OptionalImport]","-",list
+          aliases,"Dict[str, str]","-",dict
+          classes,"List[ClassInfo]","-",list
+          functions,"List[FunctionInfo]","-",list
+          types,"List[TypeInfo]","-",list
+          docstring,"Optional[str]",None,"-"
+          lines_total,int,"0","-"
+          lines_code,int,"0","-"
+          file_bytes,int,"0","-"
   similarity.py:
     imports[3]: typing.Dict,typing.List,models.ModuleInfo
     exports[3]: SimilarityDetector,is_rapidfuzz_available,get_refactoring_suggestions
@@ -1037,13 +1438,16 @@ module_details:
       get_refactoring_suggestions: Generate refactoring suggestions based on similar functions.
   universal.py:
     imports[20]: os,re,json,hashlib,pathlib.Path,typing.Dict,typing.Any,typing.List,typing.Optional,typing.Tuple,typing.Union,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,datetime
-    exports[6]: ElementType,Language,UniversalParser,CodeGenerator,UniversalReproducer,reproduce_file
+    exports[9]: ElementType,Language,Parameter,CodeElement,CodeLogic,UniversalParser,CodeGenerator,UniversalReproducer,reproduce_file
     types[2]{name,kind,values,def}:
       ElementType,enum,"IMPORT=\"import\"|CLASS=\"class\"|INTERFACE=\"interface\"|STRUCT=\"struct\"|FUNCTION=\"function\"|METHOD=\"method\"|PROPERTY=\"property\"|CONSTANT=\"constant\"|TYPE_ALIAS=\"type_alias\"|ENUM=\"enum\"|MODULE=\"module\"","-"
       Language,enum,"PYTHON=\"python\"|JAVASCRIPT=\"javascript\"|TYPESCRIPT=\"typescript\"|GO=\"go\"|RUST=\"rust\"|JAVA=\"java\"|CSHARP=\"csharp\"|SQL=\"sql\"|UNKNOWN=\"unknown\"","-"
-    classes[5]{name,bases,decorators,props,methods}:
+    classes[8]{name,bases,decorators,props,methods}:
       ElementType,Enum,-,0,0
       Language,Enum,-,0,0
+      Parameter,-,dataclass,0,0
+      CodeElement,-,dataclass,0,0
+      CodeLogic,-,dataclass,0,4
       UniversalParser,-,-,0,7
       CodeGenerator,-,-,0,7
       UniversalReproducer,-,-,0,6
@@ -1052,6 +1456,44 @@ module_details:
         doc: Types of code elements.
       Language:
         doc: Supported languages.
+      Parameter:
+        doc: Function/method parameter.
+        fields[4]{n,t,default,factory}:
+          name,str,"-","-"
+          type,str,"\"\"","-"
+          default,str,"\"\"","-"
+          is_optional,bool,False,"-"
+      CodeElement:
+        doc: Universal representation of a code element.
+        fields[13]{n,t,default,factory}:
+          type,ElementType,"-","-"
+          name,str,"-","-"
+          docstring,str,"\"\"","-"
+          signature,str,"\"\"","-"
+          parameters,"List[Parameter]","-",list
+          return_type,str,"\"\"","-"
+          body_hash,str,"\"\"","-"
+          attributes,"List[Dict[str, str]]","-",list
+          children,"List['CodeElement']","-",list
+          decorators,"List[str]","-",list
+          modifiers,"List[str]","-",list
+          extends,"List[str]","-",list
+          implements,"List[str]","-",list
+      CodeLogic:
+        doc: Universal code logic representation for a single file.
+        fields[7]{n,t,default,factory}:
+          source_file,str,"-","-"
+          source_language,Language,"-","-"
+          source_hash,str,"-","-"
+          elements,"List[CodeElement]","-",list
+          imports,"List[str]","-",list
+          module_doc,str,"\"\"","-"
+          metadata,"Dict[str, Any]","-",dict
+        methods[4]{name,sig,decorators,async,lines}:
+          to_dict,"()->Dict[str, Any]",-,false,11
+          _element_to_dict,"(elem:CodeElement)->Dict[str, Any]",-,false,16
+          to_compact,()->str,-,false,23
+          _element_to_compact,"(elem:CodeElement;indent:int)->List[str]",-,false,62
       UniversalParser:
         doc: Parse source code into universal CodeLogic format.
         methods[7]{name,sig,decorators,async,lines}:
@@ -1091,8 +1533,8 @@ module_details:
     const[1]{n,t,v,keys}:
       FORMAT_PROMPTS,Dict,"-",gherkin|csv|json|yaml|markdown
     classes[3]{name,bases,decorators,props,methods}:
-      FormatResult,-,-,10,0
-      BenchmarkResult,-,-,9,0
+      FormatResult,-,dataclass,10,0
+      BenchmarkResult,-,dataclass,9,0
       ReproductionBenchmark,-,-,0,8
     class_details:
       FormatResult:
@@ -1282,12 +1724,42 @@ module_details:
       extract_code_block: parses code block
   gherkin.py:
     imports[14]: typing.List,typing.Dict,typing.Optional,typing.Set,typing.Any,collections.defaultdict,dataclasses.dataclass,dataclasses.field,re,hashlib,models.ProjectInfo,models.ModuleInfo,models.FunctionInfo,models.ClassInfo
-    exports[5]: GherkinGenerator,StepDefinitionGenerator,CucumberYAMLGenerator,csv_to_gherkin,gherkin_to_test_data
-    classes[3]{name,bases,decorators,props,methods}:
+    exports[8]: GherkinScenario,GherkinFeature,StepDefinition,GherkinGenerator,StepDefinitionGenerator,CucumberYAMLGenerator,csv_to_gherkin,gherkin_to_test_data
+    classes[6]{name,bases,decorators,props,methods}:
+      GherkinScenario,-,dataclass,0,0
+      GherkinFeature,-,dataclass,0,0
+      StepDefinition,-,dataclass,0,0
       GherkinGenerator,-,-,0,20
       StepDefinitionGenerator,-,-,0,4
       CucumberYAMLGenerator,-,-,0,3
     class_details:
+      GherkinScenario:
+        doc: Represents a single Gherkin scenario.
+        fields[7]{n,t,default,factory}:
+          name,str,"-","-"
+          given,"List[str]","-","-"
+          when,"List[str]","-","-"
+          then,"List[str]","-","-"
+          tags,"List[str]","-","-"
+          examples,"Optional[List[Dict[str, str]]]",None,"-"
+          data_table,"Optional[List[Dict[str, str]]]",None,"-"
+      GherkinFeature:
+        doc: Represents a Gherkin feature file.
+        fields[6]{n,t,default,factory}:
+          name,str,"-","-"
+          description,str,"-","-"
+          tags,"List[str]","-","-"
+          scenarios,"List[GherkinScenario]","-","-"
+          background,"Optional[List[str]]",None,"-"
+          rules,"Optional[List[Dict[str, Any]]]",None,"-"
+      StepDefinition:
+        doc: Represents a step definition.
+        fields[5]{n,t,default,factory}:
+          pattern,str,"-","-"
+          step_type,str,"-","-"
+          function_name,str,"-","-"
+          params,"List[str]","-","-"
+          implementation_hint,str,"-","-"
       GherkinGenerator:
         doc: Generates Gherkin feature files from code analysis.
         methods[20]{name,sig,decorators,async,lines}:
@@ -1332,7 +1804,53 @@ module_details:
       gherkin_to_test_data: gherkin to test data
   schemas/logicml_schema.py:
     imports[8]: dataclasses.dataclass,dataclasses.field,typing.Any,typing.Dict,typing.List,typing.Optional,typing.Tuple,re
-    exports[3]: validate_logicml,parse_logicml_header,extract_logicml_signature
+    exports[7]: LogicMLMethod,LogicMLClass,LogicMLModule,LogicMLSchema,validate_logicml,parse_logicml_header,extract_logicml_signature
+    classes[4]{name,bases,decorators,props,methods}:
+      LogicMLMethod,-,dataclass,0,0
+      LogicMLClass,-,dataclass,0,0
+      LogicMLModule,-,dataclass,0,0
+      LogicMLSchema,-,dataclass,0,0
+    class_details:
+      LogicMLMethod:
+        doc: Schema for LogicML method.
+        fields[7]{n,t,default,factory}:
+          name,str,"-","-"
+          signature,str,"-","-"
+          does,str,"\"\"","-"
+          edge,"List[str]","-",list
+          side,str,"\"\"","-"
+          is_async,bool,False,"-"
+          is_property,bool,False,"-"
+      LogicMLClass:
+        doc: Schema for LogicML class.
+        fields[8]{n,t,default,factory}:
+          name,str,"-","-"
+          doc,str,"\"\"","-"
+          bases,"List[str]","-",list
+          attrs,"Dict[str, str]","-",dict
+          methods,"List[LogicMLMethod]","-",list
+          is_pydantic,bool,False,"-"
+          is_enum,bool,False,"-"
+          is_dataclass,bool,False,"-"
+      LogicMLModule:
+        doc: Schema for LogicML module.
+        fields[8]{n,t,default,factory}:
+          filename,str,"-","-"
+          lines,int,"0","-"
+          classes,"List[str]","-",list
+          imports,"Dict[str, List[str]]","-",dict
+          module_classes,"List[LogicMLClass]","-",list
+          functions,"List[LogicMLMethod]","-",list
+          module_type,str,"\"standard\"","-"
+          exports,"List[str]","-",list
+      LogicMLSchema:
+        doc: "Complete LogicML specification schema.          Design Principles:     1."
+        fields[5]{n,t,default,factory}:
+          modules,"List[LogicMLModule]","-",list
+          token_estimate,int,"0","-"
+          file_count,int,"0","-"
+          class_count,int,"0","-"
+          function_count,int,"0","-"
     functions[3]{name,sig,decorators,async,category,lines}:
       validate_logicml,"(spec:str)->Tuple[bool, List[str]]",-,false,-,96
       parse_logicml_header,"(line:str)->Optional[Dict[str, Any]]",-,false,-,11
@@ -1345,7 +1863,59 @@ module_details:
     imports[9]: yaml_schema.YAMLSchema,yaml_schema.validate_yaml,logicml_schema.LogicMLSchema,logicml_schema.validate_logicml,markdown_schema.MarkdownSchema,markdown_schema.validate_markdown,json_schema.JSONSchema,json_schema.validate_json,json_schema.parse_json_spec
   schemas/yaml_schema.py:
     imports[8]: dataclasses.dataclass,dataclasses.field,typing.Any,typing.Dict,typing.List,typing.Optional,typing.Tuple,yaml
-    exports[1]: validate_yaml
+    exports[6]: MethodSchema,ClassSchema,FunctionSchema,ModuleSchema,YAMLSchema,validate_yaml
+    classes[5]{name,bases,decorators,props,methods}:
+      MethodSchema,-,dataclass,0,0
+      ClassSchema,-,dataclass,0,0
+      FunctionSchema,-,dataclass,0,0
+      ModuleSchema,-,dataclass,0,0
+      YAMLSchema,-,dataclass,0,0
+    class_details:
+      MethodSchema:
+        doc: Schema for method definition.
+        fields[7]{n,t,default,factory}:
+          name,str,"-","-"
+          signature,str,"-","-"
+          intent,str,"\"\"","-"
+          lines,int,"0","-"
+          is_async,bool,False,"-"
+          decorators,"List[str]","-",list
+          raises,"List[str]","-",list
+      ClassSchema:
+        doc: Schema for class definition.
+        fields[7]{n,t,default,factory}:
+          name,str,"-","-"
+          bases,"List[str]","-",list
+          docstring,str,"\"\"","-"
+          methods,"List[MethodSchema]","-",list
+          properties,"List[str]","-",list
+          is_abstract,bool,False,"-"
+          is_dataclass,bool,False,"-"
+      FunctionSchema:
+        doc: Schema for function definition.
+        fields[6]{n,t,default,factory}:
+          name,str,"-","-"
+          signature,str,"-","-"
+          intent,str,"\"\"","-"
+          lines,int,"0","-"
+          is_async,bool,False,"-"
+          decorators,"List[str]","-",list
+      ModuleSchema:
+        doc: Schema for module definition.
+        fields[7]{n,t,default,factory}:
+          path,str,"-","-"
+          language,str,"\"python\"","-"
+          lines,int,"0","-"
+          imports,"List[str]","-",list
+          exports,"List[str]","-",list
+          classes,"List[ClassSchema]","-",list
+          functions,"List[FunctionSchema]","-",list
+      YAMLSchema:
+        doc: Complete YAML specification schema.
+        fields[3]{n,t,default,factory}:
+          project,str,"-","-"
+          statistics,"Dict[str, Any]","-",dict
+          modules,"List[ModuleSchema]","-",list
     functions[3]{name,sig,decorators,async,category,lines}:
       validate_yaml,"(spec:str)->Tuple[bool, List[str]]",-,false,-,55
       _validate_module,"(module:Dict;index:int)->List[str]",-,false,-,33
@@ -1356,7 +1926,59 @@ module_details:
       _validate_class: validates class
   schemas/json_schema.py:
     imports[8]: dataclasses.dataclass,dataclasses.field,typing.Any,typing.Dict,typing.List,typing.Optional,typing.Tuple,json
-    exports[2]: validate_json,parse_json_spec
+    exports[7]: JSONMethodSchema,JSONClassSchema,JSONFunctionSchema,JSONModuleSchema,JSONSchema,validate_json,parse_json_spec
+    classes[5]{name,bases,decorators,props,methods}:
+      JSONMethodSchema,-,dataclass,0,0
+      JSONClassSchema,-,dataclass,0,0
+      JSONFunctionSchema,-,dataclass,0,0
+      JSONModuleSchema,-,dataclass,0,0
+      JSONSchema,-,dataclass,0,0
+    class_details:
+      JSONMethodSchema:
+        doc: Schema for JSON method definition.
+        fields[7]{n,t,default,factory}:
+          name,str,"-","-"
+          signature,str,"\"\"","-"
+          intent,str,"\"\"","-"
+          is_async,bool,False,"-"
+          decorators,"List[str]","-",list
+          params,"List[str]","-",list
+          return_type,str,"\"None\"","-"
+      JSONClassSchema:
+        doc: Schema for JSON class definition.
+        fields[7]{n,t,default,factory}:
+          name,str,"-","-"
+          bases,"List[str]","-",list
+          docstring,str,"\"\"","-"
+          methods,"List[JSONMethodSchema]","-",list
+          properties,"Dict[str, str]","-",dict
+          is_abstract,bool,False,"-"
+          is_dataclass,bool,False,"-"
+      JSONFunctionSchema:
+        doc: Schema for JSON function definition.
+        fields[6]{n,t,default,factory}:
+          name,str,"-","-"
+          signature,str,"\"\"","-"
+          intent,str,"\"\"","-"
+          is_async,bool,False,"-"
+          params,"List[str]","-",list
+          return_type,str,"\"None\"","-"
+      JSONModuleSchema:
+        doc: Schema for JSON module definition.
+        fields[7]{n,t,default,factory}:
+          path,str,"-","-"
+          language,str,"\"python\"","-"
+          lines,int,"0","-"
+          imports,"List[str]","-",list
+          exports,"List[str]","-",list
+          classes,"List[JSONClassSchema]","-",list
+          functions,"List[JSONFunctionSchema]","-",list
+      JSONSchema:
+        doc: Complete JSON specification schema.
+        fields[3]{n,t,default,factory}:
+          project,str,"\"\"","-"
+          statistics,"Dict[str, Any]","-",dict
+          modules,"List[JSONModuleSchema]","-",list
     functions[4]{name,sig,decorators,async,category,lines}:
       validate_json,"(spec:str)->Tuple[bool, List[str]]",-,false,-,34
       _validate_json_module,"(module:Dict;index:int)->List[str]",-,false,-,26
@@ -1369,7 +1991,41 @@ module_details:
       parse_json_spec: parses json spec
   schemas/markdown_schema.py:
     imports[8]: dataclasses.dataclass,dataclasses.field,typing.Any,typing.Dict,typing.List,typing.Optional,typing.Tuple,re
-    exports[2]: validate_markdown,extract_markdown_sections
+    exports[6]: MarkdownMethod,MarkdownClass,MarkdownModule,MarkdownSchema,validate_markdown,extract_markdown_sections
+    classes[4]{name,bases,decorators,props,methods}:
+      MarkdownMethod,-,dataclass,0,0
+      MarkdownClass,-,dataclass,0,0
+      MarkdownModule,-,dataclass,0,0
+      MarkdownSchema,-,dataclass,0,0
+    class_details:
+      MarkdownMethod:
+        doc: Schema for Markdown method.
+        fields[4]{n,t,default,factory}:
+          name,str,"-","-"
+          signature,str,"\"\"","-"
+          is_async,bool,False,"-"
+          gherkin_scenarios,"List[str]","-",list
+      MarkdownClass:
+        doc: Schema for Markdown class.
+        fields[4]{n,t,default,factory}:
+          name,str,"-","-"
+          bases,"List[str]","-",list
+          attributes,"Dict[str, str]","-",dict
+          methods,"List[MarkdownMethod]","-",list
+      MarkdownModule:
+        doc: Schema for Markdown module.
+        fields[6]{n,t,default,factory}:
+          filename,str,"-","-"
+          language,str,"\"python\"","-"
+          lines,int,"0","-"
+          imports,"List[str]","-",list
+          classes,"List[MarkdownClass]","-",list
+          functions,"List[MarkdownMethod]","-",list
+      MarkdownSchema:
+        doc: Complete Markdown specification schema.
+        fields[2]{n,t,default,factory}:
+          modules,"List[MarkdownModule]","-",list
+          token_estimate,int,"0","-"
     functions[2]{name,sig,decorators,async,category,lines}:
       validate_markdown,"(spec:str)->Tuple[bool, List[str]]",-,false,-,62
       extract_markdown_sections,"(spec:str)->Dict[str, Any]",-,false,-,22
@@ -1431,6 +2087,105 @@ module_details:
     imports[13]: common.create_single_project,common.generate_spec,common.generate_spec_token,common.get_async_reproduction_prompt,common.get_token_reproduction_prompt,common.get_simple_reproduction_prompt,results.BenchmarkResult,results.BenchmarkConfig,results.FileResult,results.FunctionResult,results.FormatResult,runner.BenchmarkRunner,runner.run_benchmark
   benchmarks/results.py:
     imports[10]: dataclasses.dataclass,dataclasses.field,dataclasses.asdict,datetime,typing.Dict,typing.List,typing.Optional,typing.Any,pathlib.Path,json
+    exports[5]: FormatResult,FileResult,FunctionResult,BenchmarkResult,BenchmarkConfig
+    classes[5]{name,bases,decorators,props,methods}:
+      FormatResult,-,dataclass,0,1
+      FileResult,-,dataclass,0,1
+      FunctionResult,-,dataclass,0,1
+      BenchmarkResult,-,dataclass,0,6
+      BenchmarkConfig,-,dataclass,0,1
+    class_details:
+      FormatResult:
+        doc: Result for a single format test.
+        fields[12]{n,t,default,factory}:
+          format_name,str,"-","-"
+          spec_size,int,"0","-"
+          spec_tokens,int,"0","-"
+          generated_size,int,"0","-"
+          score,float,"0.0","-"
+          similarity,float,"0.0","-"
+          syntax_ok,bool,False,"-"
+          runs_ok,bool,False,"-"
+          compression_ratio,float,"0.0","-"
+          token_efficiency,float,"0.0","-"
+          gen_time,float,"0.0","-"
+          error,str,"\"\"","-"
+        methods[1]{name,sig,decorators,async,lines}:
+          to_dict,"()->Dict[str, Any]",-,false,2
+      FileResult:
+        doc: Result for single file reproduction.
+        fields[12]{n,t,default,factory}:
+          file_path,str,"-","-"
+          language,str,"-","-"
+          original_size,int,"0","-"
+          spec_size,int,"0","-"
+          generated_size,int,"0","-"
+          score,float,"0.0","-"
+          similarity,float,"0.0","-"
+          syntax_ok,bool,False,"-"
+          runs_ok,bool,False,"-"
+          format_results,"Dict[str, FormatResult]","-",dict
+          gen_time,float,"0.0","-"
+          error,str,"\"\"","-"
+        methods[1]{name,sig,decorators,async,lines}:
+          to_dict,"()->Dict[str, Any]",-,false,4
+      FunctionResult:
+        doc: Result for single function reproduction.
+        fields[9]{n,t,default,factory}:
+          file_path,str,"-","-"
+          function_name,str,"-","-"
+          language,str,"-","-"
+          original_code,str,"\"\"","-"
+          reproduced_code,str,"\"\"","-"
+          similarity,float,"0.0","-"
+          syntax_ok,bool,False,"-"
+          gen_time,float,"0.0","-"
+          error,str,"\"\"","-"
+        methods[1]{name,sig,decorators,async,lines}:
+          to_dict,"()->Dict[str, Any]",-,false,2
+      BenchmarkResult:
+        doc: Complete benchmark result.
+        fields[18]{n,t,default,factory}:
+          benchmark_type,str,"-","-"
+          timestamp,str,"\"\"","-"
+          source_path,str,"\"\"","-"
+          total_files,int,"0","-"
+          total_functions,int,"0","-"
+          avg_score,float,"0.0","-"
+          avg_similarity,float,"0.0","-"
+          syntax_ok_rate,float,"0.0","-"
+          runs_ok_rate,float,"0.0","-"
+          best_format,str,"\"\"","-"
+          best_score,float,"0.0","-"
+          file_results,"List[FileResult]","-",list
+          function_results,"List[FunctionResult]","-",list
+          format_results,"List[FormatResult]","-",list
+          format_scores,"Dict[str, float]","-",dict
+          provider,str,"\"\"","-"
+          model,str,"\"\"","-"
+          total_time,float,"0.0","-"
+        methods[6]{name,sig,decorators,async,lines}:
+          __post_init__,()->None,-,false,3
+          calculate_aggregates,()->None,-,false,24
+          to_dict,"()->Dict[str, Any]",-,false,6
+          to_json,"(indent:int=2)->str",-,false,2
+          save,"(path:str)->None",-,false,4
+          load,"(path:str)->'BenchmarkResult'",classmethod,false,13
+      BenchmarkConfig:
+        doc: Configuration for benchmark runs.
+        fields[10]{n,t,default,factory}:
+          formats,"List[str]","-","lambda: ['yaml'"
+          max_files,"Optional[int]",None,"-"
+          max_functions,"Optional[int]",None,"-"
+          max_spec_tokens,int,"5000","-"
+          workers,int,"3","-"
+          output_dir,str,"\"benchmark_output\"","-"
+          save_generated,bool,True,"-"
+          verbose,bool,False,"-"
+          use_llm,bool,True,"-"
+          max_tokens,int,"4000","-"
+        methods[1]{name,sig,decorators,async,lines}:
+          to_dict,"()->Dict[str, Any]",-,false,2
   core/__init__.py:
     imports[15]: models.FunctionInfo,models.ClassInfo,models.TypeInfo,models.ModuleInfo,models.DependencyNode,models.ProjectInfo,analyzer.ProjectAnalyzer,analyzer.analyze_project,dependency.DependencyAnalyzer,errors.ErrorSeverity,errors.ErrorType,errors.AnalysisError,errors.AnalysisResult,errors.ErrorHandler,errors.create_error_handler
   formats/__init__.py:

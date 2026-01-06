@@ -608,7 +608,10 @@ code2logic [path] [options]
     )
     parser.add_argument(
         '--function-logic',
-        help='Write detailed function logic to a separate file (format inferred from extension: .logicml/.json/.yaml/.toon)'
+        nargs='?',
+        const='auto',
+        default=None,
+        help='Write detailed function logic to a separate file. If no path given, auto-generates based on output file or uses project.functions.logicml. Format inferred from extension: .logicml/.json/.yaml/.toon'
     )
     parser.add_argument(
         '--flat',
@@ -907,7 +910,24 @@ code2logic [path] [options]
     # Optional: write detailed function logic to a separate file
     if args.function_logic:
         logic_gen = FunctionLogicGenerator()
-        logic_path = str(args.function_logic)
+        
+        # Auto-generate path if 'auto' was specified (--function-logic without argument)
+        if args.function_logic == 'auto':
+            if args.output:
+                # Derive from output file: project.c2l.yaml -> project.functions.yaml
+                base = args.output.rsplit('.', 1)[0]
+                if base.endswith('.c2l'):
+                    base = base[:-4]
+                ext = args.output.rsplit('.', 1)[-1] if '.' in args.output else 'logicml'
+                logic_path = f"{base}.functions.{ext}"
+            else:
+                # Default path based on format
+                ext_map = {'json': 'json', 'yaml': 'yaml', 'toon': 'toon'}
+                ext = ext_map.get(args.format, 'logicml')
+                logic_path = f"project.functions.{ext}"
+        else:
+            logic_path = str(args.function_logic)
+        
         lower = logic_path.lower()
         if lower.endswith('.json'):
             logic_out = logic_gen.generate_json(project, detail=args.detail)
@@ -917,10 +937,10 @@ code2logic [path] [options]
             logic_out = logic_gen.generate_toon(project, detail=args.detail)
         else:
             logic_out = logic_gen.generate(project, detail=args.detail)
-        with open(args.function_logic, 'w', encoding='utf-8') as f:
+        with open(logic_path, 'w', encoding='utf-8') as f:
             f.write(logic_out)
         if args.verbose:
-            log.success(f"Function logic written to: {args.function_logic}")
+            log.success(f"Function logic written to: {logic_path}")
     
     gen_time = time.time() - gen_start
     

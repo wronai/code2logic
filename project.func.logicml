@@ -393,7 +393,7 @@ functions:
   main:
     kind: function
     sig: () -> None
-    loc: 509-955
+    loc: 509-975
     does: "Main CLI entry point."
   Logger.__init__:
     kind: method
@@ -544,13 +544,33 @@ functions:
     loc: 454-460
     does: "Build compact signature."
 
-# errors.py | python | 9 functions
+# errors.py | python | 13 functions
 functions:
   create_error_handler:
     kind: function
     sig: (mode:str='lenient', max_file_size_mb:float=10.0) -> ErrorHandler
     loc: 432-437
     does: "Create an error handler with default settings."
+  AnalysisError.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 61-69
+    does: "converts dict"
+  AnalysisResult.add_error:
+    kind: method
+    sig: (error:AnalysisError) -> None
+    loc: 82-89
+    does: "Add an error to the result."
+  AnalysisResult.has_errors:
+    kind: method
+    sig: () -> bool
+    loc: 91-92
+    does: "has errors"
+  AnalysisResult.summary:
+    kind: method
+    sig: () -> str
+    loc: 94-102
+    does: "Generate error summary."
   ErrorHandler.__init__:
     kind: method
     sig: (mode:str='lenient', max_file_size_mb:float=10.0, timeout_seconds:float=30.0, logger:Optional[Any]=None) -> None
@@ -668,7 +688,7 @@ functions:
     loc: 245-259
     does: "Get analysis statistics."
 
-# quality.py | python | 9 functions
+# quality.py | python | 10 functions
 functions:
   analyze_quality:
     kind: function
@@ -680,6 +700,11 @@ functions:
     sig: (report:QualityReport) -> str
     loc: 227-264
     does: "Generate human-readable quality summary."
+  QualityReport.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 31-49
+    does: "Convert to dictionary."
   QualityAnalyzer.__init__:
     kind: method
     sig: (thresholds:Dict[str,int]=None) -> None
@@ -779,7 +804,7 @@ functions:
     loc: 402-414
     does: "Clean identifier by removing whitespace and special characters."
 
-# parsers.py | python | 68 functions
+# parsers.py | python | 70 functions
 functions:
   _normalize_import_path:
     kind: function
@@ -814,7 +839,7 @@ functions:
   is_tree_sitter_available:
     kind: function
     sig: () -> bool
-    loc: 1763-1765
+    loc: 1836-1838
     does: "Check if Tree-sitter is available."
   _PyFunctionBodyAnalyzer.__init__:
     kind: method
@@ -934,192 +959,202 @@ functions:
   TreeSitterParser._parse_python:
     kind: method
     sig: (filepath:str, content:str, tree) -> ModuleInfo
-    loc: 291-390
+    loc: 291-404
     does: "Parse Python source using Tree-sitter AST."
   TreeSitterParser._extract_constants:
     kind: method
     sig: (tree, content:str) -> List[ConstantInfo]
-    loc: 392-421
+    loc: 406-435
     does: "Extract module-level UPPERCASE constants."
   TreeSitterParser._extract_type_checking_imports:
     kind: method
     sig: (tree, content:str) -> List[str]
-    loc: 423-446
+    loc: 437-460
     does: "Extract TYPE_CHECKING block imports."
   TreeSitterParser._extract_conditional_imports:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 448-461
+    loc: 462-475
     does: "Extract imports from try/except blocks."
   TreeSitterParser._extract_aliases:
     kind: method
     sig: (tree, content:str) -> dict
-    loc: 463-508
+    loc: 477-522
     does: "Extract module aliases (import X as Y)."
   TreeSitterParser._extract_py_function:
     kind: method
     sig: (node, content:str, decorated_node=None) -> Optional[FunctionInfo]
-    loc: 510-611
+    loc: 524-625
     does: "Extract Python function from AST node."
   TreeSitterParser._extract_py_enum:
     kind: method
     sig: (node, content:str) -> Optional[TypeInfo]
-    loc: 613-653
+    loc: 627-667
     does: "Extract Python Enum (values) as TypeInfo(kind='enum')."
   TreeSitterParser._extract_py_class:
     kind: method
-    sig: (node, content:str) -> Optional[ClassInfo]
-    loc: 655-731
+    sig: (node, content:str, decorated_node=None) -> Optional[ClassInfo]
+    loc: 669-752
     does: "Extract Python class from AST node."
   TreeSitterParser._extract_dataclass_field:
     kind: method
     sig: (node, content:str) -> Optional[FieldInfo]
-    loc: 733-795
+    loc: 754-816
     does: "Extract dataclass field from assignment."
   TreeSitterParser._extract_class_attribute:
     kind: method
     sig: (node, content:str) -> Optional[AttributeInfo]
-    loc: 797-825
+    loc: 818-846
     does: "Extract class attribute from self.x = ..."
+  TreeSitterParser._extract_init_attributes:
+    kind: method
+    sig: (func_node, content:str) -> List[AttributeInfo]
+    loc: 848-871
+    does: "Extract self.x = ..."
+  TreeSitterParser._extract_class_property:
+    kind: method
+    sig: (node, content:str) -> Optional[str]
+    loc: 873-886
+    does: "Extract class-level property from annotated assignment."
   TreeSitterParser._extract_py_import:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 827-837
+    loc: 888-898
     does: "Extract import statement."
   TreeSitterParser._extract_py_from_import:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 839-877
+    loc: 900-938
     does: "Extract from ..."
   TreeSitterParser._extract_py_constant:
     kind: method
     sig: (node, content:str) -> Optional[ConstantInfo]
-    loc: 879-937
+    loc: 940-998
     does: "Extract constant (UPPERCASE assignment) with value."
   TreeSitterParser._extract_conditional_imports:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 939-952
+    loc: 1000-1013
     does: "Extract imports from try/except blocks."
   TreeSitterParser._parse_js_ts:
     kind: method
     sig: (filepath:str, content:str, tree, language:str) -> ModuleInfo
-    loc: 954-1039
+    loc: 1015-1100
     does: "Parse JavaScript/TypeScript source using Tree-sitter AST."
   TreeSitterParser._extract_js_class:
     kind: method
     sig: (node, content:str) -> Optional[ClassInfo]
-    loc: 1041-1075
+    loc: 1102-1136
     does: "Extract JS/TS class from AST node."
   TreeSitterParser._extract_js_method:
     kind: method
     sig: (node, content:str) -> Optional[FunctionInfo]
-    loc: 1077-1116
+    loc: 1138-1177
     does: "Extract JS/TS method from AST node."
   TreeSitterParser._extract_js_function:
     kind: method
     sig: (node, content:str) -> Optional[FunctionInfo]
-    loc: 1118-1152
+    loc: 1179-1213
     does: "Extract JS/TS function from AST node."
   TreeSitterParser._extract_js_arrow_fn:
     kind: method
     sig: (node, content:str) -> Optional[FunctionInfo]
-    loc: 1154-1184
+    loc: 1215-1245
     does: "Extract arrow function assigned to const."
   TreeSitterParser._extract_js_params:
     kind: method
     sig: (params_node, content:str) -> List[str]
-    loc: 1186-1204
+    loc: 1247-1265
     does: "Extract JS/TS function parameters."
   TreeSitterParser._extract_ts_type:
     kind: method
     sig: (node, content:str) -> Optional[TypeInfo]
-    loc: 1206-1213
+    loc: 1267-1274
     does: "Extract TypeScript interface or type alias."
   TreeSitterParser._extract_ts_enum:
     kind: method
     sig: (node, content:str) -> Optional[TypeInfo]
-    loc: 1215-1236
+    loc: 1276-1297
     does: "Extract TypeScript enum."
   TreeSitterParser._extract_js_constant:
     kind: method
     sig: (node, content:str) -> Optional[str]
-    loc: 1238-1247
+    loc: 1299-1308
     does: "Extract constant (UPPERCASE const)."
   TreeSitterParser._extract_js_comment:
     kind: method
     sig: (node, content:str) -> Optional[str]
-    loc: 1249-1259
+    loc: 1310-1320
     does: "Extract JS comment content."
   TreeSitterParser._find_child:
     kind: method
     sig: (node, type_name:str) -> None
-    loc: 1262-1267
+    loc: 1323-1328
     does: "Find first child of given type."
   TreeSitterParser._text:
     kind: method
     sig: (node, content:str) -> str
-    loc: 1269-1275
+    loc: 1330-1336
     does: "Get text content of node."
   TreeSitterParser._extract_string:
     kind: method
     sig: (node, content:str) -> str
-    loc: 1277-1284
+    loc: 1338-1345
     does: "Extract string content without quotes."
   TreeSitterParser._truncate_docstring:
     kind: method
     sig: (docstring:Optional[str], max_len:int=80) -> Optional[str]
-    loc: 1286-1308
+    loc: 1347-1369
     does: "Truncate docstring to first sentence or max_len characters."
   UniversalParser.__init__:
     kind: method
     sig: () -> None
-    loc: 1324-1326
+    loc: 1385-1387
     does: "Initialize the universal parser."
   UniversalParser.parse:
     kind: method
     sig: (filepath:str, content:str, language:str) -> Optional[ModuleInfo]
-    loc: 1328-1348
+    loc: 1389-1409
     does: "Parse a source file using AST or regex."
   UniversalParser._parse_python:
     kind: method
     sig: (filepath:str, content:str) -> Optional[ModuleInfo]
-    loc: 1350-1422
+    loc: 1411-1483
     does: "Parse Python using built-in AST."
   UniversalParser._extract_ast_enum:
     kind: method
     sig: (node:Any) -> Optional[TypeInfo]
-    loc: 1424-1468
+    loc: 1485-1529
     does: "Extract Enum values from Python AST class."
   UniversalParser._extract_ast_function:
     kind: method
     sig: (node) -> FunctionInfo
-    loc: 1470-1539
+    loc: 1531-1600
     does: "Extract function from Python AST node."
   UniversalParser._extract_ast_class:
     kind: method
     sig: (node:Any) -> ClassInfo
-    loc: 1541-1587
+    loc: 1602-1660
     does: "Extract class from Python AST node."
   UniversalParser._extract_ast_constant:
     kind: method
     sig: (node:Any, content:str) -> Optional[ConstantInfo]
-    loc: 1589-1629
+    loc: 1662-1702
     does: "Extract ConstantInfo from an AST assignment node if applicable."
   UniversalParser._format_ast_value:
     kind: method
     sig: (value_node:Any, content:str) -> str
-    loc: 1631-1649
+    loc: 1704-1722
     does: "Best-effort string representation of an AST value node."
   UniversalParser._ann_str:
     kind: method
     sig: (node) -> str
-    loc: 1651-1664
+    loc: 1724-1737
     does: "Convert AST annotation to string."
   UniversalParser._parse_js_ts:
     kind: method
     sig: (filepath:str, content:str, language:str) -> ModuleInfo
-    loc: 1666-1760
+    loc: 1739-1833
     does: "Parse JS/TS using regex patterns."
 
 # intent.py | python | 18 functions
@@ -1293,7 +1328,7 @@ functions:
     loc: 567-601
     does: "Save reproduction results."
 
-# reproducer.py | python | 22 functions
+# reproducer.py | python | 27 functions
 functions:
   reproduce_project:
     kind: function
@@ -1305,6 +1340,31 @@ functions:
     sig: (spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None) -> List[FileValidation]
     loc: 688-705
     does: "Validate specific files against spec."
+  FileValidation.score:
+    kind: method
+    sig: () -> float
+    loc: 43-58
+    does: "Calculate match score 0-100."
+  FileValidation.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 60-69
+    does: "converts dict"
+  ReproductionResult.success_rate:
+    kind: method
+    sig: () -> float
+    loc: 84-87
+    does: "success rate"
+  ReproductionResult.average_score:
+    kind: method
+    sig: () -> float
+    loc: 90-93
+    does: "average score"
+  ReproductionResult.summary:
+    kind: method
+    sig: () -> str
+    loc: 95-107
+    does: "summary"
   SpecReproducer.__init__:
     kind: method
     sig: (verbose:bool=False) -> None
@@ -1653,7 +1713,7 @@ functions:
     loc: 194-198
     does: "reproduce project"
 
-# metrics.py | python | 12 functions
+# metrics.py | python | 14 functions
 functions:
   analyze_reproduction:
     kind: function
@@ -1665,6 +1725,16 @@ functions:
     sig: (original:str, results:Dict[str,Tuple[str,str]], verbose:bool=False) -> Dict[str, Any]
     loc: 553-597
     does: "Compare reproduction quality across formats."
+  ReproductionResult.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 117-118
+    does: "converts dict"
+  ReproductionResult.to_report:
+    kind: method
+    sig: () -> str
+    loc: 120-180
+    does: "Generate detailed markdown report."
   ReproductionMetrics.__init__:
     kind: method
     sig: (verbose:bool=False) -> None
@@ -1716,7 +1786,7 @@ functions:
     loc: 499-527
     does: "Generate improvement recommendations."
 
-# refactor.py | python | 5 functions
+# refactor.py | python | 7 functions
 functions:
   find_duplicates:
     kind: function
@@ -1743,6 +1813,16 @@ functions:
     sig: (project_path:str) -> Dict[str, Any]
     loc: 353-388
     does: "Quick analysis for a project."
+  RefactoringReport.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 65-66
+    does: "converts dict"
+  RefactoringReport.to_markdown:
+    kind: method
+    sig: () -> str
+    loc: 68-109
+    does: "Generate markdown report."
 
 # logicml.py | python | 9 functions
 functions:
@@ -1873,7 +1953,7 @@ functions:
     loc: 18-24
     does: "cleanup generated root"
 
-# generators.py | python | 59 functions
+# generators.py | python | 60 functions
 functions:
   bytes_to_kb:
     kind: function
@@ -2130,45 +2210,50 @@ functions:
     sig: (constant:ConstantInfo) -> dict
     loc: 1886-1898
     does: "Serialize ConstantInfo into a compact dictionary."
+  YAMLGenerator._field_to_dict:
+    kind: method
+    sig: (field:FieldInfo) -> dict
+    loc: 1900-1909
+    does: "Serialize dataclass FieldInfo to dictionary."
   CSVGenerator.generate:
     kind: method
     sig: (project:ProjectInfo, detail:str='standard') -> str
-    loc: 1932-1983
+    loc: 1943-1994
     does: "Generate CSV output."
   CSVGenerator._build_row:
     kind: method
     sig: (m:ModuleInfo, elem_type:str, name:str, signature:str, calls:list, deps:str, detail:str) -> dict
-    loc: 1985-2012
+    loc: 1996-2023
     does: "Build a single CSV row."
   CSVGenerator._build_function_row:
     kind: method
     sig: (m:ModuleInfo, elem_type:str, name:str, f:FunctionInfo, deps:str, detail:str, project:ProjectInfo) -> dict
-    loc: 2014-2043
+    loc: 2025-2054
     does: "Build CSV row for function/method."
   CSVGenerator._build_signature:
     kind: method
     sig: (f:FunctionInfo) -> str
-    loc: 2045-2057
+    loc: 2056-2068
     does: "Build compact signature."
   CSVGenerator._categorize:
     kind: method
     sig: (name:str) -> str
-    loc: 2059-2061
+    loc: 2070-2072
     does: "Categorize function by name pattern."
   CSVGenerator._extract_domain:
     kind: method
     sig: (path:str) -> str
-    loc: 2063-2065
+    loc: 2074-2076
     does: "Extract domain from file path."
   CSVGenerator._compute_hash:
     kind: method
     sig: (name:str, signature:str) -> str
-    loc: 2067-2071
+    loc: 2078-2082
     does: "Compute short hash for quick comparison."
   CSVGenerator._escape_csv:
     kind: method
     sig: (text:str) -> str
-    loc: 2073-2077
+    loc: 2084-2088
     does: "Escape text for CSV (remove newlines, limit commas)."
 
 # markdown_format.py | python | 10 functions
@@ -2257,13 +2342,33 @@ functions:
     loc: 144-160
     does: "Build a normalized signature string."
 
-# universal.py | python | 21 functions
+# universal.py | python | 25 functions
 functions:
   reproduce_file:
     kind: function
     sig: (source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True) -> Dict[str, Any]
     loc: 1056-1074
     does: "Convenience function for single file reproduction."
+  CodeLogic.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 108-118
+    does: "Convert to dictionary."
+  CodeLogic._element_to_dict:
+    kind: method
+    sig: (elem:CodeElement) -> Dict[str, Any]
+    loc: 120-135
+    does: "Convert element to dictionary."
+  CodeLogic.to_compact:
+    kind: method
+    sig: () -> str
+    loc: 137-159
+    does: "Convert to compact string representation."
+  CodeLogic._element_to_compact:
+    kind: method
+    sig: (elem:CodeElement, indent:int) -> List[str]
+    loc: 161-222
+    does: "Convert element to compact lines."
   UniversalParser.detect_language:
     kind: method
     sig: (content:str, file_ext:str) -> Language
@@ -3228,3 +3333,56 @@ functions:
     sig: (module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FileResult
     loc: 718-779
     does: "Reproduce a single module."
+
+# benchmarks/results.py | python | 10 functions
+functions:
+  FormatResult.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 48-49
+    does: "converts dict"
+  FileResult.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 76-79
+    does: "converts dict"
+  FunctionResult.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 101-102
+    does: "converts dict"
+  BenchmarkResult.__post_init__:
+    kind: method
+    sig: () -> None
+    loc: 141-143
+    does: "creates init"
+  BenchmarkResult.calculate_aggregates:
+    kind: method
+    sig: () -> None
+    loc: 145-168
+    does: "Calculate aggregate metrics from detailed results."
+  BenchmarkResult.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 170-175
+    does: "converts dict"
+  BenchmarkResult.to_json:
+    kind: method
+    sig: (indent:int=2) -> str
+    loc: 177-178
+    does: "converts json"
+  BenchmarkResult.save:
+    kind: method
+    sig: (path:str) -> None
+    loc: 180-183
+    does: "Save result to JSON file."
+  BenchmarkResult.load:
+    kind: method
+    sig: (path:str) -> 'BenchmarkResult'
+    loc: 186-198
+    does: "Load result from JSON file."
+  BenchmarkConfig.to_dict:
+    kind: method
+    sig: () -> Dict[str, Any]
+    loc: 228-229
+    does: "converts dict"
