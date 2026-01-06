@@ -608,7 +608,7 @@ code2logic [path] [options]
     )
     parser.add_argument(
         '--function-logic',
-        help='Write detailed function logic to a separate file (LogicML-like)'
+        help='Write detailed function logic to a separate file (format inferred from extension: .logicml/.json/.yaml/.toon)'
     )
     parser.add_argument(
         '--flat',
@@ -907,7 +907,16 @@ code2logic [path] [options]
     # Optional: write detailed function logic to a separate file
     if args.function_logic:
         logic_gen = FunctionLogicGenerator()
-        logic_out = logic_gen.generate(project, detail=args.detail)
+        logic_path = str(args.function_logic)
+        lower = logic_path.lower()
+        if lower.endswith('.json'):
+            logic_out = logic_gen.generate_json(project, detail=args.detail)
+        elif lower.endswith(('.yaml', '.yml')):
+            logic_out = logic_gen.generate_yaml(project, detail=args.detail)
+        elif lower.endswith('.toon'):
+            logic_out = logic_gen.generate_toon(project, detail=args.detail)
+        else:
+            logic_out = logic_gen.generate(project, detail=args.detail)
         with open(args.function_logic, 'w', encoding='utf-8') as f:
             f.write(logic_out)
         if args.verbose:

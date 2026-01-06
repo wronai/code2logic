@@ -417,6 +417,55 @@ class JSONGenerator:
                 data['lines'] = f.lines
                 data['is_private'] = f.is_private
             return data
+
+        def ser_class(c: ClassInfo) -> dict:
+            data = {
+                'name': c.name,
+                'bases': c.bases,
+            }
+            if detail in ('standard', 'full'):
+                data['docstring'] = c.docstring
+            if getattr(c, 'properties', None):
+                data['properties'] = c.properties
+            if c.methods:
+                data['methods'] = [ser_func(m) for m in c.methods]
+            if detail == 'full':
+                if getattr(c, 'is_dataclass', False):
+                    data['is_dataclass'] = True
+                if getattr(c, 'fields', None):
+                    data['fields'] = [self._field_to_dict(f) for f in c.fields]
+            return data
+
+        def ser_module(m: ModuleInfo) -> dict:
+            data = {
+                'path': m.path,
+                'language': m.language,
+                'lines': m.lines_code,
+                'classes': [ser_class(c) for c in (m.classes or [])],
+                'functions': [ser_func(f) for f in (m.functions or [])],
+            }
+            if detail in ('standard', 'full'):
+                data['imports'] = (m.imports or [])[:10]
+                data['exports'] = (m.exports or [])[:10]
+            if detail == 'full' and m.types:
+                data['types'] = [{'name': t.name, 'kind': t.kind} for t in m.types]
+            return data
+
+        data = {
+            'name': project.name,
+            'statistics': {
+                'files': project.total_files,
+                'lines': project.total_lines,
+                'languages': project.languages,
+            },
+            'entrypoints': project.entrypoints,
+            'modules': [ser_module(m) for m in project.modules],
+        }
+
+        if detail == 'full':
+            data['dependency_graph'] = project.dependency_graph
+
+        return json.dumps(data, indent=2, ensure_ascii=False)
     
     def _field_to_dict(self, field: FieldInfo) -> dict:
         """Serialize dataclass FieldInfo to dictionary."""
@@ -428,50 +477,6 @@ class JSONGenerator:
         if getattr(field, 'default_factory', None):
             data['factory'] = field.default_factory
         return data
-        
-        def ser_class(c: ClassInfo) -> dict:
-            data = {
-                'name': c.name,
-                'bases': c.bases,
-            }
-            if detail in ('standard', 'full'):
-                data['docstring'] = c.docstring
-            if c.methods:
-                data['methods'] = [ser_func(m) for m in c.methods]
-            return data
-        
-        def ser_module(m: ModuleInfo) -> dict:
-            data = {
-                'path': m.path,
-                'language': m.language,
-                'lines': m.lines_code,
-            }
-            if detail in ('standard', 'full'):
-                data['imports'] = m.imports[:10]
-                data['exports'] = m.exports[:10]
-            if m.classes:
-                data['classes'] = [ser_class(c) for c in m.classes]
-            if m.functions:
-                data['functions'] = [ser_func(f) for f in m.functions]
-            if detail == 'full' and m.types:
-                data['types'] = [{'name': t.name, 'kind': t.kind} for t in m.types]
-            return data
-        
-        data = {
-            'name': project.name,
-            'statistics': {
-                'files': project.total_files,
-                'lines': project.total_lines,
-                'languages': project.languages,
-            },
-            'entrypoints': project.entrypoints,
-            'modules': [ser_module(m) for m in project.modules],
-        }
-        
-        if detail == 'full':
-            data['dependency_graph'] = project.dependency_graph
-        
-        return json.dumps(data, indent=2, ensure_ascii=False)
     
     def _generate_flat(self, project: ProjectInfo, detail: str) -> str:
         """Generate flat JSON list for comparisons."""
@@ -1407,6 +1412,35 @@ class YAMLGenerator:
             },
             'modules': modules
         }
+
+    def _constants_for_module_verbose(self, module: ModuleInfo, limit: int = 12) -> list:
+        constants_attr = getattr(module, 'constants', []) or []
+        constants: list = []
+        for const in constants_attr:
+            if isinstance(const, str):
+                if const.startswith('conditional:'):
+                    continue
+                constants.append({'name': const})
+            else:
+                entry = {'name': getattr(const, 'name', '')}
+                t = getattr(const, 'type_annotation', None)
+                if t:
+                    entry['type'] = t
+                keys = getattr(const, 'value_keys', None)
+                if keys:
+                    entry['keys'] = list(keys)[:10]
+                else:
+                    v = getattr(const, 'value', None)
+                    if v:
+                        snippet = str(v).replace('\n', ' ').strip()
+                        if len(snippet) > 300:
+                            snippet = snippet[:297] + '...'
+                        entry['value'] = snippet
+                if entry.get('name'):
+                    constants.append(entry)
+            if len(constants) >= limit:
+                break
+        return constants
     
     def _build_row(self, path: str, elem_type: str, name: str, signature: str,
                    language: str, detail: str, project: ProjectInfo) -> dict:
@@ -1808,6 +1842,31 @@ class YAMLGenerator:
         if params:
             return f"({params})"
         return "()"
+
+    def _constants_for_module_verbose(self, module: ModuleInfo, limit: int = 10) -> list:
+        """Convert module constants into verbose dictionaries."""
+        constants_attr = getattr(module, 'constants', []) or []
+        constants: list = []
+        for const in constants_attr:
+            if isinstance(const, str):
+                if const.startswith('conditional:'):
+                    continue
+                constants.append({'name': const})
+            else:
+                entry = {'name': const.name}
+                if getattr(const, 'type_annotation', None):
+                    entry['type'] = const.type_annotation
+                if getattr(const, 'value_keys', None):
+                    entry['keys'] = const.value_keys[:10]
+                elif getattr(const, 'value', None):
+                    snippet = const.value.replace('\n', ' ').strip()
+                    if len(snippet) > 120:
+                        snippet = snippet[:117] + '...'
+                    entry['value'] = snippet
+                constants.append(entry)
+            if len(constants) >= limit:
+                break
+        return constants
 
     def _constants_for_module(self, module: ModuleInfo, limit: int = 10) -> list:
         """Convert module constants into compact dictionaries."""
