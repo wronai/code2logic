@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  logic2code:
+    build:
+      context: ../..
+      dockerfile: examples/logic2code/Dockerfile
+    volumes:
+      - ./input:/input:ro
+      - ./out:/out
+    command: ["/input/sample_project.c2l.yaml", "-o", "/out/generated_code"]

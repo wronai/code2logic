@@ -111,7 +111,7 @@ router_settings:
 ## 🖥️ CLI Reference
 
 | Command | Description |
-|---------|-------------|
+| ------- | ----------- |
 | `lolm status` | Show provider status |
 | `lolm set-provider PROVIDER` | Set default provider |
 | `lolm set-model PROVIDER MODEL` | Set model for provider |
@@ -126,12 +126,24 @@ router_settings:
 ## 🔌 Supported Providers
 
 | Provider | Type | Free Tier | Default Model |
-|----------|------|-----------|---------------|
+| -------- | ---- | --------- | ------------- |
 | OpenRouter | Cloud | ✓ | nvidia/nemotron-3-nano-30b-a3b:free |
 | Ollama | Local | ✓ | qwen2.5-coder:14b |
 | Groq | Cloud | ✓ | llama-3.1-70b-versatile |
 | Together | Cloud | - | Qwen/Qwen2.5-Coder-32B-Instruct |
 | LiteLLM | Universal | - | gpt-4 |
+
+## 🧰 Monorepo (code2logic) workflow
+
+If you use `lolm` inside the `code2logic` monorepo, you can manage all packages from the repository root:
+
+```bash
+make test-all
+make build-subpackages
+make publish-all
+```
+
+See: `docs/19-monorepo-workflow.md`.
 
 ## 🧪 Development
 

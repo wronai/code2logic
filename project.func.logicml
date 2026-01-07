@@ -7,7 +7,7 @@ functions:
     does: "Get path to profiles storage."
   load_profiles:
     kind: function
-    sig: () -> Dict[str,LLMProfile]
+    sig: () -> Dict[str, LLMProfile]
     loc: 178-191
     does: "Load all saved profiles."
   save_profile:
@@ -97,12 +97,12 @@ functions:
     does: "Initialize chunker."
   AdaptiveChunker.get_optimal_settings:
     kind: method
-    sig: () -> Dict[str,Any]
+    sig: () -> Dict[str, Any]
     loc: 539-546
     does: "Get optimal settings for the profiled model."
   AdaptiveChunker.chunk_spec:
     kind: method
-    sig: (spec:str, format:str='yaml') -> List[Dict[str,Any]]
+    sig: (spec:str, format:str='yaml') -> List[Dict[str, Any]]
     loc: 548-606
     does: "Chunk specification based on profile."
   AdaptiveChunker.recommend_format:
@@ -185,12 +185,12 @@ functions:
     does: "Get cache directory path."
   Config.list_configured_providers:
     kind: method
-    sig: () -> Dict[str,bool]
+    sig: () -> Dict[str, bool]
     loc: 161-170
     does: "List all providers and their configuration status."
   Config.to_dict:
     kind: method
-    sig: () -> Dict[str,Any]
+    sig: () -> Dict[str, Any]
     loc: 172-181
     does: "Export configuration as dictionary."
 
@@ -616,17 +616,17 @@ functions:
 functions:
   analyze_code_quality:
     kind: function
-    sig: (project) -> Dict[str,List[Dict]]
+    sig: (project) -> Dict[str, List[Dict]]
     loc: 40-100
     does: "Analyze code quality issues."
   check_security_issues:
     kind: function
-    sig: (project) -> Dict[str,List[Dict]]
+    sig: (project) -> Dict[str, List[Dict]]
     loc: 103-139
     does: "Check for security vulnerabilities."
   check_performance_issues:
     kind: function
-    sig: (project) -> Dict[str,List[Dict]]
+    sig: (project) -> Dict[str, List[Dict]]
     loc: 142-166
     does: "Check for performance anti-patterns."
   CodeReviewer.__init__:
@@ -636,7 +636,7 @@ functions:
     does: "Initialize reviewer."
   CodeReviewer.review:
     kind: method
-    sig: (project, focus:str='all') -> Dict[str,Any]
+    sig: (project, focus:str='all') -> Dict[str, Any]
     loc: 180-221
     does: "Perform code review."
   CodeReviewer.generate_report:
@@ -839,7 +839,7 @@ functions:
   is_tree_sitter_available:
     kind: function
     sig: () -> bool
-    loc: 1836-1838
+    loc: 1900-1902
     does: "Check if Tree-sitter is available."
   _PyFunctionBodyAnalyzer.__init__:
     kind: method
@@ -1004,157 +1004,157 @@ functions:
   TreeSitterParser._extract_class_attribute:
     kind: method
     sig: (node, content:str) -> Optional[AttributeInfo]
-    loc: 818-846
+    loc: 818-860
     does: "Extract class attribute from self.x = ..."
   TreeSitterParser._extract_init_attributes:
     kind: method
     sig: (func_node, content:str) -> List[AttributeInfo]
-    loc: 848-871
+    loc: 862-885
     does: "Extract self.x = ..."
   TreeSitterParser._extract_class_property:
     kind: method
     sig: (node, content:str) -> Optional[str]
-    loc: 873-886
+    loc: 887-900
     does: "Extract class-level property from annotated assignment."
   TreeSitterParser._extract_py_import:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 888-898
+    loc: 902-912
     does: "Extract import statement."
   TreeSitterParser._extract_py_from_import:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 900-938
+    loc: 914-952
     does: "Extract from ..."
   TreeSitterParser._extract_py_constant:
     kind: method
     sig: (node, content:str) -> Optional[ConstantInfo]
-    loc: 940-998
+    loc: 954-1011
     does: "Extract constant (UPPERCASE assignment) with value."
   TreeSitterParser._extract_conditional_imports:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 1000-1013
+    loc: 1014-1027
     does: "Extract imports from try/except blocks."
   TreeSitterParser._parse_js_ts:
     kind: method
     sig: (filepath:str, content:str, tree, language:str) -> ModuleInfo
-    loc: 1015-1100
+    loc: 1029-1114
     does: "Parse JavaScript/TypeScript source using Tree-sitter AST."
   TreeSitterParser._extract_js_class:
     kind: method
     sig: (node, content:str) -> Optional[ClassInfo]
-    loc: 1102-1136
+    loc: 1116-1150
     does: "Extract JS/TS class from AST node."
   TreeSitterParser._extract_js_method:
     kind: method
     sig: (node, content:str) -> Optional[FunctionInfo]
-    loc: 1138-1177
+    loc: 1152-1191
     does: "Extract JS/TS method from AST node."
   TreeSitterParser._extract_js_function:
     kind: method
     sig: (node, content:str) -> Optional[FunctionInfo]
-    loc: 1179-1213
+    loc: 1193-1227
     does: "Extract JS/TS function from AST node."
   TreeSitterParser._extract_js_arrow_fn:
     kind: method
     sig: (node, content:str) -> Optional[FunctionInfo]
-    loc: 1215-1245
+    loc: 1229-1259
     does: "Extract arrow function assigned to const."
   TreeSitterParser._extract_js_params:
     kind: method
     sig: (params_node, content:str) -> List[str]
-    loc: 1247-1265
+    loc: 1261-1279
     does: "Extract JS/TS function parameters."
   TreeSitterParser._extract_ts_type:
     kind: method
     sig: (node, content:str) -> Optional[TypeInfo]
-    loc: 1267-1274
+    loc: 1281-1288
     does: "Extract TypeScript interface or type alias."
   TreeSitterParser._extract_ts_enum:
     kind: method
     sig: (node, content:str) -> Optional[TypeInfo]
-    loc: 1276-1297
+    loc: 1290-1311
     does: "Extract TypeScript enum."
   TreeSitterParser._extract_js_constant:
     kind: method
     sig: (node, content:str) -> Optional[str]
-    loc: 1299-1308
+    loc: 1313-1322
     does: "Extract constant (UPPERCASE const)."
   TreeSitterParser._extract_js_comment:
     kind: method
     sig: (node, content:str) -> Optional[str]
-    loc: 1310-1320
+    loc: 1324-1334
     does: "Extract JS comment content."
   TreeSitterParser._find_child:
     kind: method
     sig: (node, type_name:str) -> None
-    loc: 1323-1328
+    loc: 1337-1342
     does: "Find first child of given type."
   TreeSitterParser._text:
     kind: method
     sig: (node, content:str) -> str
-    loc: 1330-1336
+    loc: 1344-1350
     does: "Get text content of node."
   TreeSitterParser._extract_string:
     kind: method
     sig: (node, content:str) -> str
-    loc: 1338-1345
+    loc: 1352-1359
     does: "Extract string content without quotes."
   TreeSitterParser._truncate_docstring:
     kind: method
     sig: (docstring:Optional[str], max_len:int=80) -> Optional[str]
-    loc: 1347-1369
+    loc: 1361-1383
     does: "Truncate docstring to first sentence or max_len characters."
   UniversalParser.__init__:
     kind: method
     sig: () -> None
-    loc: 1385-1387
+    loc: 1399-1401
     does: "Initialize the universal parser."
   UniversalParser.parse:
     kind: method
     sig: (filepath:str, content:str, language:str) -> Optional[ModuleInfo]
-    loc: 1389-1409
+    loc: 1403-1423
     does: "Parse a source file using AST or regex."
   UniversalParser._parse_python:
     kind: method
     sig: (filepath:str, content:str) -> Optional[ModuleInfo]
-    loc: 1411-1483
+    loc: 1425-1497
     does: "Parse Python using built-in AST."
   UniversalParser._extract_ast_enum:
     kind: method
     sig: (node:Any) -> Optional[TypeInfo]
-    loc: 1485-1529
+    loc: 1499-1543
     does: "Extract Enum values from Python AST class."
   UniversalParser._extract_ast_function:
     kind: method
     sig: (node) -> FunctionInfo
-    loc: 1531-1600
+    loc: 1545-1614
     does: "Extract function from Python AST node."
   UniversalParser._extract_ast_class:
     kind: method
     sig: (node:Any) -> ClassInfo
-    loc: 1602-1660
+    loc: 1616-1724
     does: "Extract class from Python AST node."
   UniversalParser._extract_ast_constant:
     kind: method
     sig: (node:Any, content:str) -> Optional[ConstantInfo]
-    loc: 1662-1702
+    loc: 1726-1766
     does: "Extract ConstantInfo from an AST assignment node if applicable."
   UniversalParser._format_ast_value:
     kind: method
     sig: (value_node:Any, content:str) -> str
-    loc: 1704-1722
+    loc: 1768-1786
     does: "Best-effort string representation of an AST value node."
   UniversalParser._ann_str:
     kind: method
     sig: (node) -> str
-    loc: 1724-1737
+    loc: 1788-1801
     does: "Convert AST annotation to string."
   UniversalParser._parse_js_ts:
     kind: method
     sig: (filepath:str, content:str, language:str) -> ModuleInfo
-    loc: 1739-1833
+    loc: 1803-1897
     does: "Parse JS/TS using regex patterns."
 
 # intent.py | python | 18 functions
@@ -1254,7 +1254,7 @@ functions:
 functions:
   get_llm_capabilities:
     kind: function
-    sig: (model:str) -> Dict[str,Any]
+    sig: (model:str) -> Dict[str, Any]
     loc: 604-620
     does: "Get capabilities for a specific model."
   AdaptiveReproducer.__init__:
@@ -1264,7 +1264,7 @@ functions:
     does: "Initialize adaptive reproducer."
   AdaptiveReproducer._get_capabilities:
     kind: method
-    sig: () -> Dict[str,Any]
+    sig: () -> Dict[str, Any]
     loc: 138-149
     does: "Get LLM capabilities for current model."
   AdaptiveReproducer.select_format:
@@ -1466,158 +1466,68 @@ functions:
     loc: 623-630
     does: "Check Python syntax."
 
-# llm_clients.py | python | 30 functions
+# llm_clients.py | python | 12 functions
 functions:
   _get_user_llm_config_path:
     kind: function
     sig: () -> str
-    loc: 75-76
-    does: "retrieves user llm config path"
+    loc: 42-44
+    does: "Get path to legacy code2logic LLM config."
   _load_user_llm_config:
     kind: function
-    sig: () -> Dict[str,Any]
-    loc: 79-87
-    does: "retrieves user llm config"
+    sig: () -> Dict[str, Any]
+    loc: 47-56
+    does: "Load legacy code2logic LLM config."
   _get_priority_mode:
     kind: function
     sig: () -> str
-    loc: 90-92
-    does: "retrieves priority mode"
+    loc: 59-62
+    does: "Get priority mode from legacy config."
   get_priority_mode:
     kind: function
     sig: () -> str
-    loc: 95-96
-    does: "retrieves priority mode"
+    loc: 65-67
+    does: "Get priority mode (legacy wrapper)."
   _get_provider_priority_overrides:
     kind: function
-    sig: () -> Dict[str,int]
-    loc: 99-108
-    does: "retrieves provider priority overrides"
+    sig: () -> Dict[str, int]
+    loc: 70-80
+    does: "Get provider priority overrides from legacy config."
   _get_model_priority_rules:
     kind: function
-    sig: () -> Dict[str,Dict[str,int]]
-    loc: 111-131
-    does: "retrieves model priority rules"
+    sig: () -> Dict[str, Dict[str, int]]
+    loc: 83-104
+    does: "Get model priority rules from legacy config."
   _get_model_priority:
     kind: function
     sig: (model_string:str) -> Optional[int]
-    loc: 134-150
-    does: "retrieves model priority"
+    loc: 107-124
+    does: "Get model priority from legacy config."
   _get_provider_model_string:
     kind: function
     sig: (provider:str) -> str
-    loc: 153-172
-    does: "retrieves provider model string"
-  get_client:
-    kind: function
-    sig: (provider:str=None, model:str=None) -> BaseLLMClient
-    loc: 380-411
-    does: "Get appropriate LLM client based on provider."
-  _try_client:
-    kind: function
-    sig: (provider:str, model:str=None) -> Optional[BaseLLMClient]
-    loc: 414-428
-    does: "try client"
+    loc: 127-129
+    does: "Get model string for provider from environment."
   _get_priority_order:
     kind: function
     sig: () -> List[str]
-    loc: 431-432
-    does: "retrieves priority order"
+    loc: 132-134
+    does: "Get providers ordered by priority."
   _get_effective_provider_order:
     kind: function
-    sig: () -> List[tuple[str,int]]
-    loc: 435-486
-    does: "retrieves effective provider order"
+    sig: () -> List[tuple]
+    loc: 137-185
+    does: "Get effective provider order with priorities."
   get_effective_provider_priorities:
     kind: function
-    sig: () -> Dict[str,int]
-    loc: 489-490
-    does: "retrieves effective provider priorities"
-  _get_provider_priorities_from_litellm_yaml:
-    kind: function
-    sig: () -> Dict[str,int]
-    loc: 493-517
-    does: "retrieves provider priorities from litellm yaml"
+    sig: () -> Dict[str, int]
+    loc: 188-190
+    does: "Get effective provider priorities (legacy wrapper)."
   _candidate_litellm_yaml_paths:
     kind: function
     sig: () -> List[str]
-    loc: 520-526
-    does: "candidate litellm yaml paths"
-  BaseLLMClient.generate:
-    kind: method
-    sig: (prompt:str, system:str=None, max_tokens:int=4000) -> str
-    loc: 190-192
-    does: "Generate completion."
-  BaseLLMClient.is_available:
-    kind: method
-    sig: () -> bool
-    loc: 195-197
-    does: "Check if client is available."
-  BaseLLMClient.chat:
-    kind: method
-    sig: (messages:List[Dict[str,str]], max_tokens:int=4000) -> str
-    loc: 199-209
-    does: "Chat completion (default implementation)."
-  OpenRouterClient.__init__:
-    kind: method
-    sig: (api_key:str=None, model:str=None) -> None
-    loc: 218-226
-    does: "Initialize OpenRouter client."
-  OpenRouterClient.generate:
-    kind: method
-    sig: (prompt:str, system:str=None, max_tokens:int=4000) -> str
-    loc: 228-264
-    does: "Generate completion using OpenRouter."
-  OpenRouterClient.is_available:
-    kind: method
-    sig: () -> bool
-    loc: 266-268
-    does: "Check if OpenRouter is configured."
-  OpenRouterClient.list_recommended_models:
-    kind: method
-    sig: () -> List[tuple]
-    loc: 271-273
-    does: "List recommended models for code tasks."
-  OllamaLocalClient.__init__:
-    kind: method
-    sig: (model:str=None, host:str=None) -> None
-    loc: 281-289
-    does: "Initialize Ollama client."
-  OllamaLocalClient.generate:
-    kind: method
-    sig: (prompt:str, system:str=None, max_tokens:int=4000) -> str
-    loc: 291-310
-    does: "Generate completion using Ollama."
-  OllamaLocalClient.is_available:
-    kind: method
-    sig: () -> bool
-    loc: 312-320
-    does: "Check if Ollama is running."
-  OllamaLocalClient.list_models:
-    kind: method
-    sig: () -> List[str]
-    loc: 322-333
-    does: "List available Ollama models."
-  OllamaLocalClient.list_recommended_models:
-    kind: method
-    sig: () -> List[tuple]
-    loc: 336-338
-    does: "List recommended models for code tasks."
-  LiteLLMClient.__init__:
-    kind: method
-    sig: (model:str=None) -> None
-    loc: 346-352
-    does: "Initialize LiteLLM client."
-  LiteLLMClient.generate:
-    kind: method
-    sig: (prompt:str, system:str=None, max_tokens:int=4000) -> str
-    loc: 354-373
-    does: "Generate completion using LiteLLM."
-  LiteLLMClient.is_available:
-    kind: method
-    sig: () -> bool
-    loc: 375-377
-    does: "Check if LiteLLM is available."
+    loc: 193-199
+    does: "Get candidate paths for litellm_config.yaml."
 
 # prompts.py | python | 3 functions
 functions:
@@ -2073,187 +1983,187 @@ functions:
   YAMLGenerator.generate_hybrid:
     kind: method
     sig: (project:ProjectInfo, detail:str='standard') -> str
-    loc: 980-1229
+    loc: 980-1236
     does: "Generate hybrid format combining TOON compactness with YAML completeness."
   YAMLGenerator._build_enhanced_signature:
     kind: method
     sig: (f:FunctionInfo) -> str
-    loc: 1231-1250
+    loc: 1238-1277
     does: "Build enhanced signature with better parameter handling."
   YAMLGenerator._extract_constants:
     kind: method
     sig: (module:ModuleInfo) -> list
-    loc: 1252-1265
+    loc: 1279-1292
     does: "Extract constants and type definitions from module."
   YAMLGenerator._extract_dataclasses:
     kind: method
     sig: (module:ModuleInfo) -> list
-    loc: 1267-1276
+    loc: 1294-1303
     does: "Extract dataclass information from classes."
   YAMLGenerator._extract_conditional_imports:
     kind: method
     sig: (module:ModuleInfo) -> list
-    loc: 1278-1288
+    loc: 1305-1315
     does: "Extract conditional imports from constants."
   YAMLGenerator.generate_from_module:
     kind: method
     sig: (module:ModuleInfo, detail:str='full') -> str
-    loc: 1290-1304
+    loc: 1317-1331
     does: "creates from module"
   YAMLGenerator._build_flat_data:
     kind: method
     sig: (project:ProjectInfo, detail:str) -> dict
-    loc: 1306-1340
+    loc: 1333-1367
     does: "Build flat data structure optimized for comparisons."
   YAMLGenerator._build_nested_data:
     kind: method
     sig: (project:ProjectInfo, detail:str) -> dict
-    loc: 1342-1414
+    loc: 1369-1441
     does: "Build nested hierarchical data structure."
   YAMLGenerator._constants_for_module_verbose:
     kind: method
     sig: (module:ModuleInfo, limit:int=12) -> list
-    loc: 1416-1443
+    loc: 1443-1470
     does: "constants for module verbose"
   YAMLGenerator._build_row:
     kind: method
     sig: (path:str, elem_type:str, name:str, signature:str, language:str, detail:str, project:ProjectInfo) -> dict
-    loc: 1445-1455
+    loc: 1472-1482
     does: "Build a single row for flat output."
   YAMLGenerator._build_function_row:
     kind: method
     sig: (path:str, f:FunctionInfo, language:str, detail:str, project:ProjectInfo, imports:list) -> dict
-    loc: 1457-1483
+    loc: 1484-1510
     does: "Build row for standalone function."
   YAMLGenerator._build_method_row:
     kind: method
     sig: (path:str, class_name:str, f:FunctionInfo, language:str, detail:str, project:ProjectInfo, imports:list) -> dict
-    loc: 1485-1512
+    loc: 1512-1539
     does: "Build row for class method."
   YAMLGenerator._function_to_dict:
     kind: method
     sig: (f:FunctionInfo, detail:str) -> dict
-    loc: 1514-1530
+    loc: 1541-1557
     does: "Convert function to dict for nested output."
   YAMLGenerator._method_to_dict:
     kind: method
     sig: (f:FunctionInfo, detail:str) -> dict
-    loc: 1532-1571
+    loc: 1559-1598
     does: "Convert method to dictionary for YAML output."
   YAMLGenerator._build_signature:
     kind: method
     sig: (f:FunctionInfo) -> str
-    loc: 1573-1590
+    loc: 1600-1617
     does: "Build compact signature string."
   YAMLGenerator._categorize:
     kind: method
     sig: (name:str) -> str
-    loc: 1592-1594
+    loc: 1619-1621
     does: "Categorize function by name pattern."
   YAMLGenerator._extract_domain:
     kind: method
     sig: (path:str) -> str
-    loc: 1596-1598
+    loc: 1623-1625
     does: "Extract domain from file path."
   YAMLGenerator._compute_hash:
     kind: method
     sig: (name:str, signature:str) -> str
-    loc: 1600-1602
+    loc: 1627-1629
     does: "Compute short hash for quick comparison."
   YAMLGenerator._generate_simple_yaml:
     kind: method
     sig: (project:ProjectInfo, flat:bool, detail:str) -> str
-    loc: 1604-1640
+    loc: 1631-1667
     does: "Fallback YAML generation without pyyaml."
   YAMLGenerator._build_compact_data:
     kind: method
     sig: (project:ProjectInfo, detail:str) -> dict
-    loc: 1642-1709
+    loc: 1669-1736
     does: "Build compact data structure with short keys."
   YAMLGenerator._compact_imports:
     kind: method
     sig: (imports:list) -> list
-    loc: 1711-1715
+    loc: 1738-1742
     does: "Deduplicate and compact imports (typing.Dict, typing.List -> typing.{Dict,List})..."
   YAMLGenerator._compact_class:
     kind: method
     sig: (cls:ClassInfo, detail:str, module_types:Optional[list]=None) -> dict
-    loc: 1717-1791
+    loc: 1744-1829
     does: "Generate compact class representation."
   YAMLGenerator._compact_function:
     kind: method
     sig: (f:FunctionInfo, detail:str) -> dict
-    loc: 1793-1823
+    loc: 1831-1861
     does: "Generate compact function representation."
   YAMLGenerator._compact_method:
     kind: method
     sig: (f:FunctionInfo, detail:str) -> dict
-    loc: 1825-1827
+    loc: 1863-1865
     does: "Generate compact method representation (same as function)."
   YAMLGenerator._build_compact_signature:
     kind: method
     sig: (f:FunctionInfo) -> str
-    loc: 1829-1844
+    loc: 1867-1906
     does: "Build compact signature without 'self' and with clean formatting."
   YAMLGenerator._constants_for_module_verbose:
     kind: method
     sig: (module:ModuleInfo, limit:int=10) -> list
-    loc: 1846-1869
+    loc: 1908-1931
     does: "Convert module constants into verbose dictionaries."
   YAMLGenerator._constants_for_module:
     kind: method
     sig: (module:ModuleInfo, limit:int=10) -> list
-    loc: 1871-1884
+    loc: 1933-1946
     does: "Convert module constants into compact dictionaries."
   YAMLGenerator._constant_to_dict:
     kind: method
     sig: (constant:ConstantInfo) -> dict
-    loc: 1886-1898
+    loc: 1948-1960
     does: "Serialize ConstantInfo into a compact dictionary."
   YAMLGenerator._field_to_dict:
     kind: method
     sig: (field:FieldInfo) -> dict
-    loc: 1900-1909
+    loc: 1962-1971
     does: "Serialize dataclass FieldInfo to dictionary."
   CSVGenerator.generate:
     kind: method
     sig: (project:ProjectInfo, detail:str='standard') -> str
-    loc: 1943-1994
+    loc: 2005-2056
     does: "Generate CSV output."
   CSVGenerator._build_row:
     kind: method
     sig: (m:ModuleInfo, elem_type:str, name:str, signature:str, calls:list, deps:str, detail:str) -> dict
-    loc: 1996-2023
+    loc: 2058-2085
     does: "Build a single CSV row."
   CSVGenerator._build_function_row:
     kind: method
     sig: (m:ModuleInfo, elem_type:str, name:str, f:FunctionInfo, deps:str, detail:str, project:ProjectInfo) -> dict
-    loc: 2025-2054
+    loc: 2087-2116
     does: "Build CSV row for function/method."
   CSVGenerator._build_signature:
     kind: method
     sig: (f:FunctionInfo) -> str
-    loc: 2056-2068
+    loc: 2118-2130
     does: "Build compact signature."
   CSVGenerator._categorize:
     kind: method
     sig: (name:str) -> str
-    loc: 2070-2072
+    loc: 2132-2134
     does: "Categorize function by name pattern."
   CSVGenerator._extract_domain:
     kind: method
     sig: (path:str) -> str
-    loc: 2074-2076
+    loc: 2136-2138
     does: "Extract domain from file path."
   CSVGenerator._compute_hash:
     kind: method
     sig: (name:str, signature:str) -> str
-    loc: 2078-2082
+    loc: 2140-2144
     does: "Compute short hash for quick comparison."
   CSVGenerator._escape_csv:
     kind: method
     sig: (text:str) -> str
-    loc: 2084-2088
+    loc: 2146-2150
     does: "Escape text for CSV (remove newlines, limit commas)."
 
 # markdown_format.py | python | 10 functions
@@ -2318,7 +2228,7 @@ functions:
     does: "Check if Rapidfuzz is available."
   get_refactoring_suggestions:
     kind: function
-    sig: (similar_functions:Dict[str,List[str]]) -> List[Dict[str,any]]
+    sig: (similar_functions:Dict[str,List[str]]) -> List[Dict[str, any]]
     loc: 168-238
     does: "Generate refactoring suggestions based on similar functions."
   SimilarityDetector.__init__:
@@ -2328,12 +2238,12 @@ functions:
     does: "Initialize the similarity detector."
   SimilarityDetector.find_similar_functions:
     kind: method
-    sig: (modules:List[ModuleInfo]) -> Dict[str,List[str]]
+    sig: (modules:List[ModuleInfo]) -> Dict[str, List[str]]
     loc: 47-107
     does: "Find similar functions across all modules."
   SimilarityDetector.find_duplicate_signatures:
     kind: method
-    sig: (modules:List[ModuleInfo]) -> Dict[str,List[str]]
+    sig: (modules:List[ModuleInfo]) -> Dict[str, List[str]]
     loc: 109-142
     does: "Find functions with identical signatures."
   SimilarityDetector._build_signature:
@@ -2474,7 +2384,7 @@ functions:
 functions:
   run_benchmark:
     kind: function
-    sig: (files:List[str], output_dir:str='benchmark_results', provider:str=None, model:str=None) -> Dict[str,Any]
+    sig: (files:List[str], output_dir:str='benchmark_results', provider:str=None, model:str=None) -> Dict[str, Any]
     loc: 430-449
     does: "Run reproduction benchmark."
   ReproductionBenchmark.__init__:
@@ -2499,12 +2409,12 @@ functions:
     does: "Run benchmark on a single file."
   ReproductionBenchmark.run_all:
     kind: method
-    sig: (files:List[str], output_dir:str=None) -> Dict[str,Any]
+    sig: (files:List[str], output_dir:str=None) -> Dict[str, Any]
     loc: 306-337
     does: "Run benchmark on multiple files."
   ReproductionBenchmark._generate_summary:
     kind: method
-    sig: (results:List[BenchmarkResult]) -> Dict[str,Any]
+    sig: (results:List[BenchmarkResult]) -> Dict[str, Any]
     loc: 339-362
     does: "Generate summary from benchmark results."
   ReproductionBenchmark._save_results:
@@ -2888,12 +2798,12 @@ functions:
     does: "Initialize the dependency analyzer."
   DependencyAnalyzer.build_graph:
     kind: method
-    sig: (modules:List[ModuleInfo]) -> Dict[str,List[str]]
+    sig: (modules:List[ModuleInfo]) -> Dict[str, List[str]]
     loc: 45-88
     does: "Build dependency graph from modules."
   DependencyAnalyzer.analyze_metrics:
     kind: method
-    sig: () -> Dict[str,DependencyNode]
+    sig: () -> Dict[str, DependencyNode]
     loc: 90-128
     does: "Compute metrics for each node in the graph."
   DependencyAnalyzer.get_entrypoints:
@@ -2918,7 +2828,7 @@ functions:
     does: "Get strongly connected components."
   DependencyAnalyzer._detect_clusters:
     kind: method
-    sig: () -> Dict[str,int]
+    sig: () -> Dict[str, int]
     loc: 183-199
     does: "Detect clusters using connected components."
   DependencyAnalyzer._module_name:

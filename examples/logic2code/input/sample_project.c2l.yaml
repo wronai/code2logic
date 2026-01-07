@@ -1,0 +1,68 @@
+header:
+  project: sample_project
+  files: 3
+  lines: 120
+
+modules:
+  - path: calculator.py
+    language: python
+    imports:
+      - from __future__ import annotations
+    classes:
+      - name: Calculator
+        d: A tiny calculator class.
+        bases: []
+        dataclass: false
+        methods:
+          - name: add
+            sig: "(self, a: float, b: float) -> float"
+            ret: "float"
+            d: Add two numbers.
+          - name: divide
+            sig: "(self, a: float, b: float) -> float"
+            ret: "float"
+            d: Divide a by b.
+    functions:
+      - name: factorial
+        sig: "(n: int) -> int"
+        ret: "int"
+        d: Compute n! for n >= 0.
+
+  - path: models/user.py
+    language: python
+    imports:
+      - from dataclasses import dataclass
+    classes:
+      - name: User
+        d: Simple user model.
+        dataclass: true
+        fields:
+          - n: id
+            t: str
+          - n: name
+            t: str
+          - n: email
+            t: str
+          - n: active
+            t: bool
+            default: True
+    functions: []
+
+  - path: api/client.py
+    language: python
+    classes:
+      - name: APIClient
+        d: Example async API client.
+        bases: []
+        dataclass: false
+        methods:
+          - name: get
+            sig: "(self, url: str) -> Response"
+            ret: "Response"
+            async: true
+            d: Fetch a URL.
+    functions:
+      - name: create_client
+        sig: "(base_url: str) -> APIClient"
+        ret: "APIClient"
+        d: Factory function.

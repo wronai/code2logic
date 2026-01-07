@@ -1,8 +1,8 @@
 header:
   project: code2logic
   files: 52
-  lines: 22116
-  kb: 754.6
+  lines: 21957
+  kb: 750.2
   languages:
     python: 52
   modules_count: 52
@@ -19,11 +19,11 @@ M:
 - analyzer.py:235:9.6kb
 - quality.py:212:8.8kb
 - shared_utils.py:279:11.6kb
-- parsers.py:1531:73.8kb
+- parsers.py:1586:76.9kb
 - intent.py:429:20.5kb
 - adaptive.py:475:19.9kb
 - reproducer.py:534:22.0kb
-- llm_clients.py:415:16.5kb
+- llm_clients.py:168:6.4kb
 - prompts.py:120:4.0kb
 - chunked_reproduction.py:357:14.2kb
 - __init__.py:323:7.7kb
@@ -33,7 +33,7 @@ M:
 - logicml.py:281:12.8kb
 - function_logic.py:209:9.3kb
 - utils.py:16:0.6kb
-- generators.py:1713:83.4kb
+- generators.py:1763:85.7kb
 - markdown_format.py:266:13.9kb
 - models.py:296:10.6kb
 - similarity.py:178:7.8kb
@@ -57,7 +57,7 @@ M:
 - core/__init__.py:20:0.7kb
 - formats/__init__.py:27:1.2kb
 - tools/__init__.py:21:1.0kb
-- llm/__init__.py:13:0.4kb
+- llm/__init__.py:28:0.8kb
 - integrations/__init__.py:5:0.2kb
 meta:
   legend:
@@ -93,159 +93,233 @@ modules:
   - pathlib.Path
   - typing.{Any,Dict,List,Optional,Tuple}
   e:
+  - PROFILE_TEST_CASES
   - LLMProfile
   - ProfileTestResult
-  - LLMProfiler
-  - AdaptiveChunker
   - load_profiles
   - save_profile
   - get_profile
   - get_or_create_profile
+  - LLMProfiler
+  - AdaptiveChunker
   - profile_llm
-  - get_adaptive_chunker
   c:
   - n: LLMProfile
     d: Profile of LLM capabilities for code reproduction.
-    props:
-    - 'provider: str'
-    - 'model: str'
-    - 'profile_id: str'
-    - 'created_at: str'
-    - 'effective_context: int'
-    - 'max_output: int'
-    - 'optimal_chunk_size: int'
-    - 'syntax_accuracy: float'
-    - 'semantic_accuracy: float'
-    - 'type_hint_accuracy: float'
-    - 'docstring_accuracy: float'
-    - 'output_consistency: float'
-    - 'temperature_sensitivity: float'
-    - 'hallucination_rate: float'
-    - 'omission_rate: float'
     m:
     - n: __post_init__
       sig: ()
       d: creates init
     dec:
     - dataclass
+    attrs:
+    - n: provider
+      t: str
+    - n: model
+      t: str
+    - n: profile_id
+      t: str
+    - n: created_at
+      t: str
+    - n: effective_context
+      t: int
+    - n: max_output
+      t: int
+    - n: optimal_chunk_size
+      t: int
+    - n: syntax_accuracy
+      t: float
+    - n: semantic_accuracy
+      t: float
+    - n: type_hint_accuracy
+      t: float
     dataclass: true
+    fields:
+    - n: provider
+      t: str
+    - n: model
+      t: str
+    - n: profile_id
+      t: str
+      default: '""'
+    - n: created_at
+      t: str
+      default: '""'
+    - n: effective_context
+      t: int
+      default: '4000'
+    - n: max_output
+      t: int
+      default: '2000'
+    - n: optimal_chunk_size
+      t: int
+      default: '1500'
+    - n: syntax_accuracy
+      t: float
+      default: '0.0'
+    - n: semantic_accuracy
+      t: float
+      default: '0.0'
+    - n: type_hint_accuracy
+      t: float
+      default: '0.0'
   - n: ProfileTestResult
     d: Result of a single profile test.
-    props:
-    - 'test_name: str'
-    - 'original_code: str'
-    - 'reproduced_code: str'
-    - 'syntax_ok: bool'
-    - 'similarity: float'
-    - 'time_seconds: float'
-    - 'tokens_in: int'
-    - 'tokens_out: int'
-    - 'error: str'
     dec:
     - dataclass
+    attrs:
+    - n: test_name
+      t: str
+    - n: original_code
+      t: str
+    - n: reproduced_code
+      t: str
+    - n: syntax_ok
+      t: bool
+    - n: similarity
+      t: float
+    - n: time_seconds
+      t: float
+    - n: tokens_in
+      t: int
+    - n: tokens_out
+      t: int
+    - n: error
+      t: str
     dataclass: true
+    fields:
+    - n: test_name
+      t: str
+    - n: original_code
+      t: str
+    - n: reproduced_code
+      t: str
+    - n: syntax_ok
+      t: bool
+    - n: similarity
+      t: float
+    - n: time_seconds
+      t: float
+    - n: tokens_in
+      t: int
+    - n: tokens_out
+      t: int
+    - n: error
+      t: str
+      default: '""'
   - n: LLMProfiler
     d: Profile LLM capabilities for code reproduction.
     m:
     - n: __init__
       sig: (client, verbose:bool=True)
-      d: Initialize profiler.
+      d: creates
     - n: run_profile
       sig: (quick:bool=False)
       ret: LLMProfile
-      d: Run full profiling suite.
+      d: starts profile
     - n: _test_reproduction
       sig: (name:str, code:str)
       ret: ProfileTestResult
-      d: Test reproduction of a code snippet.
+      d: checks reproduction
     - n: _code_to_spec
       sig: (code:str)
       ret: str
-      d: Convert code to simple YAML spec.
+      d: code to spec
     - n: _extract_code
       sig: (response:str)
       ret: str
-      d: Extract code from LLM response.
+      d: parses code
     - n: _check_syntax
       sig: (code:str)
       ret: bool
-      d: Check if code has valid Python syntax.
+      d: checks syntax
     - n: _calculate_similarity
       sig: (original:str, reproduced:str)
       ret: float
-      d: Calculate code similarity.
+      d: processes similarity
     - n: _calculate_metrics
       sig: (profile:LLMProfile, results:List[ProfileTestResult])
       ret: LLMProfile
-      d: Calculate aggregate metrics from test results.
+      d: processes metrics
     - n: _test_consistency
       sig: (profile:LLMProfile)
       ret: LLMProfile
-      d: Test output consistency by running same prompt twi
+      d: checks consistency
+    attrs:
+    - n: client
+      init: true
+    - n: verbose
+      init: true
+    - n: provider
+      init: true
+    - n: model
+      init: true
   - n: AdaptiveChunker
     d: Adaptive chunking based on LLM profile.
     m:
     - n: __init__
       sig: (profile:Optional[LLMProfile]=None)
-      d: Initialize chunker.
+      d: creates
     - n: get_optimal_settings
       sig: ()
-      ret: Dict[str,Any]
-      d: optimal settings for the profiled model.
+      ret: Dict[str, Any]
+      d: retrieves optimal settings
     - n: chunk_spec
       sig: (spec:str, format:str='yaml')
-      ret: List[Dict[str,Any]]
-      d: Chunk specification based on profile.
+      ret: List[Dict[str, Any]]
+      d: chunk spec
     - n: recommend_format
       sig: (spec_size_tokens:int)
       ret: str
-      d: Recommend best format based on spec size and model
+      d: recommend format
     - n: estimate_chunks_needed
       sig: (spec_size_tokens:int)
       ret: int
-      d: Estimate number of chunks needed.
+      d: estimate chunks needed
+    attrs:
+    - n: profile
+      init: true
   f:
   - n: _get_profiles_path
     sig: ()
     ret: Path
-    d: path to profiles storage.
+    d: retrieves profiles path
   - n: load_profiles
     sig: ()
-    ret: Dict[str,LLMProfile]
-    d: Load all saved profiles.
+    ret: Dict[str, LLMProfile]
+    d: retrieves profiles
   - n: save_profile
     sig: (profile:LLMProfile)
     ret: None
-    d: Save a profile to storage.
+    d: caches profile
   - n: get_profile
     sig: (provider:str, model:str)
     ret: Optional[LLMProfile]
-    d: profile for a specific model.
+    d: retrieves profile
   - n: get_or_create_profile
     sig: (provider:str, model:str)
     ret: LLMProfile
-    d: existing profile or create default one.
+    d: retrieves or create profile
   - n: _create_default_profile
     sig: (provider:str, model:str)
     ret: LLMProfile
-    d: default profile based on model characteristics.
+    d: creates default profile
   - n: profile_llm
     sig: (client, quick:bool=False)
     ret: LLMProfile
-    d: Profile an LLM client.
+    d: profile llm
   - n: get_adaptive_chunker
     sig: (provider:str, model:str)
     ret: AdaptiveChunker
-    d: adaptive chunker for a model.
+    d: retrieves adaptive chunker
   const:
   - n: PROFILE_TEST_CASES
     t: Dict
     keys:
     - simple_function
-    - class_with_methods
-    - async_function
-    - decorator_usage
-    - complex_logic
+    - "\ndef calculate_sum(numbers: List[int]) -> int:\n    \"\"\"Calculate sum of numbers.\"\"\"\n    return sum(numbers)\n"
+    - ",\n    "
+    - ': '
 - p: config.py
   l: 168
   kb: 7.4
@@ -259,74 +333,75 @@ modules:
   - load_env
   - get_api_key
   - get_model
+  - SHELL_COMMANDS
   c:
   - n: Config
     d: Configuration manager for Code2Logic.
-    props:
-    - DEFAULT_MODELS
-    - API_KEY_VARS
-    - MODEL_VARS
     m:
     - n: __init__
       sig: (env_file:str=None)
-      d: Initialize configuration.
+      d: creates
     - n: _load_env_file
       sig: (env_file:str=None)
-      d: Load environment variables from .env file.
+      d: retrieves env file
     - n: _parse_env_file
       sig: (path:Path)
-      d: Parse .env file and set environment variables.
+      d: parses env file
     - n: _load_config_file
       sig: ()
-      d: Load configuration from JSON file.
+      d: retrieves config file
     - n: get_api_key
       sig: (provider:str)
       ret: Optional[str]
-      d: API key for a provider.
+      d: retrieves api key
     - n: get_model
       sig: (provider:str)
       ret: str
-      d: model for a provider.
+      d: retrieves model
     - n: get_ollama_host
       sig: ()
       ret: str
-      d: Ollama host URL.
+      d: retrieves ollama host
     - n: get_default_provider
       sig: ()
       ret: str
-      d: default LLM provider.
+      d: retrieves default provider
     - n: is_verbose
       sig: ()
       ret: bool
-      d: Check if verbose mode is enabled.
+      d: is verbose
     - n: get_cache_dir
       sig: ()
       ret: Path
-      d: cache directory path.
+      d: retrieves cache dir
     - n: list_configured_providers
       sig: ()
-      ret: Dict[str,bool]
-      d: List all providers and their configuration status.
+      ret: Dict[str, bool]
+      d: list configured providers
     - n: to_dict
       sig: ()
-      ret: Dict[str,Any]
-      d: Export configuration as dictionary.
+      ret: Dict[str, Any]
+      d: converts dict
+    attrs:
+    - n: _config
+      t: Dict
+      init: true
   f:
   - n: load_env
     sig: ()
-    d: Load environment variables from .env file.
+    d: retrieves env
   - n: get_api_key
     sig: (provider:str)
     ret: Optional[str]
-    d: Convenience function to get API key.
+    d: retrieves api key
   - n: get_model
     sig: (provider:str)
     ret: str
-    d: Convenience function to get model.
+    d: retrieves model
   const:
   - n: SHELL_COMMANDS
     t: str
-    v: '''\n# =============================================================================\n# Code2Logic API Configuration
+    v: '""" # ============================================================================= # Code2Logic API Configuration
       Co...'
 - p: file_formats.py
   l: 279
@@ -370,6 +445,7 @@ modules:
   - pathlib.Path
   - typing.{Any,Dict,List,Optional,Set}
   e:
+  - SUPPORTED_EXTENSIONS
   - FileResult
   - ProjectResult
   - ProjectReproducer
@@ -377,72 +453,146 @@ modules:
   c:
   - n: FileResult
     d: Result for a single file reproduction.
-    props:
-    - 'file_path: str'
-    - 'language: str'
-    - 'source_chars: int'
-    - 'logic_chars: int'
-    - 'generated_chars: int'
-    - 'compression: float'
-    - 'similarity: float'
-    - 'structural: float'
-    - 'success: bool'
-    - 'error: Optional[str]'
     dec:
     - dataclass
+    attrs:
+    - n: file_path
+      t: str
+    - n: language
+      t: str
+    - n: source_chars
+      t: int
+    - n: logic_chars
+      t: int
+    - n: generated_chars
+      t: int
+    - n: compression
+      t: float
+    - n: similarity
+      t: float
+    - n: structural
+      t: float
+    - n: success
+      t: bool
+    - n: error
+      t: Optional[str]
     dataclass: true
+    fields:
+    - n: file_path
+      t: str
+    - n: language
+      t: str
+    - n: source_chars
+      t: int
+    - n: logic_chars
+      t: int
+    - n: generated_chars
+      t: int
+    - n: compression
+      t: float
+    - n: similarity
+      t: float
+    - n: structural
+      t: float
+    - n: success
+      t: bool
+    - n: error
+      t: Optional[str]
+      default: None
   - n: ProjectResult
     d: Result for project reproduction.
-    props:
-    - 'project_path: str'
-    - 'total_files: int'
-    - 'successful_files: int'
-    - 'failed_files: int'
-    - 'total_source_chars: int'
-    - 'total_logic_chars: int'
-    - 'total_generated_chars: int'
-    - 'avg_compression: float'
-    - 'avg_similarity: float'
-    - 'avg_structural: float'
-    - 'files: List[FileResult]'
-    - 'by_language: Dict[str,Dict[str,float]]'
     dec:
     - dataclass
+    attrs:
+    - n: project_path
+      t: str
+    - n: total_files
+      t: int
+    - n: successful_files
+      t: int
+    - n: failed_files
+      t: int
+    - n: total_source_chars
+      t: int
+    - n: total_logic_chars
+      t: int
+    - n: total_generated_chars
+      t: int
+    - n: avg_compression
+      t: float
+    - n: avg_similarity
+      t: float
+    - n: avg_structural
+      t: float
     dataclass: true
+    fields:
+    - n: project_path
+      t: str
+    - n: total_files
+      t: int
+    - n: successful_files
+      t: int
+    - n: failed_files
+      t: int
+    - n: total_source_chars
+      t: int
+    - n: total_logic_chars
+      t: int
+    - n: total_generated_chars
+      t: int
+    - n: avg_compression
+      t: float
+    - n: avg_similarity
+      t: float
+    - n: avg_structural
+      t: float
   - n: ProjectReproducer
     d: Multi-file project reproduction system.
     m:
     - n: __init__
       sig: (client:BaseLLMClient=None, max_workers:int=4, target_lang:str=None, use_llm:bool=True)
-      d: Initialize project reproducer.
+      d: creates
     - n: _get_client
       sig: ()
       ret: BaseLLMClient
-      d: or create LLM client.
+      d: retrieves client
     - n: find_source_files
       sig: (project_path:str, extensions:Set[str]=None, exclude_patterns:List[str]=None)
       ret: List[Path]
-      d: Find all source files in project.
+      d: retrieves source files
     - n: reproduce_file
       sig: (file_path:Path, output_dir:Path)
       ret: FileResult
-      d: Reproduce a single file.
+      d: reproduce file
     - n: reproduce_project
       sig: (project_path:str, output_dir:str=None, parallel:bool=False)
       ret: ProjectResult
-      d: Reproduce entire project.
+      d: reproduce project
     - n: _aggregate_results
       sig: (project_path:str, results:List[FileResult])
       ret: ProjectResult
-      d: Aggregate file results into project result.
+      d: aggregate results
     - n: _save_report
       sig: (output_dir:Path, result:ProjectResult)
-      d: Save project reproduction report.
+      d: caches report
+    attrs:
+    - n: client
+      init: true
+    - n: max_workers
+      init: true
+    - n: target_lang
+      init: true
+    - n: use_llm
+      init: true
+    - n: parser
+      init: true
+    - n: reproducer
+      init: true
   f:
   - n: reproduce_project
     sig: (project_path:str, output_dir:str=None, target_lang:str=None, parallel:bool=False, use_llm:bool=True)
     ret: ProjectResult
-    d: Convenience function for project reproduction.
+    d: reproduce project
   const:
   - n: SUPPORTED_EXTENSIONS
     t: Dict
@@ -489,7 +639,9 @@ modules:
       sig: (msg:str)
       d: error
     attrs:
-    - n: .
+    - n: verbose
+      init: true
+    - n: _logger
       init: true
   - n: BaseParser
     b:
@@ -505,6 +657,7 @@ modules:
     - n: parse_file
       sig: (path:str)
       d: parses file
+    attrs: []
   - n: BaseGenerator
     b:
     - VerboseMixin
@@ -517,6 +670,7 @@ modules:
       sig: (project, detail:str='full')
       ret: str
       d: creates
+    attrs: []
 - p: cli.py
   l: 803
   kb: 34.5
@@ -538,6 +692,7 @@ modules:
   - main
   c:
   - n: Colors
+    attrs: []
   - n: Logger
     d: Enhanced logger for CLI output.
     m:
@@ -579,7 +734,13 @@ modules:
       sig: (msg:str)
       d: header
     attrs:
-    - n: .
+    - n: verbose
+      init: true
+    - n: debug
+      init: true
+    - n: start_time
+      init: true
+    - n: _step
       init: true
   f:
   - n: ensure_dependencies
@@ -662,6 +823,21 @@ modules:
     d: Configuration for LLM backend.
     dec:
     - dataclass
+    attrs:
+    - n: provider
+      t: str
+    - n: model
+      t: str
+    - n: base_url
+      t: str
+    - n: api_key
+      t: Optional[str]
+    - n: timeout
+      t: int
+    - n: temperature
+      t: float
+    - n: max_tokens
+      t: int
     dataclass: true
     fields:
     - n: provider
@@ -708,7 +884,9 @@ modules:
       ret: List[str]
       d: list models
     attrs:
-    - n: .
+    - n: config
+      init: true
+    - n: client
       init: true
   - n: LiteLLMClient
     d: LiteLLM client for unified API access.
@@ -729,7 +907,7 @@ modules:
       ret: bool
       d: is available
     attrs:
-    - n: .
+    - n: config
       init: true
   - n: CodeAnalyzer
     d: LLM-powered code analysis for Code2Logic.
@@ -762,7 +940,9 @@ modules:
       ret: str
       d: creates signature
     attrs:
-    - n: .
+    - n: client
+      init: true
+    - n: config
       init: true
   f:
   - n: get_available_backends
@@ -795,6 +975,7 @@ modules:
     - ERROR="error"
     - CRITICAL="critical"
     d: Error severity levels.
+    attrs: []
   - n: ErrorType
     b:
     - Enum
@@ -818,6 +999,7 @@ modules:
     - TIMEOUT="timeout"
     - UNKNOWN="unknown"
     d: Types of errors that can occur during analysis.
+    attrs: []
   - n: AnalysisError
     d: Represents an error during analysis.
     m:
@@ -827,6 +1009,19 @@ modules:
       d: converts dict
     dec:
     - dataclass
+    attrs:
+    - n: type
+      t: ErrorType
+    - n: severity
+      t: ErrorSeverity
+    - n: path
+      t: str
+    - n: message
+      t: str
+    - n: exception
+      t: Optional[str]
+    - n: suggestion
+      t: str
     dataclass: true
     fields:
     - n: type
@@ -859,6 +1054,19 @@ modules:
       d: summary
     dec:
     - dataclass
+    attrs:
+    - n: success
+      t: bool
+    - n: errors
+      t: List[AnalysisError]
+    - n: warnings
+      t: List[AnalysisError]
+    - n: skipped_files
+      t: List[str]
+    - n: processed_files
+      t: int
+    - n: total_files
+      t: int
     dataclass: true
     fields:
     - n: success
@@ -912,7 +1120,15 @@ modules:
       ret: Any
       d: safe parse
     attrs:
-    - n: .
+    - n: mode
+      init: true
+    - n: max_file_size
+      init: true
+    - n: timeout
+      init: true
+    - n: logger
+      init: true
+    - n: result
       init: true
   f:
   - n: create_error_handler
@@ -926,53 +1142,74 @@ modules:
   - collections.defaultdict
   - typing.{Any,Dict,List}
   e:
-  - CodeReviewer
+  - SECURITY_PATTERNS
+  - PERFORMANCE_PATTERNS
+  - COMPLEXITY_HIGH
+  - COMPLEXITY_MEDIUM
+  - LINES_MAX
+  - FILE_LINES_MAX
   - analyze_code_quality
   - check_security_issues
   - check_performance_issues
+  - CodeReviewer
   c:
   - n: CodeReviewer
     d: Automated code review with optional LLM enhancement.
     m:
     - n: __init__
       sig: (client=None)
-      d: Initialize reviewer.
+      d: creates
     - n: review
       sig: (project, focus:str='all')
-      ret: Dict[str,Any]
-      d: Perform code review.
+      ret: Dict[str, Any]
+      d: review
     - n: generate_report
       sig: (results:Dict[str,Any], project_name:str='Project')
       ret: str
-      d: Generate markdown review report.
+      d: creates report
+    attrs:
+    - n: client
+      init: true
   f:
   - n: analyze_code_quality
     sig: (project)
-    ret: Dict[str,List[Dict]]
-    d: Analyze code quality issues.
+    ret: Dict[str, List[Dict]]
+    d: processes code quality
   - n: check_security_issues
     sig: (project)
-    ret: Dict[str,List[Dict]]
-    d: Check for security vulnerabilities.
+    ret: Dict[str, List[Dict]]
+    d: checks security issues
   - n: check_performance_issues
     sig: (project)
-    ret: Dict[str,List[Dict]]
-    d: Check for performance anti-patterns.
+    ret: Dict[str, List[Dict]]
+    d: checks performance issues
   const:
   - n: SECURITY_PATTERNS
     t: Dict
     keys:
     - sql_injection
+    - execute
+    - raw
+    - cursor.execute
     - command_injection
+    - os.system
+    - subprocess.call
+    - eval
+    - exec
     - path_traversal
-    - hardcoded_secrets
-    - insecure_random
   - n: PERFORMANCE_PATTERNS
     t: Dict
     keys:
     - n_plus_one
+    - 'for.*in.*:'
+    - .all()
+    - .filter(
     - large_memory
+    - readlines()
+    - list(
+    - .to_list()
     - blocking_io
+    - requests.get
   - n: COMPLEXITY_HIGH
     t: int
     v: '15'
@@ -1028,7 +1265,24 @@ modules:
       ret: Dict
       d: retrieves statistics
     attrs:
-    - n: .
+    - n: root_path
+      init: true
+    - n: verbose
+      init: true
+    - n: include_private
+      init: true
+    - n: modules
+      t: List
+      init: true
+    - n: languages
+      init: true
+    - n: ts_parser
+      init: true
+    - n: fallback_parser
+      init: true
+    - n: dep_analyzer
+      init: true
+    - n: sim_detector
       init: true
   f:
   - n: analyze_project
@@ -1057,6 +1311,21 @@ modules:
     d: Represents a code quality issue.
     dec:
     - dataclass
+    attrs:
+    - n: type
+      t: str
+    - n: severity
+      t: str
+    - n: file
+      t: str
+    - n: name
+      t: str
+    - n: value
+      t: int
+    - n: threshold
+      t: int
+    - n: recommendation
+      t: str
     dataclass: true
     fields:
     - n: type
@@ -1082,6 +1351,13 @@ modules:
       d: converts dict
     dec:
     - dataclass
+    attrs:
+    - n: issues
+      t: List[QualityIssue]
+    - n: metrics
+      t: Dict[str, Any]
+    - n: score
+      t: float
     dataclass: true
     fields:
     - n: issues
@@ -1121,7 +1397,7 @@ modules:
       ret: str
       d: retrieves file recommendation
     attrs:
-    - n: .
+    - n: thresholds
       init: true
   f:
   - n: analyze_quality
@@ -1142,110 +1418,114 @@ modules:
   e:
   - compact_imports
   - deduplicate_imports
+  - TYPE_ABBREVIATIONS
   - abbreviate_type
   - expand_type
   - build_signature
   - remove_self_from_params
+  - CATEGORY_PATTERNS
   - categorize_function
-  - extract_domain
-  - compute_hash
-  - truncate_docstring
+  - DOMAIN_KEYWORDS
   f:
   - n: compact_imports
     sig: (imports:List[str], max_items:int=10)
     ret: List[str]
-    d: Compact imports by grouping submodules.
+    d: compact imports
   - n: deduplicate_imports
     sig: (imports:List[str])
     ret: List[str]
-    d: Remove redundant imports.
+    d: deduplicate imports
   - n: abbreviate_type
     sig: (type_str:str)
     ret: str
-    d: Abbreviate type annotations for compactness.
+    d: abbreviate type
   - n: expand_type
     sig: (abbrev:str)
     ret: str
-    d: Expand abbreviated type back to full form.
+    d: expand type
   - n: build_signature
     sig: (params:List[str], return_type:Optional[str]=None, include_self:bool=False, abbreviate:bool=False, max_params:int=6)
     ret: str
-    d: Build compact function signature.
+    d: creates signature
   - n: remove_self_from_params
     sig: (params:List[str])
     ret: List[str]
-    d: Remove 'self' and 'cls' from parameter list.
+    d: deletes self from params
   - n: categorize_function
     sig: (name:str)
     ret: str
-    d: Categorize function by name pattern.
+    d: categorize function
   - n: extract_domain
     sig: (path:str)
     ret: str
-    d: Extract domain from file path.
+    d: parses domain
   - n: compute_hash
     sig: (name:str, signature:str, length:int=8)
     ret: str
-    d: Compute short hash for quick comparison.
+    d: processes hash
   - n: truncate_docstring
     sig: (docstring:Optional[str], max_length:int=60)
     ret: str
-    d: Truncate docstring to first sentence or max_length
+    d: truncate docstring
   - n: escape_for_yaml
     sig: (text:str)
     ret: str
-    d: Escape text for safe YAML inclusion.
+    d: escape for yaml
   - n: clean_identifier
     sig: (name:str)
     ret: str
-    d: Clean identifier by removing whitespace and specia
+    d: clean identifier
   const:
   - n: TYPE_ABBREVIATIONS
     t: Dict
     keys:
     - str
+    - s
     - int
+    - i
     - bool
+    - b
     - float
+    - f
     - None
-    - Any
-    - List
-    - Dict
-    - Set
-    - Tuple
+    - N
   - n: CATEGORY_PATTERNS
     t: Dict
     keys:
     - read
+    - get
+    - fetch
+    - find
+    - load
+    - read
+    - query
+    - retrieve
+    - list
     - create
-    - update
-    - delete
-    - validate
-    - transform
-    - lifecycle
-    - communicate
   - n: DOMAIN_KEYWORDS
     t: List
-    v: '[''auth'', ''user'', ''order'', ''payment'', ''product'', ''cart'', ''config'', ''util'', ''api'', ''service'', ''model'',
-      ''controller'', ''v...'
+    v: '[     ''auth'', ''user'', ''order'', ''payment'', ''product'', ''cart'',     ''config'', ''util'', ''api'', ''service'',
+      ''model'', ''contro...'
 - p: parsers.py
-  l: 1531
-  kb: 73.8
+  l: 1586
+  kb: 76.9
   i:
   - ast
   - re
   - textwrap
+  - tree_sitter_python
   - intent.EnhancedIntentGenerator
   - models
   - typing.{List,Optional}
   e:
+  - TREE_SITTER_AVAILABLE
   - TreeSitterParser
   - UniversalParser
   - is_tree_sitter_available
   c:
   - n: _PyFunctionBodyAnalyzer
     b:
-    - NodeVisitor
+    - ast.NodeVisitor
     m:
     - n: __init__
       sig: ()
@@ -1285,114 +1565,139 @@ modules:
     - n: visit_Try
       sig: (node)
       d: visit try
+    attrs:
+    - n: calls
+      t: List
+      init: true
+    - n: raises
+      t: List
+      init: true
+    - n: complexity
+      init: true
+    - n: _seen_calls
+      init: true
+    - n: _seen_raises
+      init: true
   - n: TreeSitterParser
     d: Parser using Tree-sitter for high-accuracy AST parsing.
     m:
     - n: __init__
       sig: ()
-      d: Initialize Tree-sitter parsers for available langu
+      d: creates
     - n: _init_parsers
       sig: ()
-      d: Initialize parsers for each supported language.
+      d: creates parsers
     - n: is_available
       sig: (language:str)
       ret: bool
-      d: Check if Tree-sitter parser is available for a lan
+      d: is available
     - n: get_supported_languages
       sig: ()
       ret: List[str]
-      d: list of potentially supported languages.
+      d: retrieves supported languages
     - n: parse
       sig: (filepath:str, content:str, language:str)
       ret: Optional[ModuleInfo]
-      d: Parse a source file using Tree-sitter.
+      d: parses
     - n: _parse_python
       sig: (filepath:str, content:str, tree)
       ret: ModuleInfo
-      d: Parse Python source using Tree-sitter AST.
+      d: parses python
     - n: _extract_constants
       sig: (tree, content:str)
       ret: List[ConstantInfo]
-      d: Extract module-level UPPERCASE constants.
+      d: parses constants
     - n: _extract_type_checking_imports
       sig: (tree, content:str)
       ret: List[str]
-      d: Extract TYPE_CHECKING block imports.
+      d: parses type checking imports
     - n: _extract_conditional_imports
       sig: (node, content:str)
       ret: List[str]
-      d: Extract imports from try/except blocks.
+      d: parses conditional imports
     - n: _extract_aliases
       sig: (tree, content:str)
       ret: dict
-      d: Extract module aliases (import X as Y).
+      d: parses aliases
     - n: _extract_py_function
       sig: (node, content:str, decorated_node=None)
       ret: Optional[FunctionInfo]
-      d: Extract Python function from AST node.
+      d: parses py function
     - n: _extract_py_enum
       sig: (node, content:str)
       ret: Optional[TypeInfo]
-      d: Extract Python Enum (values) as TypeInfo(kind='enu
+      d: parses py enum
+    attrs:
+    - n: parsers
+      t: Dict
+      init: true
+    - n: languages
+      t: Dict
+      init: true
+    - n: intent_gen
+      init: true
   - n: UniversalParser
     d: Fallback parser using Python AST and regex.
     m:
     - n: __init__
       sig: ()
-      d: Initialize the universal parser.
+      d: creates
     - n: parse
       sig: (filepath:str, content:str, language:str)
       ret: Optional[ModuleInfo]
-      d: Parse a source file using AST or regex.
+      d: parses
     - n: _parse_python
       sig: (filepath:str, content:str)
       ret: Optional[ModuleInfo]
-      d: Parse Python using built-in AST.
+      d: parses python
     - n: _extract_ast_enum
       sig: (node:Any)
       ret: Optional[TypeInfo]
-      d: Extract Enum values from Python AST class.
+      d: parses ast enum
     - n: _extract_ast_function
       sig: (node)
       ret: FunctionInfo
-      d: Extract function from Python AST node.
+      d: parses ast function
     - n: _extract_ast_class
       sig: (node:Any)
       ret: ClassInfo
-      d: Extract class from Python AST node.
+      d: parses ast class
     - n: _extract_ast_constant
       sig: (node:Any, content:str)
       ret: Optional[ConstantInfo]
-      d: Extract ConstantInfo from an AST assignment node i
+      d: parses ast constant
     - n: _format_ast_value
       sig: (value_node:Any, content:str)
       ret: str
-      d: Best-effort string representation of an AST value
+      d: formats ast value
     - n: _ann_str
       sig: (node)
       ret: str
-      d: Convert AST annotation to string.
+      d: ann str
     - n: _parse_js_ts
       sig: (filepath:str, content:str, language:str)
       ret: ModuleInfo
-      d: Parse JS/TS using regex patterns.
+      d: parses js ts
+    attrs:
+    - n: intent_gen
+      init: true
   f:
   - n: _normalize_import_path
     sig: (import_path:str)
     ret: str
-    d: Normalize import path by removing duplicate suffix
+    d: normalize import path
   - n: _clean_imports
     sig: (imports:List[str])
     ret: List[str]
-    d: Deduplicate and normalize import paths while prese
+    d: clean imports
   - n: _combine_import_name
     sig: (module_name:str, identifier:str)
     ret: str
-    d: Combine module and identifier while avoiding dupli
+    d: merges import name
   - n: _truncate_constant_value
     sig: (value_text:str, limit:int=400)
     ret: str
-    d: a trimmed single-line snippet for constant values.
+    d: truncate constant value
   - n: _py_expr_to_dotted_name
     sig: (expr)
     ret: str
@@ -1403,7 +1708,7 @@ modules:
   - n: is_tree_sitter_available
     sig: ()
     ret: bool
-    d: Check if Tree-sitter is available.
+    d: is tree sitter available
   const:
   - n: TREE_SITTER_AVAILABLE
     t: bool
@@ -1435,10 +1740,22 @@ modules:
     - DOCUMENT=auto()
     - TEST=auto()
     d: Types of user intents for code analysis.
+    attrs: []
   - n: Intent
     d: Represents a detected user intent.
     dec:
     - dataclass
+    attrs:
+    - n: type
+      t: IntentType
+    - n: confidence
+      t: float
+    - n: target
+      t: str
+    - n: description
+      t: str
+    - n: suggestions
+      t: List[str]
     dataclass: true
     fields:
     - n: type
@@ -1475,7 +1792,11 @@ modules:
       ret: dict[str, bool]
       d: retrieves available features
     attrs:
-    - n: .
+    - n: lang
+      init: true
+    - n: lemmatizer
+      init: true
+    - n: nlp
       init: true
   - n: IntentAnalyzer
     d: Analyzes user queries to detect intent and provide suggestio
@@ -1528,7 +1849,9 @@ modules:
       ret: List[str]
       d: suggest class refactoring
     attrs:
-    - n: .
+    - n: intent_patterns
+      init: true
+    - n: code_smell_patterns
       init: true
 - p: adaptive.py
   l: 475
@@ -1537,12 +1860,14 @@ modules:
   - os
   - re
   - dataclasses.dataclass
-  - file_formats.{generate_file_csv,generate_file_json}
+  - dotenv.load_dotenv
+  - file_formats.generate_file_csv
   - llm_clients.{BaseLLMClient,get_client}
   - pathlib.Path
   - reproduction.{compare_code,extract_code_block}
   - typing.{Any,Dict,List,Optional,Tuple}
   e:
+  - LLM_CAPABILITIES
   - ChunkInfo
   - AdaptiveResult
   - AdaptiveReproducer
@@ -1550,98 +1875,154 @@ modules:
   c:
   - n: ChunkInfo
     d: Information about a code chunk.
-    props:
-    - 'index: int'
-    - 'total: int'
-    - 'content: str'
-    - 'element_type: str'
-    - 'element_name: str'
     dec:
     - dataclass
+    attrs:
+    - n: index
+      t: int
+    - n: total
+      t: int
+    - n: content
+      t: str
+    - n: element_type
+      t: str
+    - n: element_name
+      t: str
     dataclass: true
+    fields:
+    - n: index
+      t: int
+    - n: total
+      t: int
+    - n: content
+      t: str
+    - n: element_type
+      t: str
+    - n: element_name
+      t: str
   - n: AdaptiveResult
     d: Result of adaptive reproduction.
-    props:
-    - 'source_file: str'
-    - 'source_chars: int'
-    - 'format_used: str'
-    - 'chunks_used: int'
-    - 'spec_chars: int'
-    - 'generated_chars: int'
-    - 'similarity: float'
-    - 'structural_score: float'
-    - 'compression_ratio: float'
-    - 'efficiency_score: float'
     dec:
     - dataclass
+    attrs:
+    - n: source_file
+      t: str
+    - n: source_chars
+      t: int
+    - n: format_used
+      t: str
+    - n: chunks_used
+      t: int
+    - n: spec_chars
+      t: int
+    - n: generated_chars
+      t: int
+    - n: similarity
+      t: float
+    - n: structural_score
+      t: float
+    - n: compression_ratio
+      t: float
+    - n: efficiency_score
+      t: float
     dataclass: true
+    fields:
+    - n: source_file
+      t: str
+    - n: source_chars
+      t: int
+    - n: format_used
+      t: str
+    - n: chunks_used
+      t: int
+    - n: spec_chars
+      t: int
+    - n: generated_chars
+      t: int
+    - n: similarity
+      t: float
+    - n: structural_score
+      t: float
+    - n: compression_ratio
+      t: float
+    - n: efficiency_score
+      t: float
   - n: AdaptiveReproducer
     d: Adaptive code reproduction with LLM capability detection.
     m:
     - n: __init__
       sig: (client:BaseLLMClient=None, model:str=None)
-      d: Initialize adaptive reproducer.
+      d: creates
     - n: _get_capabilities
       sig: ()
-      ret: Dict[str,Any]
-      d: LLM capabilities for current model.
+      ret: Dict[str, Any]
+      d: retrieves capabilities
     - n: select_format
       sig: (file_path:Path, content:str)
       ret: str
-      d: Select optimal format based on file and LLM capabi
+      d: retrieves format
     - n: should_chunk
       sig: (content:str)
       ret: bool
-      d: Determine if content should be chunked.
+      d: checks chunk
     - n: chunk_content
       sig: (content:str, file_path:Path)
       ret: List[ChunkInfo]
-      d: Split content into logical chunks.
+      d: chunk content
     - n: generate_chunk_spec
       sig: (chunk:ChunkInfo, format_name:str)
       ret: str
-      d: Generate specification for a single chunk.
+      d: creates chunk spec
     - n: _gherkin_for_chunk
       sig: (chunk:ChunkInfo)
       ret: str
-      d: Generate Gherkin for a chunk.
+      d: gherkin for chunk
     - n: _yaml_for_chunk
       sig: (chunk:ChunkInfo)
       ret: str
-      d: Generate YAML for a chunk.
+      d: yaml for chunk
     - n: _json_for_chunk
       sig: (chunk:ChunkInfo)
       ret: str
-      d: Generate JSON for a chunk.
+      d: json for chunk
     - n: reproduce
       sig: (file_path:str, output_dir:str=None)
       ret: AdaptiveResult
-      d: Reproduce code with adaptive format selection.
+      d: reproduce
     - n: _reproduce_single
       sig: (path:Path, content:str, format_name:str, output_dir:str=None)
       ret: AdaptiveResult
-      d: Reproduce without chunking.
+      d: reproduce single
     - n: _reproduce_chunked
       sig: (path:Path, content:str, format_name:str, output_dir:str=None)
       ret: AdaptiveResult
-      d: Reproduce with chunking.
+      d: reproduce chunked
+    attrs:
+    - n: client
+      init: true
+    - n: model
+      init: true
+    - n: capabilities
+      init: true
   f:
   - n: get_llm_capabilities
     sig: (model:str)
-    ret: Dict[str,Any]
-    d: capabilities for a specific model.
+    ret: Dict[str, Any]
+    d: retrieves llm capabilities
   const:
   - n: LLM_CAPABILITIES
     t: Dict
     keys:
     - qwen/qwen-2.5-coder-32b-instruct
+    - context_size
+    - code_quality
+    - best_formats
+    - gherkin
+    - yaml
+    - json
+    - max_output
+    - supports_chunking
     - nvidia/nemotron-3-nano-30b-a3b:free
-    - meta-llama/llama-3.3-70b-instruct:free
-    - deepseek/deepseek-coder-33b-instruct
-    - qwen2.5-coder:14b
-    - qwen2.5-coder:7b
-    - codellama:7b-instruct
-    - default
 - p: reproducer.py
   l: 534
   kb: 22.0
@@ -1672,6 +2053,7 @@ modules:
     - FAILED="failed"
     - SKIPPED="skipped"
     d: Status of file reproduction.
+    attrs: []
   - n: FileValidation
     d: Validation result for a single file.
     m:
@@ -1685,6 +2067,25 @@ modules:
       d: converts dict
     dec:
     - dataclass
+    attrs:
+    - n: path
+      t: str
+    - n: exists
+      t: bool
+    - n: syntax_ok
+      t: bool
+    - n: structure_match
+      t: bool
+    - n: classes_match
+      t: int
+    - n: classes_expected
+      t: int
+    - n: functions_match
+      t: int
+    - n: functions_expected
+      t: int
+    - n: errors
+      t: List[str]
     dataclass: true
     fields:
     - n: path
@@ -1730,6 +2131,21 @@ modules:
       d: summary
     dec:
     - dataclass
+    attrs:
+    - n: output_dir
+      t: str
+    - n: total_files
+      t: int
+    - n: generated_files
+      t: int
+    - n: failed_files
+      t: int
+    - n: skipped_files
+      t: int
+    - n: validations
+      t: List[FileValidation]
+    - n: errors
+      t: List[str]
     dataclass: true
     fields:
     - n: output_dir
@@ -1803,7 +2219,7 @@ modules:
       ret: str
       d: creates typescript
     attrs:
-    - n: .
+    - n: verbose
       init: true
   - n: SpecValidator
     d: Validates generated files against logic specification.
@@ -1823,6 +2239,7 @@ modules:
       sig: (content:str, validation:FileValidation)
       ret: bool
       d: checks python syntax
+    attrs: []
   f:
   - n: reproduce_project
     sig: (spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None, validate:bool=True, verbose:bool=True)
@@ -1833,106 +2250,15 @@ modules:
     ret: List[FileValidation]
     d: validates files
 - p: llm_clients.py
-  l: 415
-  kb: 16.5
+  l: 168
+  kb: 6.4
   i:
   - os
   - json
-  - abc.{ABC,abstractmethod}
-  - typing.{Any,Dict,List,Optional}
+  - lolm
   e:
-  - BaseLLMClient
-  - OpenRouterClient
-  - OllamaLocalClient
-  - LiteLLMClient
   - get_priority_mode
-  - get_client
   - get_effective_provider_priorities
-  c:
-  - n: BaseLLMClient
-    b:
-    - ABC
-    d: Abstract base class for LLM clients.
-    m:
-    - n: generate
-      sig: (prompt:str, system:str=None, max_tokens:int=4000)
-      ret: str
-      d: Generate completion.
-    - n: is_available
-      sig: ()
-      ret: bool
-      d: Check if client is available.
-    - n: chat
-      sig: (messages:List[Dict[str,str]], max_tokens:int=4000)
-      ret: str
-      d: Chat completion (default implementation).
-  - n: OpenRouterClient
-    b:
-    - BaseLLMClient
-    d: OpenRouter API client for cloud LLM access.
-    props:
-    - API_URL
-    - provider
-    m:
-    - n: __init__
-      sig: (api_key:str=None, model:str=None)
-      d: Initialize OpenRouter client.
-    - n: generate
-      sig: (prompt:str, system:str=None, max_tokens:int=4000)
-      ret: str
-      d: Generate completion using OpenRouter.
-    - n: is_available
-      sig: ()
-      ret: bool
-      d: Check if OpenRouter is configured.
-    - n: list_recommended_models
-      sig: ()
-      ret: List[tuple]
-      d: List recommended models for code tasks.
-  - n: OllamaLocalClient
-    b:
-    - BaseLLMClient
-    d: Ollama client for local LLM inference.
-    props:
-    - provider
-    m:
-    - n: __init__
-      sig: (model:str=None, host:str=None)
-      d: Initialize Ollama client.
-    - n: generate
-      sig: (prompt:str, system:str=None, max_tokens:int=4000)
-      ret: str
-      d: Generate completion using Ollama.
-    - n: is_available
-      sig: ()
-      ret: bool
-      d: Check if Ollama is running.
-    - n: list_models
-      sig: ()
-      ret: List[str]
-      d: List available Ollama models.
-    - n: list_recommended_models
-      sig: ()
-      ret: List[tuple]
-      d: List recommended models for code tasks.
-  - n: LiteLLMClient
-    b:
-    - BaseLLMClient
-    d: LiteLLM client for universal LLM access.
-    props:
-    - provider
-    m:
-    - n: __init__
-      sig: (model:str=None)
-      d: Initialize LiteLLM client.
-    - n: generate
-      sig: (prompt:str, system:str=None, max_tokens:int=4000)
-      ret: str
-      d: Generate completion using LiteLLM.
-    - n: is_available
-      sig: ()
-      ret: bool
-      d: Check if LiteLLM is available.
   f:
   - n: _get_user_llm_config_path
     sig: ()
@@ -1940,7 +2266,7 @@ modules:
     d: retrieves user llm config path
   - n: _load_user_llm_config
     sig: ()
-    ret: Dict[str,Any]
+    ret: Dict[str, Any]
     d: retrieves user llm config
   - n: _get_priority_mode
     sig: ()
@@ -1952,11 +2278,11 @@ modules:
     d: retrieves priority mode
   - n: _get_provider_priority_overrides
     sig: ()
-    ret: Dict[str,int]
+    ret: Dict[str, int]
     d: retrieves provider priority overrides
   - n: _get_model_priority_rules
     sig: ()
-    ret: Dict[str,Dict[str,int]]
+    ret: Dict[str, Dict[str, int]]
     d: retrieves model priority rules
   - n: _get_model_priority
     sig: (model_string:str)
@@ -1966,66 +2292,29 @@ modules:
     sig: (provider:str)
     ret: str
     d: retrieves provider model string
-  - n: get_client
-    sig: (provider:str=None, model:str=None)
-    ret: BaseLLMClient
-    d: appropriate LLM client based on provider.
-  - n: _try_client
-    sig: (provider:str, model:str=None)
-    ret: Optional[BaseLLMClient]
-    d: try client
   - n: _get_priority_order
     sig: ()
     ret: List[str]
     d: retrieves priority order
   - n: _get_effective_provider_order
     sig: ()
-    ret: List[tuple[str,int]]
+    ret: List[tuple]
     d: retrieves effective provider order
   - n: get_effective_provider_priorities
     sig: ()
-    ret: Dict[str,int]
+    ret: Dict[str, int]
     d: retrieves effective provider priorities
-  - n: _get_provider_priorities_from_litellm_yaml
-    sig: ()
-    ret: Dict[str,int]
-    d: retrieves provider priorities from litellm yaml
   - n: _candidate_litellm_yaml_paths
     sig: ()
     ret: List[str]
     d: candidate litellm yaml paths
-  const:
-  - n: RECOMMENDED_MODELS
-    t: Dict
-    keys:
-    - openrouter
-    - ollama
-  - n: DEFAULT_MODELS
-    t: Dict
-    keys:
-    - openrouter
-    - openai
-    - anthropic
-    - groq
-    - together
-    - ollama
-    - litellm
-  - n: DEFAULT_PROVIDER_PRIORITIES
-    t: Dict
-    keys:
-    - ollama
-    - openrouter
-    - groq
-    - together
-    - openai
-    - anthropic
-    - litellm
 - p: prompts.py
   l: 120
   kb: 4.0
   i:
   - typing.Dict
   e:
+  - FORMAT_HINTS
   - get_reproduction_prompt
   - get_review_prompt
   - get_fix_prompt
@@ -2033,20 +2322,29 @@ modules:
   - n: get_reproduction_prompt
     sig: (spec:str, fmt:str, file_name:str, language:str='python', max_spec_length:int=5000)
     ret: str
-    d: Generate optimized reproduction prompt.
+    d: retrieves reproduction prompt
   - n: get_review_prompt
     sig: (code:str, spec:str, fmt:str)
     ret: str
-    d: Generate code review prompt.
+    d: retrieves review prompt
   - n: get_fix_prompt
     sig: (code:str, issues:list, spec:str)
     ret: str
-    d: Generate code fix prompt.
+    d: retrieves fix prompt
   const:
   - n: FORMAT_HINTS
-    t: Dict[str,str]
-    v: '{''yaml'': "Parse the YAML structure precisely:\n- ''modules'' contains file definitions\n- ''classes'' with ''methods''
-      and ...'
+    t: Dict
+    keys:
+    - yaml
+    - modules
+    - classes
+    - methods
+    - attrs
+    - functions
+    - signature
+    - intent
+    - logicml
+    - 'sig: (params) -> Type'
 - p: chunked_reproduction.py
   l: 357
   kb: 14.2
@@ -2058,10 +2356,10 @@ modules:
   - typing.{Dict,List,Optional,Tuple}
   - utils.estimate_tokens
   e:
+  - LLM_CONTEXT_LIMITS
   - Chunk
   - ChunkedSpec
   - ChunkedResult
-  - ChunkedReproducer
   - get_llm_limit
   - chunk_yaml_spec
   - chunk_gherkin_spec
@@ -2071,37 +2369,85 @@ modules:
   c:
   - n: Chunk
     d: A chunk of specification for reproduction.
-    props:
-    - 'id: int'
-    - 'content: str'
-    - 'tokens: int'
-    - 'elements: List[str]'
-    - 'dependencies: List[str]'
     dec:
     - dataclass
+    attrs:
+    - n: id
+      t: int
+    - n: content
+      t: str
+    - n: tokens
+      t: int
+    - n: elements
+      t: List[str]
+    - n: dependencies
+      t: List[str]
     dataclass: true
+    fields:
+    - n: id
+      t: int
+    - n: content
+      t: str
+    - n: tokens
+      t: int
+    - n: elements
+      t: List[str]
+    - n: dependencies
+      t: List[str]
   - n: ChunkedSpec
     d: Chunked specification.
-    props:
-    - 'chunks: List[Chunk]'
-    - 'total_tokens: int'
-    - 'format: str'
-    - 'file_name: str'
     dec:
     - dataclass
+    attrs:
+    - n: chunks
+      t: List[Chunk]
+    - n: total_tokens
+      t: int
+    - n: format
+      t: str
+    - n: file_name
+      t: str
     dataclass: true
+    fields:
+    - n: chunks
+      t: List[Chunk]
+    - n: total_tokens
+      t: int
+    - n: format
+      t: str
+    - n: file_name
+      t: str
   - n: ChunkedResult
     d: Result of chunked reproduction.
-    props:
-    - 'file_name: str'
-    - 'chunks_total: int'
-    - 'chunks_success: int'
-    - 'merged_code: str'
-    - 'chunk_codes: List[str]'
-    - 'errors: List[str]'
     dec:
     - dataclass
+    attrs:
+    - n: file_name
+      t: str
+    - n: chunks_total
+      t: int
+    - n: chunks_success
+      t: int
+    - n: merged_code
+      t: str
+    - n: chunk_codes
+      t: List[str]
+    - n: errors
+      t: List[str]
     dataclass: true
+    fields:
+    - n: file_name
+      t: str
+    - n: chunks_total
+      t: int
+    - n: chunks_success
+      t: int
+    - n: merged_code
+      t: str
+    - n: chunk_codes
+      t: List[str]
+    - n: errors
+      t: List[str]
   - n: ChunkedReproducer
     d: Reproduce code from chunked specifications.
     m:
@@ -2111,48 +2457,55 @@ modules:
     - n: reproduce
       sig: (spec:str, fmt:str, file_name:str)
       ret: ChunkedResult
-      d: Reproduce code from specification, chunking if nee
+      d: reproduce
     - n: _extract_code
       sig: (response:str)
       ret: str
-      d: Extract code from LLM response.
+      d: parses code
+    attrs:
+    - n: client
+      init: true
+    - n: model_name
+      init: true
+    - n: max_tokens
+      init: true
   f:
   - n: get_llm_limit
     sig: (model_name:str)
     ret: int
-    d: context limit for LLM model.
+    d: retrieves llm limit
   - n: chunk_yaml_spec
     sig: (spec:str, max_tokens:int=2000)
     ret: List[Chunk]
-    d: Chunk YAML specification by modules/classes/functi
+    d: chunk yaml spec
   - n: chunk_gherkin_spec
     sig: (spec:str, max_tokens:int=2000)
     ret: List[Chunk]
-    d: Chunk Gherkin specification by Features/Scenarios.
+    d: chunk gherkin spec
   - n: chunk_markdown_spec
     sig: (spec:str, max_tokens:int=2000)
     ret: List[Chunk]
-    d: Chunk Markdown specification by sections.
+    d: chunk markdown spec
   - n: chunk_spec
     sig: (spec:str, fmt:str, max_tokens:int=2000)
     ret: ChunkedSpec
-    d: Chunk specification based on format.
+    d: chunk spec
   - n: get_chunk_prompt
     sig: (chunk:Chunk, fmt:str, file_name:str, chunk_num:int, total_chunks:int)
     ret: str
-    d: Generate prompt for a single chunk.
+    d: retrieves chunk prompt
   - n: merge_chunk_codes
     sig: (codes:List[str], file_name:str)
     ret: str
-    d: Merge code from multiple chunks.
+    d: merges chunk codes
   - n: auto_chunk_reproduce
     sig: (spec:str, fmt:str, file_name:str, client, model_name:str='default')
     ret: ChunkedResult
-    d: Auto-chunking reproduction with LLM adaptation.
+    d: auto chunk reproduce
   - n: adaptive_chunk_reproduce
     sig: (spec:str, fmt:str, file_name:str, client, provider:str='unknown', model:str='unknown')
     ret: ChunkedResult
-    d: Adaptive chunking reproduction using LLM profile.
+    d: adaptive chunk reproduce
   const:
   - n: LLM_CONTEXT_LIMITS
     t: Dict
@@ -2210,6 +2563,25 @@ modules:
     d: Text-level similarity metrics.
     dec:
     - dataclass
+    attrs:
+    - n: char_similarity
+      t: float
+    - n: line_similarity
+      t: float
+    - n: word_similarity
+      t: float
+    - n: levenshtein_ratio
+      t: float
+    - n: jaccard_similarity
+      t: float
+    - n: cosine_similarity
+      t: float
+    - n: diff_added
+      t: int
+    - n: diff_removed
+      t: int
+    - n: diff_changed
+      t: int
     dataclass: true
     fields:
     - n: char_similarity
@@ -2243,6 +2615,27 @@ modules:
     d: Structural code metrics.
     dec:
     - dataclass
+    attrs:
+    - n: classes_original
+      t: int
+    - n: classes_generated
+      t: int
+    - n: classes_match
+      t: bool
+    - n: functions_original
+      t: int
+    - n: functions_generated
+      t: int
+    - n: functions_match
+      t: bool
+    - n: methods_original
+      t: int
+    - n: methods_generated
+      t: int
+    - n: methods_match
+      t: bool
+    - n: imports_original
+      t: int
     dataclass: true
     fields:
     - n: classes_original
@@ -2279,6 +2672,19 @@ modules:
     d: Semantic preservation metrics.
     dec:
     - dataclass
+    attrs:
+    - n: naming_similarity
+      t: float
+    - n: docstring_present
+      t: float
+    - n: type_hints_present
+      t: float
+    - n: decorator_match
+      t: float
+    - n: signature_match
+      t: float
+    - n: intent_score
+      t: float
     dataclass: true
     fields:
     - n: naming_similarity
@@ -2303,6 +2709,27 @@ modules:
     d: Format-specific efficiency metrics.
     dec:
     - dataclass
+    attrs:
+    - n: format_name
+      t: str
+    - n: spec_chars
+      t: int
+    - n: spec_lines
+      t: int
+    - n: spec_tokens
+      t: int
+    - n: original_chars
+      t: int
+    - n: generated_chars
+      t: int
+    - n: compression_ratio
+      t: float
+    - n: expansion_ratio
+      t: float
+    - n: efficiency_score
+      t: float
+    - n: token_cost_estimate
+      t: float
     dataclass: true
     fields:
     - n: format_name
@@ -2348,6 +2775,27 @@ modules:
       d: converts report
     dec:
     - dataclass
+    attrs:
+    - n: source_file
+      t: str
+    - n: format_used
+      t: str
+    - n: timestamp
+      t: str
+    - n: text
+      t: TextMetrics
+    - n: structural
+      t: StructuralMetrics
+    - n: semantic
+      t: SemanticMetrics
+    - n: format
+      t: FormatMetrics
+    - n: overall_score
+      t: float
+    - n: quality_grade
+      t: str
+    - n: recommendations
+      t: List[str]
     dataclass: true
     fields:
     - n: source_file
@@ -2423,7 +2871,7 @@ modules:
       ret: List[str]
       d: creates recommendations
     attrs:
-    - n: .
+    - n: verbose
       init: true
   f:
   - n: analyze_reproduction
@@ -2465,6 +2913,15 @@ modules:
     d: Group of duplicate functions.
     dec:
     - dataclass
+    attrs:
+    - n: hash
+      t: str
+    - n: functions
+      t: List[str]
+    - n: suggestion
+      t: str
+    - n: effort
+      t: str
     dataclass: true
     fields:
     - n: hash
@@ -2480,6 +2937,19 @@ modules:
     d: Single refactoring suggestion.
     dec:
     - dataclass
+    attrs:
+    - n: type
+      t: str
+    - n: severity
+      t: str
+    - n: location
+      t: str
+    - n: description
+      t: str
+    - n: suggestion
+      t: str
+    - n: effort
+      t: str
     dataclass: true
     fields:
     - n: type
@@ -2507,6 +2977,21 @@ modules:
       d: converts markdown
     dec:
     - dataclass
+    attrs:
+    - n: project_path
+      t: str
+    - n: total_files
+      t: int
+    - n: total_functions
+      t: int
+    - n: duplicates
+      t: List[DuplicateGroup]
+    - n: quality_issues
+      t: List[RefactoringSuggestion]
+    - n: security_issues
+      t: List[RefactoringSuggestion]
+    - n: suggestions
+      t: List[RefactoringSuggestion]
     dataclass: true
     fields:
     - n: project_path
@@ -2561,18 +3046,35 @@ modules:
   - LogicMLSpec
   - LogicMLGenerator
   - generate_logicml
+  - LOGICML_EXAMPLE
   c:
   - n: LogicMLSpec
     d: LogicML specification output.
-    props:
-    - 'content: str'
-    - 'token_estimate: int'
-    - 'file_count: int'
-    - 'class_count: int'
-    - 'function_count: int'
     dec:
     - dataclass
+    attrs:
+    - n: content
+      t: str
+    - n: token_estimate
+      t: int
+    - n: file_count
+      t: int
+    - n: class_count
+      t: int
+    - n: function_count
+      t: int
     dataclass: true
+    fields:
+    - n: content
+      t: str
+    - n: token_estimate
+      t: int
+    - n: file_count
+      t: int
+    - n: class_count
+      t: int
+    - n: function_count
+      t: int
   - n: LogicMLGenerator
     d: Generates LogicML format - optimized for LLM code reproducti
     props:
@@ -2580,7 +3082,6 @@ modules:
     - 'FILE_EXTENSION: str'
     - 'TOKEN_EFFICIENCY: float'
     - 'REPRODUCTION_FIDELITY: float'
-    - 'STDLIB_MODULES: Set[str]'
     m:
     - n: __init__
       sig: (verbose:bool=False)
@@ -2589,40 +3090,44 @@ modules:
     - n: generate
       sig: (project:ProjectInfo, detail:str='standard')
       ret: LogicMLSpec
-      d: Generate LogicML specification for a project.
+      d: creates
     - n: _generate_module
       sig: (module:ModuleInfo, detail:str)
       ret: str
-      d: Generate LogicML for a single module.
+      d: creates module
     - n: _generate_imports
       sig: (imports:List[str])
       ret: str
-      d: Generate compact imports section.
+      d: creates imports
     - n: _generate_class
       sig: (cls:ClassInfo, detail:str)
       ret: str
-      d: Generate LogicML for a class.
+      d: creates class
     - n: _generate_method
       sig: (method:FunctionInfo, detail:str, indent:int=2)
       ret: str
-      d: Generate LogicML for a method.
+      d: creates method
     - n: _generate_functions
       sig: (functions:List[FunctionInfo], detail:str)
       ret: str
-      d: Generate LogicML for top-level functions.
+      d: creates functions
     - n: _detect_side_effects
       sig: (method:FunctionInfo)
       ret: Optional[str]
-      d: Detect side effects from method calls and name pat
+      d: detect side effects
+    attrs:
+    - n: verbose
+      init: true
   f:
   - n: generate_logicml
     sig: (project:ProjectInfo, detail:str='standard')
     ret: str
-    d: Convenience function to generate LogicML format.
+    d: creates logicml
   const:
   - n: LOGICML_EXAMPLE
     t: str
-    v: '''\n# sample_class.py | Calculator | 74 lines\n\nimports:\n  stdlib: [typing.List, typing.Optional]\n\nCalculator:\n  ...'
+    v: ''''''' # sample_class.py | Calculator | 74 lines  imports:   stdlib: [typing.List, typing.Optional]  Calculator:   doc:
+      ...'
 - p: function_logic.py
   l: 209
   kb: 9.3
@@ -2687,7 +3192,7 @@ modules:
       ret: List[str]
       d: formats function
     attrs:
-    - n: .
+    - n: verbose
       init: true
 - p: utils.py
   l: 16
@@ -2713,8 +3218,8 @@ modules:
     ret: None
     d: cleanup generated root
 - p: generators.py
-  l: 1713
-  kb: 83.4
+  l: 1763
+  kb: 85.7
   i:
   - json
   - collections.defaultdict
@@ -2753,6 +3258,7 @@ modules:
       sig: (f:FunctionInfo)
       ret: str
       d: sig
+    attrs: []
   - n: CompactGenerator
     d: Generates ultra-compact output for token efficiency.
     m:
@@ -2760,6 +3266,7 @@ modules:
       sig: (project:ProjectInfo)
       ret: str
       d: creates
+    attrs: []
   - n: JSONGenerator
     d: Generates JSON output for machine processing.
     m:
@@ -2784,7 +3291,7 @@ modules:
       ret: str
       d: creates flat
     - n: _build_element_row
-      sig: (m:ModuleInfo, elem_type:str, name:str, signature:str, f:FunctionInfo, ...+2)
+      sig: (m:ModuleInfo, elem_type:str, name:str, signature:str, f:FunctionInfo, deps:list, ...+1)
       ret: dict
       d: creates element row
     - n: _build_signature
@@ -2803,6 +3310,7 @@ modules:
       sig: (name:str, signature:str)
       ret: str
       d: processes hash
+    attrs: []
   - n: YAMLGenerator
     d: Generates YAML output for human-readable representation.
     m:
@@ -2854,6 +3362,7 @@ modules:
       sig: (project:ProjectInfo, detail:str)
       ret: dict
       d: creates flat data
+    attrs: []
   - n: CSVGenerator
     d: Generates CSV output optimized for LLM processing.
     m:
@@ -2862,11 +3371,11 @@ modules:
       ret: str
       d: creates
     - n: _build_row
-      sig: (m:ModuleInfo, elem_type:str, name:str, signature:str, calls:list, ...+2)
+      sig: (m:ModuleInfo, elem_type:str, name:str, signature:str, calls:list, deps:str, ...+1)
       ret: dict
       d: creates row
     - n: _build_function_row
-      sig: (m:ModuleInfo, elem_type:str, name:str, f:FunctionInfo, deps:str, ...+2)
+      sig: (m:ModuleInfo, elem_type:str, name:str, f:FunctionInfo, deps:str, detail:str, ...+1)
       ret: dict
       d: creates function row
     - n: _build_signature
@@ -2889,6 +3398,7 @@ modules:
       sig: (text:str)
       ret: str
       d: escape csv
+    attrs: []
   f:
   - n: bytes_to_kb
     sig: (bytes_value:int)
@@ -2915,6 +3425,15 @@ modules:
     d: Markdown specification for a project.
     dec:
     - dataclass
+    attrs:
+    - n: content
+      t: str
+    - n: file_count
+      t: int
+    - n: total_chars
+      t: int
+    - n: sections
+      t: Dict[str, int]
     dataclass: true
     fields:
     - n: content
@@ -2960,7 +3479,11 @@ modules:
       ret: str
       d: creates dependencies
     attrs:
-    - n: .
+    - n: verbose
+      init: true
+    - n: gherkin_gen
+      init: true
+    - n: yaml_gen
       init: true
   f:
   - n: generate_markdown_hybrid
@@ -2993,6 +3516,27 @@ modules:
     d: Information about a function or method.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: params
+      t: List[str]
+    - n: return_type
+      t: Optional[str]
+    - n: docstring
+      t: Optional[str]
+    - n: calls
+      t: List[str]
+    - n: raises
+      t: List[str]
+    - n: complexity
+      t: int
+    - n: lines
+      t: int
+    - n: decorators
+      t: List[str]
+    - n: is_async
+      t: bool
     dataclass: true
     fields:
     - n: name
@@ -3019,6 +3563,25 @@ modules:
     d: Information about a class or interface.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: bases
+      t: List[str]
+    - n: docstring
+      t: Optional[str]
+    - n: methods
+      t: List[FunctionInfo]
+    - n: properties
+      t: List[str]
+    - n: is_interface
+      t: bool
+    - n: is_abstract
+      t: bool
+    - n: generic_params
+      t: List[str]
+    - n: is_dataclass
+      t: bool
     dataclass: true
     fields:
     - n: name
@@ -3044,6 +3607,15 @@ modules:
     d: Information about a type alias, interface, or enum.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: kind
+      t: str
+    - n: definition
+      t: str
+    - n: values
+      t: Optional[List[str]]
     dataclass: true
     fields:
     - n: name
@@ -3059,6 +3631,27 @@ modules:
     d: Information about a source file/module.
     dec:
     - dataclass
+    attrs:
+    - n: path
+      t: str
+    - n: language
+      t: str
+    - n: imports
+      t: List[str]
+    - n: exports
+      t: List[str]
+    - n: classes
+      t: List[ClassInfo]
+    - n: functions
+      t: List[FunctionInfo]
+    - n: types
+      t: List[TypeInfo]
+    - n: constants
+      t: List[ConstantInfo]
+    - n: docstring
+      t: Optional[str]
+    - n: lines_total
+      t: int
     dataclass: true
     fields:
     - n: path
@@ -3085,6 +3678,19 @@ modules:
     d: Node in the dependency graph with metrics.
     dec:
     - dataclass
+    attrs:
+    - n: path
+      t: str
+    - n: in_degree
+      t: int
+    - n: out_degree
+      t: int
+    - n: pagerank
+      t: float
+    - n: is_hub
+      t: bool
+    - n: cluster
+      t: int
     dataclass: true
     fields:
     - n: path
@@ -3108,6 +3714,27 @@ modules:
     d: Complete project analysis results.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: root_path
+      t: str
+    - n: languages
+      t: Dict[str, int]
+    - n: modules
+      t: List[ModuleInfo]
+    - n: dependency_graph
+      t: Dict[str, List[str]]
+    - n: dependency_metrics
+      t: Dict[str, DependencyNode]
+    - n: entrypoints
+      t: List[str]
+    - n: similar_functions
+      t: Dict[str, List[str]]
+    - n: total_files
+      t: int
+    - n: total_lines
+      t: int
     dataclass: true
     fields:
     - n: name
@@ -3134,6 +3761,15 @@ modules:
     d: Module-level constant information.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: type_annotation
+      t: str
+    - n: value
+      t: Optional[str]
+    - n: value_keys
+      t: Optional[List[str]]
     dataclass: true
     fields:
     - n: name
@@ -3151,6 +3787,15 @@ modules:
     d: Dataclass field information.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: type_annotation
+      t: str
+    - n: default
+      t: Optional[str]
+    - n: default_factory
+      t: Optional[str]
     dataclass: true
     fields:
     - n: name
@@ -3167,6 +3812,13 @@ modules:
     d: Instance attribute information (self.x = ...).
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: type_annotation
+      t: str
+    - n: set_in_init
+      t: bool
     dataclass: true
     fields:
     - n: name
@@ -3181,6 +3833,17 @@ modules:
     d: Property information (@property, @x.setter).
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: type_annotation
+      t: str
+    - n: has_getter
+      t: bool
+    - n: has_setter
+      t: bool
+    - n: docstring
+      t: str
     dataclass: true
     fields:
     - n: name
@@ -3202,8 +3865,10 @@ modules:
   kb: 7.8
   i:
   - models.ModuleInfo
+  - rapidfuzz.{fuzz,process}
   - typing.{Dict,List}
   e:
+  - RAPIDFUZZ_AVAILABLE
   - SimilarityDetector
   - is_rapidfuzz_available
   - get_refactoring_suggestions
@@ -3213,28 +3878,31 @@ modules:
     m:
     - n: __init__
       sig: (threshold:float=80.0)
-      d: Initialize the similarity detector.
+      d: creates
     - n: find_similar_functions
       sig: (modules:List[ModuleInfo])
-      ret: Dict[str,List[str]]
-      d: Find similar functions across all modules.
+      ret: Dict[str, List[str]]
+      d: retrieves similar functions
     - n: find_duplicate_signatures
       sig: (modules:List[ModuleInfo])
-      ret: Dict[str,List[str]]
-      d: Find functions with identical signatures.
+      ret: Dict[str, List[str]]
+      d: retrieves duplicate signatures
     - n: _build_signature
       sig: (name:str, params:List[str], return_type:str=None)
       ret: str
-      d: Build a normalized signature string.
+      d: creates signature
+    attrs:
+    - n: threshold
+      init: true
   f:
   - n: is_rapidfuzz_available
     sig: ()
     ret: bool
-    d: Check if Rapidfuzz is available.
+    d: is rapidfuzz available
   - n: get_refactoring_suggestions
     sig: (similar_functions:Dict[str,List[str]])
-    ret: List[Dict[str,any]]
-    d: Generate refactoring suggestions based on similar
+    ret: List[Dict[str, any]]
+    d: retrieves refactoring suggestions
   const:
   - n: RAPIDFUZZ_AVAILABLE
     t: bool
@@ -3278,6 +3946,7 @@ modules:
     - ENUM="enum"
     - MODULE="module"
     d: Types of code elements.
+    attrs: []
   - n: Language
     b:
     - Enum
@@ -3292,10 +3961,20 @@ modules:
     - SQL="sql"
     - UNKNOWN="unknown"
     d: Supported languages.
+    attrs: []
   - n: Parameter
     d: Function/method parameter.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: type
+      t: str
+    - n: default
+      t: str
+    - n: is_optional
+      t: bool
     dataclass: true
     fields:
     - n: name
@@ -3313,6 +3992,27 @@ modules:
     d: Universal representation of a code element.
     dec:
     - dataclass
+    attrs:
+    - n: type
+      t: ElementType
+    - n: name
+      t: str
+    - n: docstring
+      t: str
+    - n: signature
+      t: str
+    - n: parameters
+      t: List[Parameter]
+    - n: return_type
+      t: str
+    - n: body_hash
+      t: str
+    - n: attributes
+      t: List[Dict[str, str]]
+    - n: children
+      t: List['CodeElement']
+    - n: decorators
+      t: List[str]
     dataclass: true
     fields:
     - n: type
@@ -3364,6 +4064,21 @@ modules:
       d: element to compact
     dec:
     - dataclass
+    attrs:
+    - n: source_file
+      t: str
+    - n: source_language
+      t: Language
+    - n: source_hash
+      t: str
+    - n: elements
+      t: List[CodeElement]
+    - n: imports
+      t: List[str]
+    - n: module_doc
+      t: str
+    - n: metadata
+      t: Dict[str, Any]
     dataclass: true
     fields:
     - n: source_file
@@ -3415,6 +4130,7 @@ modules:
       sig: (path:Path, content:str, hash_:str, lang:Language)
       ret: CodeLogic
       d: parses generic
+    attrs: []
   - n: CodeGenerator
     d: Generate code from CodeLogic in target language.
     m:
@@ -3446,6 +4162,7 @@ modules:
       sig: (logic:CodeLogic, target:Language)
       ret: str
       d: creates generic
+    attrs: []
   - n: UniversalReproducer
     d: Universal code reproduction system.
     m:
@@ -3472,7 +4189,11 @@ modules:
       sig: (output_dir:Path, original:str, logic:CodeLogic, generated:str, result:Dict[str,Any])
       d: caches result
     attrs:
-    - n: .
+    - n: client
+      init: true
+    - n: parser
+      init: true
+    - n: generator
       init: true
   f:
   - n: reproduce_file
@@ -3489,93 +4210,157 @@ modules:
   - datetime
   - analyzer.analyze_project
   - dataclasses.{asdict,dataclass}
-  - generators.{CompactGenerator,JSONGenerator,MarkdownGenerator}
+  - dotenv.load_dotenv
+  - generators.{CompactGenerator,MarkdownGenerator}
   - pathlib.Path
   - typing.{Any,Dict,List,Optional}
   e:
   - FormatResult
   - BenchmarkResult
+  - FORMAT_PROMPTS
   - ReproductionBenchmark
   - run_benchmark
   c:
   - n: FormatResult
     d: Result for a single format test.
-    props:
-    - 'format_name: str'
-    - 'spec_chars: int'
-    - 'spec_tokens: int'
-    - 'generated_chars: int'
-    - 'similarity: float'
-    - 'structural_score: float'
-    - 'classes_match: bool'
-    - 'functions_match: bool'
-    - 'generation_time: float'
-    - 'error: Optional[str]'
     dec:
     - dataclass
+    attrs:
+    - n: format_name
+      t: str
+    - n: spec_chars
+      t: int
+    - n: spec_tokens
+      t: int
+    - n: generated_chars
+      t: int
+    - n: similarity
+      t: float
+    - n: structural_score
+      t: float
+    - n: classes_match
+      t: bool
+    - n: functions_match
+      t: bool
+    - n: generation_time
+      t: float
+    - n: error
+      t: Optional[str]
     dataclass: true
+    fields:
+    - n: format_name
+      t: str
+    - n: spec_chars
+      t: int
+    - n: spec_tokens
+      t: int
+    - n: generated_chars
+      t: int
+    - n: similarity
+      t: float
+    - n: structural_score
+      t: float
+    - n: classes_match
+      t: bool
+    - n: functions_match
+      t: bool
+    - n: generation_time
+      t: float
+    - n: error
+      t: Optional[str]
+      default: None
   - n: BenchmarkResult
     d: Complete benchmark result.
-    props:
-    - 'source_file: str'
-    - 'source_chars: int'
-    - 'source_classes: int'
-    - 'source_functions: int'
-    - 'timestamp: str'
-    - 'model: str'
-    - 'formats: List[FormatResult]'
-    - 'best_format: str'
-    - 'best_similarity: float'
     dec:
     - dataclass
+    attrs:
+    - n: source_file
+      t: str
+    - n: source_chars
+      t: int
+    - n: source_classes
+      t: int
+    - n: source_functions
+      t: int
+    - n: timestamp
+      t: str
+    - n: model
+      t: str
+    - n: formats
+      t: List[FormatResult]
+    - n: best_format
+      t: str
+    - n: best_similarity
+      t: float
     dataclass: true
+    fields:
+    - n: source_file
+      t: str
+    - n: source_chars
+      t: int
+    - n: source_classes
+      t: int
+    - n: source_functions
+      t: int
+    - n: timestamp
+      t: str
+    - n: model
+      t: str
+    - n: formats
+      t: List[FormatResult]
+    - n: best_format
+      t: str
+    - n: best_similarity
+      t: float
   - n: ReproductionBenchmark
     d: Benchmark reproduction quality across formats.
     m:
     - n: __init__
       sig: (client:BaseLLMClient=None)
-      d: Initialize benchmark.
+      d: creates
     - n: generate_spec
       sig: (file_path:Path, format_name:str, detail:str='full')
       ret: str
-      d: Generate specification in given format.
+      d: creates spec
     - n: reproduce_with_format
       sig: (file_path:Path, format_name:str, original_code:str)
       ret: FormatResult
-      d: Test reproduction with a specific format.
+      d: reproduce with format
     - n: run_single
       sig: (file_path:str, formats:List[str]=None)
       ret: BenchmarkResult
-      d: Run benchmark on a single file.
+      d: starts single
     - n: run_all
       sig: (files:List[str], output_dir:str=None)
-      ret: Dict[str,Any]
-      d: Run benchmark on multiple files.
+      ret: Dict[str, Any]
+      d: starts all
     - n: _generate_summary
       sig: (results:List[BenchmarkResult])
-      ret: Dict[str,Any]
-      d: Generate summary from benchmark results.
+      ret: Dict[str, Any]
+      d: creates summary
     - n: _save_results
       sig: (output_dir:Path, results:List[BenchmarkResult], summary:Dict)
-      d: Save benchmark results.
+      d: caches results
     - n: _generate_report
       sig: (results:List[BenchmarkResult], summary:Dict)
       ret: str
-      d: Generate markdown benchmark report.
+      d: creates report
+    attrs:
+    - n: client
+      init: true
+    - n: generators
+      init: true
   f:
   - n: run_benchmark
     sig: (files:List[str], output_dir:str='benchmark_results', provider:str=None, model:str=None)
-    ret: Dict[str,Any]
-    d: Run reproduction benchmark.
+    ret: Dict[str, Any]
+    d: starts benchmark
   const:
   - n: FORMAT_PROMPTS
     t: Dict
     keys:
     - gherkin
     - csv
-    - json
-    - yaml
-    - markdown
 - p: terminal.py
   l: 500
   kb: 21.6
@@ -3585,10 +4370,11 @@ modules:
   - sys
   - typing.{Any,Dict,List,Literal,Optional}
   e:
+  - COLORS
   - ShellRenderer
-  - RenderAPI
   - get_renderer
   - set_renderer
+  - RenderAPI
   c:
   - n: ShellRenderer
     d: Renders colorized markdown output in terminal.
@@ -3599,47 +4385,57 @@ modules:
     - n: _supports_colors
       sig: ()
       ret: bool
-      d: Check if terminal supports ANSI colors.
+      d: supports colors
     - n: enable_log
       sig: ()
       ret: None
-      d: Enable log buffering for markdown export.
+      d: enable log
     - n: get_log
       sig: ()
       ret: str
-      d: buffered log as clean markdown (no ANSI codes).
+      d: retrieves log
     - n: clear_log
       sig: ()
       ret: None
-      d: Clear log buffer.
+      d: deletes log
     - n: _log
       sig: (text:str)
       ret: None
-      d: Log a line (strips ANSI codes for markdown).
+      d: logs
     - n: _c
       sig: (color:str, text:str)
       ret: str
-      d: Apply color to text.
+      d: c
     - n: heading
       sig: (level:int, text:str)
       ret: None
-      d: Print a markdown heading.
+      d: heading
     - n: codeblock
       sig: (language:Language, content:str)
       ret: None
-      d: Print a syntax-highlighted code block.
+      d: codeblock
     - n: render_markdown
       sig: (text:str)
       ret: None
-      d: Render full markdown text with syntax highlighting
+      d: formats markdown
     - n: success
       sig: (message:str)
       ret: None
-      d: Print success message.
+      d: success
     - n: error
       sig: (message:str)
       ret: None
-      d: Print error message.
+      d: error
+    attrs:
+    - n: verbose
+      init: true
+    - n: use_colors
+      init: true
+    - n: log_buffer
+      t: List
+      init: true
+    - n: log_enabled
+      init: true
   - n: RenderAPI
     d: Convenience API for terminal rendering.
     m:
@@ -3691,29 +4487,20 @@ modules:
       sig: (char:str='─', width:int=60)
       ret: None
       d: separator
+    attrs: []
   f:
   - n: get_renderer
     sig: (use_colors:bool=True, verbose:bool=True)
     ret: ShellRenderer
-    d: or create the global renderer instance.
+    d: retrieves renderer
   - n: set_renderer
     sig: (renderer:ShellRenderer)
     ret: None
-    d: the global renderer instance.
+    d: updates renderer
   const:
   - n: COLORS
     t: Dict
-    keys:
-    - reset
-    - bold
-    - dim
-    - italic
-    - underline
-    - black
-    - red
-    - green
-    - yellow
-    - blue
+    v: '{     "reset": "\033[0m",     "bold": "\033[1m",     "dim": "\033[2m",     "italic": "\033[3m",     "underline": "\03...'
 - p: toon_format.py
   l: 541
   kb: 29.7
@@ -3779,7 +4566,9 @@ modules:
       ret: str
       d: creates schema
     attrs:
-    - n: .
+    - n: delimiter
+      init: true
+    - n: delim_marker
       init: true
   - n: TOONParser
     d: Parse TOON format back to Python dict.
@@ -3796,7 +4585,7 @@ modules:
       ret: Any
       d: parses value
     attrs:
-    - n: .
+    - n: delimiter
       init: true
   f:
   - n: generate_toon
@@ -3811,10 +4600,12 @@ modules:
   l: 187
   kb: 7.5
   i:
+  - networkx
   - models.{DependencyNode,ModuleInfo}
   - pathlib.Path
   - typing.{Dict,List,Optional}
   e:
+  - NETWORKX_AVAILABLE
   - DependencyAnalyzer
   - is_networkx_available
   c:
@@ -3823,48 +4614,51 @@ modules:
     m:
     - n: __init__
       sig: ()
-      d: Initialize the dependency analyzer.
+      d: creates
     - n: build_graph
       sig: (modules:List[ModuleInfo])
-      ret: Dict[str,List[str]]
-      d: Build dependency graph from modules.
+      ret: Dict[str, List[str]]
+      d: creates graph
     - n: analyze_metrics
       sig: ()
-      ret: Dict[str,DependencyNode]
-      d: Compute metrics for each node in the graph.
+      ret: Dict[str, DependencyNode]
+      d: processes metrics
     - n: get_entrypoints
       sig: ()
       ret: List[str]
-      d: entry points (nodes with no incoming edges).
+      d: retrieves entrypoints
     - n: get_hubs
       sig: ()
       ret: List[str]
-      d: hub modules (high centrality).
+      d: retrieves hubs
     - n: detect_cycles
       sig: ()
       ret: List[List[str]]
-      d: Detect dependency cycles.
+      d: detect cycles
     - n: get_strongly_connected_components
       sig: ()
       ret: List[List[str]]
-      d: strongly connected components.
+      d: retrieves strongly connected components
     - n: _detect_clusters
       sig: ()
-      ret: Dict[str,int]
-      d: Detect clusters using connected components.
+      ret: Dict[str, int]
+      d: detect clusters
     - n: _module_name
       sig: (path:str)
       ret: str
-      d: Convert file path to module name.
+      d: module name
     - n: get_dependency_depth
       sig: (module_path:str)
       ret: int
-      d: the maximum depth of dependencies for a module.
+      d: retrieves dependency depth
+    attrs:
+    - n: graph
+      init: true
   f:
   - n: is_networkx_available
     sig: ()
     ret: bool
-    d: Check if NetworkX is available.
+    d: is networkx available
   const:
   - n: NETWORKX_AVAILABLE
     t: bool
@@ -3932,7 +4726,7 @@ modules:
       ret: str
       d: creates report
     attrs:
-    - n: .
+    - n: client
       init: true
   f:
   - n: generate_file_gherkin
@@ -3971,6 +4765,21 @@ modules:
     d: Represents a single Gherkin scenario.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: given
+      t: List[str]
+    - n: when
+      t: List[str]
+    - n: then
+      t: List[str]
+    - n: tags
+      t: List[str]
+    - n: examples
+      t: Optional[List[Dict[str, str]]]
+    - n: data_table
+      t: Optional[List[Dict[str, str]]]
     dataclass: true
     fields:
     - n: name
@@ -3993,6 +4802,19 @@ modules:
     d: Represents a Gherkin feature file.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: description
+      t: str
+    - n: tags
+      t: List[str]
+    - n: scenarios
+      t: List[GherkinScenario]
+    - n: background
+      t: Optional[List[str]]
+    - n: rules
+      t: Optional[List[Dict[str, Any]]]
     dataclass: true
     fields:
     - n: name
@@ -4013,6 +4835,17 @@ modules:
     d: Represents a step definition.
     dec:
     - dataclass
+    attrs:
+    - n: pattern
+      t: str
+    - n: step_type
+      t: str
+    - n: function_name
+      t: str
+    - n: params
+      t: List[str]
+    - n: implementation_hint
+      t: str
     dataclass: true
     fields:
     - n: pattern
@@ -4076,7 +4909,12 @@ modules:
       ret: str
       d: parses param placeholders
     attrs:
-    - n: .
+    - n: language
+      init: true
+    - n: keywords
+      init: true
+    - n: _step_registry
+      t: Dict
       init: true
   - n: StepDefinitionGenerator
     d: Generates step definition stubs from Gherkin features.
@@ -4097,6 +4935,7 @@ modules:
       sig: (step:str)
       ret: str
       d: step to func name
+    attrs: []
   - n: CucumberYAMLGenerator
     d: Generates Cucumber YAML configuration and test data.
     m:
@@ -4112,6 +4951,7 @@ modules:
       sig: (name:str)
       ret: str
       d: categorize
+    attrs: []
   f:
   - n: csv_to_gherkin
     sig: (csv_content:str, language:str='en')
@@ -4141,6 +4981,21 @@ modules:
     d: Schema for LogicML method.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: signature
+      t: str
+    - n: does
+      t: str
+    - n: edge
+      t: List[str]
+    - n: side
+      t: str
+    - n: is_async
+      t: bool
+    - n: is_property
+      t: bool
     dataclass: true
     fields:
     - n: name
@@ -4166,6 +5021,23 @@ modules:
     d: Schema for LogicML class.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: doc
+      t: str
+    - n: bases
+      t: List[str]
+    - n: attrs
+      t: Dict[str, str]
+    - n: methods
+      t: List[LogicMLMethod]
+    - n: is_pydantic
+      t: bool
+    - n: is_enum
+      t: bool
+    - n: is_dataclass
+      t: bool
     dataclass: true
     fields:
     - n: name
@@ -4195,6 +5067,23 @@ modules:
     d: Schema for LogicML module.
     dec:
     - dataclass
+    attrs:
+    - n: filename
+      t: str
+    - n: lines
+      t: int
+    - n: classes
+      t: List[str]
+    - n: imports
+      t: Dict[str, List[str]]
+    - n: module_classes
+      t: List[LogicMLClass]
+    - n: functions
+      t: List[LogicMLMethod]
+    - n: module_type
+      t: str
+    - n: exports
+      t: List[str]
     dataclass: true
     fields:
     - n: filename
@@ -4224,6 +5113,17 @@ modules:
     d: Complete LogicML specification schema.
     dec:
     - dataclass
+    attrs:
+    - n: modules
+      t: List[LogicMLModule]
+    - n: token_estimate
+      t: int
+    - n: file_count
+      t: int
+    - n: class_count
+      t: int
+    - n: function_count
+      t: int
     dataclass: true
     fields:
     - n: modules
@@ -4281,6 +5181,21 @@ modules:
     d: Schema for method definition.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: signature
+      t: str
+    - n: intent
+      t: str
+    - n: lines
+      t: int
+    - n: is_async
+      t: bool
+    - n: decorators
+      t: List[str]
+    - n: raises
+      t: List[str]
     dataclass: true
     fields:
     - n: name
@@ -4306,6 +5221,21 @@ modules:
     d: Schema for class definition.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: bases
+      t: List[str]
+    - n: docstring
+      t: str
+    - n: methods
+      t: List[MethodSchema]
+    - n: properties
+      t: List[str]
+    - n: is_abstract
+      t: bool
+    - n: is_dataclass
+      t: bool
     dataclass: true
     fields:
     - n: name
@@ -4332,6 +5262,19 @@ modules:
     d: Schema for function definition.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: signature
+      t: str
+    - n: intent
+      t: str
+    - n: lines
+      t: int
+    - n: is_async
+      t: bool
+    - n: decorators
+      t: List[str]
     dataclass: true
     fields:
     - n: name
@@ -4354,6 +5297,21 @@ modules:
     d: Schema for module definition.
     dec:
     - dataclass
+    attrs:
+    - n: path
+      t: str
+    - n: language
+      t: str
+    - n: lines
+      t: int
+    - n: imports
+      t: List[str]
+    - n: exports
+      t: List[str]
+    - n: classes
+      t: List[ClassSchema]
+    - n: functions
+      t: List[FunctionSchema]
     dataclass: true
     fields:
     - n: path
@@ -4380,6 +5338,13 @@ modules:
     d: Complete YAML specification schema.
     dec:
     - dataclass
+    attrs:
+    - n: project
+      t: str
+    - n: statistics
+      t: Dict[str, Any]
+    - n: modules
+      t: List[ModuleSchema]
     dataclass: true
     fields:
     - n: project
@@ -4423,6 +5388,21 @@ modules:
     d: Schema for JSON method definition.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: signature
+      t: str
+    - n: intent
+      t: str
+    - n: is_async
+      t: bool
+    - n: decorators
+      t: List[str]
+    - n: params
+      t: List[str]
+    - n: return_type
+      t: str
     dataclass: true
     fields:
     - n: name
@@ -4449,6 +5429,21 @@ modules:
     d: Schema for JSON class definition.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: bases
+      t: List[str]
+    - n: docstring
+      t: str
+    - n: methods
+      t: List[JSONMethodSchema]
+    - n: properties
+      t: Dict[str, str]
+    - n: is_abstract
+      t: bool
+    - n: is_dataclass
+      t: bool
     dataclass: true
     fields:
     - n: name
@@ -4475,6 +5470,19 @@ modules:
     d: Schema for JSON function definition.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: signature
+      t: str
+    - n: intent
+      t: str
+    - n: is_async
+      t: bool
+    - n: params
+      t: List[str]
+    - n: return_type
+      t: str
     dataclass: true
     fields:
     - n: name
@@ -4498,6 +5506,21 @@ modules:
     d: Schema for JSON module definition.
     dec:
     - dataclass
+    attrs:
+    - n: path
+      t: str
+    - n: language
+      t: str
+    - n: lines
+      t: int
+    - n: imports
+      t: List[str]
+    - n: exports
+      t: List[str]
+    - n: classes
+      t: List[JSONClassSchema]
+    - n: functions
+      t: List[JSONFunctionSchema]
     dataclass: true
     fields:
     - n: path
@@ -4524,6 +5547,13 @@ modules:
     d: Complete JSON specification schema.
     dec:
     - dataclass
+    attrs:
+    - n: project
+      t: str
+    - n: statistics
+      t: Dict[str, Any]
+    - n: modules
+      t: List[JSONModuleSchema]
     dataclass: true
     fields:
     - n: project
@@ -4571,6 +5601,15 @@ modules:
     d: Schema for Markdown method.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: signature
+      t: str
+    - n: is_async
+      t: bool
+    - n: gherkin_scenarios
+      t: List[str]
     dataclass: true
     fields:
     - n: name
@@ -4588,6 +5627,15 @@ modules:
     d: Schema for Markdown class.
     dec:
     - dataclass
+    attrs:
+    - n: name
+      t: str
+    - n: bases
+      t: List[str]
+    - n: attributes
+      t: Dict[str, str]
+    - n: methods
+      t: List[MarkdownMethod]
     dataclass: true
     fields:
     - n: name
@@ -4605,6 +5653,19 @@ modules:
     d: Schema for Markdown module.
     dec:
     - dataclass
+    attrs:
+    - n: filename
+      t: str
+    - n: language
+      t: str
+    - n: lines
+      t: int
+    - n: imports
+      t: List[str]
+    - n: classes
+      t: List[MarkdownClass]
+    - n: functions
+      t: List[MarkdownMethod]
     dataclass: true
     fields:
     - n: filename
@@ -4628,6 +5689,11 @@ modules:
     d: Complete Markdown specification schema.
     dec:
     - dataclass
+    attrs:
+    - n: modules
+      t: List[MarkdownModule]
+    - n: token_estimate
+      t: int
     dataclass: true
     fields:
     - n: modules
@@ -4738,7 +5804,7 @@ modules:
       ret: BenchmarkResult
       d: starts format benchmark
     - n: _test_format
-      sig: (project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], ...+1)
+      sig: (project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], verbose:bool=False)
       ret: FormatResult
       d: checks format
     - n: run_file_benchmark
@@ -4750,7 +5816,7 @@ modules:
       ret: BenchmarkResult
       d: starts function benchmark
     - n: _test_function
-      sig: (func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], ...+1)
+      sig: (func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], verbose:bool=False)
       ret: FunctionResult
       d: checks function
     - n: run_project_benchmark
@@ -4762,7 +5828,11 @@ modules:
       ret: FileResult
       d: reproduce module
     attrs:
-    - n: .
+    - n: client
+      init: true
+    - n: config
+      init: true
+    - n: _metrics
       init: true
   f:
   - n: _test_python_syntax
@@ -4814,6 +5884,27 @@ modules:
       d: converts dict
     dec:
     - dataclass
+    attrs:
+    - n: format_name
+      t: str
+    - n: spec_size
+      t: int
+    - n: spec_tokens
+      t: int
+    - n: generated_size
+      t: int
+    - n: score
+      t: float
+    - n: similarity
+      t: float
+    - n: syntax_ok
+      t: bool
+    - n: runs_ok
+      t: bool
+    - n: compression_ratio
+      t: float
+    - n: token_efficiency
+      t: float
     dataclass: true
     fields:
     - n: format_name
@@ -4854,6 +5945,27 @@ modules:
       d: converts dict
     dec:
     - dataclass
+    attrs:
+    - n: file_path
+      t: str
+    - n: language
+      t: str
+    - n: original_size
+      t: int
+    - n: spec_size
+      t: int
+    - n: generated_size
+      t: int
+    - n: score
+      t: float
+    - n: similarity
+      t: float
+    - n: syntax_ok
+      t: bool
+    - n: runs_ok
+      t: bool
+    - n: format_results
+      t: Dict[str, FormatResult]
     dataclass: true
     fields:
     - n: file_path
@@ -4893,6 +6005,25 @@ modules:
       d: converts dict
     dec:
     - dataclass
+    attrs:
+    - n: file_path
+      t: str
+    - n: function_name
+      t: str
+    - n: language
+      t: str
+    - n: original_code
+      t: str
+    - n: reproduced_code
+      t: str
+    - n: similarity
+      t: float
+    - n: syntax_ok
+      t: bool
+    - n: gen_time
+      t: float
+    - n: error
+      t: str
     dataclass: true
     fields:
     - n: file_path
@@ -4945,6 +6076,27 @@ modules:
       d: retrieves
     dec:
     - dataclass
+    attrs:
+    - n: benchmark_type
+      t: str
+    - n: timestamp
+      t: str
+    - n: source_path
+      t: str
+    - n: total_files
+      t: int
+    - n: total_functions
+      t: int
+    - n: avg_score
+      t: float
+    - n: avg_similarity
+      t: float
+    - n: syntax_ok_rate
+      t: float
+    - n: runs_ok_rate
+      t: float
+    - n: best_format
+      t: str
     dataclass: true
     fields:
     - n: benchmark_type
@@ -4985,6 +6137,27 @@ modules:
       d: converts dict
     dec:
     - dataclass
+    attrs:
+    - n: formats
+      t: List[str]
+    - n: max_files
+      t: Optional[int]
+    - n: max_functions
+      t: Optional[int]
+    - n: max_spec_tokens
+      t: int
+    - n: workers
+      t: int
+    - n: output_dir
+      t: str
+    - n: save_generated
+      t: bool
+    - n: verbose
+      t: bool
+    - n: use_llm
+      t: bool
+    - n: max_tokens
+      t: int
     dataclass: true
     fields:
     - n: formats
@@ -5042,11 +6215,11 @@ modules:
   - code_review.{CodeReviewer,analyze_code_quality,check_performance_issues,check_security_issues}
   - refactor
 - p: llm/__init__.py
-  l: 13
-  kb: 0.4
+  l: 28
+  kb: 0.8
   i:
   - intent.EnhancedIntentGenerator
-  - llm_clients.{BaseLLMClient,LiteLLMClient,OllamaLocalClient,OpenRouterClient,get_client}
+  - lolm
 - p: integrations/__init__.py
   l: 5
   kb: 0.2

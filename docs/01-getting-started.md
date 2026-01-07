@@ -76,7 +76,7 @@ for module in project.modules:
 ## Output Formats
 
 | Format | Command | Best For |
-|--------|---------|----------|
+| ------ | ------- | -------- |
 | Markdown | `-f markdown` | Documentation |
 | CSV | `-f csv` | Data analysis |
 | JSON | `-f json` | RAG/Embeddings |
@@ -134,6 +134,18 @@ make lint          # Lint
 make format        # Format
 make typecheck     # Type checking
 ```
+
+### Monorepo workflow (all packages)
+
+If you work inside this repository (monorepo), you can manage all packages from the root folder:
+
+```bash
+make test-all
+make build-subpackages
+make publish-all
+```
+
+See: [Monorepo Workflow](19-monorepo-workflow.md).
 
 ## Examples
 

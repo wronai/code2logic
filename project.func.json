@@ -1,4 +1,4 @@
-# code2logic | 52f 22116L | python:52
+# code2logic | 52f 21957L | python:52
 
 ENTRY: llm_profiler.py config.py project_reproducer.py
 
@@ -28,7 +28,7 @@ ENTRY: llm_profiler.py config.py project_reproducer.py
 [formats]
   __init__.py (27L) -
   function_logic.py (209L) C:FunctionLogicGenerator
-  generators.py (1713L) C:MarkdownGenerator,CompactGenerator,JSONGenerator | F:bytes_to_kb
+  generators.py (1763L) C:MarkdownGenerator,CompactGenerator,JSONGenerator | F:bytes_to_kb
   gherkin.py (766L) C:GherkinScenario,GherkinFeature,StepDefinition | F:csv_to_gherkin,gherkin_to_test_data
 
 [integrations]
@@ -37,15 +37,15 @@ ENTRY: llm_profiler.py config.py project_reproducer.py
   llm.py (376L) C:LLMConfig,OllamaClient,LiteLLMClient | F:get_available_backends
 
 [llm]
-  __init__.py (13L) -
-  llm_clients.py (415L) C:BaseLLMClient,OpenRouterClient,OllamaLocalClient | F:get_priority_mode
+  __init__.py (28L) -
+  llm_clients.py (168L) F:get_priority_mode
   llm_profiler.py (491L) C:LLMProfile,ProfileTestResult,LLMProfiler | F:load_profiles,save_profile,get_profile
   logicml.py (281L) C:LogicMLSpec,LogicMLGenerator | F:generate_logicml
   markdown_format.py (266L) C:MarkdownSpec,MarkdownHybridGenerator | F:generate_markdown_hybrid,generate_file_markdown
   mcp_server.py (293L) F:handle_request,call_tool,run_server
   metrics.py (447L) C:TextMetrics,StructuralMetrics,SemanticMetrics | F:analyze_reproduction,compare_formats
   models.py (296L) C:FunctionInfo,ClassInfo,TypeInfo
-  parsers.py (1531L) C:_PyFunctionBodyAnalyzer,TreeSitterParser,UniversalParser
+  parsers.py (1586L) C:_PyFunctionBodyAnalyzer,TreeSitterParser,UniversalParser
   project_reproducer.py (322L) C:FileResult,ProjectResult,ProjectReproducer | F:reproduce_project
   prompts.py (120L) F:get_reproduction_prompt,get_review_prompt,get_fix_prompt
   quality.py (212L) C:QualityIssue,QualityReport,QualityAnalyzer | F:analyze_quality,get_quality_summary

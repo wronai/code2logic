@@ -142,7 +142,7 @@ optional arguments:
 ## Supported Input Formats
 
 | Format | Extension | Description |
-|--------|-----------|-------------|
+| ------ | --------- | ----------- |
 | YAML | `.yaml` | Standard Code2Logic YAML output |
 | Hybrid | `.hybrid.yaml` | Compact YAML with full metadata |
 | TOON | `.toon` | Token-Oriented Object Notation |

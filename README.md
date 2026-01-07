@@ -1,10 +1,14 @@
-![alt text](image.png)
 # Code2Logic
 
+ 
+![alt text](image.png)
+
+ 
 [![PyPI version](https://badge.fury.io/py/code2logic.svg)](https://badge.fury.io/py/code2logic)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
+ 
 **Convert source code to logical representation for LLM analysis.**
 
 Code2Logic analyzes codebases and generates compact, LLM-friendly representations with semantic understanding.
@@ -64,6 +68,7 @@ code2logic /path/to/project -d detailed
 ```
 
 ![alt text](image-1.png)
+
 ### Python API
 
 ```python
@@ -476,6 +481,8 @@ python -m logic2code project.c2l.yaml -o new_src/ --stubs-only
 - [15 - Logic2Test](docs/15-logic2test.md) - Test generation from logic files
 - [16 - Logic2Code](docs/16-logic2code.md) - Code generation from logic files
 - [17 - LOLM](docs/17-lolm.md) - LLM provider management
+- [18 - Reproduction Testing](docs/18-reproduction-testing.md) - Format validation and code regeneration
+- [19 - Monorepo Workflow](docs/19-monorepo-workflow.md) - Managing all packages from repo root
 
 ## 🔗 Links
 

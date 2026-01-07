@@ -110,7 +110,7 @@ test-all: ## Run all tests including subpackages
 	@echo "$(BLUE)Running subpackage tests...$(NC)"
 	@for pkg in $(SUBPACKAGES); do \
 		echo "$(YELLOW)Testing $$pkg...$(NC)"; \
-		cd $$pkg && $(MAKE) test && cd .. || true; \
+		(cd $$pkg && $(MAKE) test); \
 	done
 	@echo "$(GREEN)All tests passed!$(NC)"
 

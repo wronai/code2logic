@@ -107,13 +107,13 @@ result = generator.generate('output/')
 ## 🖥️ CLI Reference
 
 | Option | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `-o, --output DIR` | Output directory |
 | `-l, --language LANG` | Target language (default: python) |
 | `--stubs-only` | Generate stubs only |
 | `--no-docstrings` | Skip docstring generation |
 | `--no-type-hints` | Skip type hints |
-| `--no-init` | Skip __init__.py generation |
+| `--no-init` | Skip `__init__.py` generation |
 | `--flat` | Flat output structure |
 | `--modules LIST` | Comma-separated modules to generate |
 | `--summary` | Show summary without generating |
@@ -153,6 +153,18 @@ logic2code project.c2l.yaml -o new_src/
 # 4. Compare and merge
 diff -r src/ new_src/
 ```
+
+## 🧰 Monorepo (code2logic) workflow
+
+If you use `logic2code` inside the `code2logic` monorepo, you can manage all packages from the repository root:
+
+```bash
+make test-all
+make build-subpackages
+make publish-all
+```
+
+See: `docs/19-monorepo-workflow.md`.
 
 ## 🧪 Development
 

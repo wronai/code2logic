@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  code2logic:
+    build:
+      context: ../..
+      dockerfile: examples/code2logic/Dockerfile
+    volumes:
+      - ./sample_project:/project:ro
+      - ./out:/out
+    command: ["/project", "-f", "yaml", "--no-install", "-o", "/out/project.c2l.yaml"]

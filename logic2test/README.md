@@ -70,7 +70,7 @@ result = generator.generate_all('tests/')
 
 ## 📋 Generated Test Structure
 
-```
+```text
 tests/
 ├── unit/
 │   ├── test_analyzer.py
@@ -102,7 +102,7 @@ def test_analyze_project():
 ## 🖥️ CLI Reference
 
 | Option | Description |
-|--------|-------------|
+| ------ | ----------- |
 | `-o, --output DIR` | Output directory for tests |
 | `-t, --type TYPE` | Test type: unit, integration, property, all |
 | `--framework FW` | Test framework: pytest, unittest |
@@ -133,10 +133,22 @@ generator = TestGenerator('project.c2l.yaml', config)
 ## 📥 Supported Input Formats
 
 | Format | Extension | Description |
-|--------|-----------|-------------|
+| ------ | --------- | ----------- |
 | YAML | `.yaml` | Standard Code2Logic output |
 | Hybrid | `.hybrid.yaml` | Compact YAML with metadata |
 | TOON | `.toon` | Token-Oriented Object Notation |
+
+## 🧰 Monorepo (code2logic) workflow
+
+If you use `logic2test` inside the `code2logic` monorepo, you can manage all packages from the repository root:
+
+```bash
+make test-all
+make build-subpackages
+make publish-all
+```
+
+See: `docs/19-monorepo-workflow.md`.
 
 ## 🧪 Development
 
