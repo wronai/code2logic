@@ -1128,15 +1128,22 @@ class YAMLGenerator:
                             cls_data['fields'] = fields_data
                     
                     # NEW: Class attributes
+                    attrs_data = []
                     if hasattr(c, 'attributes') and c.attributes:
-                        attrs_data = []
                         for attr in c.attributes:
                             attr_dict = {'n': attr.name}
                             if attr.type_annotation:
                                 attr_dict['t'] = attr.type_annotation
                             attrs_data.append(attr_dict)
-                        if attrs_data:
-                            cls_data['attrs'] = attrs_data
+                    # For dataclasses, expose fields as instance attributes if no explicit attrs were found
+                    if (not attrs_data) and getattr(c, 'is_dataclass', False) and getattr(c, 'fields', None):
+                        for fld in c.fields[:10]:
+                            attr_dict = {'n': fld.name}
+                            if getattr(fld, 'type_annotation', None):
+                                attr_dict['t'] = fld.type_annotation
+                            attrs_data.append(attr_dict)
+                    # Always include attrs key for validator transparency
+                    cls_data['attrs'] = attrs_data
                     
                     # Methods with enhanced signatures
                     if c.methods:
@@ -1243,9 +1250,29 @@ class YAMLGenerator:
         if not params:
             return '()'
         
-        # Limit to 5 params for compactness
-        if len(params) > 5:
-            params = params[:5] + [f'...+{len(params)-5}']
+        # Limit to 5 params for compactness, but try to preserve trailing defaults
+        max_params = 5
+        if len(params) > max_params:
+            tail = []
+            for p in reversed(params):
+                if '=' in p:
+                    tail.append(p)
+                    if len(tail) >= (max_params - 1):
+                        break
+                else:
+                    break
+            tail = list(reversed(tail))
+
+            head_limit = max_params - len(tail)
+            head = params[:head_limit]
+            omitted = len(params) - (len(head) + len(tail))
+
+            out = []
+            out.extend(head)
+            if omitted > 0:
+                out.append(f'...+{omitted}')
+            out.extend(tail)
+            params = out
         
         return f"({','.join(params)})"
 
@@ -1759,18 +1786,29 @@ class YAMLGenerator:
         
         if getattr(cls, 'decorators', None):
             data['dec'] = cls.decorators[:5]
-        
-        if getattr(cls, 'attributes', None):
-            attrs_data = []
-            for attr in cls.attributes[:10]:
-                attr_dict = {'n': attr.name}
-                if attr.type_annotation:
-                    attr_dict['t'] = attr.type_annotation
-                if hasattr(attr, 'set_in_init'):
-                    attr_dict['init'] = attr.set_in_init
+
+        attrs_data = []
+        for attr in (getattr(cls, 'attributes', None) or [])[:10]:
+            attr_dict = {'n': attr.name}
+            if attr.type_annotation:
+                attr_dict['t'] = attr.type_annotation
+            if hasattr(attr, 'set_in_init'):
+                attr_dict['init'] = attr.set_in_init
+            attrs_data.append(attr_dict)
+
+        # For dataclasses, expose fields as instance attributes if no explicit attrs were found
+        if (not attrs_data) and cls.is_dataclass and getattr(cls, 'fields', None):
+            for fld in cls.fields[:10]:
+                attr_dict = {'n': fld.name}
+                if getattr(fld, 'type_annotation', None):
+                    attr_dict['t'] = fld.type_annotation
                 attrs_data.append(attr_dict)
-            if attrs_data:
-                data['attrs'] = attrs_data
+
+        # Always include attrs key (empty list when none) for standard/full detail
+        if detail in ('standard', 'full'):
+            data['attrs'] = attrs_data
+        elif attrs_data:
+            data['attrs'] = attrs_data
         
         if cls.is_dataclass:
             data['dataclass'] = True
@@ -1828,20 +1866,44 @@ class YAMLGenerator:
     
     def _build_compact_signature(self, f: FunctionInfo) -> str:
         """Build compact signature without 'self' and with clean formatting."""
-        clean_params = []
-        for p in f.params[:6]:
+        max_params = 6
+        params_no_self = []
+        for p in (f.params or []):
             p_clean = p.replace('\n', ' ').replace('  ', ' ').strip()
-            # Skip 'self' parameter
-            if p_clean and p_clean not in ('self', 'cls') and not p_clean.startswith('self:'):
-                clean_params.append(p_clean)
-        
-        params = ', '.join(clean_params)
-        if len(f.params) > 6:
-            params += f', ...+{len(f.params)-6}'
-        
-        if params:
-            return f"({params})"
-        return "()"
+            if not p_clean:
+                continue
+            if p_clean in ('self', 'cls') or p_clean.startswith('self:'):
+                continue
+            params_no_self.append(p_clean)
+
+        if not params_no_self:
+            return "()"
+
+        if len(params_no_self) <= max_params:
+            return f"({', '.join(params_no_self)})"
+
+        # Keep trailing default params when possible (common: verbose=False at the end)
+        tail = []
+        for p in reversed(params_no_self):
+            if '=' in p:
+                tail.append(p)
+                if len(tail) >= (max_params - 1):
+                    break
+            else:
+                break
+        tail = list(reversed(tail))
+
+        head_limit = max_params - len(tail)
+        head = params_no_self[:head_limit]
+        omitted = len(params_no_self) - (len(head) + len(tail))
+
+        out = []
+        out.extend(head)
+        if omitted > 0:
+            out.append(f"...+{omitted}")
+        out.extend(tail)
+
+        return f"({', '.join(out)})"
 
     def _constants_for_module_verbose(self, module: ModuleInfo, limit: int = 10) -> list:
         """Convert module constants into verbose dictionaries."""

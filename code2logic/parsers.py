@@ -822,11 +822,25 @@ class TreeSitterParser:
             if expr.type == 'assignment':
                 left = expr.children[0] if expr.children else None
                 if left and left.type == 'attribute':
-                    # Check if it's self.attribute
-                    obj = left.children[0] if left.children else None
-                    attr = left.children[1] if len(left.children) > 1 else None
-                    
-                    if obj and attr and obj.type == 'identifier' and self._text(obj, content) == 'self':
+                    obj = None
+                    attr = None
+                    try:
+                        obj = left.child_by_field_name('object')
+                        attr = left.child_by_field_name('attribute')
+                    except Exception:
+                        obj = None
+                        attr = None
+
+                    if obj is None and left.children:
+                        obj = left.children[0]
+
+                    if attr is None:
+                        for sub in reversed(getattr(left, 'children', []) or []):
+                            if sub.type == 'identifier':
+                                attr = sub
+                                break
+
+                    if obj and attr and obj.type == 'identifier' and self._text(obj, content) == 'self' and attr.type == 'identifier':
                         attr_name = self._text(attr, content)
                         
                         # Try to infer type from the assignment
@@ -990,12 +1004,12 @@ class TreeSitterParser:
                             # For dictionaries, extract keys
                             if value_text.startswith('{') and value_text.endswith('}'):
                                 # Simple regex to extract keys
-                                import re
                                 keys = re.findall(r"'([^']+)'|'([^']+)'", value_text[:500])
                                 const.value_keys = [k for pair in keys for k in pair if k][:10]
                         
                         return const
         return None
+
     
     def _extract_conditional_imports(self, node, content: str) -> List[str]:
         """Extract imports from try/except blocks."""
@@ -1621,15 +1635,63 @@ class UniversalParser:
             ))
             for d in node.decorator_list
         )
+
+        fields: List[FieldInfo] = []
+        attributes: List[AttributeInfo] = []
         
         for item in node.body:
             if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 methods.append(self._extract_ast_function(item))
+                # Best-effort instance attribute extraction from __init__
+                if item.name == '__init__':
+                    try:
+                        for stmt in getattr(item, 'body', []) or []:
+                            # self.x = ...
+                            if isinstance(stmt, ast.Assign):
+                                for tgt in stmt.targets:
+                                    if isinstance(tgt, ast.Attribute) and isinstance(tgt.value, ast.Name) and tgt.value.id == 'self':
+                                        attr_name = tgt.attr
+                                        if attr_name:
+                                            attributes.append(AttributeInfo(name=attr_name, type_annotation='', set_in_init=True))
+                    except Exception:
+                        pass
             # Extract class attributes (properties) - critical for dataclasses
             elif isinstance(item, ast.AnnAssign) and isinstance(item.target, ast.Name):
                 prop_name = item.target.id
                 prop_type = self._ann_str(item.annotation) if item.annotation else 'Any'
                 properties.append(f"{prop_name}: {prop_type}")
+
+                # Dataclass fields should include name+type (+ default info when available)
+                if is_dataclass:
+                    default = None
+                    default_factory = None
+                    try:
+                        if getattr(item, 'value', None) is not None:
+                            v = item.value
+                            # dataclasses.field(default_factory=...)
+                            if isinstance(v, ast.Call) and (
+                                (isinstance(v.func, ast.Name) and v.func.id == 'field') or
+                                (isinstance(v.func, ast.Attribute) and v.func.attr == 'field')
+                            ):
+                                for kw in getattr(v, 'keywords', []) or []:
+                                    if kw.arg == 'default_factory':
+                                        default_factory = ast.unparse(kw.value) if hasattr(ast, 'unparse') else None
+                                    elif kw.arg == 'default':
+                                        default = ast.unparse(kw.value) if hasattr(ast, 'unparse') else None
+                            else:
+                                default = ast.unparse(v) if hasattr(ast, 'unparse') else None
+                    except Exception:
+                        default = None
+                        default_factory = None
+
+                    fields.append(
+                        FieldInfo(
+                            name=prop_name,
+                            type_annotation=prop_type,
+                            default=default,
+                            default_factory=default_factory,
+                        )
+                    )
             # Also handle simple assignments
             elif isinstance(item, ast.Assign):
                 for target in item.targets:
@@ -1652,6 +1714,8 @@ class UniversalParser:
             decorators=decorators,
             docstring=ast.get_docstring(node)[:100] if ast.get_docstring(node) else None,
             is_dataclass=is_dataclass,
+            fields=fields,
+            attributes=attributes,
             methods=methods,
             properties=properties,
             is_interface=False,

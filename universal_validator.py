@@ -775,8 +775,100 @@ class UniversalValidator:
                             impact=self.IMPACT_WEIGHTS['type_annotation'] * 0.2
                         ))
         
-        # Sprawdź wartości domyślne
-        if '=' not in sig and name not in ('__init__', 'constructor', 'new', 'init'):
+        def _split_params(params_str: str) -> List[str]:
+            params_str = (params_str or '').strip()
+            if not params_str:
+                return []
+            parts: List[str] = []
+            depth = 0
+            buf: List[str] = []
+            opens = '([{<'
+            closes = ')]}>'
+            close_map = {')': '(', ']': '[', '}': '{', '>': '<'}
+            stack: List[str] = []
+            for ch in params_str:
+                if ch in opens:
+                    depth += 1
+                    stack.append(ch)
+                elif ch in closes:
+                    if stack and stack[-1] == close_map.get(ch):
+                        stack.pop()
+                        depth = max(0, depth - 1)
+                if ch == ',' and depth == 0:
+                    part = ''.join(buf).strip()
+                    if part:
+                        parts.append(part)
+                    buf = []
+                    continue
+                buf.append(ch)
+            tail = ''.join(buf).strip()
+            if tail:
+                parts.append(tail)
+            return parts
+
+        def _param_name(param: str) -> str:
+            p = (param or '').strip()
+            if not p:
+                return ''
+            if p.startswith('...'):
+                return ''
+            if p.startswith('**'):
+                p = p[2:].lstrip()
+            elif p.startswith('*'):
+                p = p[1:].lstrip()
+            head = p.split('=')[0]
+            head = head.split(':')[0]
+            head = head.strip()
+            if head.endswith('?'):
+                head = head[:-1].strip()
+            return head
+
+        # Sprawdź wartości domyślne - tylko dla podejrzanych przypadków
+        sig_str = (sig or '').strip()
+        params_match = re.search(r'\(([^)]*)\)', sig_str)
+        inner = params_match.group(1).strip() if params_match else ''
+        params_list = _split_params(inner)
+
+        filtered_params = []
+        for p in params_list:
+            pname = _param_name(p)
+            if pname in ('self', 'cls', 'this'):
+                continue
+            if pname:
+                filtered_params.append(p)
+
+        suspicious = False
+        flag_names = {
+            'verbose', 'debug', 'dry_run', 'dryrun', 'force', 'strict', 'silent', 'quiet',
+            'recursive', 'overwrite', 'confirm', 'check', 'validate'
+        }
+        for p in filtered_params:
+            p_norm = p.replace(' ', '')
+            pname = _param_name(p).lower()
+            if not pname:
+                continue
+
+            has_optional_type = (
+                'Optional[' in p or 'typing.Optional[' in p or
+                '|None' in p_norm or 'None|' in p_norm or
+                ('Union[' in p and 'None' in p)
+            )
+            has_optional_marker = '?' in (p.split(':')[0] if ':' in p else p)
+            is_bool_type = bool(re.search(r'\bbool\b', p)) or bool(re.search(r'\bboolean\b', p, re.IGNORECASE))
+
+            if has_optional_type and not has_optional_marker:
+                suspicious = True
+                break
+
+            if pname in flag_names:
+                suspicious = True
+                break
+
+            if (pname.startswith('is_') or pname.startswith('has_')) and is_bool_type:
+                suspicious = True
+                break
+
+        if filtered_params and '=' not in sig and name not in ('__init__', 'constructor', 'new', 'init') and suspicious:
             issues.append(ValidationIssue(
                 severity='low',
                 category='signature',
