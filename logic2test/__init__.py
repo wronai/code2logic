@@ -11,9 +11,9 @@ Usage:
     generator.generate_unit_tests('tests/')
 """
 
-from .generator import TestGenerator
+from .generator import TestGenerator, GeneratorConfig, GenerationResult
 from .parsers import LogicParser
 from .templates import TestTemplate
 
 __version__ = '0.1.0'
-__all__ = ['TestGenerator', 'LogicParser', 'TestTemplate']
+__all__ = ['TestGenerator', 'GeneratorConfig', 'GenerationResult', 'LogicParser', 'TestTemplate']

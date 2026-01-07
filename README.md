@@ -1,3 +1,4 @@
+![alt text](image.png)
 # Code2Logic
 
 [![PyPI version](https://badge.fury.io/py/code2logic.svg)](https://badge.fury.io/py/code2logic)
@@ -62,6 +63,7 @@ code2logic /path/to/project -f yaml --compact --with-schema
 code2logic /path/to/project -d detailed
 ```
 
+![alt text](image-1.png)
 ### Python API
 
 ```python
@@ -393,6 +395,67 @@ Contributions welcome! Please read our [Contributing Guide](CONTRIBUTING.md).
 
 Apache 2 License - see [LICENSE](LICENSE) for details.
 
+## 🔄 Companion Packages
+
+### logic2test - Generate Tests from Logic
+
+Generate test scaffolds from Code2Logic output:
+
+```bash
+# Show what can be generated
+python -m logic2test project.c2l.yaml --summary
+
+# Generate unit tests
+python -m logic2test project.c2l.yaml -o tests/
+
+# Generate all test types (unit, integration, property)
+python -m logic2test project.c2l.yaml -o tests/ --type all
+```
+
+```python
+from logic2test import TestGenerator
+
+generator = TestGenerator('project.c2l.yaml')
+result = generator.generate_unit_tests('tests/')
+print(f"Generated {result.tests_generated} tests")
+```
+
+### logic2code - Generate Code from Logic
+
+Generate source code from Code2Logic output:
+
+```bash
+# Show what can be generated
+python -m logic2code project.c2l.yaml --summary
+
+# Generate Python code
+python -m logic2code project.c2l.yaml -o generated_src/
+
+# Generate stubs only
+python -m logic2code project.c2l.yaml -o src/ --stubs-only
+```
+
+```python
+from logic2code import CodeGenerator
+
+generator = CodeGenerator('project.c2l.yaml')
+result = generator.generate('output/')
+print(f"Generated {result.files_generated} files")
+```
+
+### Full Workflow: Code → Logic → Tests/Code
+
+```bash
+# 1. Analyze existing codebase
+code2logic src/ -f yaml -o project.c2l.yaml
+
+# 2. Generate tests for the codebase
+python -m logic2test project.c2l.yaml -o tests/ --type all
+
+# 3. Generate code scaffolds (for refactoring)
+python -m logic2code project.c2l.yaml -o new_src/ --stubs-only
+```
+
 ## 📚 Documentation
 
 - [00 - Docs Index](docs/00-index.md) - Documentation home (start here)
@@ -410,6 +473,9 @@ Apache 2 License - see [LICENSE](LICENSE) for details.
 - [12 - Examples](docs/12-examples.md) - Usage workflows and examples
 - [13 - Architecture](docs/13-architecture.md) - System design and components
 - [14 - Format Analysis](docs/14-format-analysis.md) - Deeper format evaluation
+- [15 - Logic2Test](docs/15-logic2test.md) - Test generation from logic files
+- [16 - Logic2Code](docs/16-logic2code.md) - Code generation from logic files
+- [17 - LOLM](docs/17-lolm.md) - LLM provider management
 
 ## 🔗 Links
 

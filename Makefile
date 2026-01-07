@@ -18,6 +18,9 @@ YELLOW := \033[33m
 RED := \033[31m
 NC := \033[0m # No Color
 
+# Sub-packages
+SUBPACKAGES := lolm logic2test logic2code
+
 help: ## Show this help message
 	@echo "$(BLUE)Code2Logic - Build Commands$(NC)"
 	@echo ""
@@ -101,8 +104,14 @@ test-cov: ## Run tests with coverage
 test-fast: ## Run tests without coverage (faster)
 	$(RUN) pytest tests/ -v -p no:aiohttp --no-cov
 
-test-all: ## Run all tests including integration
+test-all: ## Run all tests including subpackages
+	@echo "$(BLUE)Running code2logic tests...$(NC)"
 	$(RUN) pytest tests/ -v -p no:aiohttp --cov=code2logic
+	@echo "$(BLUE)Running subpackage tests...$(NC)"
+	@for pkg in $(SUBPACKAGES); do \
+		echo "$(YELLOW)Testing $$pkg...$(NC)"; \
+		cd $$pkg && $(MAKE) test && cd .. || true; \
+	done
 	@echo "$(GREEN)All tests passed!$(NC)"
 
 # ============================================================================
@@ -336,12 +345,96 @@ llm-status: ## Show LLM configuration status
 	@cat ~/.code2logic/llm_config.json 2>/dev/null | head -20 || echo "  Not configured (run: make llm)"
 
 # ============================================================================
+# Sub-packages (lolm, logic2test, logic2code)
+# ============================================================================
+
+publish-lolm: ## Publish lolm package to PyPI
+	@echo "$(YELLOW)Publishing lolm to PyPI...$(NC)"
+	cd lolm && $(MAKE) build && $(MAKE) publish
+	@echo "$(GREEN)lolm published!$(NC)"
+
+publish-logic2test: ## Publish logic2test package to PyPI
+	@echo "$(YELLOW)Publishing logic2test to PyPI...$(NC)"
+	cd logic2test && $(MAKE) build && $(MAKE) publish
+	@echo "$(GREEN)logic2test published!$(NC)"
+
+publish-logic2code: ## Publish logic2code package to PyPI
+	@echo "$(YELLOW)Publishing logic2code to PyPI...$(NC)"
+	cd logic2code && $(MAKE) build && $(MAKE) publish
+	@echo "$(GREEN)logic2code published!$(NC)"
+
+publish-all: ## Publish all packages (code2logic + sub-packages)
+	@echo "$(BLUE)Publishing all packages...$(NC)"
+	@for pkg in $(SUBPACKAGES); do \
+		echo "$(YELLOW)Building and publishing $$pkg...$(NC)"; \
+		cd $$pkg && $(MAKE) build && $(MAKE) publish && cd ..; \
+	done
+	@echo "$(YELLOW)Publishing code2logic...$(NC)"
+	$(MAKE) publish
+	@echo "$(GREEN)All packages published!$(NC)"
+
+publish-all-test: ## Publish all packages to TestPyPI
+	@echo "$(BLUE)Publishing all packages to TestPyPI...$(NC)"
+	@for pkg in $(SUBPACKAGES); do \
+		echo "$(YELLOW)Building and publishing $$pkg to TestPyPI...$(NC)"; \
+		cd $$pkg && $(MAKE) build && $(MAKE) publish-test && cd ..; \
+	done
+	$(MAKE) publish-test
+	@echo "$(GREEN)All packages published to TestPyPI!$(NC)"
+
+build-subpackages: ## Build all sub-packages
+	@echo "$(BLUE)Building sub-packages...$(NC)"
+	@for pkg in $(SUBPACKAGES); do \
+		echo "$(YELLOW)Building $$pkg...$(NC)"; \
+		cd $$pkg && $(MAKE) build && cd ..; \
+	done
+	@echo "$(GREEN)All sub-packages built!$(NC)"
+
+test-subpackages: ## Run tests for all sub-packages
+	@echo "$(BLUE)Testing sub-packages...$(NC)"
+	@for pkg in $(SUBPACKAGES); do \
+		echo "$(YELLOW)Testing $$pkg...$(NC)"; \
+		cd $$pkg && $(MAKE) test && cd ..; \
+	done
+	@echo "$(GREEN)All sub-package tests passed!$(NC)"
+
+lint-subpackages: ## Lint all sub-packages
+	@echo "$(BLUE)Linting sub-packages...$(NC)"
+	@for pkg in $(SUBPACKAGES); do \
+		echo "$(YELLOW)Linting $$pkg...$(NC)"; \
+		cd $$pkg && $(MAKE) lint && cd .. || true; \
+	done
+
+clean-subpackages: ## Clean all sub-packages
+	@for pkg in $(SUBPACKAGES); do \
+		cd $$pkg && $(MAKE) clean && cd ..; \
+	done
+
+install-subpackages: ## Install all sub-packages in dev mode
+	@for pkg in $(SUBPACKAGES); do \
+		echo "$(YELLOW)Installing $$pkg...$(NC)"; \
+		cd $$pkg && $(MAKE) install-dev && cd ..; \
+	done
+	@echo "$(GREEN)All sub-packages installed!$(NC)"
+
+# ============================================================================
 # Release
 # ============================================================================
 
 version: ## Show current version
 	@$(PYTHON) -c "from code2logic import __version__; print(__version__)"
 
+version-all: ## Show versions of all packages
+	@echo "$(BLUE)Package versions:$(NC)"
+	@echo -n "  code2logic: " && $(PYTHON) -c "from code2logic import __version__; print(__version__)"
+	@echo -n "  lolm: " && $(PYTHON) -c "from lolm import __version__; print(__version__)" 2>/dev/null || echo "not installed"
+	@echo -n "  logic2test: " && $(PYTHON) -c "from logic2test import __version__; print(__version__)" 2>/dev/null || echo "not installed"
+	@echo -n "  logic2code: " && $(PYTHON) -c "from logic2code import __version__; print(__version__)" 2>/dev/null || echo "not installed"
+
 check-release: clean test lint build ## Full release check
 	@echo "$(GREEN)Release check passed!$(NC)"
 	@echo "Ready to publish with: make publish"
+
+check-release-all: clean test lint build test-subpackages build-subpackages ## Full release check for all packages
+	@echo "$(GREEN)Release check for all packages passed!$(NC)"
+	@echo "Ready to publish all with: make publish-all"

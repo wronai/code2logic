@@ -59,6 +59,7 @@ result = generator.generate_property_tests('tests/property/')
 ### Unit Tests
 
 Generated for each class and function with:
+
 - Arrange-Act-Assert structure
 - Mocked parameters based on type hints
 - Return type assertions
@@ -82,6 +83,7 @@ def test_analyze_project():
 ### Integration Tests
 
 Focus on cross-module interactions:
+
 - Tests for public classes
 - Dependency injection patterns
 - Module collaboration scenarios
@@ -89,6 +91,7 @@ Focus on cross-module interactions:
 ### Property Tests
 
 For dataclasses using Hypothesis:
+
 - Serialization roundtrip tests
 - Field validation tests
 - Equality tests
@@ -114,7 +117,7 @@ generator = TestGenerator('project.c2l.yaml', config)
 
 ## CLI Reference
 
-```
+```text
 usage: logic2test [-h] [-o OUTPUT] [-t {unit,integration,property,all}]
                   [--framework {pytest,unittest}] [--include-private]
                   [--include-dunder] [--summary] [-v]
@@ -146,7 +149,7 @@ optional arguments:
 
 ## Output Structure
 
-```
+```text
 tests/
 ├── unit/
 │   ├── test_analyzer.py
