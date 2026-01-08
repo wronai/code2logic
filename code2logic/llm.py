@@ -9,15 +9,15 @@ Provides integration with local Ollama and LiteLLM for:
 
 Usage:
     from code2logic.llm import CodeAnalyzer
-    
+
     analyzer = CodeAnalyzer(model="qwen2.5-coder:7b")
     suggestions = analyzer.suggest_refactoring(project_info)
 """
 
 import json
 import os
-from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 # Optional imports
 try:
@@ -34,9 +34,8 @@ except ImportError:
 
 
 from .llm_clients import (
-    OpenRouterClient,
     OllamaLocalClient,
-    LiteLLMClient,
+    OpenRouterClient,
     get_client,
 )
 
@@ -55,13 +54,13 @@ class LLMConfig:
 
 class OllamaClient:
     """Direct Ollama API client."""
-    
+
     def __init__(self, config: LLMConfig):
         if not HTTPX_AVAILABLE:
             raise ImportError("httpx required: pip install httpx")
         self.config = config
         self.client = httpx.Client(timeout=config.timeout)
-    
+
     def generate(self, prompt: str, system: Optional[str] = None) -> str:
         """Generate completion from Ollama."""
         payload = {
@@ -73,17 +72,17 @@ class OllamaClient:
                 "num_predict": self.config.max_tokens,
             }
         }
-        
+
         if system:
             payload["system"] = system
-        
+
         response = self.client.post(
             f"{self.config.base_url}/api/generate",
             json=payload
         )
         response.raise_for_status()
         return response.json().get("response", "")
-    
+
     def chat(self, messages: List[Dict[str, str]]) -> str:
         """Chat completion from Ollama."""
         payload = {
@@ -95,14 +94,14 @@ class OllamaClient:
                 "num_predict": self.config.max_tokens,
             }
         }
-        
+
         response = self.client.post(
             f"{self.config.base_url}/api/chat",
             json=payload
         )
         response.raise_for_status()
         return response.json().get("message", {}).get("content", "")
-    
+
     def is_available(self) -> bool:
         """Check if Ollama is running."""
         try:
@@ -110,7 +109,7 @@ class OllamaClient:
             return response.status_code == 200
         except Exception:
             return False
-    
+
     def list_models(self) -> List[str]:
         """List available models."""
         try:
@@ -123,27 +122,27 @@ class OllamaClient:
 
 class LiteLLMClient:
     """LiteLLM client for unified API access."""
-    
+
     def __init__(self, config: LLMConfig):
         if not LITELLM_AVAILABLE:
             raise ImportError("litellm required: pip install litellm")
         self.config = config
-    
+
     def generate(self, prompt: str, system: Optional[str] = None) -> str:
         """Generate completion via LiteLLM."""
         messages = []
         if system:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
-        
+
         return self.chat(messages)
-    
+
     def chat(self, messages: List[Dict[str, str]]) -> str:
         """Chat completion via LiteLLM."""
         model = f"ollama/{self.config.model}"
         if self.config.provider == "litellm":
             model = self.config.model
-        
+
         response = completion(
             model=model,
             messages=messages,
@@ -152,7 +151,7 @@ class LiteLLMClient:
             max_tokens=self.config.max_tokens,
         )
         return response.choices[0].message.content
-    
+
     def is_available(self) -> bool:
         """Check if LiteLLM backend is available."""
         try:
@@ -165,21 +164,21 @@ class LiteLLMClient:
 class CodeAnalyzer:
     """
     LLM-powered code analysis for Code2Logic.
-    
+
     Example:
         >>> from code2logic import analyze_project
         >>> from code2logic.llm import CodeAnalyzer
-        >>> 
+        >>>
         >>> project = analyze_project("/path/to/project")
         >>> analyzer = CodeAnalyzer()
-        >>> 
+        >>>
         >>> # Get refactoring suggestions
         >>> suggestions = analyzer.suggest_refactoring(project)
-        >>> 
+        >>>
         >>> # Generate code in another language
         >>> code = analyzer.generate_code(project, target_lang="typescript")
     """
-    
+
     SYSTEM_PROMPT = """You are an expert software architect and code analyst.
 You analyze code structure and provide actionable suggestions for:
 - Refactoring and code improvement
@@ -188,7 +187,7 @@ You analyze code structure and provide actionable suggestions for:
 - Architecture optimization
 
 Be specific, practical, and provide code examples when helpful."""
-    
+
     def __init__(
         self,
         model: str = None,
@@ -199,7 +198,7 @@ Be specific, practical, and provide code examples when helpful."""
     ):
         """
         Initialize CodeAnalyzer.
-        
+
         Args:
             model: Model name (e.g., "qwen2.5-coder:7b")
             provider: "ollama" or "litellm"
@@ -234,32 +233,32 @@ Be specific, practical, and provide code examples when helpful."""
             api_key=api_key,
             **kwargs
         )
-    
+
     def is_available(self) -> bool:
         """Check if LLM backend is available."""
         return bool(getattr(self.client, "is_available", lambda: False)())
-    
+
     def suggest_refactoring(self, project) -> List[Dict[str, Any]]:
         """
         Analyze project and suggest refactoring improvements.
-        
+
         Args:
             project: ProjectInfo from code2logic analysis
-            
+
         Returns:
             List of refactoring suggestions with details
         """
         from .generators import CSVGenerator
-        
+
         # Generate compact representation
         csv_gen = CSVGenerator()
         csv_data = csv_gen.generate(project, detail='full')
-        
+
         # Truncate if too long
         if len(csv_data) > 8000:
             lines = csv_data.split('\n')
             csv_data = '\n'.join(lines[:100]) + f"\n... ({len(lines)-100} more lines)"
-        
+
         prompt = f"""Analyze this codebase and suggest refactoring improvements:
 
 ```csv
@@ -274,9 +273,9 @@ For each suggestion, provide:
 5. Priority (high/medium/low)
 
 Format as JSON array."""
-        
+
         response = self.client.generate(prompt, system=self.SYSTEM_PROMPT)
-        
+
         # Try to parse JSON from response
         try:
             # Find JSON in response
@@ -286,17 +285,17 @@ Format as JSON array."""
                 return json.loads(response[start:end])
         except json.JSONDecodeError:
             pass
-        
+
         # Return raw response if JSON parsing fails
         return [{"raw_response": response}]
-    
+
     def find_semantic_duplicates(self, project) -> List[Dict[str, Any]]:
         """
         Find semantically similar functions using LLM.
-        
+
         Args:
             project: ProjectInfo from code2logic analysis
-            
+
         Returns:
             List of duplicate groups with similarity analysis
         """
@@ -318,10 +317,10 @@ Format as JSON array."""
                         'signature': self._build_signature(method),
                         'intent': method.intent or '',
                     })
-        
+
         if len(functions) > 50:
             functions = functions[:50]
-        
+
         prompt = f"""Analyze these functions and find semantic duplicates:
 
 {json.dumps(functions, indent=2)}
@@ -337,9 +336,9 @@ For each group, explain:
 - Suggested shared function name
 
 Format as JSON array of groups."""
-        
+
         response = self.client.generate(prompt, system=self.SYSTEM_PROMPT)
-        
+
         try:
             start = response.find('[')
             end = response.rfind(']') + 1
@@ -347,9 +346,9 @@ Format as JSON array of groups."""
                 return json.loads(response[start:end])
         except json.JSONDecodeError:
             pass
-        
+
         return [{"raw_response": response}]
-    
+
     def generate_code(
         self,
         project,
@@ -358,44 +357,44 @@ Format as JSON array of groups."""
     ) -> Dict[str, str]:
         """
         Generate code in target language from project analysis.
-        
+
         Args:
             project: ProjectInfo from code2logic analysis
             target_lang: Target language (typescript, python, go, rust, etc.)
             module_filter: Optional filter for specific module paths
-            
+
         Returns:
             Dict mapping original path to generated code
         """
         results = {}
-        
+
         modules = project.modules
         if module_filter:
             modules = [m for m in modules if module_filter in m.path]
-        
+
         for module in modules[:5]:  # Limit to 5 modules
             # Build specification
             spec_lines = [f"Module: {module.path}"]
             spec_lines.append(f"Language: {module.language}")
             spec_lines.append(f"Lines: {module.lines_code}")
-            
+
             if module.imports:
                 spec_lines.append(f"Imports: {', '.join(module.imports[:10])}")
-            
+
             if module.classes:
                 spec_lines.append("\nClasses:")
                 for c in module.classes[:5]:
                     spec_lines.append(f"  class {c.name}({', '.join(c.bases)})")
                     for m in c.methods[:10]:
                         spec_lines.append(f"    - {m.name}{self._build_signature(m)}: {m.intent}")
-            
+
             if module.functions:
                 spec_lines.append("\nFunctions:")
                 for f in module.functions[:10]:
                     spec_lines.append(f"  - {f.name}{self._build_signature(f)}: {f.intent}")
-            
+
             spec = '\n'.join(spec_lines)
-            
+
             prompt = f"""Generate {target_lang} code from this specification:
 
 {spec}
@@ -408,12 +407,12 @@ Requirements:
 5. Maintain the same public API
 
 Output only the code."""
-            
+
             response = self.client.generate(prompt, system=self.SYSTEM_PROMPT)
             results[module.path] = response
-        
+
         return results
-    
+
     def translate_function(
         self,
         name: str,
@@ -424,14 +423,14 @@ Output only the code."""
     ) -> str:
         """
         Translate a single function to another language.
-        
+
         Args:
             name: Function name
             signature: Function signature
             intent: What the function does
             source_lang: Source language
             target_lang: Target language
-            
+
         Returns:
             Generated code in target language
         """
@@ -447,9 +446,9 @@ Generate idiomatic {target_lang} code with:
 3. Documentation
 
 Output only the code."""
-        
+
         return self.client.generate(prompt, system=self.SYSTEM_PROMPT)
-    
+
     def _build_signature(self, f) -> str:
         """Build compact signature."""
         params = ','.join(f.params[:4])
@@ -466,12 +465,12 @@ def get_available_backends() -> Dict[str, bool]:
         'litellm': LITELLM_AVAILABLE,
         'ollama': False,
     }
-    
+
     if HTTPX_AVAILABLE:
         try:
             client = OllamaClient(LLMConfig())
             status['ollama'] = client.is_available()
         except Exception:
             pass
-    
+
     return status

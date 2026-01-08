@@ -23,165 +23,205 @@ __author__ = "Softreck"
 __email__ = "info@softreck.dev"
 __license__ = "MIT"
 
+from .adaptive import (
+    LLM_CAPABILITIES,
+    AdaptiveReproducer,
+    AdaptiveResult,
+    get_llm_capabilities,
+)
 from .analyzer import (
     ProjectAnalyzer,
     analyze_project,
 )
-from .models import (
-    FunctionInfo,
-    ClassInfo,
-    TypeInfo,
-    ModuleInfo,
-    DependencyNode,
-    ProjectInfo,
-)
-from .generators import (
-    MarkdownGenerator,
-    CompactGenerator,
-    JSONGenerator,
-    YAMLGenerator,
-    CSVGenerator,
-)
-from .gherkin import (
-    GherkinGenerator,
-    StepDefinitionGenerator,
-    CucumberYAMLGenerator,
-    csv_to_gherkin,
-    gherkin_to_test_data,
-)
-from .intent import EnhancedIntentGenerator
-from .parsers import TreeSitterParser, UniversalParser
-from .dependency import DependencyAnalyzer
-from .similarity import SimilarityDetector
-from .config import Config, load_env, get_api_key, get_model
-from .llm_clients import (
-    BaseLLMClient,
-    OpenRouterClient,
-    OllamaLocalClient,
-    LiteLLMClient,
-    get_client,
-)
-from .reproduction import (
-    generate_file_gherkin,
-    compare_code,
-    extract_code_block,
-    CodeReproducer,
-)
-from .code_review import (
-    analyze_code_quality,
-    check_security_issues,
-    check_performance_issues,
-    CodeReviewer,
+from .base import (
+    BaseGenerator,
+    BaseParser,
+    VerboseMixin,
 )
 from .benchmark import (
+    BenchmarkResult,
+    FormatResult,
     ReproductionBenchmark,
     run_benchmark,
-    FormatResult,
-    BenchmarkResult,
+)
+from .chunked_reproduction import (
+    Chunk,
+    ChunkedReproducer,
+    ChunkedResult,
+    ChunkedSpec,
+    auto_chunk_reproduce,
+    chunk_spec,
+    get_llm_limit,
+)
+from .code_review import (
+    CodeReviewer,
+    analyze_code_quality,
+    check_performance_issues,
+    check_security_issues,
+)
+from .config import Config, get_api_key, get_model, load_env
+from .dependency import DependencyAnalyzer
+from .errors import (
+    AnalysisError,
+    AnalysisResult,
+    ErrorHandler,
+    ErrorSeverity,
+    ErrorType,
+    create_error_handler,
 )
 from .file_formats import (
     generate_file_csv,
     generate_file_json,
     generate_file_yaml,
 )
-from .adaptive import (
-    AdaptiveReproducer,
-    AdaptiveResult,
-    get_llm_capabilities,
-    LLM_CAPABILITIES,
+from .function_logic import (
+    FunctionLogicGenerator,
 )
-from .universal import (
-    UniversalReproducer,
-    UniversalParser,
-    CodeGenerator,
-    CodeLogic,
-    CodeElement,
-    Language,
-    ElementType,
-    reproduce_file,
+from .generators import (
+    CompactGenerator,
+    CSVGenerator,
+    JSONGenerator,
+    MarkdownGenerator,
+    YAMLGenerator,
 )
-from .project_reproducer import (
-    ProjectReproducer,
-    ProjectResult,
-    FileResult,
-    reproduce_project as _reproduce_project_from_source,
+from .gherkin import (
+    CucumberYAMLGenerator,
+    GherkinGenerator,
+    StepDefinitionGenerator,
+    csv_to_gherkin,
+    gherkin_to_test_data,
 )
-from .refactor import (
-    find_duplicates,
-    analyze_quality as _analyze_quality_from_path,
-    suggest_refactoring,
-    compare_codebases,
-    quick_analyze,
-    RefactoringReport,
-    DuplicateGroup,
+from .intent import EnhancedIntentGenerator
+from .llm_clients import (
+    BaseLLMClient,
+    LiteLLMClient,
+    OllamaLocalClient,
+    OpenRouterClient,
+    get_client,
 )
-from .metrics import (
-    ReproductionMetrics,
-    ReproductionResult,
-    TextMetrics,
-    StructuralMetrics,
-    SemanticMetrics,
-    FormatMetrics,
-    analyze_reproduction,
-    compare_formats,
-)
-from .base import (
-    VerboseMixin,
-    BaseParser,
-    BaseGenerator,
-)
-from .markdown_format import (
-    MarkdownHybridGenerator,
-    MarkdownSpec,
-    generate_markdown_hybrid,
+from .llm_profiler import (
+    AdaptiveChunker,
+    LLMProfile,
+    LLMProfiler,
+    get_adaptive_chunker,
+    get_or_create_profile,
+    get_profile,
+    load_profiles,
+    profile_llm,
+    save_profile,
 )
 from .logicml import (
     LogicMLGenerator,
     LogicMLSpec,
     generate_logicml,
 )
-from .function_logic import (
-    FunctionLogicGenerator,
+from .markdown_format import (
+    MarkdownHybridGenerator,
+    MarkdownSpec,
+    generate_markdown_hybrid,
+)
+from .metrics import (
+    FormatMetrics,
+    ReproductionMetrics,
+    ReproductionResult,
+    SemanticMetrics,
+    StructuralMetrics,
+    TextMetrics,
+    analyze_reproduction,
+    compare_formats,
+)
+from .models import (
+    ClassInfo,
+    DependencyNode,
+    FunctionInfo,
+    ModuleInfo,
+    ProjectInfo,
+    TypeInfo,
+)
+from .parsers import TreeSitterParser, UniversalParser
+from .project_reproducer import (
+    FileResult,
+    ProjectReproducer,
+    ProjectResult,
+)
+from .project_reproducer import (
+    reproduce_project as _reproduce_project_from_source,
 )
 from .prompts import (
     FORMAT_HINTS,
+    get_fix_prompt,
     get_reproduction_prompt,
     get_review_prompt,
-    get_fix_prompt,
-)
-from .schemas import (
-    validate_yaml,
-    validate_logicml,
-    validate_markdown,
-    validate_json,
-    YAMLSchema,
-    LogicMLSchema,
-    MarkdownSchema,
-    JSONSchema,
 )
 from .quality import (
     QualityAnalyzer,
-    QualityReport,
     QualityIssue,
-    analyze_quality as _analyze_quality_from_project,
+    QualityReport,
     get_quality_summary,
 )
-from .similarity import get_refactoring_suggestions
-from .errors import (
-    ErrorHandler,
-    ErrorType,
-    ErrorSeverity,
-    AnalysisError,
-    AnalysisResult,
-    create_error_handler,
+from .quality import (
+    analyze_quality as _analyze_quality_from_project,
+)
+from .refactor import (
+    DuplicateGroup,
+    RefactoringReport,
+    compare_codebases,
+    find_duplicates,
+    quick_analyze,
+    suggest_refactoring,
+)
+from .refactor import (
+    analyze_quality as _analyze_quality_from_path,
 )
 from .reproducer import (
+    FileValidation,
     SpecReproducer,
     SpecValidator,
-    ReproductionResult as SpecReproductionResult,
-    FileValidation,
-    reproduce_project as _reproduce_project_from_spec,
     validate_files,
+)
+from .reproducer import (
+    ReproductionResult as SpecReproductionResult,
+)
+from .reproducer import (
+    reproduce_project as _reproduce_project_from_spec,
+)
+from .reproduction import (
+    CodeReproducer,
+    compare_code,
+    extract_code_block,
+    generate_file_gherkin,
+)
+from .schemas import (
+    JSONSchema,
+    LogicMLSchema,
+    MarkdownSchema,
+    YAMLSchema,
+    validate_json,
+    validate_logicml,
+    validate_markdown,
+    validate_yaml,
+)
+from .similarity import SimilarityDetector, get_refactoring_suggestions
+from .terminal import (
+    ShellRenderer,
+    get_renderer,
+    render,
+    set_renderer,
+)
+from .toon_format import (
+    TOONGenerator,
+    TOONParser,
+    generate_toon,
+    parse_toon,
+)
+from .universal import (
+    CodeElement,
+    CodeGenerator,
+    CodeLogic,
+    ElementType,
+    Language,
+    UniversalReproducer,
+    reproduce_file,
 )
 
 
@@ -196,38 +236,6 @@ def reproduce_project(source: str, *args, **kwargs):
     if src.endswith(('.yaml', '.yml', '.json')):
         return _reproduce_project_from_spec(src, *args, **kwargs)
     return _reproduce_project_from_source(src, *args, **kwargs)
-from .toon_format import (
-    TOONGenerator,
-    TOONParser,
-    generate_toon,
-    parse_toon,
-)
-from .chunked_reproduction import (
-    ChunkedReproducer,
-    ChunkedResult,
-    ChunkedSpec,
-    Chunk,
-    chunk_spec,
-    auto_chunk_reproduce,
-    get_llm_limit,
-)
-from .llm_profiler import (
-    LLMProfiler,
-    LLMProfile,
-    AdaptiveChunker,
-    profile_llm,
-    get_profile,
-    get_or_create_profile,
-    get_adaptive_chunker,
-    load_profiles,
-    save_profile,
-)
-from .terminal import (
-    ShellRenderer,
-    render,
-    get_renderer,
-    set_renderer,
-)
 
 __all__ = [
     # Version
@@ -237,7 +245,7 @@ __all__ = [
     "ProjectAnalyzer",
     # Models
     "FunctionInfo",
-    "ClassInfo", 
+    "ClassInfo",
     "TypeInfo",
     "ModuleInfo",
     "DependencyNode",
@@ -351,4 +359,56 @@ __all__ = [
     "render",
     "get_renderer",
     "set_renderer",
+    # LogicML
+    "LogicMLGenerator",
+    "LogicMLSpec",
+    "generate_logicml",
+    # Function Logic
+    "FunctionLogicGenerator",
+    # Prompts
+    "FORMAT_HINTS",
+    "get_reproduction_prompt",
+    "get_review_prompt",
+    "get_fix_prompt",
+    # Schemas
+    "validate_yaml",
+    "validate_logicml",
+    "validate_markdown",
+    "validate_json",
+    "YAMLSchema",
+    "LogicMLSchema",
+    "MarkdownSchema",
+    "JSONSchema",
+    # Quality
+    "QualityAnalyzer",
+    "QualityReport",
+    "QualityIssue",
+    "get_quality_summary",
+    # Similarity
+    "get_refactoring_suggestions",
+    # Errors
+    "ErrorHandler",
+    "ErrorType",
+    "ErrorSeverity",
+    "AnalysisError",
+    "AnalysisResult",
+    "create_error_handler",
+    # Reproducer
+    "SpecReproducer",
+    "SpecValidator",
+    "FileValidation",
+    "validate_files",
+    # TOON Format
+    "TOONGenerator",
+    "TOONParser",
+    "generate_toon",
+    "parse_toon",
+    # Chunked Reproduction
+    "ChunkedReproducer",
+    "ChunkedResult",
+    "ChunkedSpec",
+    "Chunk",
+    "chunk_spec",
+    "auto_chunk_reproduce",
+    "get_llm_limit",
 ]

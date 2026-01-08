@@ -8,14 +8,14 @@ Automatically selects the optimal format and chunking strategy based on:
 
 Usage:
     from code2logic.adaptive import AdaptiveReproducer
-    
+
     reproducer = AdaptiveReproducer()
     result = reproducer.reproduce("path/to/file.py")
 """
 
-from pathlib import Path
-from typing import Dict, Any, List
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Load .env file
 try:
@@ -24,11 +24,9 @@ try:
 except ImportError:
     pass
 
-from .llm_clients import BaseLLMClient, get_client
-from .reproduction import compare_code, extract_code_block
 from .file_formats import generate_file_csv, generate_file_json, generate_file_yaml
-from .reproduction import generate_file_gherkin
-
+from .llm_clients import BaseLLMClient, get_client
+from .reproduction import compare_code, extract_code_block, generate_file_gherkin
 
 # LLM Model capabilities database
 LLM_CAPABILITIES = {
@@ -121,10 +119,10 @@ class AdaptiveResult:
 
 class AdaptiveReproducer:
     """Adaptive code reproduction with LLM capability detection."""
-    
+
     def __init__(self, client: BaseLLMClient = None, model: str = None):
         """Initialize adaptive reproducer.
-        
+
         Args:
             client: LLM client (default: auto-detect)
             model: Model name for capability lookup
@@ -132,109 +130,107 @@ class AdaptiveReproducer:
         self.client = client or get_client()
         self.model = model or getattr(self.client, 'model', 'default')
         self.capabilities = self._get_capabilities()
-    
+
     def _get_capabilities(self) -> Dict[str, Any]:
         """Get LLM capabilities for current model."""
         # Try exact match first
         if self.model in LLM_CAPABILITIES:
             return LLM_CAPABILITIES[self.model]
-        
+
         # Try partial match
         for model_name, caps in LLM_CAPABILITIES.items():
             if model_name in self.model or self.model in model_name:
                 return caps
-        
+
         return LLM_CAPABILITIES['default']
-    
+
     def select_format(self, file_path: Path, content: str) -> str:
         """Select optimal format based on file and LLM capabilities.
-        
+
         Args:
             file_path: Source file path
             content: File content
-            
+
         Returns:
             Best format name
         """
         best_formats = self.capabilities['best_formats']
-        
+
         # Analyze file characteristics
         is_dataclass = '@dataclass' in content
         has_classes = 'class ' in content
         has_functions = 'def ' in content or 'function ' in content
         is_sql = file_path.suffix == '.sql'
-        is_typescript = file_path.suffix in ['.ts', '.tsx']
-        
+
         # Select format based on content type
         if is_sql:
             return 'yaml' if 'yaml' in best_formats else best_formats[0]
-        
+
         if is_dataclass:
             # YAML is best for dataclasses
             if 'yaml' in best_formats:
                 return 'yaml'
             return best_formats[0]
-        
+
         if has_functions and not has_classes:
             # Gherkin is best for function-heavy code
             return 'gherkin' if 'gherkin' in best_formats else best_formats[0]
-        
+
         # Default to first best format
         return best_formats[0]
-    
+
     def should_chunk(self, content: str) -> bool:
         """Determine if content should be chunked.
-        
+
         Args:
             content: Source content
-            
+
         Returns:
             True if chunking is needed
         """
         if not self.capabilities['supports_chunking']:
             return False
-        
+
         # Estimate tokens (rough: 4 chars per token)
         estimated_tokens = len(content) // 4
         max_context = self.capabilities['context_size']
-        
+
         # Leave room for prompt and output
         usable_context = max_context * 0.4
-        
+
         return estimated_tokens > usable_context
-    
+
     def chunk_content(self, content: str, file_path: Path) -> List[ChunkInfo]:
         """Split content into logical chunks.
-        
+
         Args:
             content: Source content
             file_path: Source file path
-            
+
         Returns:
             List of chunk info objects
         """
         chunks = []
         lines = content.split('\n')
-        
+
         # Extract imports
         import_lines = []
         current_chunk = []
         current_type = 'imports'
         current_name = 'imports'
         chunk_index = 0
-        
+
         in_class = False
         class_name = ''
-        class_start = 0
-        
+
         for i, line in enumerate(lines):
             stripped = line.strip()
-            
+
             # Imports
             if stripped.startswith('import ') or stripped.startswith('from '):
                 import_lines.append(line)
                 continue
-            
+
             # Class start
             if stripped.startswith('class '):
                 if current_chunk:
@@ -247,14 +243,14 @@ class AdaptiveReproducer:
                     ))
                     chunk_index += 1
                     current_chunk = []
-                
+
                 class_name = stripped.split('(')[0].split(':')[0].replace('class ', '')
                 in_class = True
                 current_type = 'class'
                 current_name = class_name
                 current_chunk = [line]
                 continue
-            
+
             # Function outside class
             if stripped.startswith('def ') and not in_class:
                 if current_chunk and current_type != 'function':
@@ -267,13 +263,13 @@ class AdaptiveReproducer:
                     ))
                     chunk_index += 1
                     current_chunk = []
-                
+
                 func_name = stripped.split('(')[0].replace('def ', '')
                 current_type = 'function'
                 current_name = func_name
-            
+
             current_chunk.append(line)
-            
+
             # Check if class ends (next line has no indent and is not empty)
             if in_class and i + 1 < len(lines):
                 next_line = lines[i + 1]
@@ -291,7 +287,7 @@ class AdaptiveReproducer:
                         current_chunk = []
                         current_type = 'other'
                         current_name = ''
-        
+
         # Add remaining content
         if current_chunk:
             chunks.append(ChunkInfo(
@@ -301,7 +297,7 @@ class AdaptiveReproducer:
                 element_type=current_type,
                 element_name=current_name,
             ))
-        
+
         # Add imports as first chunk if present
         if import_lines:
             chunks.insert(0, ChunkInfo(
@@ -314,27 +310,27 @@ class AdaptiveReproducer:
             # Reindex
             for i, chunk in enumerate(chunks):
                 chunk.index = i
-        
+
         # Update total count
         total = len(chunks)
         for chunk in chunks:
             chunk.total = total
-        
+
         return chunks
-    
+
     def generate_chunk_spec(self, chunk: ChunkInfo, format_name: str) -> str:
         """Generate specification for a single chunk.
-        
+
         Args:
             chunk: Chunk info
             format_name: Format to use
-            
+
         Returns:
             Specification string
         """
         # Create temporary file-like content
         content = chunk.content
-        
+
         if format_name == 'gherkin':
             return self._gherkin_for_chunk(chunk)
         elif format_name == 'yaml':
@@ -343,7 +339,7 @@ class AdaptiveReproducer:
             return self._json_for_chunk(chunk)
         else:
             return content
-    
+
     def _gherkin_for_chunk(self, chunk: ChunkInfo) -> str:
         """Generate Gherkin for a chunk."""
         lines = [
@@ -352,31 +348,31 @@ class AdaptiveReproducer:
             f"Feature: {chunk.element_name}",
             "",
         ]
-        
+
         if chunk.element_type == 'imports':
             lines.append("  Scenario: Required imports")
             lines.append("    Given the following imports:")
             for imp in chunk.content.split('\n'):
                 if imp.strip():
                     lines.append(f"      | {imp.strip()} |")
-        
+
         elif chunk.element_type == 'class':
             lines.append(f"  Scenario: Define {chunk.element_name} class")
             lines.append(f"    Given a class named \"{chunk.element_name}\"")
-            
+
             # Extract attributes and methods from content
             for line in chunk.content.split('\n'):
                 stripped = line.strip()
                 if stripped.startswith('def '):
                     method_name = stripped.split('(')[0].replace('def ', '')
                     lines.append(f"    And method \"{method_name}\"")
-        
+
         elif chunk.element_type == 'function':
             lines.append(f"  Scenario: Define {chunk.element_name} function")
             lines.append(f"    Given a function named \"{chunk.element_name}\"")
-        
+
         return '\n'.join(lines)
-    
+
     def _yaml_for_chunk(self, chunk: ChunkInfo) -> str:
         """Generate YAML for a chunk."""
         lines = [
@@ -385,12 +381,12 @@ class AdaptiveReproducer:
             f"name: {chunk.element_name}",
             "content:",
         ]
-        
+
         for line in chunk.content.split('\n'):
             lines.append(f"  - \"{line}\"")
-        
+
         return '\n'.join(lines)
-    
+
     def _json_for_chunk(self, chunk: ChunkInfo) -> str:
         """Generate JSON for a chunk."""
         import json
@@ -401,37 +397,36 @@ class AdaptiveReproducer:
             'name': chunk.element_name,
             'content': chunk.content,
         }, indent=2)
-    
+
     def reproduce(self, file_path: str, output_dir: str = None) -> AdaptiveResult:
         """Reproduce code with adaptive format selection.
-        
+
         Args:
             file_path: Source file path
             output_dir: Optional output directory
-            
+
         Returns:
             AdaptiveResult with metrics
         """
         path = Path(file_path)
         content = path.read_text()
-        source_chars = len(content)
-        
+
         # Select optimal format
         format_name = self.select_format(path, content)
-        
+
         # Determine if chunking is needed
         use_chunking = self.should_chunk(content)
-        
+
         if use_chunking:
             return self._reproduce_chunked(path, content, format_name, output_dir)
         else:
             return self._reproduce_single(path, content, format_name, output_dir)
-    
+
     def _reproduce_single(
-        self, 
-        path: Path, 
-        content: str, 
-        format_name: str, 
+        self,
+        path: Path,
+        content: str,
+        format_name: str,
         output_dir: str = None
     ) -> AdaptiveResult:
         """Reproduce without chunking."""
@@ -446,20 +441,20 @@ class AdaptiveReproducer:
             spec = generate_file_csv(path)
         else:
             spec = generate_file_gherkin(path)
-        
+
         spec_chars = len(spec)
-        
+
         # Generate code
         generated = self._generate_from_spec(spec, format_name, path.suffix)
         generated_chars = len(generated)
-        
+
         # Compare
         comparison = compare_code(content, generated)
-        
+
         # Calculate efficiency
         compression_ratio = spec_chars / max(generated_chars, 1)
         efficiency = (comparison['similarity_percent'] / 100) / max(compression_ratio, 0.1)
-        
+
         result = AdaptiveResult(
             source_file=str(path),
             source_chars=len(content),
@@ -472,13 +467,13 @@ class AdaptiveReproducer:
             compression_ratio=compression_ratio,
             efficiency_score=efficiency,
         )
-        
+
         # Save if output_dir provided
         if output_dir:
             self._save_result(Path(output_dir), content, spec, generated, result)
-        
+
         return result
-    
+
     def _reproduce_chunked(
         self,
         path: Path,
@@ -488,28 +483,28 @@ class AdaptiveReproducer:
     ) -> AdaptiveResult:
         """Reproduce with chunking."""
         chunks = self.chunk_content(content, path)
-        
+
         generated_parts = []
         total_spec_chars = 0
-        
+
         for chunk in chunks:
             spec = self.generate_chunk_spec(chunk, format_name)
             total_spec_chars += len(spec)
-            
+
             generated = self._generate_from_spec(spec, format_name, path.suffix)
             generated_parts.append(generated)
-        
+
         # Combine generated parts
         generated = '\n\n'.join(generated_parts)
         generated_chars = len(generated)
-        
+
         # Compare
         comparison = compare_code(content, generated)
-        
+
         # Calculate efficiency
         compression_ratio = total_spec_chars / max(generated_chars, 1)
         efficiency = (comparison['similarity_percent'] / 100) / max(compression_ratio, 0.1)
-        
+
         result = AdaptiveResult(
             source_file=str(path),
             source_chars=len(content),
@@ -522,13 +517,13 @@ class AdaptiveReproducer:
             compression_ratio=compression_ratio,
             efficiency_score=efficiency,
         )
-        
+
         if output_dir:
-            self._save_result(Path(output_dir), content, 
+            self._save_result(Path(output_dir), content,
                             f"# Chunked spec ({len(chunks)} chunks)", generated, result)
-        
+
         return result
-    
+
     def _generate_from_spec(self, spec: str, format_name: str, file_ext: str) -> str:
         """Generate code from specification."""
         # Determine target language
@@ -542,7 +537,7 @@ class AdaptiveReproducer:
             '.rs': 'Rust',
         }
         target_lang = lang_map.get(file_ext, 'Python')
-        
+
         system = f"""You are an expert {target_lang} developer. Generate clean, production-ready code.
 Rules:
 1. Generate ONLY code, no explanations
@@ -561,22 +556,22 @@ Generate complete, working {target_lang} code."""
 
         response = self.client.generate(prompt, system=system, max_tokens=self.capabilities['max_output'])
         return extract_code_block(response, target_lang.lower())
-    
+
     def _save_result(
-        self, 
-        output_dir: Path, 
-        original: str, 
-        spec: str, 
-        generated: str, 
+        self,
+        output_dir: Path,
+        original: str,
+        spec: str,
+        generated: str,
         result: AdaptiveResult
     ):
         """Save reproduction results."""
         output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         (output_dir / 'original.txt').write_text(original)
         (output_dir / 'specification.txt').write_text(spec)
         (output_dir / 'generated.txt').write_text(generated)
-        
+
         # Report
         report = f"""# Adaptive Reproduction Report
 
@@ -601,18 +596,18 @@ Generate complete, working {target_lang} code."""
 
 def get_llm_capabilities(model: str) -> Dict[str, Any]:
     """Get capabilities for a specific model.
-    
+
     Args:
         model: Model name
-        
+
     Returns:
         Capabilities dictionary
     """
     if model in LLM_CAPABILITIES:
         return LLM_CAPABILITIES[model]
-    
+
     for model_name, caps in LLM_CAPABILITIES.items():
         if model_name in model or model in model_name:
             return caps
-    
+
     return LLM_CAPABILITIES['default']

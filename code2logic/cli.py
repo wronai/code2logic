@@ -9,12 +9,12 @@ Usage:
 """
 
 import argparse
-import os
-import sys
-import subprocess
-import time
 import json
+import os
 import signal
+import subprocess
+import sys
+import time
 from datetime import datetime
 
 from . import __version__
@@ -34,60 +34,60 @@ class Colors:
 
 class Logger:
     """Enhanced logger for CLI output."""
-    
+
     def __init__(self, verbose: bool = False, debug: bool = False):
         self.verbose = verbose
         self.debug = debug
         self.start_time = time.time()
         self._step = 0
-    
+
     def _elapsed(self) -> str:
         """Get elapsed time string."""
         elapsed = time.time() - self.start_time
         return f"{elapsed:.2f}s"
-    
+
     def info(self, msg: str):
         """Print info message."""
         print(f"{Colors.BLUE}ℹ{Colors.NC} {msg}", file=sys.stderr)
-    
+
     def success(self, msg: str):
         """Print success message."""
         print(f"{Colors.GREEN}✓{Colors.NC} {msg}", file=sys.stderr)
-    
+
     def warning(self, msg: str):
         """Print warning message."""
         print(f"{Colors.YELLOW}⚠{Colors.NC} {msg}", file=sys.stderr)
-    
+
     def error(self, msg: str):
         """Print error message."""
         print(f"{Colors.RED}✗{Colors.NC} {msg}", file=sys.stderr)
-    
+
     def step(self, msg: str):
         """Print step message with counter."""
         self._step += 1
         if self.verbose:
             print(f"{Colors.CYAN}[{self._step}]{Colors.NC} {msg} {Colors.DIM}({self._elapsed()}){Colors.NC}", file=sys.stderr)
-    
+
     def detail(self, msg: str):
         """Print detail message (only in verbose mode)."""
         if self.verbose:
             print(f"    {Colors.DIM}{msg}{Colors.NC}", file=sys.stderr)
-    
+
     def debug_msg(self, msg: str):
         """Print debug message (only in debug mode)."""
         if self.debug:
             print(f"{Colors.DIM}[DEBUG] {msg}{Colors.NC}", file=sys.stderr)
-    
+
     def stats(self, label: str, value):
         """Print statistics."""
         if self.verbose:
             print(f"    {Colors.BOLD}{label}:{Colors.NC} {value}", file=sys.stderr)
-    
+
     def separator(self):
         """Print separator line."""
         if self.verbose:
             print(f"{Colors.DIM}{'─' * 50}{Colors.NC}", file=sys.stderr)
-    
+
     def header(self, msg: str):
         """Print header."""
         if self.verbose:
@@ -99,21 +99,21 @@ def ensure_dependencies():
     """Auto-install optional dependencies for best results."""
     packages = {
         'tree-sitter': 'tree_sitter',
-        'tree-sitter-python': 'tree_sitter_python', 
+        'tree-sitter-python': 'tree_sitter_python',
         'tree-sitter-javascript': 'tree_sitter_javascript',
         'tree-sitter-typescript': 'tree_sitter_typescript',
         'networkx': 'networkx',
         'rapidfuzz': 'rapidfuzz',
         'pyyaml': 'yaml',
     }
-    
+
     missing = []
     for pkg_name, import_name in packages.items():
         try:
             __import__(import_name)
         except ImportError:
             missing.append(pkg_name)
-    
+
     if missing:
         print(f"Installing dependencies for best results: {', '.join(missing)}", file=sys.stderr)
         try:
@@ -140,7 +140,7 @@ def _get_env_file_path() -> str:
 
 def _read_text_file(path: str) -> str:
     try:
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return f.read()
     except FileNotFoundError:
         return ""
@@ -204,7 +204,7 @@ def _load_user_llm_config() -> dict:
     if not os.path.exists(path):
         return {}
     try:
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return json.load(f) or {}
     except Exception:
         return {}
@@ -228,7 +228,7 @@ def _load_litellm_yaml() -> dict:
     if not os.path.exists(path):
         raise FileNotFoundError(f"litellm_config.yaml not found at {path}")
 
-    with open(path, 'r', encoding='utf-8') as f:
+    with open(path, encoding='utf-8') as f:
         data = yaml.safe_load(f) or {}
     if data.get('model_list') is None:
         data['model_list'] = []
@@ -448,10 +448,10 @@ def _code2logic_llm_cli(argv: list[str]) -> None:
     if args.cmd == 'status':
         from .config import Config
         from .llm_clients import (
+            OllamaLocalClient,
+            OpenRouterClient,
             get_effective_provider_priorities,
             get_priority_mode,
-            OpenRouterClient,
-            OllamaLocalClient,
         )
 
         cfg = Config()
@@ -517,7 +517,7 @@ def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'llm':
         _code2logic_llm_cli(sys.argv[2:])
         return
-    
+
     parser = argparse.ArgumentParser(
         prog='code2logic',
         description='Convert source code to logical representation for LLM analysis',
@@ -536,7 +536,7 @@ Output formats (token efficiency):
   csv      - Best for LLM (~20K tokens/100 files) - flat table
   compact  - Good for LLM (~25K tokens/100 files) - minimal text
   json     - Standard (~35K tokens/100 files) - nested/flat
-  yaml     - Readable (~35K tokens/100 files) - nested/flat  
+  yaml     - Readable (~35K tokens/100 files) - nested/flat
   logicml  - Compressed (best compression) - reproduction-oriented
   toon     - Token-oriented (~JSON-size, more LLM-friendly) - tabular arrays
   hybrid   - Optimal balance (70% YAML size, 90% info, best LLM quality)
@@ -582,7 +582,7 @@ code2logic [path] [options]
 """
         render.markdown(help_md)
         return True
-    
+
     parser.add_argument(
         'path',
         nargs='?',
@@ -687,7 +687,7 @@ code2logic [path] [options]
         action='store_true',
         help='Show saved LLM profiles'
     )
-    
+
     if len(sys.argv) == 1 or any(a in ("-h", "--help") for a in sys.argv[1:]):
         if not _maybe_print_pretty_help():
             parser.print_help()
@@ -697,15 +697,15 @@ code2logic [path] [options]
 
     if args.detail == 'detailed':
         args.detail = 'full'
-    
+
     # Initialize logger
     log = Logger(verbose=args.verbose, debug=args.debug)
-    
+
     if args.verbose and not args.quiet:
         log.header("CODE2LOGIC")
         log.detail(f"Version: {__version__}")
         log.detail(f"Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    
+
     # Auto-install dependencies unless disabled
     if not args.no_install and not args.status:
         if args.verbose:
@@ -713,17 +713,14 @@ code2logic [path] [options]
         ensure_dependencies()
         if args.verbose:
             log.detail("Dependencies OK")
-    
+
     # Import after potential installation
     from .analyzer import ProjectAnalyzer, get_library_status
-    from .generators import (
-        MarkdownGenerator, CompactGenerator, JSONGenerator,
-        YAMLGenerator
-    )
-    from .toon_format import TOONGenerator
-    from .logicml import LogicMLGenerator
     from .function_logic import FunctionLogicGenerator
-    
+    from .generators import CompactGenerator, JSONGenerator, MarkdownGenerator, YAMLGenerator
+    from .logicml import LogicMLGenerator
+    from .toon_format import TOONGenerator
+
     # Status check
     if args.status:
         status = get_library_status()
@@ -732,7 +729,7 @@ code2logic [path] [options]
             symbol = "✓" if available else "✗"
             print(f"  {lib}: {symbol}")
         sys.exit(0)
-    
+
     # Show LLM profiles
     if args.show_profiles:
         from .llm_profiler import load_profiles
@@ -743,7 +740,7 @@ code2logic [path] [options]
         else:
             print(f"Saved LLM Profiles ({len(profiles)}):")
             print("-" * 60)
-            for pid, p in profiles.items():
+            for _pid, p in profiles.items():
                 print(f"\n{Colors.BOLD}{p.provider}/{p.model}{Colors.NC}")
                 print(f"  Profile ID: {p.profile_id}")
                 print(f"  Created: {p.created_at}")
@@ -753,58 +750,58 @@ code2logic [path] [options]
                 print(f"  Semantic accuracy: {p.semantic_accuracy:.0%}")
                 print(f"  Preferred format: {p.preferred_format}")
         sys.exit(0)
-    
+
     # Profile LLM
     if args.profile_llm:
         from .llm_clients import get_client
         from .llm_profiler import LLMProfiler
-        
+
         log.info("Profiling LLM capabilities...")
-        
+
         try:
             client = get_client()
             provider = getattr(client, 'provider', 'unknown')
             model = getattr(client, 'model', 'unknown')
-            
+
             log.info(f"Using: {provider}/{model}")
-            
+
             profiler = LLMProfiler(client, verbose=True)
             profile = profiler.run_profile(quick=args.profile_quick)
-            
+
             log.success(f"Profile saved: {profile.profile_id}")
             print(f"\nRecommendations for {provider}/{model}:")
             print(f"  Optimal chunk size: {profile.optimal_chunk_size} tokens")
             print(f"  Preferred format: {profile.preferred_format}")
             print(f"  Syntax accuracy: {profile.syntax_accuracy:.0%}")
             print(f"  Semantic accuracy: {profile.semantic_accuracy:.0%}")
-            
+
         except Exception as e:
             log.error(f"Profiling failed: {e}")
             sys.exit(1)
-        
+
         sys.exit(0)
-    
+
     # Path is required for analysis
     if args.path is None:
         # Keep behavior consistent with --help
         if not _maybe_print_pretty_help():
             parser.print_help()
         return
-    
+
     # Validate path
     if not os.path.exists(args.path):
         log.error(f"Path does not exist: {args.path}")
         sys.exit(1)
-    
+
     if not os.path.isdir(args.path):
         log.error(f"Path is not a directory: {args.path}")
         sys.exit(1)
-    
+
     # Analyze
     if args.verbose:
         log.step(f"Analyzing project: {args.path}")
         log.detail(f"Parser: {'Tree-sitter' if not args.no_treesitter else 'Fallback regex'}")
-    
+
     analyze_start = time.time()
     analyzer = ProjectAnalyzer(
         args.path,
@@ -813,7 +810,7 @@ code2logic [path] [options]
     )
     project = analyzer.analyze()
     analyze_time = time.time() - analyze_start
-    
+
     if args.verbose:
         log.success(f"Analysis complete ({analyze_time:.2f}s)")
         log.separator()
@@ -821,23 +818,23 @@ code2logic [path] [options]
         log.stats("Lines", f"{project.total_lines:,}")
         log.stats("Languages", ', '.join(project.languages.keys()))
         log.stats("Modules", len(project.modules))
-        
+
         total_functions = sum(len(m.functions) for m in project.modules)
         total_classes = sum(len(m.classes) for m in project.modules)
         log.stats("Functions", total_functions)
         log.stats("Classes", total_classes)
-        
+
         if project.entrypoints:
             log.stats("Entrypoints", ', '.join(project.entrypoints[:3]))
-        
+
         log.separator()
-    
+
     # Generate output
     if args.verbose:
         log.step(f"Generating {args.format} output (detail: {args.detail})")
-    
+
     gen_start = time.time()
-    
+
     if args.format == 'markdown':
         generator = MarkdownGenerator()
         output = generator.generate(project, args.detail)
@@ -851,12 +848,12 @@ code2logic [path] [options]
         generator = YAMLGenerator()
         compact = args.compact if hasattr(args, 'compact') else False
         hybrid = args.hybrid if hasattr(args, 'hybrid') else False
-        
+
         if hybrid:
             output = generator.generate_hybrid(project, detail=args.detail)
         else:
             output = generator.generate(project, flat=args.flat, detail=args.detail, compact=compact)
-        
+
         # Generate schema if requested
         if args.with_schema:
             if hybrid:
@@ -869,16 +866,16 @@ code2logic [path] [options]
                 f.write(schema)
             if args.verbose:
                 log.success(f"Schema written to: {schema_path}")
-    
+
     elif args.format == 'toon':
         generator = TOONGenerator()
         # For TOON, --compact means ultra-compact format
         compact = args.compact if hasattr(args, 'compact') else False
         ultra_compact = args.ultra_compact if hasattr(args, 'ultra_compact') else False
-        
+
         # Use compact or ultra_compact flag (compact takes precedence for TOON)
         use_ultra_compact = ultra_compact or compact
-        
+
         if use_ultra_compact:
             output = generator.generate_ultra_compact(project)
         else:
@@ -888,7 +885,7 @@ code2logic [path] [options]
                 'full': 'full',
             }
             output = generator.generate(project, detail=detail_map.get(args.detail, 'standard'))
-        
+
         # Generate schema if requested
         if args.with_schema:
             schema_type = 'ultra_compact' if use_ultra_compact else 'standard'
@@ -908,7 +905,7 @@ code2logic [path] [options]
     # Optional: write detailed function logic to a separate file
     if args.function_logic:
         logic_gen = FunctionLogicGenerator()
-        
+
         # Auto-generate path if 'auto' was specified (--function-logic without argument)
         if args.function_logic == 'auto':
             if args.output:
@@ -925,7 +922,7 @@ code2logic [path] [options]
                 logic_path = f"project.functions.{ext}"
         else:
             logic_path = str(args.function_logic)
-        
+
         lower = logic_path.lower()
         if lower.endswith('.json'):
             logic_out = logic_gen.generate_json(project, detail=args.detail)
@@ -939,16 +936,16 @@ code2logic [path] [options]
             f.write(logic_out)
         if args.verbose:
             log.success(f"Function logic written to: {logic_path}")
-    
+
     gen_time = time.time() - gen_start
-    
+
     if args.verbose:
         output_size = len(output)
         tokens_approx = output_size // 4
         log.success(f"Output generated ({gen_time:.2f}s)")
         log.stats("Size", f"{output_size:,} chars (~{tokens_approx:,} tokens)")
         log.stats("Lines", output.count('\n') + 1)
-    
+
     # Write output
     if args.output:
         with open(args.output, 'w', encoding='utf-8') as f:
@@ -965,7 +962,7 @@ code2logic [path] [options]
                 except Exception:
                     pass
                 os._exit(0)
-    
+
     # Final summary
     if args.verbose:
         total_time = time.time() - cli_start

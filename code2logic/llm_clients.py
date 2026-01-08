@@ -11,27 +11,31 @@ functions that were specific to code2logic.
 """
 
 # Re-export everything from lolm for backward compatibility
+import json
+import os
+from typing import Any, Dict, List, Optional
+
 from lolm import (
-    BaseLLMClient,
-    OpenRouterClient,
-    OllamaClient as OllamaLocalClient,
-    LiteLLMClient,
-    LLMManager,
-    get_client,
-    list_available_providers,
-    RECOMMENDED_MODELS,
     DEFAULT_MODELS,
     DEFAULT_PROVIDER_PRIORITIES,
+    RECOMMENDED_MODELS,
+    BaseLLMClient,
+    LiteLLMClient,
+    LLMManager,
+    OpenRouterClient,
+    get_client,
     get_provider_model,
+    list_available_providers,
+)
+from lolm import (
+    OllamaClient as OllamaLocalClient,
+)
+from lolm import (
     get_provider_priorities_from_litellm as _get_provider_priorities_from_litellm_yaml,
 )
 
-import os
-import json
-from typing import Optional, List, Dict, Any
-
 try:
-    import yaml
+    import yaml  # noqa: F401
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
@@ -49,7 +53,7 @@ def _load_user_llm_config() -> Dict[str, Any]:
     if not os.path.exists(path):
         return {}
     try:
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, encoding='utf-8') as f:
             return json.load(f) or {}
     except Exception:
         return {}

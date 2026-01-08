@@ -9,17 +9,17 @@ Handles multi-file projects with:
 
 Usage:
     from code2logic.project_reproducer import ProjectReproducer
-    
+
     reproducer = ProjectReproducer()
     result = reproducer.reproduce_project("path/to/project")
 """
 
 import json
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Set
-from dataclasses import dataclass, field, asdict
-from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Load .env
 try:
@@ -28,13 +28,12 @@ try:
 except ImportError:
     pass
 
-from .universal import (
-    UniversalReproducer,
-    UniversalParser,
-    Language,
-)
 from .llm_clients import BaseLLMClient, get_client
-
+from .universal import (
+    Language,
+    UniversalParser,
+    UniversalReproducer,
+)
 
 # Supported file extensions
 SUPPORTED_EXTENSIONS = {
@@ -84,7 +83,7 @@ class ProjectResult:
 
 class ProjectReproducer:
     """Multi-file project reproduction system."""
-    
+
     def __init__(
         self,
         client: BaseLLMClient = None,
@@ -93,7 +92,7 @@ class ProjectReproducer:
         use_llm: bool = True,
     ):
         """Initialize project reproducer.
-        
+
         Args:
             client: LLM client
             max_workers: Max parallel workers
@@ -113,7 +112,7 @@ class ProjectReproducer:
             # Keep UniversalReproducer in sync
             self.reproducer.client = self.client
         return self.client
-    
+
     def find_source_files(
         self,
         project_path: str,
@@ -121,51 +120,51 @@ class ProjectReproducer:
         exclude_patterns: List[str] = None,
     ) -> List[Path]:
         """Find all source files in project.
-        
+
         Args:
             project_path: Project root path
             extensions: File extensions to include
             exclude_patterns: Patterns to exclude
-            
+
         Returns:
             List of source file paths
         """
         extensions = extensions or set(SUPPORTED_EXTENSIONS.keys())
         exclude_patterns = exclude_patterns or [
-            '__pycache__', 'node_modules', '.git', 'venv', 
+            '__pycache__', 'node_modules', '.git', 'venv',
             'dist', 'build', '.tox', '.pytest_cache'
         ]
-        
+
         files = []
         root = Path(project_path)
-        
+
         for path in root.rglob('*'):
             if not path.is_file():
                 continue
-            
+
             if path.suffix not in extensions:
                 continue
-            
+
             # Check exclusions
             path_str = str(path)
             if any(pattern in path_str for pattern in exclude_patterns):
                 continue
-            
+
             files.append(path)
-        
+
         return sorted(files)
-    
+
     def reproduce_file(
         self,
         file_path: Path,
         output_dir: Path,
     ) -> FileResult:
         """Reproduce a single file.
-        
+
         Args:
             file_path: Source file path
             output_dir: Output directory
-            
+
         Returns:
             FileResult
         """
@@ -180,7 +179,7 @@ class ProjectReproducer:
                 output_dir=str(output_dir / file_path.stem),
                 use_llm=self.use_llm,
             )
-            
+
             return FileResult(
                 file_path=str(file_path),
                 language=result['source_language'],
@@ -192,7 +191,7 @@ class ProjectReproducer:
                 structural=result['structural_score'],
                 success=True,
             )
-            
+
         except Exception as e:
             return FileResult(
                 file_path=str(file_path),
@@ -206,7 +205,7 @@ class ProjectReproducer:
                 success=False,
                 error=str(e),
             )
-    
+
     def reproduce_project(
         self,
         project_path: str,
@@ -214,33 +213,33 @@ class ProjectReproducer:
         parallel: bool = False,
     ) -> ProjectResult:
         """Reproduce entire project.
-        
+
         Args:
             project_path: Project root path
             output_dir: Output directory
             parallel: Use parallel processing
-            
+
         Returns:
             ProjectResult
         """
         output_path = Path(output_dir or f"{project_path}_reproduced")
         output_path.mkdir(parents=True, exist_ok=True)
-        
+
         # Find files
         files = self.find_source_files(project_path)
-        
+
         print(f"Found {len(files)} source files")
-        
+
         # Reproduce files
         results = []
-        
+
         if parallel and len(files) > 1:
             with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
                 futures = {
                     executor.submit(self.reproduce_file, f, output_path): f
                     for f in files
                 }
-                
+
                 for future in as_completed(futures):
                     file_path = futures[future]
                     try:
@@ -255,20 +254,20 @@ class ProjectReproducer:
                 print(f"  Processing {file_path.name}...", end=" ")
                 result = self.reproduce_file(file_path, output_path)
                 results.append(result)
-                
+
                 if result.success:
                     print(f"✓ {result.similarity:.1f}%")
                 else:
                     print(f"✗ {result.error[:30]}")
-        
+
         # Aggregate results
         project_result = self._aggregate_results(project_path, results)
-        
+
         # Save report
         self._save_report(output_path, project_result)
-        
+
         return project_result
-    
+
     def _aggregate_results(
         self,
         project_path: str,
@@ -277,11 +276,11 @@ class ProjectReproducer:
         """Aggregate file results into project result."""
         successful = [r for r in results if r.success]
         failed = [r for r in results if not r.success]
-        
+
         total_source = sum(r.source_chars for r in successful)
         total_logic = sum(r.logic_chars for r in successful)
         total_generated = sum(r.generated_chars for r in successful)
-        
+
         avg_compression = (
             sum(r.compression for r in successful) / len(successful)
             if successful else 0
@@ -294,7 +293,7 @@ class ProjectReproducer:
             sum(r.structural for r in successful) / len(successful)
             if successful else 0
         )
-        
+
         # Group by language
         by_language = {}
         for r in successful:
@@ -308,11 +307,11 @@ class ProjectReproducer:
             by_language[lang]['count'] += 1
             by_language[lang]['similarity'] += r.similarity
             by_language[lang]['structural'] += r.structural
-        
-        for lang, data in by_language.items():
+
+        for _lang, data in by_language.items():
             data['similarity'] /= data['count']
             data['structural'] /= data['count']
-        
+
         return ProjectResult(
             project_path=project_path,
             total_files=len(results),
@@ -327,13 +326,13 @@ class ProjectReproducer:
             files=results,
             by_language=by_language,
         )
-    
+
     def _save_report(self, output_dir: Path, result: ProjectResult):
         """Save project reproduction report."""
         # JSON data
         data = asdict(result)
         (output_dir / 'project_results.json').write_text(json.dumps(data, indent=2))
-        
+
         # Markdown report
         report = f"""# Project Reproduction Report
 
@@ -360,7 +359,7 @@ class ProjectReproducer:
 """
         for lang, data in sorted(result.by_language.items()):
             report += f"| {lang} | {data['count']} | {data['similarity']:.1f}% | {data['structural']:.1f}% |\n"
-        
+
         report += """
 ## File Details
 
@@ -370,7 +369,7 @@ class ProjectReproducer:
         for f in sorted(result.files, key=lambda x: -x.similarity):
             status = "✓" if f.success else "✗"
             report += f"| {status} {Path(f.file_path).name} | {f.language} | {f.similarity:.1f}% | {f.structural:.1f}% | {f.compression:.2f}x |\n"
-        
+
         (output_dir / 'PROJECT_REPORT.md').write_text(report)
         print(f"\nReport saved to: {output_dir}/PROJECT_REPORT.md")
 
@@ -383,13 +382,13 @@ def reproduce_project(
     use_llm: bool = True,
 ) -> ProjectResult:
     """Convenience function for project reproduction.
-    
+
     Args:
         project_path: Project root path
         output_dir: Output directory
         target_lang: Target language
         parallel: Use parallel processing
-        
+
     Returns:
         ProjectResult
     """
