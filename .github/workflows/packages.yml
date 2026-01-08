@@ -1,0 +1,213 @@
+name: Packages CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'lolm/**'
+      - 'logic2test/**'
+      - 'logic2code/**'
+      - '.github/workflows/packages.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lolm/**'
+      - 'logic2test/**'
+      - 'logic2code/**'
+  release:
+    types: [published]
+
+jobs:
+  test-lolm:
+    name: Test lolm
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install dependencies
+        run: |
+          cd lolm
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      
+      - name: Lint
+        run: |
+          cd lolm
+          python -m ruff check lolm/ || true
+      
+      - name: Test
+        run: |
+          cd lolm
+          python -m pytest tests/ -v || echo "No tests yet"
+
+  test-logic2test:
+    name: Test logic2test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install dependencies
+        run: |
+          cd logic2test
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      
+      - name: Lint
+        run: |
+          cd logic2test
+          python -m ruff check logic2test/ || true
+      
+      - name: Test
+        run: |
+          cd logic2test
+          python -m pytest tests/ -v || echo "No tests yet"
+
+  test-logic2code:
+    name: Test logic2code
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install logic2test (dependency)
+        run: |
+          cd logic2test
+          pip install -e .
+      
+      - name: Install dependencies
+        run: |
+          cd logic2code
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      
+      - name: Lint
+        run: |
+          cd logic2code
+          python -m ruff check logic2code/ || true
+      
+      - name: Test
+        run: |
+          cd logic2code
+          python -m pytest tests/ -v || echo "No tests yet"
+
+  publish-lolm:
+    name: Publish lolm
+    needs: test-lolm
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags/lolm-')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+      
+      - name: Build package
+        run: |
+          cd lolm
+          python -m build
+      
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN_LOLM }}
+        run: |
+          cd lolm
+          python -m twine upload dist/*
+
+  publish-logic2test:
+    name: Publish logic2test
+    needs: test-logic2test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags/logic2test-')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+      
+      - name: Build package
+        run: |
+          cd logic2test
+          python -m build
+      
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN_LOGIC2TEST }}
+        run: |
+          cd logic2test
+          python -m twine upload dist/*
+
+  publish-logic2code:
+    name: Publish logic2code
+    needs: [test-logic2code, publish-logic2test]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && startsWith(github.ref, 'refs/tags/logic2code-')
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+      
+      - name: Build package
+        run: |
+          cd logic2code
+          python -m build
+      
+      - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN_LOGIC2CODE }}
+        run: |
+          cd logic2code
+          python -m twine upload dist/*

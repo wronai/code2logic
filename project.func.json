@@ -1,70 +1,71 @@
-# code2logic | 52f 21957L | python:52
+# code2logic | 53f 21955L | python:53
 
 ENTRY: llm_profiler.py config.py project_reproducer.py
 
-  __init__.py (323L) F:analyze_quality,reproduce_project
+  __init__.py (365L) F:analyze_quality,reproduce_project
   __main__.py (12L) -
-  adaptive.py (475L) C:ChunkInfo,AdaptiveResult,AdaptiveReproducer | F:get_llm_capabilities
+  adaptive.py (473L) C:ChunkInfo,AdaptiveResult,AdaptiveReproducer | F:get_llm_capabilities
   analyzer.py (235L) C:ProjectAnalyzer | F:analyze_project,get_library_status
-  base.py (50L) C:VerboseMixin,BaseParser,BaseGenerator
-  benchmark.py (351L) C:FormatResult,BenchmarkResult,ReproductionBenchmark | F:run_benchmark
+  base.py (49L) C:VerboseMixin,BaseParser,BaseGenerator
+  benchmark.py (349L) C:FormatResult,BenchmarkResult,ReproductionBenchmark | F:run_benchmark
 
 [benchmarks]
   __init__.py (19L) -
   common.py (206L) F:create_single_project,generate_spec
   results.py (148L) C:FormatResult,FileResult,FunctionResult
-  runner.py (638L) C:BenchmarkRunner | F:run_benchmark
-  chunked_reproduction.py (357L) C:Chunk,ChunkedSpec,ChunkedResult | F:get_llm_limit,chunk_yaml_spec,chunk_gherkin_spec,chunk_markdown_spec
-  cli.py (803L) C:Colors,Logger | F:ensure_dependencies
+  runner.py (633L) C:BenchmarkRunner | F:run_benchmark
+  chunked_reproduction.py (355L) C:Chunk,ChunkedSpec,ChunkedResult | F:get_llm_limit,chunk_yaml_spec,chunk_gherkin_spec,chunk_markdown_spec
+  cli.py (801L) C:Colors,Logger | F:ensure_dependencies
   code_review.py (205L) C:CodeReviewer | F:analyze_code_quality,check_security_issues,check_performance_issues
   config.py (168L) C:Config | F:load_env,get_api_key,get_model
 
 [core]
   __init__.py (20L) -
   dependency.py (187L) C:DependencyAnalyzer | F:is_networkx_available
-  errors.py (372L) C:ErrorSeverity,ErrorType,AnalysisError | F:create_error_handler
-  file_formats.py (279L) F:generate_file_csv,generate_file_json,generate_file_yaml
+  errors.py (371L) C:ErrorSeverity,ErrorType,AnalysisError | F:create_error_handler
+  file_formats.py (278L) F:generate_file_csv,generate_file_json,generate_file_yaml
 
 [formats]
   __init__.py (27L) -
   function_logic.py (209L) C:FunctionLogicGenerator
   generators.py (1763L) C:MarkdownGenerator,CompactGenerator,JSONGenerator | F:bytes_to_kb
-  gherkin.py (766L) C:GherkinScenario,GherkinFeature,StepDefinition | F:csv_to_gherkin,gherkin_to_test_data
+  gherkin.py (764L) C:GherkinScenario,GherkinFeature,StepDefinition | F:csv_to_gherkin,gherkin_to_test_data
 
 [integrations]
   __init__.py (5L) -
   intent.py (429L) C:IntentType,Intent,EnhancedIntentGenerator
-  llm.py (376L) C:LLMConfig,OllamaClient,LiteLLMClient | F:get_available_backends
+  llm.py (375L) C:LLMConfig,OllamaClient,LiteLLMClient | F:get_available_backends
 
 [llm]
   __init__.py (28L) -
-  llm_clients.py (168L) F:get_priority_mode
-  llm_profiler.py (491L) C:LLMProfile,ProfileTestResult,LLMProfiler | F:load_profiles,save_profile,get_profile
+  llm_clients.py (167L) F:get_priority_mode
+  llm_clients_new.py (0L) -
+  llm_profiler.py (490L) C:LLMProfile,ProfileTestResult,LLMProfiler | F:load_profiles,save_profile,get_profile
   logicml.py (281L) C:LogicMLSpec,LogicMLGenerator | F:generate_logicml
-  markdown_format.py (266L) C:MarkdownSpec,MarkdownHybridGenerator | F:generate_markdown_hybrid,generate_file_markdown
-  mcp_server.py (293L) F:handle_request,call_tool,run_server
-  metrics.py (447L) C:TextMetrics,StructuralMetrics,SemanticMetrics | F:analyze_reproduction,compare_formats
+  markdown_format.py (265L) C:MarkdownSpec,MarkdownHybridGenerator | F:generate_markdown_hybrid,generate_file_markdown
+  mcp_server.py (291L) F:handle_request,call_tool,run_server
+  metrics.py (446L) C:TextMetrics,StructuralMetrics,SemanticMetrics | F:analyze_reproduction,compare_formats
   models.py (296L) C:FunctionInfo,ClassInfo,TypeInfo
-  parsers.py (1586L) C:_PyFunctionBodyAnalyzer,TreeSitterParser,UniversalParser
-  project_reproducer.py (322L) C:FileResult,ProjectResult,ProjectReproducer | F:reproduce_project
+  parsers.py (1584L) C:_PyFunctionBodyAnalyzer,TreeSitterParser,UniversalParser
+  project_reproducer.py (318L) C:FileResult,ProjectResult,ProjectReproducer | F:reproduce_project
   prompts.py (120L) F:get_reproduction_prompt,get_review_prompt,get_fix_prompt
   quality.py (212L) C:QualityIssue,QualityReport,QualityAnalyzer | F:analyze_quality,get_quality_summary
-  refactor.py (313L) C:DuplicateGroup,RefactoringSuggestion,RefactoringReport | F:find_duplicates,analyze_quality,suggest_refactoring,compare_codebases
-  reproducer.py (534L) C:ReproductionStatus,FileValidation,ReproductionResult | F:reproduce_project,validate_files
+  refactor.py (308L) C:DuplicateGroup,RefactoringSuggestion,RefactoringReport | F:find_duplicates,analyze_quality,suggest_refactoring,compare_codebases
+  reproducer.py (533L) C:ReproductionStatus,FileValidation,ReproductionResult | F:reproduce_project,validate_files
   reproduction.py (333L) C:CodeReproducer | F:generate_file_gherkin,compare_code,extract_code_block
 
 [schemas]
   __init__.py (25L) -
   json_schema.py (206L) C:JSONMethodSchema,JSONClassSchema,JSONFunctionSchema | F:validate_json,parse_json_spec
-  logicml_schema.py (190L) C:LogicMLMethod,LogicMLClass,LogicMLModule | F:validate_logicml,parse_logicml_header,extract_logicml_signature
-  markdown_schema.py (121L) C:MarkdownMethod,MarkdownClass,MarkdownModule | F:validate_markdown,extract_markdown_sections
+  logicml_schema.py (184L) C:LogicMLMethod,LogicMLClass,LogicMLModule | F:validate_logicml,parse_logicml_header,extract_logicml_signature
+  markdown_schema.py (118L) C:MarkdownMethod,MarkdownClass,MarkdownModule | F:validate_markdown,extract_markdown_sections
   yaml_schema.py (164L) C:MethodSchema,ClassSchema,FunctionSchema | F:validate_yaml
   shared_utils.py (279L) F:compact_imports,deduplicate_imports,abbreviate_type,expand_type
   similarity.py (178L) C:SimilarityDetector | F:is_rapidfuzz_available,get_refactoring_suggestions
-  terminal.py (500L) C:ShellRenderer,RenderAPI | F:get_renderer,set_renderer
+  terminal.py (496L) C:ShellRenderer,RenderAPI | F:get_renderer,set_renderer
 
 [tools]
   __init__.py (21L) -
-  toon_format.py (541L) C:TOONGenerator,TOONParser | F:generate_toon,parse_toon
-  universal.py (831L) C:ElementType,Language,Parameter | F:reproduce_file
+  toon_format.py (540L) C:TOONGenerator,TOONParser | F:generate_toon,parse_toon
+  universal.py (829L) C:ElementType,Language,Parameter | F:reproduce_file
   utils.py (16L) F:estimate_tokens,write_text_atomic,cleanup_generated_root

@@ -3,117 +3,117 @@ functions:
   _get_profiles_path:
     kind: function
     sig: () -> Path
-    loc: 171-175
+    loc: 170-174
     does: "Get path to profiles storage."
   load_profiles:
     kind: function
     sig: () -> Dict[str, LLMProfile]
-    loc: 178-191
+    loc: 177-190
     does: "Load all saved profiles."
   save_profile:
     kind: function
     sig: (profile:LLMProfile) -> None
-    loc: 194-204
+    loc: 193-203
     does: "Save a profile to storage."
   get_profile:
     kind: function
     sig: (provider:str, model:str) -> Optional[LLMProfile]
-    loc: 207-211
+    loc: 206-210
     does: "Get profile for a specific model."
   get_or_create_profile:
     kind: function
     sig: (provider:str, model:str) -> LLMProfile
-    loc: 214-221
+    loc: 213-220
     does: "Get existing profile or create default one."
   _create_default_profile:
     kind: function
     sig: (provider:str, model:str) -> LLMProfile
-    loc: 224-270
+    loc: 223-269
     does: "Create default profile based on model characteristics."
   profile_llm:
     kind: function
     sig: (client, quick:bool=False) -> LLMProfile
-    loc: 641-644
+    loc: 640-643
     does: "Profile an LLM client."
   get_adaptive_chunker:
     kind: function
     sig: (provider:str, model:str) -> AdaptiveChunker
-    loc: 647-650
+    loc: 646-649
     does: "Get adaptive chunker for a model."
   LLMProfile.__post_init__:
     kind: method
     sig: () -> None
-    loc: 148-154
+    loc: 147-153
     does: "creates init"
   LLMProfiler.__init__:
     kind: method
     sig: (client, verbose:bool=True) -> None
-    loc: 283-294
+    loc: 282-293
     does: "Initialize profiler."
   LLMProfiler.run_profile:
     kind: method
     sig: (quick:bool=False) -> LLMProfile
-    loc: 296-348
+    loc: 295-347
     does: "Run full profiling suite."
   LLMProfiler._test_reproduction:
     kind: method
     sig: (name:str, code:str) -> ProfileTestResult
-    loc: 350-397
+    loc: 349-396
     does: "Test reproduction of a code snippet."
   LLMProfiler._code_to_spec:
     kind: method
     sig: (code:str) -> str
-    loc: 399-427
+    loc: 398-426
     does: "Convert code to simple YAML spec."
   LLMProfiler._extract_code:
     kind: method
     sig: (response:str) -> str
-    loc: 429-444
+    loc: 428-443
     does: "Extract code from LLM response."
   LLMProfiler._check_syntax:
     kind: method
     sig: (code:str) -> bool
-    loc: 446-452
+    loc: 445-451
     does: "Check if code has valid Python syntax."
   LLMProfiler._calculate_similarity:
     kind: method
     sig: (original:str, reproduced:str) -> float
-    loc: 454-460
+    loc: 453-459
     does: "Calculate code similarity."
   LLMProfiler._calculate_metrics:
     kind: method
     sig: (profile:LLMProfile, results:List[ProfileTestResult]) -> LLMProfile
-    loc: 462-499
+    loc: 461-498
     does: "Calculate aggregate metrics from test results."
   LLMProfiler._test_consistency:
     kind: method
     sig: (profile:LLMProfile) -> LLMProfile
-    loc: 501-516
+    loc: 500-515
     does: "Test output consistency by running same prompt twice."
   AdaptiveChunker.__init__:
     kind: method
     sig: (profile:Optional[LLMProfile]=None) -> None
-    loc: 527-537
+    loc: 526-536
     does: "Initialize chunker."
   AdaptiveChunker.get_optimal_settings:
     kind: method
     sig: () -> Dict[str, Any]
-    loc: 539-546
+    loc: 538-545
     does: "Get optimal settings for the profiled model."
   AdaptiveChunker.chunk_spec:
     kind: method
     sig: (spec:str, format:str='yaml') -> List[Dict[str, Any]]
-    loc: 548-606
+    loc: 547-605
     does: "Chunk specification based on profile."
   AdaptiveChunker.recommend_format:
     kind: method
     sig: (spec_size_tokens:int) -> str
-    loc: 608-631
+    loc: 607-630
     does: "Recommend best format based on spec size and model."
   AdaptiveChunker.estimate_chunks_needed:
     kind: method
     sig: (spec_size_tokens:int) -> int
-    loc: 633-637
+    loc: 632-636
     does: "Estimate number of chunks needed."
 
 # config.py | python | 15 functions
@@ -199,22 +199,22 @@ functions:
   generate_file_csv:
     kind: function
     sig: (file_path:Path) -> str
-    loc: 14-67
+    loc: 13-66
     does: "Generate detailed CSV specification for a single file."
   generate_file_json:
     kind: function
     sig: (file_path:Path) -> str
-    loc: 70-137
+    loc: 69-136
     does: "Generate detailed JSON specification for a single file."
   generate_file_yaml:
     kind: function
     sig: (file_path:Path) -> str
-    loc: 140-216
+    loc: 139-215
     does: "Generate detailed YAML specification for a single file."
   _parse_file_elements:
     kind: function
     sig: (content:str) -> Dict[str, Any]
-    loc: 219-352
+    loc: 218-351
     does: "Parse file content to extract code elements."
 
 # project_reproducer.py | python | 8 functions
@@ -222,42 +222,42 @@ functions:
   reproduce_project:
     kind: function
     sig: (project_path:str, output_dir:str=None, target_lang:str=None, parallel:bool=False, use_llm:bool=True) -> ProjectResult
-    loc: 382-401
+    loc: 378-397
     does: "Convenience function for project reproduction."
   ProjectReproducer.__init__:
     kind: method
     sig: (client:BaseLLMClient=None, max_workers:int=4, target_lang:str=None, use_llm:bool=True) -> None
-    loc: 92-111
+    loc: 88-107
     does: "Initialize project reproducer."
   ProjectReproducer._get_client:
     kind: method
     sig: () -> BaseLLMClient
-    loc: 113-119
+    loc: 109-115
     does: "Get or create LLM client."
   ProjectReproducer.find_source_files:
     kind: method
     sig: (project_path:str, extensions:Set[str]=None, exclude_patterns:List[str]=None) -> List[Path]
-    loc: 121-160
+    loc: 117-156
     does: "Find all source files in project."
   ProjectReproducer.reproduce_file:
     kind: method
     sig: (file_path:Path, output_dir:Path) -> FileResult
-    loc: 162-212
+    loc: 158-208
     does: "Reproduce a single file."
   ProjectReproducer.reproduce_project:
     kind: method
     sig: (project_path:str, output_dir:str=None, parallel:bool=False) -> ProjectResult
-    loc: 214-274
+    loc: 210-270
     does: "Reproduce entire project."
   ProjectReproducer._aggregate_results:
     kind: method
     sig: (project_path:str, results:List[FileResult]) -> ProjectResult
-    loc: 276-333
+    loc: 272-329
     does: "Aggregate file results into project result."
   ProjectReproducer._save_report:
     kind: method
     sig: (output_dir:Path, result:ProjectResult) -> None
-    loc: 335-379
+    loc: 331-375
     does: "Save project reproduction report."
 
 # base.py | python | 11 functions
@@ -265,57 +265,57 @@ functions:
   VerboseMixin.__init__:
     kind: method
     sig: (verbose:bool=False) -> None
-    loc: 17-21
+    loc: 16-20
     does: "creates"
   VerboseMixin.log:
     kind: method
     sig: (msg:str, level:str='info') -> None
-    loc: 23-27
+    loc: 22-26
     does: "Log message if verbose mode enabled."
   VerboseMixin.debug:
     kind: method
     sig: (msg:str) -> None
-    loc: 29-31
+    loc: 28-30
     does: "Log debug message."
   VerboseMixin.info:
     kind: method
     sig: (msg:str) -> None
-    loc: 33-35
+    loc: 32-34
     does: "Log info message."
   VerboseMixin.warn:
     kind: method
     sig: (msg:str) -> None
-    loc: 37-39
+    loc: 36-38
     does: "Log warning message."
   VerboseMixin.error:
     kind: method
     sig: (msg:str) -> None
-    loc: 41-43
+    loc: 40-42
     does: "Log error message."
   BaseParser.__init__:
     kind: method
     sig: (verbose:bool=False) -> None
-    loc: 49-50
+    loc: 48-49
     does: "creates"
   BaseParser.parse:
     kind: method
     sig: (content:str, language:str=None) -> None
-    loc: 52-54
+    loc: 51-53
     does: "Parse source code content."
   BaseParser.parse_file:
     kind: method
     sig: (path:str) -> None
-    loc: 56-58
+    loc: 55-57
     does: "Parse source file."
   BaseGenerator.__init__:
     kind: method
     sig: (verbose:bool=False) -> None
-    loc: 64-65
+    loc: 63-64
     does: "creates"
   BaseGenerator.generate:
     kind: method
     sig: (project, detail:str='full') -> str
-    loc: 67-69
+    loc: 66-68
     does: "Generate output from project analysis."
 
 # cli.py | python | 27 functions
@@ -323,137 +323,137 @@ functions:
   ensure_dependencies:
     kind: function
     sig: () -> None
-    loc: 99-135
+    loc: 98-134
     does: "Auto-install optional dependencies for best results."
   _get_env_file_path:
     kind: function
     sig: () -> str
-    loc: 138-139
+    loc: 137-138
     does: "retrieves env file path"
   _read_text_file:
     kind: function
     sig: (path:str) -> str
-    loc: 142-147
+    loc: 141-146
     does: "retrieves text file"
   _write_text_file:
     kind: function
     sig: (path:str, content:str) -> None
-    loc: 150-152
+    loc: 149-151
     does: "logs text file"
   _set_env_var:
     kind: function
     sig: (var_name:str, value:str) -> str
-    loc: 155-180
+    loc: 154-179
     does: "updates env var"
   _unset_env_var:
     kind: function
     sig: (var_name:str) -> str
-    loc: 183-192
+    loc: 182-191
     does: "unset env var"
   _get_litellm_config_path:
     kind: function
     sig: () -> str
-    loc: 195-196
+    loc: 194-195
     does: "retrieves litellm config path"
   _get_user_llm_config_path:
     kind: function
     sig: () -> str
-    loc: 199-200
+    loc: 198-199
     does: "retrieves user llm config path"
   _load_user_llm_config:
     kind: function
     sig: () -> dict
-    loc: 203-211
+    loc: 202-210
     does: "retrieves user llm config"
   _save_user_llm_config:
     kind: function
     sig: (data:dict) -> str
-    loc: 214-219
+    loc: 213-218
     does: "caches user llm config"
   _load_litellm_yaml:
     kind: function
     sig: () -> dict
-    loc: 222-238
+    loc: 221-237
     does: "retrieves litellm yaml"
   _save_litellm_yaml:
     kind: function
     sig: (data:dict) -> str
-    loc: 241-250
+    loc: 240-249
     does: "caches litellm yaml"
   _infer_provider_from_litellm_model:
     kind: function
     sig: (litellm_model:str) -> str
-    loc: 253-258
+    loc: 252-257
     does: "infer provider from litellm model"
   _code2logic_llm_cli:
     kind: function
     sig: (argv:list[str]) -> None
-    loc: 261-506
+    loc: 260-505
     does: "code2logic llm cli"
   main:
     kind: function
     sig: () -> None
-    loc: 509-975
+    loc: 508-973
     does: "Main CLI entry point."
   Logger.__init__:
     kind: method
     sig: (verbose:bool=False, debug:bool=False) -> None
-    loc: 39-43
+    loc: 38-42
     does: "creates"
   Logger._elapsed:
     kind: method
     sig: () -> str
-    loc: 45-48
+    loc: 44-47
     does: "Get elapsed time string."
   Logger.info:
     kind: method
     sig: (msg:str) -> None
-    loc: 50-52
+    loc: 49-51
     does: "Print info message."
   Logger.success:
     kind: method
     sig: (msg:str) -> None
-    loc: 54-56
+    loc: 53-55
     does: "Print success message."
   Logger.warning:
     kind: method
     sig: (msg:str) -> None
-    loc: 58-60
+    loc: 57-59
     does: "Print warning message."
   Logger.error:
     kind: method
     sig: (msg:str) -> None
-    loc: 62-64
+    loc: 61-63
     does: "Print error message."
   Logger.step:
     kind: method
     sig: (msg:str) -> None
-    loc: 66-70
+    loc: 65-69
     does: "Print step message with counter."
   Logger.detail:
     kind: method
     sig: (msg:str) -> None
-    loc: 72-75
+    loc: 71-74
     does: "Print detail message (only in verbose mode)."
   Logger.debug_msg:
     kind: method
     sig: (msg:str) -> None
-    loc: 77-80
+    loc: 76-79
     does: "Print debug message (only in debug mode)."
   Logger.stats:
     kind: method
     sig: (label:str, value) -> None
-    loc: 82-85
+    loc: 81-84
     does: "Print statistics."
   Logger.separator:
     kind: method
     sig: () -> None
-    loc: 87-90
+    loc: 86-89
     does: "Print separator line."
   Logger.header:
     kind: method
     sig: (msg:str) -> None
-    loc: 92-96
+    loc: 91-95
     does: "Print header."
 
 # llm.py | python | 17 functions
@@ -461,87 +461,87 @@ functions:
   get_available_backends:
     kind: function
     sig: () -> Dict[str, bool]
-    loc: 463-478
+    loc: 462-477
     does: "Get availability status of LLM backends."
   OllamaClient.__init__:
     kind: method
     sig: (config:LLMConfig) -> None
-    loc: 60-64
+    loc: 59-63
     does: "creates"
   OllamaClient.generate:
     kind: method
     sig: (prompt:str, system:Optional[str]=None) -> str
-    loc: 66-86
+    loc: 65-85
     does: "Generate completion from Ollama."
   OllamaClient.chat:
     kind: method
     sig: (messages:List[Dict[str,str]]) -> str
-    loc: 88-105
+    loc: 87-104
     does: "Chat completion from Ollama."
   OllamaClient.is_available:
     kind: method
     sig: () -> bool
-    loc: 107-113
+    loc: 106-112
     does: "Check if Ollama is running."
   OllamaClient.list_models:
     kind: method
     sig: () -> List[str]
-    loc: 115-122
+    loc: 114-121
     does: "List available models."
   LiteLLMClient.__init__:
     kind: method
     sig: (config:LLMConfig) -> None
-    loc: 128-131
+    loc: 127-130
     does: "creates"
   LiteLLMClient.generate:
     kind: method
     sig: (prompt:str, system:Optional[str]=None) -> str
-    loc: 133-140
+    loc: 132-139
     does: "Generate completion via LiteLLM."
   LiteLLMClient.chat:
     kind: method
     sig: (messages:List[Dict[str,str]]) -> str
-    loc: 142-155
+    loc: 141-154
     does: "Chat completion via LiteLLM."
   LiteLLMClient.is_available:
     kind: method
     sig: () -> bool
-    loc: 157-163
+    loc: 156-162
     does: "Check if LiteLLM backend is available."
   CodeAnalyzer.__init__:
     kind: method
     sig: (model:str=None, provider:str=None, base_url:str=None, api_key:str=None) -> None
-    loc: 193-237
+    loc: 192-236
     does: "Initialize CodeAnalyzer."
   CodeAnalyzer.is_available:
     kind: method
     sig: () -> bool
-    loc: 239-241
+    loc: 238-240
     does: "Check if LLM backend is available."
   CodeAnalyzer.suggest_refactoring:
     kind: method
     sig: (project) -> List[Dict[str, Any]]
-    loc: 243-292
+    loc: 242-291
     does: "Analyze project and suggest refactoring improvements."
   CodeAnalyzer.find_semantic_duplicates:
     kind: method
     sig: (project) -> List[Dict[str, Any]]
-    loc: 294-352
+    loc: 293-351
     does: "Find semantically similar functions using LLM."
   CodeAnalyzer.generate_code:
     kind: method
     sig: (project, target_lang:str, module_filter:Optional[str]=None) -> Dict[str, str]
-    loc: 354-416
+    loc: 353-415
     does: "Generate code in target language from project analysis."
   CodeAnalyzer.translate_function:
     kind: method
     sig: (name:str, signature:str, intent:str, source_lang:str, target_lang:str) -> str
-    loc: 418-452
+    loc: 417-451
     does: "Translate a single function to another language."
   CodeAnalyzer._build_signature:
     kind: method
     sig: (f) -> str
-    loc: 454-460
+    loc: 453-459
     does: "Build compact signature."
 
 # errors.py | python | 13 functions
@@ -549,67 +549,67 @@ functions:
   create_error_handler:
     kind: function
     sig: (mode:str='lenient', max_file_size_mb:float=10.0) -> ErrorHandler
-    loc: 432-437
+    loc: 431-436
     does: "Create an error handler with default settings."
   AnalysisError.to_dict:
     kind: method
     sig: () -> Dict[str, Any]
-    loc: 61-69
+    loc: 60-68
     does: "converts dict"
   AnalysisResult.add_error:
     kind: method
     sig: (error:AnalysisError) -> None
-    loc: 82-89
+    loc: 81-88
     does: "Add an error to the result."
   AnalysisResult.has_errors:
     kind: method
     sig: () -> bool
-    loc: 91-92
+    loc: 90-91
     does: "has errors"
   AnalysisResult.summary:
     kind: method
     sig: () -> str
-    loc: 94-102
+    loc: 93-101
     does: "Generate error summary."
   ErrorHandler.__init__:
     kind: method
     sig: (mode:str='lenient', max_file_size_mb:float=10.0, timeout_seconds:float=30.0, logger:Optional[Any]=None) -> None
-    loc: 137-148
+    loc: 136-147
     does: "creates"
   ErrorHandler.reset:
     kind: method
     sig: () -> None
-    loc: 150-152
+    loc: 149-151
     does: "Reset error state for new analysis."
   ErrorHandler.handle_error:
     kind: method
     sig: (error_type:ErrorType, path:str, message:str, exception:Optional[Exception]=None, severity:Optional[ErrorSeverity]=None) -> bool
-    loc: 154-188
+    loc: 153-187
     does: "Handle an error."
   ErrorHandler._default_severity:
     kind: method
     sig: (error_type:ErrorType) -> ErrorSeverity
-    loc: 190-206
+    loc: 189-205
     does: "Get default severity for error type."
   ErrorHandler._log_error:
     kind: method
     sig: (error:AnalysisError) -> None
-    loc: 208-216
+    loc: 207-215
     does: "Log an error."
   ErrorHandler.safe_read_file:
     kind: method
     sig: (path:Path) -> Optional[str]
-    loc: 218-329
+    loc: 217-328
     does: "Safely read a file with error handling."
   ErrorHandler.safe_write_file:
     kind: method
     sig: (path:Path, content:str) -> bool
-    loc: 331-376
+    loc: 330-375
     does: "Safely write a file with error handling."
   ErrorHandler.safe_parse:
     kind: method
     sig: (path:str, content:str, parser_func:Callable) -> Any
-    loc: 378-429
+    loc: 377-428
     does: "Safely parse content with error handling."
 
 # code_review.py | python | 6 functions
@@ -839,7 +839,7 @@ functions:
   is_tree_sitter_available:
     kind: function
     sig: () -> bool
-    loc: 1900-1902
+    loc: 1898-1900
     does: "Check if Tree-sitter is available."
   _PyFunctionBodyAnalyzer.__init__:
     kind: method
@@ -969,192 +969,192 @@ functions:
   TreeSitterParser._extract_type_checking_imports:
     kind: method
     sig: (tree, content:str) -> List[str]
-    loc: 437-460
+    loc: 437-458
     does: "Extract TYPE_CHECKING block imports."
   TreeSitterParser._extract_conditional_imports:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 462-475
+    loc: 460-473
     does: "Extract imports from try/except blocks."
   TreeSitterParser._extract_aliases:
     kind: method
     sig: (tree, content:str) -> dict
-    loc: 477-522
+    loc: 475-520
     does: "Extract module aliases (import X as Y)."
   TreeSitterParser._extract_py_function:
     kind: method
     sig: (node, content:str, decorated_node=None) -> Optional[FunctionInfo]
-    loc: 524-625
+    loc: 522-623
     does: "Extract Python function from AST node."
   TreeSitterParser._extract_py_enum:
     kind: method
     sig: (node, content:str) -> Optional[TypeInfo]
-    loc: 627-667
+    loc: 625-665
     does: "Extract Python Enum (values) as TypeInfo(kind='enum')."
   TreeSitterParser._extract_py_class:
     kind: method
     sig: (node, content:str, decorated_node=None) -> Optional[ClassInfo]
-    loc: 669-752
+    loc: 667-750
     does: "Extract Python class from AST node."
   TreeSitterParser._extract_dataclass_field:
     kind: method
     sig: (node, content:str) -> Optional[FieldInfo]
-    loc: 754-816
+    loc: 752-814
     does: "Extract dataclass field from assignment."
   TreeSitterParser._extract_class_attribute:
     kind: method
     sig: (node, content:str) -> Optional[AttributeInfo]
-    loc: 818-860
+    loc: 816-858
     does: "Extract class attribute from self.x = ..."
   TreeSitterParser._extract_init_attributes:
     kind: method
     sig: (func_node, content:str) -> List[AttributeInfo]
-    loc: 862-885
+    loc: 860-883
     does: "Extract self.x = ..."
   TreeSitterParser._extract_class_property:
     kind: method
     sig: (node, content:str) -> Optional[str]
-    loc: 887-900
+    loc: 885-898
     does: "Extract class-level property from annotated assignment."
   TreeSitterParser._extract_py_import:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 902-912
+    loc: 900-910
     does: "Extract import statement."
   TreeSitterParser._extract_py_from_import:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 914-952
+    loc: 912-950
     does: "Extract from ..."
   TreeSitterParser._extract_py_constant:
     kind: method
     sig: (node, content:str) -> Optional[ConstantInfo]
-    loc: 954-1011
+    loc: 952-1009
     does: "Extract constant (UPPERCASE assignment) with value."
   TreeSitterParser._extract_conditional_imports:
     kind: method
     sig: (node, content:str) -> List[str]
-    loc: 1014-1027
+    loc: 1012-1025
     does: "Extract imports from try/except blocks."
   TreeSitterParser._parse_js_ts:
     kind: method
     sig: (filepath:str, content:str, tree, language:str) -> ModuleInfo
-    loc: 1029-1114
+    loc: 1027-1112
     does: "Parse JavaScript/TypeScript source using Tree-sitter AST."
   TreeSitterParser._extract_js_class:
     kind: method
     sig: (node, content:str) -> Optional[ClassInfo]
-    loc: 1116-1150
+    loc: 1114-1148
     does: "Extract JS/TS class from AST node."
   TreeSitterParser._extract_js_method:
     kind: method
     sig: (node, content:str) -> Optional[FunctionInfo]
-    loc: 1152-1191
+    loc: 1150-1189
     does: "Extract JS/TS method from AST node."
   TreeSitterParser._extract_js_function:
     kind: method
     sig: (node, content:str) -> Optional[FunctionInfo]
-    loc: 1193-1227
+    loc: 1191-1225
     does: "Extract JS/TS function from AST node."
   TreeSitterParser._extract_js_arrow_fn:
     kind: method
     sig: (node, content:str) -> Optional[FunctionInfo]
-    loc: 1229-1259
+    loc: 1227-1257
     does: "Extract arrow function assigned to const."
   TreeSitterParser._extract_js_params:
     kind: method
     sig: (params_node, content:str) -> List[str]
-    loc: 1261-1279
+    loc: 1259-1277
     does: "Extract JS/TS function parameters."
   TreeSitterParser._extract_ts_type:
     kind: method
     sig: (node, content:str) -> Optional[TypeInfo]
-    loc: 1281-1288
+    loc: 1279-1286
     does: "Extract TypeScript interface or type alias."
   TreeSitterParser._extract_ts_enum:
     kind: method
     sig: (node, content:str) -> Optional[TypeInfo]
-    loc: 1290-1311
+    loc: 1288-1309
     does: "Extract TypeScript enum."
   TreeSitterParser._extract_js_constant:
     kind: method
     sig: (node, content:str) -> Optional[str]
-    loc: 1313-1322
+    loc: 1311-1320
     does: "Extract constant (UPPERCASE const)."
   TreeSitterParser._extract_js_comment:
     kind: method
     sig: (node, content:str) -> Optional[str]
-    loc: 1324-1334
+    loc: 1322-1332
     does: "Extract JS comment content."
   TreeSitterParser._find_child:
     kind: method
     sig: (node, type_name:str) -> None
-    loc: 1337-1342
+    loc: 1335-1340
     does: "Find first child of given type."
   TreeSitterParser._text:
     kind: method
     sig: (node, content:str) -> str
-    loc: 1344-1350
+    loc: 1342-1348
     does: "Get text content of node."
   TreeSitterParser._extract_string:
     kind: method
     sig: (node, content:str) -> str
-    loc: 1352-1359
+    loc: 1350-1357
     does: "Extract string content without quotes."
   TreeSitterParser._truncate_docstring:
     kind: method
     sig: (docstring:Optional[str], max_len:int=80) -> Optional[str]
-    loc: 1361-1383
+    loc: 1359-1381
     does: "Truncate docstring to first sentence or max_len characters."
   UniversalParser.__init__:
     kind: method
     sig: () -> None
-    loc: 1399-1401
+    loc: 1397-1399
     does: "Initialize the universal parser."
   UniversalParser.parse:
     kind: method
     sig: (filepath:str, content:str, language:str) -> Optional[ModuleInfo]
-    loc: 1403-1423
+    loc: 1401-1421
     does: "Parse a source file using AST or regex."
   UniversalParser._parse_python:
     kind: method
     sig: (filepath:str, content:str) -> Optional[ModuleInfo]
-    loc: 1425-1497
+    loc: 1423-1495
     does: "Parse Python using built-in AST."
   UniversalParser._extract_ast_enum:
     kind: method
     sig: (node:Any) -> Optional[TypeInfo]
-    loc: 1499-1543
+    loc: 1497-1541
     does: "Extract Enum values from Python AST class."
   UniversalParser._extract_ast_function:
     kind: method
     sig: (node) -> FunctionInfo
-    loc: 1545-1614
+    loc: 1543-1612
     does: "Extract function from Python AST node."
   UniversalParser._extract_ast_class:
     kind: method
     sig: (node:Any) -> ClassInfo
-    loc: 1616-1724
+    loc: 1614-1722
     does: "Extract class from Python AST node."
   UniversalParser._extract_ast_constant:
     kind: method
     sig: (node:Any, content:str) -> Optional[ConstantInfo]
-    loc: 1726-1766
+    loc: 1724-1764
     does: "Extract ConstantInfo from an AST assignment node if applicable."
   UniversalParser._format_ast_value:
     kind: method
     sig: (value_node:Any, content:str) -> str
-    loc: 1768-1786
+    loc: 1766-1784
     does: "Best-effort string representation of an AST value node."
   UniversalParser._ann_str:
     kind: method
     sig: (node) -> str
-    loc: 1788-1801
+    loc: 1786-1799
     does: "Convert AST annotation to string."
   UniversalParser._parse_js_ts:
     kind: method
     sig: (filepath:str, content:str, language:str) -> ModuleInfo
-    loc: 1803-1897
+    loc: 1801-1895
     does: "Parse JS/TS using regex patterns."
 
 # intent.py | python | 18 functions
@@ -1255,77 +1255,77 @@ functions:
   get_llm_capabilities:
     kind: function
     sig: (model:str) -> Dict[str, Any]
-    loc: 604-620
+    loc: 602-618
     does: "Get capabilities for a specific model."
   AdaptiveReproducer.__init__:
     kind: method
     sig: (client:BaseLLMClient=None, model:str=None) -> None
-    loc: 127-136
+    loc: 125-134
     does: "Initialize adaptive reproducer."
   AdaptiveReproducer._get_capabilities:
     kind: method
     sig: () -> Dict[str, Any]
-    loc: 138-149
+    loc: 136-147
     does: "Get LLM capabilities for current model."
   AdaptiveReproducer.select_format:
     kind: method
     sig: (file_path:Path, content:str) -> str
-    loc: 151-185
+    loc: 149-183
     does: "Select optimal format based on file and LLM capabilities."
   AdaptiveReproducer.should_chunk:
     kind: method
     sig: (content:str) -> bool
-    loc: 187-206
+    loc: 185-204
     does: "Determine if content should be chunked."
   AdaptiveReproducer.chunk_content:
     kind: method
     sig: (content:str, file_path:Path) -> List[ChunkInfo]
-    loc: 208-325
+    loc: 206-323
     does: "Split content into logical chunks."
   AdaptiveReproducer.generate_chunk_spec:
     kind: method
     sig: (chunk:ChunkInfo, format_name:str) -> str
-    loc: 327-347
+    loc: 325-345
     does: "Generate specification for a single chunk."
   AdaptiveReproducer._gherkin_for_chunk:
     kind: method
     sig: (chunk:ChunkInfo) -> str
-    loc: 349-380
+    loc: 347-378
     does: "Generate Gherkin for a chunk."
   AdaptiveReproducer._yaml_for_chunk:
     kind: method
     sig: (chunk:ChunkInfo) -> str
-    loc: 382-394
+    loc: 380-392
     does: "Generate YAML for a chunk."
   AdaptiveReproducer._json_for_chunk:
     kind: method
     sig: (chunk:ChunkInfo) -> str
-    loc: 396-405
+    loc: 394-403
     does: "Generate JSON for a chunk."
   AdaptiveReproducer.reproduce:
     kind: method
     sig: (file_path:str, output_dir:str=None) -> AdaptiveResult
-    loc: 407-430
+    loc: 405-428
     does: "Reproduce code with adaptive format selection."
   AdaptiveReproducer._reproduce_single:
     kind: method
     sig: (path:Path, content:str, format_name:str, output_dir:str=None) -> AdaptiveResult
-    loc: 432-482
+    loc: 430-480
     does: "Reproduce without chunking."
   AdaptiveReproducer._reproduce_chunked:
     kind: method
     sig: (path:Path, content:str, format_name:str, output_dir:str=None) -> AdaptiveResult
-    loc: 484-532
+    loc: 482-530
     does: "Reproduce with chunking."
   AdaptiveReproducer._generate_from_spec:
     kind: method
     sig: (spec:str, format_name:str, file_ext:str) -> str
-    loc: 534-565
+    loc: 532-563
     does: "Generate code from specification."
   AdaptiveReproducer._save_result:
     kind: method
     sig: (output_dir:Path, original:str, spec:str, generated:str, result:AdaptiveResult) -> None
-    loc: 567-601
+    loc: 565-599
     does: "Save reproduction results."
 
 # reproducer.py | python | 27 functions
@@ -1333,137 +1333,137 @@ functions:
   reproduce_project:
     kind: function
     sig: (spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None, validate:bool=True, verbose:bool=True) -> ReproductionResult
-    loc: 633-685
+    loc: 632-684
     does: "Convenience function to reproduce and validate a project."
   validate_files:
     kind: function
     sig: (spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None) -> List[FileValidation]
-    loc: 688-705
+    loc: 687-704
     does: "Validate specific files against spec."
   FileValidation.score:
     kind: method
     sig: () -> float
-    loc: 43-58
+    loc: 42-57
     does: "Calculate match score 0-100."
   FileValidation.to_dict:
     kind: method
     sig: () -> Dict[str, Any]
-    loc: 60-69
+    loc: 59-68
     does: "converts dict"
   ReproductionResult.success_rate:
     kind: method
     sig: () -> float
-    loc: 84-87
+    loc: 83-86
     does: "success rate"
   ReproductionResult.average_score:
     kind: method
     sig: () -> float
-    loc: 90-93
+    loc: 89-92
     does: "average score"
   ReproductionResult.summary:
     kind: method
     sig: () -> str
-    loc: 95-107
+    loc: 94-106
     does: "summary"
   SpecReproducer.__init__:
     kind: method
     sig: (verbose:bool=False) -> None
-    loc: 122-123
+    loc: 121-122
     does: "creates"
   SpecReproducer.reproduce_from_yaml:
     kind: method
     sig: (spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult
-    loc: 125-142
+    loc: 124-141
     does: "Reproduce files from YAML specification."
   SpecReproducer.reproduce_from_json:
     kind: method
     sig: (spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult
-    loc: 144-154
+    loc: 143-153
     does: "Reproduce files from JSON specification."
   SpecReproducer._reproduce:
     kind: method
     sig: (spec:Dict[str,Any], output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult
-    loc: 156-196
+    loc: 155-195
     does: "Internal reproduction logic."
   SpecReproducer._generate_file:
     kind: method
     sig: (module:Dict[str,Any], output_path:Path) -> bool
-    loc: 198-214
+    loc: 197-213
     does: "Generate a single file from module spec."
   SpecReproducer._generate_python:
     kind: method
     sig: (module:Dict[str,Any]) -> str
-    loc: 216-261
+    loc: 215-260
     does: "Generate Python file content."
   SpecReproducer._render_docstring:
     kind: method
     sig: (text:str, indent:str) -> List[str]
-    loc: 263-290
+    loc: 262-289
     does: "Render a safe Python docstring or fall back to comments."
   SpecReproducer._sanitize_python_property:
     kind: method
     sig: (prop:str) -> str
-    loc: 292-320
+    loc: 291-319
     does: "Sanitize a Python class property declaration for valid syntax."
   SpecReproducer._generate_python_class:
     kind: method
     sig: (cls:Dict[str,Any]) -> List[str]
-    loc: 322-363
+    loc: 321-362
     does: "Generate Python class."
   SpecReproducer._generate_python_method:
     kind: method
     sig: (method:Dict[str,Any]) -> List[str]
-    loc: 365-391
+    loc: 364-390
     does: "Generate Python method."
   SpecReproducer._generate_python_function:
     kind: method
     sig: (func:Dict[str,Any]) -> List[str]
-    loc: 393-412
+    loc: 392-411
     does: "Generate Python function."
   SpecReproducer._generate_typescript:
     kind: method
     sig: (module:Dict[str,Any]) -> str
-    loc: 414-442
+    loc: 413-441
     does: "Generate TypeScript file content."
   SpecReproducer._generate_ts_class:
     kind: method
     sig: (cls:Dict[str,Any]) -> List[str]
-    loc: 444-466
+    loc: 443-465
     does: "Generate TypeScript class."
   SpecReproducer._generate_ts_method:
     kind: method
     sig: (method:Dict[str,Any]) -> List[str]
-    loc: 468-481
+    loc: 467-480
     does: "Generate TypeScript method."
   SpecReproducer._generate_ts_function:
     kind: method
     sig: (func:Dict[str,Any]) -> List[str]
-    loc: 483-496
+    loc: 482-495
     does: "Generate TypeScript function."
   SpecReproducer._parse_signature:
     kind: method
     sig: (sig:str) -> str
-    loc: 498-513
+    loc: 497-512
     does: "Parse and clean signature."
   SpecValidator.__init__:
     kind: method
     sig: () -> None
-    loc: 529-530
+    loc: 528-529
     does: "creates"
   SpecValidator.validate:
     kind: method
     sig: (spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None) -> List[FileValidation]
-    loc: 532-568
+    loc: 531-567
     does: "Validate generated files against spec."
   SpecValidator._validate_file:
     kind: method
     sig: (module:Dict[str,Any], base_path:Path) -> FileValidation
-    loc: 570-621
+    loc: 569-620
     does: "Validate a single file."
   SpecValidator._check_python_syntax:
     kind: method
     sig: (content:str, validation:FileValidation) -> bool
-    loc: 623-630
+    loc: 622-629
     does: "Check Python syntax."
 
 # llm_clients.py | python | 12 functions
@@ -1471,62 +1471,62 @@ functions:
   _get_user_llm_config_path:
     kind: function
     sig: () -> str
-    loc: 42-44
+    loc: 41-43
     does: "Get path to legacy code2logic LLM config."
   _load_user_llm_config:
     kind: function
     sig: () -> Dict[str, Any]
-    loc: 47-56
+    loc: 46-55
     does: "Load legacy code2logic LLM config."
   _get_priority_mode:
     kind: function
     sig: () -> str
-    loc: 59-62
+    loc: 58-61
     does: "Get priority mode from legacy config."
   get_priority_mode:
     kind: function
     sig: () -> str
-    loc: 65-67
+    loc: 64-66
     does: "Get priority mode (legacy wrapper)."
   _get_provider_priority_overrides:
     kind: function
     sig: () -> Dict[str, int]
-    loc: 70-80
+    loc: 69-79
     does: "Get provider priority overrides from legacy config."
   _get_model_priority_rules:
     kind: function
     sig: () -> Dict[str, Dict[str, int]]
-    loc: 83-104
+    loc: 82-103
     does: "Get model priority rules from legacy config."
   _get_model_priority:
     kind: function
     sig: (model_string:str) -> Optional[int]
-    loc: 107-124
+    loc: 106-123
     does: "Get model priority from legacy config."
   _get_provider_model_string:
     kind: function
     sig: (provider:str) -> str
-    loc: 127-129
+    loc: 126-128
     does: "Get model string for provider from environment."
   _get_priority_order:
     kind: function
     sig: () -> List[str]
-    loc: 132-134
+    loc: 131-133
     does: "Get providers ordered by priority."
   _get_effective_provider_order:
     kind: function
     sig: () -> List[tuple]
-    loc: 137-185
+    loc: 136-184
     does: "Get effective provider order with priorities."
   get_effective_provider_priorities:
     kind: function
     sig: () -> Dict[str, int]
-    loc: 188-190
+    loc: 187-189
     does: "Get effective provider priorities (legacy wrapper)."
   _candidate_litellm_yaml_paths:
     kind: function
     sig: () -> List[str]
-    loc: 193-199
+    loc: 192-198
     does: "Get candidate paths for litellm_config.yaml."
 
 # prompts.py | python | 3 functions
@@ -1552,62 +1552,62 @@ functions:
   get_llm_limit:
     kind: function
     sig: (model_name:str) -> int
-    loc: 71-79
+    loc: 69-77
     does: "Get context limit for LLM model."
   chunk_yaml_spec:
     kind: function
     sig: (spec:str, max_tokens:int=2000) -> List[Chunk]
-    loc: 82-144
+    loc: 80-142
     does: "Chunk YAML specification by modules/classes/functions."
   chunk_gherkin_spec:
     kind: function
     sig: (spec:str, max_tokens:int=2000) -> List[Chunk]
-    loc: 147-225
+    loc: 145-223
     does: "Chunk Gherkin specification by Features/Scenarios."
   chunk_markdown_spec:
     kind: function
     sig: (spec:str, max_tokens:int=2000) -> List[Chunk]
-    loc: 228-276
+    loc: 226-274
     does: "Chunk Markdown specification by sections."
   chunk_spec:
     kind: function
     sig: (spec:str, fmt:str, max_tokens:int=2000) -> ChunkedSpec
-    loc: 279-298
+    loc: 277-296
     does: "Chunk specification based on format."
   get_chunk_prompt:
     kind: function
     sig: (chunk:Chunk, fmt:str, file_name:str, chunk_num:int, total_chunks:int) -> str
-    loc: 301-319
+    loc: 299-317
     does: "Generate prompt for a single chunk."
   merge_chunk_codes:
     kind: function
     sig: (codes:List[str], file_name:str) -> str
-    loc: 322-348
+    loc: 320-346
     does: "Merge code from multiple chunks."
   auto_chunk_reproduce:
     kind: function
     sig: (spec:str, fmt:str, file_name:str, client, model_name:str='default') -> ChunkedResult
-    loc: 431-440
+    loc: 429-438
     does: "Auto-chunking reproduction with LLM adaptation."
   adaptive_chunk_reproduce:
     kind: function
     sig: (spec:str, fmt:str, file_name:str, client, provider:str='unknown', model:str='unknown') -> ChunkedResult
-    loc: 443-479
+    loc: 441-477
     does: "Adaptive chunking reproduction using LLM profile."
   ChunkedReproducer.__init__:
     kind: method
     sig: (client, model_name:str='default') -> None
-    loc: 354-357
+    loc: 352-355
     does: "creates"
   ChunkedReproducer.reproduce:
     kind: method
     sig: (spec:str, fmt:str, file_name:str) -> ChunkedResult
-    loc: 359-420
+    loc: 357-418
     does: "Reproduce code from specification, chunking if needed."
   ChunkedReproducer._extract_code:
     kind: method
     sig: (response:str) -> str
-    loc: 422-428
+    loc: 420-426
     does: "Extract code from LLM response."
 
 # __init__.py | python | 2 functions
@@ -1628,72 +1628,72 @@ functions:
   analyze_reproduction:
     kind: function
     sig: (original:str, generated:str, spec:str='', format_name:str='', verbose:bool=False) -> ReproductionResult
-    loc: 530-550
+    loc: 529-549
     does: "Convenience function for reproduction analysis."
   compare_formats:
     kind: function
     sig: (original:str, results:Dict[str,Tuple[str,str]], verbose:bool=False) -> Dict[str, Any]
-    loc: 553-597
+    loc: 552-596
     does: "Compare reproduction quality across formats."
   ReproductionResult.to_dict:
     kind: method
     sig: () -> Dict[str, Any]
-    loc: 117-118
+    loc: 116-117
     does: "converts dict"
   ReproductionResult.to_report:
     kind: method
     sig: () -> str
-    loc: 120-180
+    loc: 119-179
     does: "Generate detailed markdown report."
   ReproductionMetrics.__init__:
     kind: method
     sig: (verbose:bool=False) -> None
-    loc: 186-189
+    loc: 185-188
     does: "creates"
   ReproductionMetrics.analyze:
     kind: method
     sig: (original:str, generated:str, spec:str='', format_name:str='', source_file:str='') -> ReproductionResult
-    loc: 191-244
+    loc: 190-243
     does: "Analyze reproduction quality."
   ReproductionMetrics._compute_text_metrics:
     kind: method
     sig: (original:str, generated:str) -> TextMetrics
-    loc: 246-288
+    loc: 245-287
     does: "Compute text-level metrics."
   ReproductionMetrics._cosine_similarity:
     kind: method
     sig: (words1:List[str], words2:List[str]) -> float
-    loc: 290-304
+    loc: 289-303
     does: "Compute cosine similarity between word lists."
   ReproductionMetrics._compute_structural_metrics:
     kind: method
     sig: (original:str, generated:str) -> StructuralMetrics
-    loc: 306-359
+    loc: 305-358
     does: "Compute structural metrics."
   ReproductionMetrics._compute_semantic_metrics:
     kind: method
     sig: (original:str, generated:str) -> SemanticMetrics
-    loc: 361-417
+    loc: 360-416
     does: "Compute semantic preservation metrics."
   ReproductionMetrics._compute_format_metrics:
     kind: method
     sig: (original:str, generated:str, spec:str, format_name:str) -> FormatMetrics
-    loc: 419-453
+    loc: 418-452
     does: "Compute format efficiency metrics."
   ReproductionMetrics._compute_overall_score:
     kind: method
     sig: (result:ReproductionResult) -> float
-    loc: 455-484
+    loc: 454-483
     does: "Compute weighted overall score."
   ReproductionMetrics._get_grade:
     kind: method
     sig: (score:float) -> str
-    loc: 486-497
+    loc: 485-496
     does: "Get letter grade from score."
   ReproductionMetrics._generate_recommendations:
     kind: method
     sig: (result:ReproductionResult) -> List[str]
-    loc: 499-527
+    loc: 498-526
     does: "Generate improvement recommendations."
 
 # refactor.py | python | 7 functions
@@ -1701,37 +1701,37 @@ functions:
   find_duplicates:
     kind: function
     sig: (project_path:str, threshold:float=0.8) -> List[DuplicateGroup]
-    loc: 112-167
+    loc: 108-162
     does: "Find duplicate functions in a project."
   analyze_quality:
     kind: function
     sig: (project_path:str, include_security:bool=True, include_performance:bool=True) -> RefactoringReport
-    loc: 170-229
+    loc: 165-224
     does: "Analyze code quality and generate refactoring report."
   suggest_refactoring:
     kind: function
     sig: (project_path:str, use_llm:bool=False, client:BaseLLMClient=None) -> RefactoringReport
-    loc: 232-294
+    loc: 227-289
     does: "Generate refactoring suggestions for a project."
   compare_codebases:
     kind: function
     sig: (project1:str, project2:str) -> Dict[str, Any]
-    loc: 297-350
+    loc: 292-345
     does: "Compare two codebases for similarities and differences."
   quick_analyze:
     kind: function
     sig: (project_path:str) -> Dict[str, Any]
-    loc: 353-388
+    loc: 348-383
     does: "Quick analysis for a project."
   RefactoringReport.to_dict:
     kind: method
     sig: () -> Dict[str, Any]
-    loc: 65-66
+    loc: 61-62
     does: "converts dict"
   RefactoringReport.to_markdown:
     kind: method
     sig: () -> str
-    loc: 68-109
+    loc: 64-105
     does: "Generate markdown report."
 
 # logicml.py | python | 9 functions
@@ -2171,52 +2171,52 @@ functions:
   generate_markdown_hybrid:
     kind: function
     sig: (project:ProjectInfo, detail:str='full') -> str
-    loc: 344-348
+    loc: 343-347
     does: "Convenience function to generate Markdown hybrid format."
   generate_file_markdown:
     kind: function
     sig: (file_path:str) -> str
-    loc: 351-365
+    loc: 350-364
     does: "Generate Markdown hybrid for a single file."
   MarkdownHybridGenerator.__init__:
     kind: method
     sig: (verbose:bool=False) -> None
-    loc: 45-48
+    loc: 44-47
     does: "creates"
   MarkdownHybridGenerator.generate:
     kind: method
     sig: (project:ProjectInfo, detail:str='full') -> MarkdownSpec
-    loc: 50-92
+    loc: 49-91
     does: "Generate Markdown hybrid specification."
   MarkdownHybridGenerator._generate_header:
     kind: method
     sig: (project:ProjectInfo) -> str
-    loc: 94-101
+    loc: 93-100
     does: "Generate header section."
   MarkdownHybridGenerator._generate_tree:
     kind: method
     sig: (project:ProjectInfo) -> str
-    loc: 103-124
+    loc: 102-123
     does: "Generate file tree section."
   MarkdownHybridGenerator._generate_imports:
     kind: method
     sig: (project:ProjectInfo) -> str
-    loc: 126-165
+    loc: 125-164
     does: "Generate imports as YAML for precise reproduction."
   MarkdownHybridGenerator._generate_classes_yaml:
     kind: method
     sig: (project:ProjectInfo) -> str
-    loc: 167-241
+    loc: 166-240
     does: "Generate classes as detailed YAML codeblock."
   MarkdownHybridGenerator._generate_functions_gherkin:
     kind: method
     sig: (project:ProjectInfo) -> str
-    loc: 243-313
+    loc: 242-312
     does: "Generate functions as detailed Gherkin codeblock."
   MarkdownHybridGenerator._generate_dependencies:
     kind: method
     sig: (project:ProjectInfo) -> str
-    loc: 315-341
+    loc: 314-340
     does: "Generate module dependencies section."
 
 # similarity.py | python | 6 functions
@@ -2257,127 +2257,127 @@ functions:
   reproduce_file:
     kind: function
     sig: (source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True) -> Dict[str, Any]
-    loc: 1056-1074
+    loc: 1054-1072
     does: "Convenience function for single file reproduction."
   CodeLogic.to_dict:
     kind: method
     sig: () -> Dict[str, Any]
-    loc: 108-118
+    loc: 106-116
     does: "Convert to dictionary."
   CodeLogic._element_to_dict:
     kind: method
     sig: (elem:CodeElement) -> Dict[str, Any]
-    loc: 120-135
+    loc: 118-133
     does: "Convert element to dictionary."
   CodeLogic.to_compact:
     kind: method
     sig: () -> str
-    loc: 137-159
+    loc: 135-157
     does: "Convert to compact string representation."
   CodeLogic._element_to_compact:
     kind: method
     sig: (elem:CodeElement, indent:int) -> List[str]
-    loc: 161-222
+    loc: 159-220
     does: "Convert element to compact lines."
   UniversalParser.detect_language:
     kind: method
     sig: (content:str, file_ext:str) -> Language
-    loc: 239-262
+    loc: 237-260
     does: "Detect programming language from content and extension."
   UniversalParser.parse:
     kind: method
     sig: (file_path:Union[str,Path]) -> CodeLogic
-    loc: 264-282
+    loc: 262-280
     does: "Parse source file into CodeLogic."
   UniversalParser._parse_python:
     kind: method
     sig: (path:Path, content:str, hash_:str) -> CodeLogic
-    loc: 284-406
+    loc: 282-404
     does: "Parse Python file."
   UniversalParser._parse_js_ts:
     kind: method
     sig: (path:Path, content:str, hash_:str, lang:Language) -> CodeLogic
-    loc: 408-577
+    loc: 406-575
     does: "Parse JavaScript/TypeScript file."
   UniversalParser._parse_go:
     kind: method
     sig: (path:Path, content:str, hash_:str) -> CodeLogic
-    loc: 579-639
+    loc: 577-637
     does: "Parse Go file."
   UniversalParser._parse_sql:
     kind: method
     sig: (path:Path, content:str, hash_:str) -> CodeLogic
-    loc: 641-683
+    loc: 639-681
     does: "Parse SQL file."
   UniversalParser._parse_generic:
     kind: method
     sig: (path:Path, content:str, hash_:str, lang:Language) -> CodeLogic
-    loc: 685-706
+    loc: 683-704
     does: "Generic parser for unknown languages."
   CodeGenerator.generate:
     kind: method
     sig: (logic:CodeLogic, target_lang:Language) -> str
-    loc: 712-723
+    loc: 710-721
     does: "Generate code in target language."
   CodeGenerator._generate_python:
     kind: method
     sig: (logic:CodeLogic) -> str
-    loc: 725-756
+    loc: 723-754
     does: "Generate Python code."
   CodeGenerator._generate_python_element:
     kind: method
     sig: (elem:CodeElement, indent:int=0) -> List[str]
-    loc: 758-814
+    loc: 756-812
     does: "Generate Python code for element."
   CodeGenerator._generate_typescript:
     kind: method
     sig: (logic:CodeLogic) -> str
-    loc: 816-855
+    loc: 814-853
     does: "Generate TypeScript code."
   CodeGenerator._generate_go:
     kind: method
     sig: (logic:CodeLogic) -> str
-    loc: 857-878
+    loc: 855-876
     does: "Generate Go code."
   CodeGenerator._generate_sql:
     kind: method
     sig: (logic:CodeLogic) -> str
-    loc: 880-894
+    loc: 878-892
     does: "Generate SQL code."
   CodeGenerator._generate_generic:
     kind: method
     sig: (logic:CodeLogic, target:Language) -> str
-    loc: 896-898
+    loc: 894-896
     does: "Generate generic code."
   UniversalReproducer.__init__:
     kind: method
     sig: (client:BaseLLMClient=None) -> None
-    loc: 904-908
+    loc: 902-906
     does: "Initialize reproducer."
   UniversalReproducer._get_client:
     kind: method
     sig: () -> BaseLLMClient
-    loc: 910-914
+    loc: 908-912
     does: "Get or create LLM client."
   UniversalReproducer.extract_logic:
     kind: method
     sig: (file_path:str) -> CodeLogic
-    loc: 916-918
+    loc: 914-916
     does: "Extract code logic from file."
   UniversalReproducer.reproduce:
     kind: method
     sig: (source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True) -> Dict[str, Any]
-    loc: 920-983
+    loc: 918-981
     does: "Reproduce code from source file."
   UniversalReproducer._generate_with_llm:
     kind: method
     sig: (logic:CodeLogic, target:Language) -> str
-    loc: 985-1018
+    loc: 983-1016
     does: "Generate code using LLM."
   UniversalReproducer._save_result:
     kind: method
     sig: (output_dir:Path, original:str, logic:CodeLogic, generated:str, result:Dict[str,Any]) -> None
-    loc: 1020-1053
+    loc: 1018-1051
     does: "Save reproduction results."
 
 # benchmark.py | python | 9 functions
@@ -2385,47 +2385,47 @@ functions:
   run_benchmark:
     kind: function
     sig: (files:List[str], output_dir:str='benchmark_results', provider:str=None, model:str=None) -> Dict[str, Any]
-    loc: 430-449
+    loc: 428-447
     does: "Run reproduction benchmark."
   ReproductionBenchmark.__init__:
     kind: method
     sig: (client:BaseLLMClient=None) -> None
-    loc: 140-153
+    loc: 138-151
     does: "Initialize benchmark."
   ReproductionBenchmark.generate_spec:
     kind: method
     sig: (file_path:Path, format_name:str, detail:str='full') -> str
-    loc: 155-179
+    loc: 153-177
     does: "Generate specification in given format."
   ReproductionBenchmark.reproduce_with_format:
     kind: method
     sig: (file_path:Path, format_name:str, original_code:str) -> FormatResult
-    loc: 181-252
+    loc: 179-250
     does: "Test reproduction with a specific format."
   ReproductionBenchmark.run_single:
     kind: method
     sig: (file_path:str, formats:List[str]=None) -> BenchmarkResult
-    loc: 254-304
+    loc: 252-302
     does: "Run benchmark on a single file."
   ReproductionBenchmark.run_all:
     kind: method
     sig: (files:List[str], output_dir:str=None) -> Dict[str, Any]
-    loc: 306-337
+    loc: 304-335
     does: "Run benchmark on multiple files."
   ReproductionBenchmark._generate_summary:
     kind: method
     sig: (results:List[BenchmarkResult]) -> Dict[str, Any]
-    loc: 339-362
+    loc: 337-360
     does: "Generate summary from benchmark results."
   ReproductionBenchmark._save_results:
     kind: method
     sig: (output_dir:Path, results:List[BenchmarkResult], summary:Dict) -> None
-    loc: 364-379
+    loc: 362-377
     does: "Save benchmark results."
   ReproductionBenchmark._generate_report:
     kind: method
     sig: (results:List[BenchmarkResult], summary:Dict) -> str
-    loc: 381-427
+    loc: 379-425
     does: "Generate markdown benchmark report."
 
 # terminal.py | python | 52 functions
@@ -2433,12 +2433,12 @@ functions:
   get_renderer:
     kind: function
     sig: (use_colors:bool=True, verbose:bool=True) -> ShellRenderer
-    loc: 578-583
+    loc: 574-579
     does: "Get or create the global renderer instance."
   set_renderer:
     kind: function
     sig: (renderer:ShellRenderer) -> None
-    loc: 586-589
+    loc: 582-585
     does: "Set the global renderer instance."
   ShellRenderer.__init__:
     kind: method
@@ -2568,127 +2568,127 @@ functions:
   ShellRenderer._highlight_json:
     kind: method
     sig: (line:str) -> str
-    loc: 383-409
+    loc: 383-405
     does: "Highlight JSON syntax."
   ShellRenderer._highlight_python:
     kind: method
     sig: (line:str) -> str
-    loc: 411-443
+    loc: 407-439
     does: "Highlight Python syntax."
   ShellRenderer._highlight_bash:
     kind: method
     sig: (line:str) -> str
-    loc: 445-463
+    loc: 441-459
     does: "Highlight Bash syntax."
   ShellRenderer._highlight_js:
     kind: method
     sig: (line:str) -> str
-    loc: 465-493
+    loc: 461-489
     does: "Highlight JavaScript/TypeScript syntax."
   ShellRenderer._highlight_gherkin:
     kind: method
     sig: (line:str) -> str
-    loc: 495-519
+    loc: 491-515
     does: "Highlight Gherkin/BDD syntax."
   ShellRenderer._highlight_log:
     kind: method
     sig: (line:str) -> str
-    loc: 521-540
+    loc: 517-536
     does: "Highlight log messages."
   ShellRenderer._highlight_markdown:
     kind: method
     sig: (line:str) -> str
-    loc: 542-561
+    loc: 538-557
     does: "Highlight Markdown syntax."
   ShellRenderer.save_log:
     kind: method
     sig: (filepath:str) -> None
-    loc: 563-568
+    loc: 559-564
     does: "Save log buffer to file as markdown."
   RenderAPI.heading:
     kind: method
     sig: (level:int, text:str) -> None
-    loc: 596-597
+    loc: 592-593
     does: "heading"
   RenderAPI.code:
     kind: method
     sig: (lang:Language, content:str) -> None
-    loc: 600-601
+    loc: 596-597
     does: "code"
   RenderAPI.codeblock:
     kind: method
     sig: (lang:Language, content:str) -> None
-    loc: 604-605
+    loc: 600-601
     does: "codeblock"
   RenderAPI.markdown:
     kind: method
     sig: (text:str) -> None
-    loc: 608-609
+    loc: 604-605
     does: "markdown"
   RenderAPI.success:
     kind: method
     sig: (message:str) -> None
-    loc: 612-613
+    loc: 608-609
     does: "success"
   RenderAPI.error:
     kind: method
     sig: (message:str) -> None
-    loc: 616-617
+    loc: 612-613
     does: "error"
   RenderAPI.warning:
     kind: method
     sig: (message:str) -> None
-    loc: 620-621
+    loc: 616-617
     does: "warning"
   RenderAPI.info:
     kind: method
     sig: (message:str) -> None
-    loc: 624-625
+    loc: 620-621
     does: "info"
   RenderAPI.status:
     kind: method
     sig: (icon:str, message:str, type:Literal[info,success,warning,error]='info') -> None
-    loc: 628-630
+    loc: 624-626
     does: "status"
   RenderAPI.kv:
     kind: method
     sig: (key:str, value:Any) -> None
-    loc: 633-634
+    loc: 629-630
     does: "kv"
   RenderAPI.progress:
     kind: method
     sig: (done:int, total:int, label:str='') -> None
-    loc: 637-638
+    loc: 633-634
     does: "progress"
   RenderAPI.separator:
     kind: method
     sig: (char:str='─', width:int=60) -> None
-    loc: 641-642
+    loc: 637-638
     does: "separator"
   RenderAPI.table:
     kind: method
     sig: (headers:List[str], rows:List[List[Any]], widths:Optional[List[int]]=None) -> None
-    loc: 645-647
+    loc: 641-643
     does: "table"
   RenderAPI.task:
     kind: method
     sig: (name:str, status:Literal[pending,running,done,failed], duration:Optional[float]=None) -> None
-    loc: 650-653
+    loc: 646-649
     does: "task"
   RenderAPI.inline:
     kind: method
     sig: (text:str) -> str
-    loc: 656-657
+    loc: 652-653
     does: "inline"
   RenderAPI.print:
     kind: method
     sig: (text:str, color:Optional[str]=None) -> None
-    loc: 660-661
+    loc: 656-657
     does: "logs"
   RenderAPI.newline:
     kind: method
     sig: () -> None
-    loc: 664-665
+    loc: 660-661
     does: "newline"
 
 # toon_format.py | python | 18 functions
@@ -2696,12 +2696,12 @@ functions:
   generate_toon:
     kind: function
     sig: (project:ProjectInfo, detail:str='standard', use_tabs:bool=False) -> str
-    loc: 692-705
+    loc: 691-704
     does: "Convenience function to generate TOON format."
   parse_toon:
     kind: function
     sig: (content:str) -> Dict[str, Any]
-    loc: 708-710
+    loc: 707-709
     does: "Convenience function to parse TOON content."
   TOONGenerator.__init__:
     kind: method
@@ -2776,12 +2776,12 @@ functions:
   TOONParser.parse:
     kind: method
     sig: (content:str) -> Dict[str, Any]
-    loc: 587-659
+    loc: 587-658
     does: "Parse TOON content to dict."
   TOONParser._parse_value:
     kind: method
     sig: (value:str) -> Any
-    loc: 661-689
+    loc: 660-688
     does: "Parse a TOON value to Python type."
 
 # dependency.py | python | 11 functions
@@ -2847,17 +2847,17 @@ functions:
   handle_request:
     kind: function
     sig: (request:dict) -> dict
-    loc: 36-175
+    loc: 34-173
     does: "Handle incoming MCP request."
   call_tool:
     kind: function
     sig: (tool_name:str, arguments:dict) -> str
-    loc: 178-330
+    loc: 176-328
     does: "Execute a tool and return result."
   run_server:
     kind: function
     sig: () -> None
-    loc: 333-352
+    loc: 331-350
     does: "Run the MCP server."
 
 # reproduction.py | python | 8 functions
@@ -2908,147 +2908,147 @@ functions:
   csv_to_gherkin:
     kind: function
     sig: (csv_content:str, language:str='en') -> str
-    loc: 875-940
+    loc: 873-938
     does: "Convert CSV analysis directly to Gherkin."
   gherkin_to_test_data:
     kind: function
     sig: (gherkin_content:str) -> Dict[str, Any]
-    loc: 943-979
+    loc: 941-977
     does: "Extract structured test data from Gherkin for LLM processing."
   GherkinGenerator.__init__:
     kind: method
     sig: (language:str='en') -> None
-    loc: 164-173
+    loc: 163-172
     does: "Initialize GherkinGenerator."
   GherkinGenerator.generate:
     kind: method
     sig: (project:ProjectInfo, detail:str='standard', group_by:str='domain') -> str
-    loc: 175-189
+    loc: 174-188
     does: "Generate Gherkin feature files from project analysis."
   GherkinGenerator.generate_test_scenarios:
     kind: method
     sig: (project:ProjectInfo, group_by:str='domain') -> List[GherkinFeature]
-    loc: 191-203
+    loc: 190-202
     does: "Generate structured test scenarios for programmatic use."
   GherkinGenerator.get_step_definitions:
     kind: method
     sig: () -> List[StepDefinition]
-    loc: 205-207
+    loc: 204-206
     does: "Get all unique step definitions from generated features."
   GherkinGenerator._extract_features:
     kind: method
     sig: (project:ProjectInfo, group_by:str) -> List[GherkinFeature]
-    loc: 209-259
+    loc: 208-258
     does: "Extract Gherkin features from project."
   GherkinGenerator._create_feature:
     kind: method
     sig: (group_name:str, items:List[dict], project:ProjectInfo, group_by:str) -> GherkinFeature
-    loc: 261-306
+    loc: 260-305
     does: "Create a Gherkin feature from grouped items."
   GherkinGenerator._create_scenario:
     kind: method
     sig: (category:str, items:List[dict], domain:str) -> GherkinScenario
-    loc: 308-358
+    loc: 307-356
     does: "Create a scenario from category items."
   GherkinGenerator._create_edge_case_scenarios:
     kind: method
     sig: (category:str, items:List[dict]) -> List[GherkinScenario]
-    loc: 360-386
+    loc: 358-384
     does: "Create edge case scenarios for thorough testing."
   GherkinGenerator._create_when_step:
     kind: method
     sig: (func:FunctionInfo, verb:str) -> str
-    loc: 388-403
+    loc: 386-401
     does: "Create a When step from function info."
   GherkinGenerator._create_background:
     kind: method
     sig: (domain:str, items:List[dict]) -> Optional[List[str]]
-    loc: 405-421
+    loc: 403-419
     does: "Create background steps for common setup."
   GherkinGenerator._create_examples_table:
     kind: method
     sig: (items:List[dict]) -> List[Dict[str, str]]
-    loc: 423-442
+    loc: 421-440
     does: "Create Examples table for Scenario Outline."
   GherkinGenerator._extract_param_placeholders:
     kind: method
     sig: (func:FunctionInfo) -> str
-    loc: 444-451
+    loc: 442-449
     does: "Extract parameter placeholders for Gherkin steps."
   GherkinGenerator._register_step:
     kind: method
     sig: (step_type:str, pattern:str, func:FunctionInfo) -> None
-    loc: 453-466
+    loc: 451-464
     does: "Register a step definition for later generation."
   GherkinGenerator._render_features:
     kind: method
     sig: (features:List[GherkinFeature], detail:str) -> str
-    loc: 468-482
+    loc: 466-480
     does: "Render features to Gherkin text."
   GherkinGenerator._render_feature:
     kind: method
     sig: (feature:GherkinFeature, detail:str) -> str
-    loc: 484-511
+    loc: 482-509
     does: "Render a single feature."
   GherkinGenerator._render_scenario:
     kind: method
     sig: (scenario:GherkinScenario, detail:str) -> str
-    loc: 513-556
+    loc: 511-554
     does: "Render a single scenario."
   GherkinGenerator._categorize:
     kind: method
     sig: (name:str) -> str
-    loc: 558-577
+    loc: 556-575
     does: "Categorize function by name pattern."
   GherkinGenerator._extract_domain:
     kind: method
     sig: (path:str) -> str
-    loc: 579-588
+    loc: 577-586
     does: "Extract domain from file path."
   GherkinGenerator._name_to_readable:
     kind: method
     sig: (name:str) -> str
-    loc: 590-596
+    loc: 588-594
     does: "Convert function name to readable text."
   GherkinGenerator._step_to_func_name:
     kind: method
     sig: (step:str) -> str
-    loc: 598-602
+    loc: 596-600
     does: "Convert step text to valid function name."
   StepDefinitionGenerator.generate_pytest_bdd:
     kind: method
     sig: (features:List[GherkinFeature]) -> str
-    loc: 616-677
+    loc: 614-675
     does: "Generate pytest-bdd step definitions."
   StepDefinitionGenerator.generate_behave:
     kind: method
     sig: (features:List[GherkinFeature]) -> str
-    loc: 679-717
+    loc: 677-715
     does: "Generate behave step definitions."
   StepDefinitionGenerator.generate_cucumber_js:
     kind: method
     sig: (features:List[GherkinFeature]) -> str
-    loc: 719-761
+    loc: 717-759
     does: "Generate Cucumber.js step definitions."
   StepDefinitionGenerator._step_to_func_name:
     kind: method
     sig: (step:str) -> str
-    loc: 763-767
+    loc: 761-765
     does: "Convert step text to valid function name."
   CucumberYAMLGenerator.generate:
     kind: method
     sig: (project:ProjectInfo, detail:str='standard') -> str
-    loc: 777-842
+    loc: 775-840
     does: "Generate Cucumber YAML configuration."
   CucumberYAMLGenerator._extract_domain:
     kind: method
     sig: (path:str) -> str
-    loc: 844-855
+    loc: 842-853
     does: "Extract domain from path."
   CucumberYAMLGenerator._categorize:
     kind: method
     sig: (name:str) -> str
-    loc: 857-872
+    loc: 855-870
     does: "Categorize by name pattern."
 
 # schemas/logicml_schema.py | python | 3 functions
@@ -3056,17 +3056,17 @@ functions:
   validate_logicml:
     kind: function
     sig: (spec:str) -> Tuple[bool, List[str]]
-    loc: 111-206
+    loc: 111-198
     does: "Validate LogicML specification."
   parse_logicml_header:
     kind: function
     sig: (line:str) -> Optional[Dict[str, Any]]
-    loc: 209-219
+    loc: 201-211
     does: "Parse LogicML header comment."
   extract_logicml_signature:
     kind: function
     sig: (sig_line:str) -> Dict[str, Any]
-    loc: 222-250
+    loc: 214-242
     does: "Extract signature components from LogicML sig: line."
 
 # schemas/yaml_schema.py | python | 3 functions
@@ -3115,12 +3115,12 @@ functions:
   validate_markdown:
     kind: function
     sig: (spec:str) -> Tuple[bool, List[str]]
-    loc: 89-150
+    loc: 89-147
     does: "Validate Markdown specification."
   extract_markdown_sections:
     kind: function
     sig: (spec:str) -> Dict[str, Any]
-    loc: 153-174
+    loc: 150-171
     does: "Extract sections from Markdown specification."
 
 # benchmarks/common.py | python | 8 functions
@@ -3171,77 +3171,77 @@ functions:
   _test_python_syntax:
     kind: function
     sig: (code:str) -> bool
-    loc: 43-49
+    loc: 39-45
     does: "Test if Python code has valid syntax."
   _test_python_runs:
     kind: function
     sig: (code:str, timeout:int=5) -> bool
-    loc: 52-67
+    loc: 48-63
     does: "Test if Python code runs without errors."
   _extract_code:
     kind: function
     sig: (response:str) -> str
-    loc: 70-86
+    loc: 66-82
     does: "Extract code from LLM response."
   run_benchmark:
     kind: function
     sig: (source:str, benchmark_type:str='format', formats:List[str]=None, limit:Optional[int]=None, output:Optional[str]=None, verbose:bool=False) -> BenchmarkResult
-    loc: 782-824
+    loc: 777-819
     does: "Convenience function to run benchmarks."
   BenchmarkRunner.__init__:
     kind: method
     sig: (client:Optional[BaseLLMClient]=None, config:Optional[BenchmarkConfig]=None) -> None
-    loc: 97-111
+    loc: 93-107
     does: "Initialize benchmark runner."
   BenchmarkRunner._should_use_llm:
     kind: method
     sig: () -> bool
-    loc: 113-115
+    loc: 109-111
     does: "Return whether this runner should call an LLM."
   BenchmarkRunner._get_client:
     kind: method
     sig: () -> BaseLLMClient
-    loc: 117-123
+    loc: 113-119
     does: "Get or create LLM client."
   BenchmarkRunner._template_generate_code:
     kind: method
     sig: (spec:str, fmt:str, file_name:str) -> str
-    loc: 125-182
+    loc: 121-178
     does: "Generate minimal Python code without an LLM (fallback mode)."
   BenchmarkRunner.run_format_benchmark:
     kind: method
     sig: (folder:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult
-    loc: 184-292
+    loc: 180-288
     does: "Run format comparison benchmark."
   BenchmarkRunner._test_format:
     kind: method
     sig: (project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FormatResult
-    loc: 294-354
+    loc: 290-350
     does: "Test a single format."
   BenchmarkRunner.run_file_benchmark:
     kind: method
     sig: (file_path:str, formats:List[str]=None, verbose:bool=False) -> BenchmarkResult
-    loc: 356-454
+    loc: 352-450
     does: "Run benchmark on a single file."
   BenchmarkRunner.run_function_benchmark:
     kind: method
     sig: (file_path:str, function_names:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult
-    loc: 456-527
+    loc: 452-523
     does: "Run function-level reproduction benchmark."
   BenchmarkRunner._test_function:
     kind: method
     sig: (func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], verbose:bool=False) -> FunctionResult
-    loc: 529-617
+    loc: 525-612
     does: "Test reproduction of a single function."
   BenchmarkRunner.run_project_benchmark:
     kind: method
     sig: (project_path:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult
-    loc: 619-716
+    loc: 614-711
     does: "Run benchmark on entire project."
   BenchmarkRunner._reproduce_module:
     kind: method
     sig: (module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FileResult
-    loc: 718-779
+    loc: 713-774
     does: "Reproduce a single module."
 
 # benchmarks/results.py | python | 10 functions

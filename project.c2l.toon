@@ -1,57 +1,58 @@
 project: code2logic
 root: /home/tom/github/wronai/code2logic/code2logic
-generated: 2026-01-07T19:22:34.967734
+generated: 2026-01-08T09:45:29.140140
 stats:
-  files: 52
-  lines: 21957
-  languages[1]: python:52
+  files: 53
+  lines: 21903
+  languages[1]: python:53
 
-modules[52]{path,lang,lines,kb}:
-  llm_profiler.py,python,491,20.4
+modules[53]{path,lang,lines,kb}:
+  llm_profiler.py,python,490,20.4
   config.py,python,168,7.4
-  file_formats.py,python,279,12.3
-  project_reproducer.py,python,322,12.2
-  base.py,python,50,1.8
-  cli.py,python,803,34.5
-  llm.py,python,376,14.6
-  errors.py,python,372,13.7
+  file_formats.py,python,278,12.3
+  project_reproducer.py,python,318,12.2
+  base.py,python,49,1.8
+  cli.py,python,801,34.5
+  llm.py,python,375,14.5
+  errors.py,python,371,13.6
   code_review.py,python,205,9.0
   analyzer.py,python,235,9.6
   quality.py,python,212,8.8
   shared_utils.py,python,279,11.6
-  parsers.py,python,1586,76.9
+  parsers.py,python,1584,76.8
   intent.py,python,429,20.5
-  adaptive.py,python,475,19.9
-  reproducer.py,python,534,22.0
-  llm_clients.py,python,168,6.4
+  adaptive.py,python,473,19.9
+  reproducer.py,python,533,22.0
+  llm_clients.py,python,167,6.4
   prompts.py,python,120,4.0
-  chunked_reproduction.py,python,357,14.2
+  chunked_reproduction.py,python,355,14.0
   __init__.py,python,323,7.7
-  metrics.py,python,447,22.7
+  metrics.py,python,446,22.7
   __main__.py,python,12,0.3
-  refactor.py,python,313,11.4
+  refactor.py,python,308,11.2
   logicml.py,python,281,12.8
   function_logic.py,python,209,9.3
   utils.py,python,16,0.6
   generators.py,python,1763,85.7
-  markdown_format.py,python,266,13.9
+  markdown_format.py,python,265,13.8
   models.py,python,296,10.6
+  llm_clients_new.py,python,0,0.0
   similarity.py,python,178,7.8
-  universal.py,python,831,39.7
-  benchmark.py,python,351,14.4
-  terminal.py,python,500,21.6
-  toon_format.py,python,541,29.7
+  universal.py,python,829,39.6
+  benchmark.py,python,349,14.3
+  terminal.py,python,496,21.6
+  toon_format.py,python,540,29.7
   dependency.py,python,187,7.5
-  mcp_server.py,python,293,12.2
+  mcp_server.py,python,291,12.1
   reproduction.py,python,333,15.3
-  gherkin.py,python,766,35.4
-  schemas/logicml_schema.py,python,190,6.7
+  gherkin.py,python,764,35.3
+  schemas/logicml_schema.py,python,184,6.5
   schemas/__init__.py,python,25,0.7
   schemas/yaml_schema.py,python,164,6.7
   schemas/json_schema.py,python,206,7.2
-  schemas/markdown_schema.py,python,121,4.2
+  schemas/markdown_schema.py,python,118,4.0
   benchmarks/common.py,python,206,8.5
-  benchmarks/runner.py,python,638,27.3
+  benchmarks/runner.py,python,633,27.0
   benchmarks/__init__.py,python,19,0.4
   benchmarks/results.py,python,148,6.3
   core/__init__.py,python,20,0.7
@@ -62,7 +63,7 @@ modules[52]{path,lang,lines,kb}:
 
 module_details:
   llm_profiler.py:
-    imports[16]: json,os,time,hashlib,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,datetime,typing.Dict,typing.List,typing.Optional,typing.Any,typing.Tuple,pathlib.Path,difflib.SequenceMatcher
+    imports[14]: json,time,hashlib,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,datetime,typing.Dict,typing.List,typing.Optional,typing.Any,pathlib.Path,difflib.SequenceMatcher,utils.estimate_tokens
     exports[11]: PROFILE_TEST_CASES,LLMProfile,ProfileTestResult,load_profiles,save_profile,get_profile,get_or_create_profile,LLMProfiler,AdaptiveChunker,profile_llm
     const[1]{n,t,v,keys}:
       PROFILE_TEST_CASES,Dict,"-","simple_function|\ndef calculate_sum(numbers: List[int]) -> int:\n    \"\"\"Calculate sum of numbers.\"\"\"\n    return sum(numbers)\n|,\n    |: "
@@ -179,7 +180,7 @@ module_details:
       get_api_key: retrieves api key
       get_model: retrieves model
   file_formats.py:
-    imports[6]: re,json,pathlib.Path,typing.Dict,typing.Any,typing.List
+    imports[4]: json,pathlib.Path,typing.Dict,typing.Any
     exports[3]: generate_file_csv,generate_file_json,generate_file_yaml
     functions[4]{name,sig,decorators,async,category,lines}:
       generate_file_csv,"(file_path:Path)->str",-,false,-,54
@@ -192,7 +193,7 @@ module_details:
       generate_file_yaml: creates file yaml
       _parse_file_elements: parses file elements
   project_reproducer.py:
-    imports[20]: os,json,hashlib,pathlib.Path,typing.Dict,typing.Any,typing.List,typing.Optional,typing.Set,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,datetime,concurrent.futures.ThreadPoolExecutor,concurrent.futures.as_completed
+    imports[18]: json,pathlib.Path,typing.Dict,typing.List,typing.Optional,typing.Set,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,datetime,concurrent.futures.ThreadPoolExecutor,concurrent.futures.as_completed,dotenv.load_dotenv,universal.UniversalReproducer,universal.UniversalParser
     exports[5]: SUPPORTED_EXTENSIONS,FileResult,ProjectResult,ProjectReproducer,reproduce_project
     const[1]{n,t,v,keys}:
       SUPPORTED_EXTENSIONS,Dict,"-",.py|.js|.ts|.tsx|.go|.rs|.java|.sql|.cs
@@ -244,7 +245,7 @@ module_details:
     function_docs:
       reproduce_project: reproduce project
   base.py:
-    imports[2]: logging,typing.Optional
+    imports[1]: logging
     exports[3]: VerboseMixin,BaseParser,BaseGenerator
     classes[3]{name,bases,decorators,props,methods}:
       VerboseMixin,-,-,0,6
@@ -272,7 +273,7 @@ module_details:
           __init__,"(verbose:bool=False)->None",-,false,2
           generate,"(project;detail:str='full')->str",-,false,3
   cli.py:
-    imports[10]: argparse,os,sys,subprocess,time,logging,json,signal,datetime,__version__
+    imports[9]: argparse,os,sys,subprocess,time,json,signal,datetime,__version__
     exports[4]: Colors,Logger,ensure_dependencies,main
     classes[2]{name,bases,decorators,props,methods}:
       Colors,-,-,0,0
@@ -309,7 +310,7 @@ module_details:
       _save_litellm_yaml,"(data:dict)->str",-,false,-,10
       _infer_provider_from_litellm_model,"(litellm_model:str)->str",-,false,-,6
       _code2logic_llm_cli,"(argv:list[str])->None",-,false,-,246
-      main,()->None,-,false,-,467
+      main,()->None,-,false,-,466
     function_docs:
       ensure_dependencies: ensure dependencies
       _get_env_file_path: retrieves env file path
@@ -327,7 +328,7 @@ module_details:
       _code2logic_llm_cli: code2logic llm cli
       main: main
   llm.py:
-    imports[14]: json,os,typing.Optional,typing.List,typing.Dict,typing.Any,dataclasses.dataclass,httpx,litellm.completion,llm_clients.BaseLLMClient,llm_clients.OpenRouterClient,llm_clients.OllamaLocalClient,llm_clients.LiteLLMClient,llm_clients.get_client
+    imports[13]: json,os,typing.Optional,typing.List,typing.Dict,typing.Any,dataclasses.dataclass,httpx,litellm.completion,llm_clients.OpenRouterClient,llm_clients.OllamaLocalClient,llm_clients.LiteLLMClient,llm_clients.get_client
     exports[5]: LLMConfig,OllamaClient,LiteLLMClient,CodeAnalyzer,get_available_backends
     classes[4]{name,bases,decorators,props,methods}:
       LLMConfig,-,dataclass,0,0
@@ -375,7 +376,7 @@ module_details:
     function_docs:
       get_available_backends: retrieves available backends
   errors.py:
-    imports[11]: dataclasses.dataclass,dataclasses.field,enum.Enum,pathlib.Path,typing.List,typing.Dict,typing.Any,typing.Optional,typing.Callable,logging,traceback
+    imports[10]: dataclasses.dataclass,dataclasses.field,enum.Enum,pathlib.Path,typing.List,typing.Dict,typing.Any,typing.Optional,typing.Callable,logging
     exports[6]: ErrorSeverity,ErrorType,AnalysisError,AnalysisResult,ErrorHandler,create_error_handler
     types[2]{name,kind,values,def}:
       ErrorSeverity,enum,"WARNING=\"warning\"|ERROR=\"error\"|CRITICAL=\"critical\"","-"
@@ -458,7 +459,7 @@ module_details:
       check_security_issues: checks security issues
       check_performance_issues: checks performance issues
   analyzer.py:
-    imports[18]: sys,pathlib.Path,datetime,collections.defaultdict,typing.Optional,typing.List,typing.Dict,models.ProjectInfo,models.ModuleInfo,parsers.TreeSitterParser,parsers.UniversalParser,parsers.TREE_SITTER_AVAILABLE,dependency.DependencyAnalyzer,dependency.NETWORKX_AVAILABLE,similarity.SimilarityDetector
+    imports[17]: sys,pathlib.Path,datetime,collections.defaultdict,typing.List,typing.Dict,models.ProjectInfo,models.ModuleInfo,parsers.TreeSitterParser,parsers.UniversalParser,parsers.TREE_SITTER_AVAILABLE,dependency.DependencyAnalyzer,dependency.NETWORKX_AVAILABLE,similarity.SimilarityDetector,similarity.RAPIDFUZZ_AVAILABLE
     exports[3]: ProjectAnalyzer,analyze_project,get_library_status
     classes[1]{name,bases,decorators,props,methods}:
       ProjectAnalyzer,-,-,0,6
@@ -554,7 +555,7 @@ module_details:
       escape_for_yaml: escape for yaml
       clean_identifier: clean identifier
   parsers.py:
-    imports[18]: ast,re,textwrap,typing.Optional,typing.List,models.FunctionInfo,models.ClassInfo,models.TypeInfo,models.ModuleInfo,models.ConstantInfo,models.FieldInfo,models.AttributeInfo,models.OptionalImport,intent.EnhancedIntentGenerator,tree_sitter_python
+    imports[17]: ast,re,textwrap,typing.Optional,typing.List,models.FunctionInfo,models.ClassInfo,models.TypeInfo,models.ModuleInfo,models.ConstantInfo,models.FieldInfo,models.AttributeInfo,intent.EnhancedIntentGenerator,tree_sitter_python,tree_sitter_javascript
     exports[4]: TREE_SITTER_AVAILABLE,TreeSitterParser,UniversalParser,is_tree_sitter_available
     const[1]{n,t,v,keys}:
       TREE_SITTER_AVAILABLE,bool,False,"-"
@@ -593,7 +594,7 @@ module_details:
           parse,"(filepath:str;content:str;language:str)->Optional[ModuleInfo]",-,false,24
           _parse_python,"(filepath:str;content:str;tree)->ModuleInfo",-,false,114
           _extract_constants,"(tree;content:str)->List[ConstantInfo]",-,false,30
-          _extract_type_checking_imports,"(tree;content:str)->List[str]",-,false,24
+          _extract_type_checking_imports,"(tree;content:str)->List[str]",-,false,22
           _extract_conditional_imports,"(node;content:str)->List[str]",-,false,14
           _extract_aliases,"(tree;content:str)->dict",-,false,46
           _extract_py_function,"(node;content:str;decorated_node=None)->Optional[FunctionInfo]",-,false,102
@@ -651,7 +652,7 @@ module_details:
       _analyze_python_function_node: processes python function node
       is_tree_sitter_available: is tree sitter available
   intent.py:
-    imports[13]: re,dataclasses.dataclass,dataclasses.field,enum.Enum,enum.auto,typing.Optional,typing.List,typing.Tuple,typing.Any,typing.TYPE_CHECKING,nltk,nltk.stem.WordNetLemmatizer,spacy
+    imports[12]: re,dataclasses.dataclass,dataclasses.field,enum.Enum,enum.auto,typing.Optional,typing.List,typing.Any,typing.TYPE_CHECKING,nltk,nltk.stem.WordNetLemmatizer,spacy
     exports[4]: IntentType,Intent,EnhancedIntentGenerator,IntentAnalyzer
     types[1]{name,kind,values,def}:
       IntentType,enum,REFACTOR=auto()|ANALYZE=auto()|OPTIMIZE=auto()|DEBUG=auto()|DOCUMENT=auto()|TEST=auto(),"-"
@@ -696,7 +697,7 @@ module_details:
           _suggest_class_refactoring,"(cls:Any)->List[str]",-,false,12
           _suggest_function_refactoring,"(func:Any)->List[str]",-,false,20
   adaptive.py:
-    imports[18]: os,re,pathlib.Path,typing.Dict,typing.Any,typing.List,typing.Optional,typing.Tuple,dataclasses.dataclass,dotenv.load_dotenv,llm_clients.BaseLLMClient,llm_clients.get_client,reproduction.compare_code,reproduction.extract_code_block,file_formats.generate_file_csv
+    imports[14]: pathlib.Path,typing.Dict,typing.Any,typing.List,dataclasses.dataclass,dotenv.load_dotenv,llm_clients.BaseLLMClient,llm_clients.get_client,reproduction.compare_code,reproduction.extract_code_block,file_formats.generate_file_csv,file_formats.generate_file_json,file_formats.generate_file_yaml,reproduction.generate_file_gherkin
     exports[5]: LLM_CAPABILITIES,ChunkInfo,AdaptiveResult,AdaptiveReproducer,get_llm_capabilities
     const[1]{n,t,v,keys}:
       LLM_CAPABILITIES,Dict,"-","qwen/qwen-2.5-coder-32b-instruct|context_size|code_quality|best_formats|gherkin|yaml|json|max_output|supports_chunking|nvidia/nemotron-3-nano-30b-a3b:free"
@@ -748,7 +749,7 @@ module_details:
     function_docs:
       get_llm_capabilities: retrieves llm capabilities
   reproducer.py:
-    imports[13]: os,yaml,json,re,pathlib.Path,dataclasses.dataclass,dataclasses.field,typing.List,typing.Dict,typing.Any,typing.Optional,typing.Callable,enum.Enum
+    imports[11]: yaml,json,re,pathlib.Path,dataclasses.dataclass,dataclasses.field,typing.List,typing.Dict,typing.Any,typing.Optional,enum.Enum
     exports[7]: ReproductionStatus,FileValidation,ReproductionResult,SpecReproducer,SpecValidator,reproduce_project,validate_files
     types[1]{name,kind,values,def}:
       ReproductionStatus,enum,"SUCCESS=\"success\"|PARTIAL=\"partial\"|FAILED=\"failed\"|SKIPPED=\"skipped\"","-"
@@ -823,7 +824,7 @@ module_details:
       reproduce_project: reproduce project
       validate_files: validates files
   llm_clients.py:
-    imports[20]: lolm.BaseLLMClient,lolm.OpenRouterClient,lolm.OllamaLocalClient,lolm.LiteLLMClient,lolm.LLMManager,lolm.get_client,lolm.list_available_providers,lolm.RECOMMENDED_MODELS,lolm.DEFAULT_MODELS,lolm.DEFAULT_PROVIDER_PRIORITIES,lolm._load_lolm_config,lolm.get_provider_model,lolm._get_provider_priorities_from_litellm_yaml,os,json
+    imports[19]: lolm.BaseLLMClient,lolm.OpenRouterClient,lolm.OllamaLocalClient,lolm.LiteLLMClient,lolm.LLMManager,lolm.get_client,lolm.list_available_providers,lolm.RECOMMENDED_MODELS,lolm.DEFAULT_MODELS,lolm.DEFAULT_PROVIDER_PRIORITIES,lolm.get_provider_model,lolm._get_provider_priorities_from_litellm_yaml,os,json,typing.Optional
     exports[2]: get_priority_mode,get_effective_provider_priorities
     functions[12]{name,sig,decorators,async,category,lines}:
       _get_user_llm_config_path,()->str,-,false,-,3
@@ -865,7 +866,7 @@ module_details:
       get_review_prompt: retrieves review prompt
       get_fix_prompt: retrieves fix prompt
   chunked_reproduction.py:
-    imports[13]: re,dataclasses.dataclass,dataclasses.field,typing.Dict,typing.List,typing.Optional,typing.Tuple,pathlib.Path,models.ProjectInfo,models.ModuleInfo,models.FunctionInfo,models.ClassInfo,utils.estimate_tokens
+    imports[4]: re,dataclasses.dataclass,typing.List,utils.estimate_tokens
     exports[14]: LLM_CONTEXT_LIMITS,Chunk,ChunkedSpec,ChunkedResult,get_llm_limit,chunk_yaml_spec,chunk_gherkin_spec,chunk_markdown_spec,chunk_spec,get_chunk_prompt
     const[1]{n,t,v,keys}:
       LLM_CONTEXT_LIMITS,Dict,"-",gpt-4|gpt-4-turbo|gpt-3.5-turbo|claude-3|claude-2|llama-7b|llama-13b|llama-70b|mistral-7b|mixtral-8x7b
@@ -935,7 +936,7 @@ module_details:
       analyze_quality: processes quality
       reproduce_project: reproduce project
   metrics.py:
-    imports[13]: re,difflib,hashlib,typing.Dict,typing.Any,typing.List,typing.Tuple,typing.Optional,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,collections.Counter,logging
+    imports[11]: re,difflib,typing.Dict,typing.Any,typing.List,typing.Tuple,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,collections.Counter,logging
     exports[8]: TextMetrics,StructuralMetrics,SemanticMetrics,FormatMetrics,ReproductionResult,ReproductionMetrics,analyze_reproduction,compare_formats
     classes[6]{name,bases,decorators,props,methods}:
       TextMetrics,-,dataclass,0,0
@@ -1037,7 +1038,7 @@ module_details:
   __main__.py:
     imports[1]: cli.main
   refactor.py:
-    imports[16]: json,pathlib.Path,typing.Dict,typing.List,typing.Any,typing.Optional,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,analyzer.analyze_project,similarity.SimilarityDetector,code_review.analyze_code_quality,code_review.check_security_issues,code_review.check_performance_issues,llm_clients.get_client
+    imports[11]: typing.Dict,typing.List,typing.Any,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,analyzer.analyze_project,code_review.analyze_code_quality,code_review.check_security_issues,llm_clients.get_client,llm_clients.BaseLLMClient
     exports[8]: DuplicateGroup,RefactoringSuggestion,RefactoringReport,find_duplicates,analyze_quality,suggest_refactoring,compare_codebases,quick_analyze
     classes[3]{name,bases,decorators,props,methods}:
       DuplicateGroup,-,dataclass,0,0
@@ -1074,7 +1075,7 @@ module_details:
           to_dict,"()->Dict[str, Any]",-,false,2
           to_markdown,()->str,-,false,42
     functions[5]{name,sig,decorators,async,category,lines}:
-      find_duplicates,"(project_path:str;threshold:float=0.8)->List[DuplicateGroup]",-,false,-,56
+      find_duplicates,"(project_path:str;threshold:float=0.8)->List[DuplicateGroup]",-,false,-,55
       analyze_quality,"(project_path:str;include_security:bool=True;include_performance:bool=True)->RefactoringReport",-,false,-,60
       suggest_refactoring,"(project_path:str;use_llm:bool=False;client:BaseLLMClient=None)->RefactoringReport",-,false,-,63
       compare_codebases,"(project1:str;project2:str)->Dict[str, Any]",-,false,-,54
@@ -1086,7 +1087,7 @@ module_details:
       compare_codebases: compare codebases
       quick_analyze: quick analyze
   logicml.py:
-    imports[14]: pathlib.Path,typing.Dict,typing.List,typing.Optional,typing.Set,typing.Any,dataclasses.dataclass,models.ProjectInfo,models.ModuleInfo,models.FunctionInfo,models.ClassInfo,shared_utils.truncate_docstring,shared_utils.compact_imports,shared_utils.remove_self_from_params
+    imports[13]: pathlib.Path,typing.Dict,typing.List,typing.Optional,typing.Set,dataclasses.dataclass,models.ProjectInfo,models.ModuleInfo,models.FunctionInfo,models.ClassInfo,shared_utils.truncate_docstring,shared_utils.compact_imports,shared_utils.remove_self_from_params
     exports[4]: LogicMLSpec,LogicMLGenerator,generate_logicml,LOGICML_EXAMPLE
     const[1]{n,t,v,keys}:
       LOGICML_EXAMPLE,str,"''' # sample_class.py | Calculator | 74 lines  imports:   stdlib: [typing.List, typing.Optional]  Calculator:   doc: ...","-"
@@ -1151,7 +1152,7 @@ module_details:
       write_text_atomic: logs text atomic
       cleanup_generated_root: cleanup generated root
   generators.py:
-    imports[18]: json,pathlib.Path,typing.List,typing.Optional,collections.defaultdict,models.ProjectInfo,models.ModuleInfo,models.ClassInfo,models.FunctionInfo,models.DependencyNode,models.ConstantInfo,models.FieldInfo,shared_utils.categorize_function,shared_utils.extract_domain,shared_utils.compute_hash
+    imports[17]: json,pathlib.Path,typing.List,typing.Optional,collections.defaultdict,models.ProjectInfo,models.ModuleInfo,models.ClassInfo,models.FunctionInfo,models.ConstantInfo,models.FieldInfo,shared_utils.categorize_function,shared_utils.extract_domain,shared_utils.compute_hash,shared_utils.remove_self_from_params
     exports[6]: bytes_to_kb,MarkdownGenerator,CompactGenerator,JSONGenerator,YAMLGenerator,CSVGenerator
     classes[5]{name,bases,decorators,props,methods}:
       MarkdownGenerator,-,-,0,6
@@ -1239,7 +1240,7 @@ module_details:
     function_docs:
       bytes_to_kb: bytes to kb
   markdown_format.py:
-    imports[12]: os,pathlib.Path,typing.Dict,typing.List,typing.Optional,dataclasses.dataclass,models.ProjectInfo,models.ModuleInfo,models.FunctionInfo,models.ClassInfo,gherkin.GherkinGenerator,generators.YAMLGenerator
+    imports[7]: pathlib.Path,typing.Dict,typing.List,dataclasses.dataclass,models.ProjectInfo,gherkin.GherkinGenerator,generators.YAMLGenerator
     exports[4]: MarkdownSpec,MarkdownHybridGenerator,generate_markdown_hybrid,generate_file_markdown
     classes[2]{name,bases,decorators,props,methods}:
       MarkdownSpec,-,dataclass,0,0
@@ -1454,6 +1455,7 @@ module_details:
           lines_total,int,"0","-"
           lines_code,int,"0","-"
           file_bytes,int,"0","-"
+  llm_clients_new.py:
   similarity.py:
     imports[5]: typing.Dict,typing.List,models.ModuleInfo,rapidfuzz.fuzz,rapidfuzz.process
     exports[4]: RAPIDFUZZ_AVAILABLE,SimilarityDetector,is_rapidfuzz_available,get_refactoring_suggestions
@@ -1476,7 +1478,7 @@ module_details:
       is_rapidfuzz_available: is rapidfuzz available
       get_refactoring_suggestions: retrieves refactoring suggestions
   universal.py:
-    imports[20]: os,re,json,hashlib,pathlib.Path,typing.Dict,typing.Any,typing.List,typing.Optional,typing.Tuple,typing.Union,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,datetime
+    imports[17]: re,json,hashlib,pathlib.Path,typing.Dict,typing.Any,typing.List,typing.Union,dataclasses.dataclass,dataclasses.field,dataclasses.asdict,enum.Enum,dotenv.load_dotenv,llm_clients.BaseLLMClient,llm_clients.get_client
     exports[9]: ElementType,Language,Parameter,CodeElement,CodeLogic,UniversalParser,CodeGenerator,UniversalReproducer,reproduce_file
     types[2]{name,kind,values,def}:
       ElementType,enum,"IMPORT=\"import\"|CLASS=\"class\"|INTERFACE=\"interface\"|STRUCT=\"struct\"|FUNCTION=\"function\"|METHOD=\"method\"|PROPERTY=\"property\"|CONSTANT=\"constant\"|TYPE_ALIAS=\"type_alias\"|ENUM=\"enum\"|MODULE=\"module\"","-"
@@ -1567,7 +1569,7 @@ module_details:
     function_docs:
       reproduce_file: reproduce file
   benchmark.py:
-    imports[20]: os,json,time,dotenv.load_dotenv,pathlib.Path,typing.Dict,typing.Any,typing.List,typing.Optional,datetime,dataclasses.dataclass,dataclasses.asdict,analyzer.analyze_project,generators.MarkdownGenerator,generators.CompactGenerator
+    imports[20]: json,time,dotenv.load_dotenv,pathlib.Path,typing.Dict,typing.Any,typing.List,typing.Optional,datetime,dataclasses.dataclass,dataclasses.asdict,analyzer.analyze_project,generators.MarkdownGenerator,generators.JSONGenerator,generators.YAMLGenerator
     exports[5]: FormatResult,BenchmarkResult,FORMAT_PROMPTS,ReproductionBenchmark,run_benchmark
     const[1]{n,t,v,keys}:
       FORMAT_PROMPTS,Dict,"-",gherkin|csv
@@ -1617,7 +1619,7 @@ module_details:
     function_docs:
       run_benchmark: starts benchmark
   terminal.py:
-    imports[8]: os,re,sys,typing.Literal,typing.Optional,typing.List,typing.Dict,typing.Any
+    imports[7]: os,re,sys,typing.Literal,typing.Optional,typing.List,typing.Any
     exports[5]: COLORS,ShellRenderer,get_renderer,set_renderer,RenderAPI
     const[1]{n,t,v,keys}:
       COLORS,Dict,"{     \"reset\": \"\\033[0m\",     \"bold\": \"\\033[1m\",     \"dim\": \"\\033[2m\",     \"italic\": \"\\033[3m\",     \"underline\": \"\\03...","-"
@@ -1653,7 +1655,7 @@ module_details:
           newline,()->None,-,false,3
           _highlight_line,"(line:str;language:str)->str",-,false,22
           _highlight_yaml,"(line:str)->str",-,false,34
-          _highlight_json,"(line:str)->str",-,false,27
+          _highlight_json,"(line:str)->str",-,false,23
           _highlight_python,"(line:str)->str",-,false,33
           _highlight_bash,"(line:str)->str",-,false,19
           _highlight_js,"(line:str)->str",-,false,29
@@ -1688,7 +1690,7 @@ module_details:
       get_renderer: retrieves renderer
       set_renderer: updates renderer
   toon_format.py:
-    imports[12]: re,typing.List,typing.Dict,typing.Any,typing.Optional,models.ProjectInfo,models.ModuleInfo,models.ClassInfo,models.FunctionInfo,models.TypeInfo,shared_utils.compact_imports,shared_utils.truncate_docstring
+    imports[11]: re,typing.List,typing.Dict,typing.Any,models.ProjectInfo,models.ModuleInfo,models.ClassInfo,models.FunctionInfo,models.TypeInfo,shared_utils.compact_imports,shared_utils.truncate_docstring
     exports[4]: TOONGenerator,TOONParser,generate_toon,parse_toon
     classes[2]{name,bases,decorators,props,methods}:
       TOONGenerator,-,-,0,13
@@ -1714,7 +1716,7 @@ module_details:
         doc: Parse TOON format back to Python dict.
         methods[3]{name,sig,decorators,async,lines}:
           __init__,()->None,-,false,2
-          parse,"(content:str)->Dict[str, Any]",-,false,73
+          parse,"(content:str)->Dict[str, Any]",-,false,72
           _parse_value,"(value:str)->Any",-,false,29
     functions[2]{name,sig,decorators,async,category,lines}:
       generate_toon,"(project:ProjectInfo;detail:str='standard';use_tabs:bool=False)->str",-,false,-,14
@@ -1723,7 +1725,7 @@ module_details:
       generate_toon: creates toon
       parse_toon: parses toon
   dependency.py:
-    imports[7]: pathlib.Path,typing.Dict,typing.List,typing.Optional,models.ModuleInfo,models.DependencyNode,networkx
+    imports[6]: pathlib.Path,typing.Dict,typing.List,models.ModuleInfo,models.DependencyNode,networkx
     exports[3]: NETWORKX_AVAILABLE,DependencyAnalyzer,is_networkx_available
     const[1]{n,t,v,keys}:
       NETWORKX_AVAILABLE,bool,False,"-"
@@ -1748,7 +1750,7 @@ module_details:
     function_docs:
       is_networkx_available: is networkx available
   mcp_server.py:
-    imports[5]: json,sys,pathlib.Path,typing.Optional,__version__
+    imports[3]: json,sys,__version__
     exports[3]: handle_request,call_tool,run_server
     functions[3]{name,sig,decorators,async,category,lines}:
       handle_request,"(request:dict)->dict",-,false,-,140
@@ -1759,7 +1761,7 @@ module_details:
       call_tool: call tool
       run_server: starts server
   reproduction.py:
-    imports[10]: re,difflib,pathlib.Path,typing.Dict,typing.Any,typing.List,typing.Optional,datetime,llm_clients.BaseLLMClient,llm_clients.get_client
+    imports[9]: re,difflib,pathlib.Path,typing.Dict,typing.Any,typing.List,datetime,llm_clients.BaseLLMClient,llm_clients.get_client
     exports[4]: generate_file_gherkin,compare_code,extract_code_block,CodeReproducer
     classes[1]{name,bases,decorators,props,methods}:
       CodeReproducer,-,-,0,5
@@ -1781,7 +1783,7 @@ module_details:
       compare_code: compare code
       extract_code_block: parses code block
   gherkin.py:
-    imports[14]: typing.List,typing.Dict,typing.Optional,typing.Set,typing.Any,collections.defaultdict,dataclasses.dataclass,dataclasses.field,re,hashlib,models.ProjectInfo,models.ModuleInfo,models.FunctionInfo,models.ClassInfo
+    imports[9]: typing.List,typing.Dict,typing.Optional,typing.Any,collections.defaultdict,dataclasses.dataclass,re,models.ProjectInfo,models.FunctionInfo
     exports[8]: GherkinScenario,GherkinFeature,StepDefinition,GherkinGenerator,StepDefinitionGenerator,CucumberYAMLGenerator,csv_to_gherkin,gherkin_to_test_data
     classes[6]{name,bases,decorators,props,methods}:
       GherkinScenario,-,dataclass,0,0
@@ -1827,7 +1829,7 @@ module_details:
           get_step_definitions,"()->List[StepDefinition]",-,false,3
           _extract_features,"(project:ProjectInfo;group_by:str)->List[GherkinFeature]",-,false,51
           _create_feature,"(group_name:str;items:List[dict];project:ProjectInfo;group_by:str)->GherkinFeature",-,false,46
-          _create_scenario,"(category:str;items:List[dict];domain:str)->GherkinScenario",-,false,51
+          _create_scenario,"(category:str;items:List[dict];domain:str)->GherkinScenario",-,false,50
           _create_edge_case_scenarios,"(category:str;items:List[dict])->List[GherkinScenario]",-,false,27
           _create_when_step,"(func:FunctionInfo;verb:str)->str",-,false,16
           _create_background,"(domain:str;items:List[dict])->Optional[List[str]]",-,false,17
@@ -1910,7 +1912,7 @@ module_details:
           class_count,int,"0","-"
           function_count,int,"0","-"
     functions[3]{name,sig,decorators,async,category,lines}:
-      validate_logicml,"(spec:str)->Tuple[bool, List[str]]",-,false,-,96
+      validate_logicml,"(spec:str)->Tuple[bool, List[str]]",-,false,-,88
       parse_logicml_header,"(line:str)->Optional[Dict[str, Any]]",-,false,-,11
       extract_logicml_signature,"(sig_line:str)->Dict[str, Any]",-,false,-,29
     function_docs:
@@ -1920,7 +1922,7 @@ module_details:
   schemas/__init__.py:
     imports[9]: yaml_schema.YAMLSchema,yaml_schema.validate_yaml,logicml_schema.LogicMLSchema,logicml_schema.validate_logicml,markdown_schema.MarkdownSchema,markdown_schema.validate_markdown,json_schema.JSONSchema,json_schema.validate_json,json_schema.parse_json_spec
   schemas/yaml_schema.py:
-    imports[8]: dataclasses.dataclass,dataclasses.field,typing.Any,typing.Dict,typing.List,typing.Optional,typing.Tuple,yaml
+    imports[7]: dataclasses.dataclass,dataclasses.field,typing.Any,typing.Dict,typing.List,typing.Tuple,yaml
     exports[6]: MethodSchema,ClassSchema,FunctionSchema,ModuleSchema,YAMLSchema,validate_yaml
     classes[5]{name,bases,decorators,props,methods}:
       MethodSchema,-,dataclass,0,0
@@ -2048,7 +2050,7 @@ module_details:
       _validate_json_class: validates json class
       parse_json_spec: parses json spec
   schemas/markdown_schema.py:
-    imports[8]: dataclasses.dataclass,dataclasses.field,typing.Any,typing.Dict,typing.List,typing.Optional,typing.Tuple,re
+    imports[7]: dataclasses.dataclass,dataclasses.field,typing.Any,typing.Dict,typing.List,typing.Tuple,re
     exports[6]: MarkdownMethod,MarkdownClass,MarkdownModule,MarkdownSchema,validate_markdown,extract_markdown_sections
     classes[4]{name,bases,decorators,props,methods}:
       MarkdownMethod,-,dataclass,0,0
@@ -2085,7 +2087,7 @@ module_details:
           modules,"List[MarkdownModule]","-",list
           token_estimate,int,"0","-"
     functions[2]{name,sig,decorators,async,category,lines}:
-      validate_markdown,"(spec:str)->Tuple[bool, List[str]]",-,false,-,62
+      validate_markdown,"(spec:str)->Tuple[bool, List[str]]",-,false,-,59
       extract_markdown_sections,"(spec:str)->Dict[str, Any]",-,false,-,22
     function_docs:
       validate_markdown: validates markdown
@@ -2112,7 +2114,7 @@ module_details:
       get_token_reproduction_prompt: retrieves token reproduction prompt
       get_simple_reproduction_prompt: retrieves simple reproduction prompt
   benchmarks/runner.py:
-    imports[20]: re,sys,time,pathlib.Path,typing.Dict,typing.List,typing.Optional,typing.Tuple,typing.Callable,concurrent.futures.ThreadPoolExecutor,concurrent.futures.as_completed,dataclasses.dataclass,analyzer.analyze_project,llm_clients.get_client,llm_clients.BaseLLMClient
+    imports[19]: sys,time,pathlib.Path,typing.List,typing.Optional,analyzer.analyze_project,llm_clients.get_client,llm_clients.BaseLLMClient,utils.estimate_tokens,metrics.ReproductionMetrics,terminal.render,results.BenchmarkResult,results.BenchmarkConfig,results.FileResult,results.FunctionResult
     exports[2]: BenchmarkRunner,run_benchmark
     classes[1]{name,bases,decorators,props,methods}:
       BenchmarkRunner,-,-,0,11
@@ -2128,7 +2130,7 @@ module_details:
           _test_format,"(project;original:str;fmt:str;file_name:str;client:Optional[BaseLLMClient];verbose:bool=False)->FormatResult",-,false,61
           run_file_benchmark,"(file_path:str;formats:List[str]=None;verbose:bool=False)->BenchmarkResult",-,false,99
           run_function_benchmark,"(file_path:str;function_names:List[str]=None;limit:Optional[int]=None;verbose:bool=False)->BenchmarkResult",-,false,72
-          _test_function,"(func;content:str;language:str;file_path:Path;client:Optional[BaseLLMClient];verbose:bool=False)->FunctionResult",-,false,89
+          _test_function,"(func;content:str;language:str;file_path:Path;client:Optional[BaseLLMClient];verbose:bool=False)->FunctionResult",-,false,88
           run_project_benchmark,"(project_path:str;formats:List[str]=None;limit:Optional[int]=None;verbose:bool=False)->BenchmarkResult",-,false,98
           _reproduce_module,"(module_info;fmt:str;project_root:str;client:Optional[BaseLLMClient];verbose:bool=False)->FileResult",-,false,62
     functions[4]{name,sig,decorators,async,category,lines}:

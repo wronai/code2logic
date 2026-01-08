@@ -28,7 +28,7 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from .utils import estimate_tokens
 
@@ -45,9 +45,9 @@ class DataProcessor:
 
     def __init__(self, config: Dict[str, Any]):
         self.config = config
-        self._cache: Dict[str, Any] = {}
+        self._cache: dict[str, Any] = {}
 
-    def process(self, data: List[Dict]) -> List[Dict]:
+    def process(self, data: list[dict]) -> list[dict]:
         """Process data items."""
         return [self._transform(item) for item in data]
 
@@ -137,11 +137,11 @@ class LLMProfile:
     preferred_format: str = "yaml"  # Best format for this model
 
     # Recommendations
-    recommended_formats: List[str] = field(default_factory=lambda: ["yaml", "toon"])
+    recommended_formats: list[str] = field(default_factory=lambda: ["yaml", "toon"])
     chunk_strategy: str = "by_function"  # by_function, by_class, by_module
 
     # Test results
-    test_results: Dict[str, Any] = field(default_factory=dict)
+    test_results: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
         if not self.profile_id:
@@ -173,7 +173,7 @@ def _get_profiles_path() -> Path:
     return config_dir / 'llm_profiles.json'
 
 
-def load_profiles() -> Dict[str, LLMProfile]:
+def load_profiles() -> dict[str, LLMProfile]:
     """Load all saved profiles."""
     path = _get_profiles_path()
     if not path.exists():
@@ -457,7 +457,7 @@ Python code:"""
 
         return SequenceMatcher(None, orig_norm, repr_norm).ratio()
 
-    def _calculate_metrics(self, profile: LLMProfile, results: List[ProfileTestResult]) -> LLMProfile:
+    def _calculate_metrics(self, profile: LLMProfile, results: list[ProfileTestResult]) -> LLMProfile:
         """Calculate aggregate metrics from test results."""
         if not results:
             return profile
@@ -534,7 +534,7 @@ class AdaptiveChunker:
             model="default",
         )
 
-    def get_optimal_settings(self) -> Dict[str, Any]:
+    def get_optimal_settings(self) -> dict[str, Any]:
         """Get optimal settings for the profiled model."""
         return {
             'max_chunk_tokens': self.profile.optimal_chunk_size,
@@ -543,7 +543,7 @@ class AdaptiveChunker:
             'formats_ranked': self.profile.recommended_formats,
         }
 
-    def chunk_spec(self, spec: str, format: str = 'yaml') -> List[Dict[str, Any]]:
+    def chunk_spec(self, spec: str, format: str = 'yaml') -> list[dict[str, Any]]:
         """
         Chunk specification based on profile.
 

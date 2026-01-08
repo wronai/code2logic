@@ -13,26 +13,76 @@ functions that were specific to code2logic.
 # Re-export everything from lolm for backward compatibility
 import json
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
-from lolm import (
-    DEFAULT_MODELS,
-    DEFAULT_PROVIDER_PRIORITIES,
-    RECOMMENDED_MODELS,
-    BaseLLMClient,
-    LiteLLMClient,
-    LLMManager,
-    OpenRouterClient,
-    get_client,
-    get_provider_model,
-    list_available_providers,
-)
-from lolm import (
-    OllamaClient as OllamaLocalClient,
-)
-from lolm import (
-    get_provider_priorities_from_litellm as _get_provider_priorities_from_litellm_yaml,
-)
+try:
+    from lolm import (
+        DEFAULT_MODELS,
+        DEFAULT_PROVIDER_PRIORITIES,
+        RECOMMENDED_MODELS,
+        BaseLLMClient,
+        LiteLLMClient,
+        LLMConfig,
+        LLMManager,
+        OpenRouterClient,
+        get_client,
+        get_provider_model,
+        list_available_providers,
+    )
+    from lolm import (
+        OllamaClient as OllamaLocalClient,
+    )
+    from lolm import (
+        get_provider_priorities_from_litellm as _get_provider_priorities_from_litellm_yaml,
+    )
+
+    LOLM_AVAILABLE = True
+except ImportError:
+    LOLM_AVAILABLE = False
+
+    DEFAULT_MODELS: dict[str, str] = {}
+    DEFAULT_PROVIDER_PRIORITIES: dict[str, int] = {}
+    RECOMMENDED_MODELS: dict[str, list[tuple]] = {}
+
+    class BaseLLMClient:  # type: ignore[no-redef]
+        def generate(self, prompt: str, system: Optional[str] = None, max_tokens: int = 4000) -> str:
+            raise ImportError('lolm is required for LLM features')
+
+        def is_available(self) -> bool:
+            return False
+
+    class OpenRouterClient(BaseLLMClient):  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError('lolm is required for LLM features')
+
+    class OllamaLocalClient(BaseLLMClient):  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError('lolm is required for LLM features')
+
+    class LiteLLMClient(BaseLLMClient):  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError('lolm is required for LLM features')
+
+    class LLMConfig:  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError('lolm is required for LLM features')
+
+    class LLMManager:  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError('lolm is required for LLM features')
+
+    def get_client(*args, **kwargs):  # type: ignore[no-redef]
+        raise ImportError('lolm is required for LLM features')
+
+    def list_available_providers() -> list[str]:  # type: ignore[no-redef]
+        return []
+
+    def get_provider_model(provider: str) -> str:  # type: ignore[no-redef]
+        _ = provider
+        return ''
+
+    def _get_provider_priorities_from_litellm_yaml() -> dict[str, int]:
+        return {}
 
 try:
     import yaml  # noqa: F401
@@ -47,7 +97,7 @@ def _get_user_llm_config_path() -> str:
     return os.path.join(os.path.expanduser('~'), '.code2logic', 'llm_config.json')
 
 
-def _load_user_llm_config() -> Dict[str, Any]:
+def _load_user_llm_config() -> dict[str, Any]:
     """Load legacy code2logic LLM config."""
     path = _get_user_llm_config_path()
     if not os.path.exists(path):
@@ -70,11 +120,11 @@ def get_priority_mode() -> str:
     return _get_priority_mode()
 
 
-def _get_provider_priority_overrides() -> Dict[str, int]:
+def _get_provider_priority_overrides() -> dict[str, int]:
     """Get provider priority overrides from legacy config."""
     cfg = _load_user_llm_config()
     raw = cfg.get('provider_priorities') or {}
-    out: Dict[str, int] = {}
+    out: dict[str, int] = {}
     for k, v in raw.items():
         try:
             out[str(k)] = int(v)
@@ -83,7 +133,7 @@ def _get_provider_priority_overrides() -> Dict[str, int]:
     return out
 
 
-def _get_model_priority_rules() -> Dict[str, Dict[str, int]]:
+def _get_model_priority_rules() -> dict[str, dict[str, int]]:
     """Get model priority rules from legacy config."""
     cfg = _load_user_llm_config()
     mp = cfg.get('model_priorities') or {}
@@ -91,8 +141,8 @@ def _get_model_priority_rules() -> Dict[str, Dict[str, int]]:
     exact_raw = mp.get('exact') or {}
     prefix_raw = mp.get('prefix') or {}
 
-    exact: Dict[str, int] = {}
-    prefix: Dict[str, int] = {}
+    exact: dict[str, int] = {}
+    prefix: dict[str, int] = {}
     for k, v in exact_raw.items():
         try:
             exact[str(k)] = int(v)
@@ -132,12 +182,12 @@ def _get_provider_model_string(provider: str) -> str:
     return get_provider_model(provider)
 
 
-def _get_priority_order() -> List[str]:
+def _get_priority_order() -> list[str]:
     """Get providers ordered by priority."""
     return [p for p, _ in _get_effective_provider_order()]
 
 
-def _get_effective_provider_order() -> List[tuple]:
+def _get_effective_provider_order() -> list[tuple[str, int]]:
     """Get effective provider order with priorities."""
     mode = _get_priority_mode()
     provider_priorities = dict(DEFAULT_PROVIDER_PRIORITIES)
@@ -152,8 +202,8 @@ def _get_effective_provider_order() -> List[tuple]:
     for provider, pr in override_priorities.items():
         provider_priorities[provider] = int(pr)
 
-    effective: Dict[str, int] = {}
-    has_model_rule: Dict[str, bool] = {}
+    effective: dict[str, int] = {}
+    has_model_rule: dict[str, bool] = {}
     for provider, base_pr in provider_priorities.items():
         model_str = _get_provider_model_string(provider)
         model_pr = _get_model_priority(model_str)
@@ -188,12 +238,12 @@ def _get_effective_provider_order() -> List[tuple]:
     )
 
 
-def get_effective_provider_priorities() -> Dict[str, int]:
+def get_effective_provider_priorities() -> dict[str, int]:
     """Get effective provider priorities (legacy wrapper)."""
     return {p: int(pr) for p, pr in _get_effective_provider_order()}
 
 
-def _candidate_litellm_yaml_paths() -> List[str]:
+def _candidate_litellm_yaml_paths() -> list[str]:
     """Get candidate paths for litellm_config.yaml."""
     return [
         os.path.join(os.getcwd(), 'litellm_config.yaml'),
@@ -210,6 +260,7 @@ __all__ = [
     'OllamaLocalClient',
     'LiteLLMClient',
     'LLMManager',
+    'LLMConfig',
     # Functions
     'get_client',
     'list_available_providers',

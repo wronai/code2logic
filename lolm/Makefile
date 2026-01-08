@@ -58,10 +58,41 @@ typecheck:
 build: clean
 	$(PYTHON) -m build
 
-publish: build
+bump-patch:
+	@$(PYTHON) - <<'PY'
+	import re
+	from pathlib import Path
+	pp = Path('pyproject.toml')
+	txt = pp.read_text(encoding='utf-8')
+	m = re.search(r'(?m)^version\s*=\s*"(\d+)\.(\d+)\.(\d+)"\s*$', txt)
+	if not m:
+	    raise SystemExit('Cannot find version in pyproject.toml')
+	maj, minor, patch = map(int, m.groups())
+	new_version = f"{maj}.{minor}.{patch + 1}"
+	txt = re.sub(
+	    r'(?m)^version\s*=\s*"\d+\.\d+\.\d+"\s*$',
+	    f'version = "{new_version}"',
+	    txt,
+	    count=1,
+	)
+	pp.write_text(txt, encoding='utf-8')
+	init_py = Path('__init__.py')
+	init_txt = init_py.read_text(encoding='utf-8')
+	init_txt, n = re.subn(
+	    r"(?m)^__version__\s*=\s*['\"]\d+\.\d+\.\d+['\"]\s*$",
+	    f"__version__ = '{new_version}'",
+	    init_txt,
+	    count=1,
+	)
+	if n:
+	    init_py.write_text(init_txt, encoding='utf-8')
+	print(new_version)
+	PY
+
+publish: bump-patch build
 	$(PYTHON) -m twine upload dist/*
 
-publish-test: build
+publish-test: bump-patch build
 	$(PYTHON) -m twine upload --repository testpypi dist/*
 
 # Clean

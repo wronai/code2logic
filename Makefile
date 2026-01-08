@@ -165,7 +165,7 @@ build: clean ## Build package
 # Publishing
 # ============================================================================
 
-publish-test: build ## Publish to TestPyPI
+publish-test: bump-patch build ## Publish to TestPyPI
 	@echo "$(YELLOW)Publishing to TestPyPI...$(NC)"
 	$(PYTHON) -m twine upload --repository testpypi dist/*
 	@echo "$(GREEN)Published to TestPyPI!$(NC)"
@@ -350,24 +350,24 @@ llm-status: ## Show LLM configuration status
 
 publish-lolm: ## Publish lolm package to PyPI
 	@echo "$(YELLOW)Publishing lolm to PyPI...$(NC)"
-	cd lolm && $(MAKE) build && $(MAKE) publish
+	$(MAKE) -C lolm publish
 	@echo "$(GREEN)lolm published!$(NC)"
 
 publish-logic2test: ## Publish logic2test package to PyPI
 	@echo "$(YELLOW)Publishing logic2test to PyPI...$(NC)"
-	cd logic2test && $(MAKE) build && $(MAKE) publish
+	$(MAKE) -C logic2test publish
 	@echo "$(GREEN)logic2test published!$(NC)"
 
 publish-logic2code: ## Publish logic2code package to PyPI
 	@echo "$(YELLOW)Publishing logic2code to PyPI...$(NC)"
-	cd logic2code && $(MAKE) build && $(MAKE) publish
+	$(MAKE) -C logic2code publish
 	@echo "$(GREEN)logic2code published!$(NC)"
 
 publish-all: ## Publish all packages (code2logic + sub-packages)
 	@echo "$(BLUE)Publishing all packages...$(NC)"
 	@for pkg in $(SUBPACKAGES); do \
 		echo "$(YELLOW)Building and publishing $$pkg...$(NC)"; \
-		cd $$pkg && $(MAKE) build && $(MAKE) publish && cd ..; \
+		$(MAKE) -C $$pkg publish || exit $$?; \
 	done
 	@echo "$(YELLOW)Publishing code2logic...$(NC)"
 	$(MAKE) publish
@@ -377,7 +377,7 @@ publish-all-test: ## Publish all packages to TestPyPI
 	@echo "$(BLUE)Publishing all packages to TestPyPI...$(NC)"
 	@for pkg in $(SUBPACKAGES); do \
 		echo "$(YELLOW)Building and publishing $$pkg to TestPyPI...$(NC)"; \
-		cd $$pkg && $(MAKE) build && $(MAKE) publish-test && cd ..; \
+		$(MAKE) -C $$pkg publish-test || exit $$?; \
 	done
 	$(MAKE) publish-test
 	@echo "$(GREEN)All packages published to TestPyPI!$(NC)"

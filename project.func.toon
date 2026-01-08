@@ -1,10 +1,10 @@
 {
   "name": "code2logic",
   "statistics": {
-    "files": 52,
-    "lines": 21957,
+    "files": 53,
+    "lines": 21971,
     "languages": {
-      "python": 52
+      "python": 53
     }
   },
   "entrypoints": [
@@ -23,7 +23,7 @@
     {
       "path": "llm_profiler.py",
       "language": "python",
-      "lines": 491,
+      "lines": 490,
       "classes": [
         {
           "name": "LLMProfile",
@@ -194,7 +194,6 @@
       ],
       "imports": [
         "json",
-        "os",
         "time",
         "hashlib",
         "dataclasses.dataclass",
@@ -202,7 +201,8 @@
         "dataclasses.asdict",
         "datetime",
         "typing.Dict",
-        "typing.List"
+        "typing.List",
+        "typing.Optional"
       ],
       "exports": [
         "PROFILE_TEST_CASES",
@@ -341,7 +341,7 @@
     {
       "path": "file_formats.py",
       "language": "python",
-      "lines": 279,
+      "lines": 278,
       "classes": [],
       "functions": [
         {
@@ -370,12 +370,10 @@
         }
       ],
       "imports": [
-        "re",
         "json",
         "pathlib.Path",
         "typing.Dict",
-        "typing.Any",
-        "typing.List"
+        "typing.Any"
       ],
       "exports": [
         "generate_file_csv",
@@ -386,7 +384,7 @@
     {
       "path": "project_reproducer.py",
       "language": "python",
-      "lines": 322,
+      "lines": 318,
       "classes": [
         {
           "name": "FileResult",
@@ -457,16 +455,16 @@
         }
       ],
       "imports": [
-        "os",
         "json",
-        "hashlib",
         "pathlib.Path",
         "typing.Dict",
-        "typing.Any",
         "typing.List",
         "typing.Optional",
         "typing.Set",
-        "dataclasses.dataclass"
+        "dataclasses.dataclass",
+        "dataclasses.field",
+        "dataclasses.asdict",
+        "datetime"
       ],
       "exports": [
         "SUPPORTED_EXTENSIONS",
@@ -479,7 +477,7 @@
     {
       "path": "base.py",
       "language": "python",
-      "lines": 50,
+      "lines": 49,
       "classes": [
         {
           "name": "VerboseMixin",
@@ -575,8 +573,7 @@
       ],
       "functions": [],
       "imports": [
-        "logging",
-        "typing.Optional"
+        "logging"
       ],
       "exports": [
         "VerboseMixin",
@@ -587,7 +584,7 @@
     {
       "path": "cli.py",
       "language": "python",
-      "lines": 803,
+      "lines": 801,
       "classes": [
         {
           "name": "Colors",
@@ -772,7 +769,6 @@
         "sys",
         "subprocess",
         "time",
-        "logging",
         "json",
         "signal",
         "datetime",
@@ -788,7 +784,7 @@
     {
       "path": "llm.py",
       "language": "python",
-      "lines": 376,
+      "lines": 375,
       "classes": [
         {
           "name": "LLMConfig",
@@ -931,7 +927,7 @@
         "dataclasses.dataclass",
         "httpx",
         "litellm.completion",
-        "llm_clients.BaseLLMClient"
+        "llm_clients.OpenRouterClient"
       ],
       "exports": [
         "LLMConfig",
@@ -944,7 +940,7 @@
     {
       "path": "errors.py",
       "language": "python",
-      "lines": 372,
+      "lines": 371,
       "classes": [
         {
           "name": "ErrorSeverity",
@@ -1221,12 +1217,12 @@
         "pathlib.Path",
         "datetime",
         "collections.defaultdict",
-        "typing.Optional",
         "typing.List",
         "typing.Dict",
         "models.ProjectInfo",
         "models.ModuleInfo",
-        "parsers.TreeSitterParser"
+        "parsers.TreeSitterParser",
+        "parsers.UniversalParser"
       ],
       "exports": [
         "ProjectAnalyzer",
@@ -1441,7 +1437,7 @@
     {
       "path": "parsers.py",
       "language": "python",
-      "lines": 1586,
+      "lines": 1584,
       "classes": [
         {
           "name": "_PyFunctionBodyAnalyzer",
@@ -2057,9 +2053,9 @@
         "enum.auto",
         "typing.Optional",
         "typing.List",
-        "typing.Tuple",
         "typing.Any",
-        "typing.TYPE_CHECKING"
+        "typing.TYPE_CHECKING",
+        "nltk"
       ],
       "exports": [
         "IntentType",
@@ -2071,7 +2067,7 @@
     {
       "path": "adaptive.py",
       "language": "python",
-      "lines": 475,
+      "lines": 473,
       "classes": [
         {
           "name": "ChunkInfo",
@@ -2184,16 +2180,16 @@
         }
       ],
       "imports": [
-        "os",
-        "re",
         "pathlib.Path",
         "typing.Dict",
         "typing.Any",
         "typing.List",
-        "typing.Optional",
-        "typing.Tuple",
         "dataclasses.dataclass",
-        "dotenv.load_dotenv"
+        "dotenv.load_dotenv",
+        "llm_clients.BaseLLMClient",
+        "llm_clients.get_client",
+        "reproduction.compare_code",
+        "reproduction.extract_code_block"
       ],
       "exports": [
         "LLM_CAPABILITIES",
@@ -2206,7 +2202,7 @@
     {
       "path": "reproducer.py",
       "language": "python",
-      "lines": 534,
+      "lines": 533,
       "classes": [
         {
           "name": "ReproductionStatus",
@@ -2409,7 +2405,6 @@
         }
       ],
       "imports": [
-        "os",
         "yaml",
         "json",
         "re",
@@ -2418,7 +2413,8 @@
         "dataclasses.field",
         "typing.List",
         "typing.Dict",
-        "typing.Any"
+        "typing.Any",
+        "typing.Optional"
       ],
       "exports": [
         "ReproductionStatus",
@@ -2433,7 +2429,7 @@
     {
       "path": "llm_clients.py",
       "language": "python",
-      "lines": 168,
+      "lines": 167,
       "classes": [],
       "functions": [
         {
@@ -2564,7 +2560,7 @@
     {
       "path": "chunked_reproduction.py",
       "language": "python",
-      "lines": 357,
+      "lines": 355,
       "classes": [
         {
           "name": "Chunk",
@@ -2666,14 +2662,8 @@
       "imports": [
         "re",
         "dataclasses.dataclass",
-        "dataclasses.field",
-        "typing.Dict",
         "typing.List",
-        "typing.Optional",
-        "typing.Tuple",
-        "pathlib.Path",
-        "models.ProjectInfo",
-        "models.ModuleInfo"
+        "utils.estimate_tokens"
       ],
       "exports": [
         "LLM_CONTEXT_LIMITS",
@@ -2691,7 +2681,7 @@
     {
       "path": "__init__.py",
       "language": "python",
-      "lines": 323,
+      "lines": 365,
       "classes": [],
       "functions": [
         {
@@ -2727,7 +2717,7 @@
     {
       "path": "metrics.py",
       "language": "python",
-      "lines": 447,
+      "lines": 446,
       "classes": [
         {
           "name": "TextMetrics",
@@ -2853,14 +2843,14 @@
       "imports": [
         "re",
         "difflib",
-        "hashlib",
         "typing.Dict",
         "typing.Any",
         "typing.List",
         "typing.Tuple",
-        "typing.Optional",
         "dataclasses.dataclass",
-        "dataclasses.field"
+        "dataclasses.field",
+        "dataclasses.asdict",
+        "collections.Counter"
       ],
       "exports": [
         "TextMetrics",
@@ -2887,7 +2877,7 @@
     {
       "path": "refactor.py",
       "language": "python",
-      "lines": 313,
+      "lines": 308,
       "classes": [
         {
           "name": "DuplicateGroup",
@@ -2952,16 +2942,16 @@
         }
       ],
       "imports": [
-        "json",
-        "pathlib.Path",
         "typing.Dict",
         "typing.List",
         "typing.Any",
-        "typing.Optional",
         "dataclasses.dataclass",
         "dataclasses.field",
         "dataclasses.asdict",
-        "analyzer.analyze_project"
+        "analyzer.analyze_project",
+        "code_review.analyze_code_quality",
+        "code_review.check_security_issues",
+        "llm_clients.get_client"
       ],
       "exports": [
         "DuplicateGroup",
@@ -3060,11 +3050,11 @@
         "typing.List",
         "typing.Optional",
         "typing.Set",
-        "typing.Any",
         "dataclasses.dataclass",
         "models.ProjectInfo",
         "models.ModuleInfo",
-        "models.FunctionInfo"
+        "models.FunctionInfo",
+        "models.ClassInfo"
       ],
       "exports": [
         "LogicMLSpec",
@@ -3623,7 +3613,7 @@
         "models.ModuleInfo",
         "models.ClassInfo",
         "models.FunctionInfo",
-        "models.DependencyNode"
+        "models.ConstantInfo"
       ],
       "exports": [
         "bytes_to_kb",
@@ -3637,7 +3627,7 @@
     {
       "path": "markdown_format.py",
       "language": "python",
-      "lines": 266,
+      "lines": 265,
       "classes": [
         {
           "name": "MarkdownSpec",
@@ -3715,16 +3705,13 @@
         }
       ],
       "imports": [
-        "os",
         "pathlib.Path",
         "typing.Dict",
         "typing.List",
-        "typing.Optional",
         "dataclasses.dataclass",
         "models.ProjectInfo",
-        "models.ModuleInfo",
-        "models.FunctionInfo",
-        "models.ClassInfo"
+        "gherkin.GherkinGenerator",
+        "generators.YAMLGenerator"
       ],
       "exports": [
         "MarkdownSpec",
@@ -3831,6 +3818,15 @@
       ]
     },
     {
+      "path": "llm_clients_new.py",
+      "language": "python",
+      "lines": 0,
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "exports": []
+    },
+    {
       "path": "similarity.py",
       "language": "python",
       "lines": 178,
@@ -3898,7 +3894,7 @@
     {
       "path": "universal.py",
       "language": "python",
-      "lines": 831,
+      "lines": 829,
       "classes": [
         {
           "name": "ElementType",
@@ -4106,7 +4102,6 @@
         }
       ],
       "imports": [
-        "os",
         "re",
         "json",
         "hashlib",
@@ -4114,8 +4109,9 @@
         "typing.Dict",
         "typing.Any",
         "typing.List",
-        "typing.Optional",
-        "typing.Tuple"
+        "typing.Union",
+        "dataclasses.dataclass",
+        "dataclasses.field"
       ],
       "exports": [
         "ElementType",
@@ -4132,7 +4128,7 @@
     {
       "path": "benchmark.py",
       "language": "python",
-      "lines": 351,
+      "lines": 349,
       "classes": [
         {
           "name": "FormatResult",
@@ -4209,7 +4205,6 @@
         }
       ],
       "imports": [
-        "os",
         "json",
         "time",
         "dotenv.load_dotenv",
@@ -4218,7 +4213,8 @@
         "typing.Any",
         "typing.List",
         "typing.Optional",
-        "datetime"
+        "datetime",
+        "dataclasses.dataclass"
       ],
       "exports": [
         "FormatResult",
@@ -4231,7 +4227,7 @@
     {
       "path": "terminal.py",
       "language": "python",
-      "lines": 500,
+      "lines": 496,
       "classes": [
         {
           "name": "ShellRenderer",
@@ -4569,7 +4565,6 @@
         "typing.Literal",
         "typing.Optional",
         "typing.List",
-        "typing.Dict",
         "typing.Any"
       ],
       "exports": [
@@ -4583,7 +4578,7 @@
     {
       "path": "toon_format.py",
       "language": "python",
-      "lines": 541,
+      "lines": 540,
       "classes": [
         {
           "name": "TOONGenerator",
@@ -4715,12 +4710,12 @@
         "typing.List",
         "typing.Dict",
         "typing.Any",
-        "typing.Optional",
         "models.ProjectInfo",
         "models.ModuleInfo",
         "models.ClassInfo",
         "models.FunctionInfo",
-        "models.TypeInfo"
+        "models.TypeInfo",
+        "shared_utils.compact_imports"
       ],
       "exports": [
         "TOONGenerator",
@@ -4814,7 +4809,6 @@
         "pathlib.Path",
         "typing.Dict",
         "typing.List",
-        "typing.Optional",
         "models.ModuleInfo",
         "models.DependencyNode",
         "networkx"
@@ -4828,7 +4822,7 @@
     {
       "path": "mcp_server.py",
       "language": "python",
-      "lines": 293,
+      "lines": 291,
       "classes": [],
       "functions": [
         {
@@ -4853,8 +4847,6 @@
       "imports": [
         "json",
         "sys",
-        "pathlib.Path",
-        "typing.Optional",
         "__version__"
       ],
       "exports": [
@@ -4933,7 +4925,6 @@
         "typing.Dict",
         "typing.Any",
         "typing.List",
-        "typing.Optional",
         "datetime",
         "llm_clients.BaseLLMClient",
         "llm_clients.get_client"
@@ -4948,7 +4939,7 @@
     {
       "path": "gherkin.py",
       "language": "python",
-      "lines": 766,
+      "lines": 764,
       "classes": [
         {
           "name": "GherkinScenario",
@@ -5167,13 +5158,12 @@
         "typing.List",
         "typing.Dict",
         "typing.Optional",
-        "typing.Set",
         "typing.Any",
         "collections.defaultdict",
         "dataclasses.dataclass",
-        "dataclasses.field",
         "re",
-        "hashlib"
+        "models.ProjectInfo",
+        "models.FunctionInfo"
       ],
       "exports": [
         "GherkinScenario",
@@ -5189,7 +5179,7 @@
     {
       "path": "schemas/logicml_schema.py",
       "language": "python",
-      "lines": 190,
+      "lines": 184,
       "classes": [
         {
           "name": "LogicMLMethod",
@@ -5328,7 +5318,6 @@
         "typing.Any",
         "typing.Dict",
         "typing.List",
-        "typing.Optional",
         "typing.Tuple",
         "yaml"
       ],
@@ -5421,7 +5410,7 @@
     {
       "path": "schemas/markdown_schema.py",
       "language": "python",
-      "lines": 121,
+      "lines": 118,
       "classes": [
         {
           "name": "MarkdownMethod",
@@ -5464,7 +5453,6 @@
         "typing.Any",
         "typing.Dict",
         "typing.List",
-        "typing.Optional",
         "typing.Tuple",
         "re"
       ],
@@ -5556,7 +5544,7 @@
     {
       "path": "benchmarks/runner.py",
       "language": "python",
-      "lines": 638,
+      "lines": 633,
       "classes": [
         {
           "name": "BenchmarkRunner",
@@ -5659,16 +5647,16 @@
         }
       ],
       "imports": [
-        "re",
         "sys",
         "time",
         "pathlib.Path",
-        "typing.Dict",
         "typing.List",
         "typing.Optional",
-        "typing.Tuple",
-        "typing.Callable",
-        "concurrent.futures.ThreadPoolExecutor"
+        "analyzer.analyze_project",
+        "llm_clients.get_client",
+        "llm_clients.BaseLLMClient",
+        "utils.estimate_tokens",
+        "metrics.ReproductionMetrics"
       ],
       "exports": [
         "BenchmarkRunner",
@@ -5678,7 +5666,7 @@
     {
       "path": "benchmarks/__init__.py",
       "language": "python",
-      "lines": 19,
+      "lines": 34,
       "classes": [],
       "functions": [],
       "imports": [

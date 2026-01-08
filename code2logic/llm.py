@@ -17,27 +17,10 @@ Usage:
 import json
 import os
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from importlib.util import find_spec
+from typing import Any, Optional
 
-# Optional imports
-try:
-    import httpx
-    HTTPX_AVAILABLE = True
-except ImportError:
-    HTTPX_AVAILABLE = False
-
-try:
-    from litellm import completion
-    LITELLM_AVAILABLE = True
-except ImportError:
-    LITELLM_AVAILABLE = False
-
-
-from .llm_clients import (
-    OllamaLocalClient,
-    OpenRouterClient,
-    get_client,
-)
+from .llm_clients import LiteLLMClient, OllamaLocalClient, OpenRouterClient, get_client
 
 
 @dataclass
@@ -50,115 +33,6 @@ class LLMConfig:
     timeout: int = 120
     temperature: float = 0.7
     max_tokens: int = 2000
-
-
-class OllamaClient:
-    """Direct Ollama API client."""
-
-    def __init__(self, config: LLMConfig):
-        if not HTTPX_AVAILABLE:
-            raise ImportError("httpx required: pip install httpx")
-        self.config = config
-        self.client = httpx.Client(timeout=config.timeout)
-
-    def generate(self, prompt: str, system: Optional[str] = None) -> str:
-        """Generate completion from Ollama."""
-        payload = {
-            "model": self.config.model,
-            "prompt": prompt,
-            "stream": False,
-            "options": {
-                "temperature": self.config.temperature,
-                "num_predict": self.config.max_tokens,
-            }
-        }
-
-        if system:
-            payload["system"] = system
-
-        response = self.client.post(
-            f"{self.config.base_url}/api/generate",
-            json=payload
-        )
-        response.raise_for_status()
-        return response.json().get("response", "")
-
-    def chat(self, messages: List[Dict[str, str]]) -> str:
-        """Chat completion from Ollama."""
-        payload = {
-            "model": self.config.model,
-            "messages": messages,
-            "stream": False,
-            "options": {
-                "temperature": self.config.temperature,
-                "num_predict": self.config.max_tokens,
-            }
-        }
-
-        response = self.client.post(
-            f"{self.config.base_url}/api/chat",
-            json=payload
-        )
-        response.raise_for_status()
-        return response.json().get("message", {}).get("content", "")
-
-    def is_available(self) -> bool:
-        """Check if Ollama is running."""
-        try:
-            response = self.client.get(f"{self.config.base_url}/api/tags")
-            return response.status_code == 200
-        except Exception:
-            return False
-
-    def list_models(self) -> List[str]:
-        """List available models."""
-        try:
-            response = self.client.get(f"{self.config.base_url}/api/tags")
-            data = response.json()
-            return [m["name"] for m in data.get("models", [])]
-        except Exception:
-            return []
-
-
-class LiteLLMClient:
-    """LiteLLM client for unified API access."""
-
-    def __init__(self, config: LLMConfig):
-        if not LITELLM_AVAILABLE:
-            raise ImportError("litellm required: pip install litellm")
-        self.config = config
-
-    def generate(self, prompt: str, system: Optional[str] = None) -> str:
-        """Generate completion via LiteLLM."""
-        messages = []
-        if system:
-            messages.append({"role": "system", "content": system})
-        messages.append({"role": "user", "content": prompt})
-
-        return self.chat(messages)
-
-    def chat(self, messages: List[Dict[str, str]]) -> str:
-        """Chat completion via LiteLLM."""
-        model = f"ollama/{self.config.model}"
-        if self.config.provider == "litellm":
-            model = self.config.model
-
-        response = completion(
-            model=model,
-            messages=messages,
-            api_base=self.config.base_url,
-            temperature=self.config.temperature,
-            max_tokens=self.config.max_tokens,
-        )
-        return response.choices[0].message.content
-
-    def is_available(self) -> bool:
-        """Check if LiteLLM backend is available."""
-        try:
-            self.chat([{"role": "user", "content": "test"}])
-            return True
-        except Exception:
-            return False
 
 
 class CodeAnalyzer:
@@ -238,7 +112,7 @@ Be specific, practical, and provide code examples when helpful."""
         """Check if LLM backend is available."""
         return bool(getattr(self.client, "is_available", lambda: False)())
 
-    def suggest_refactoring(self, project) -> List[Dict[str, Any]]:
+    def suggest_refactoring(self, project) -> list[dict[str, Any]]:
         """
         Analyze project and suggest refactoring improvements.
 
@@ -289,7 +163,7 @@ Format as JSON array."""
         # Return raw response if JSON parsing fails
         return [{"raw_response": response}]
 
-    def find_semantic_duplicates(self, project) -> List[Dict[str, Any]]:
+    def find_semantic_duplicates(self, project) -> list[dict[str, Any]]:
         """
         Find semantically similar functions using LLM.
 
@@ -354,7 +228,7 @@ Format as JSON array of groups."""
         project,
         target_lang: str,
         module_filter: Optional[str] = None
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """
         Generate code in target language from project analysis.
 
@@ -458,19 +332,42 @@ Output only the code."""
         return f"({params}){ret}"
 
 
-def get_available_backends() -> Dict[str, bool]:
+def get_available_backends() -> dict[str, bool]:
     """Get availability status of LLM backends."""
+    httpx_available = find_spec('httpx') is not None
+    litellm_available = find_spec('litellm') is not None
+
     status = {
-        'httpx': HTTPX_AVAILABLE,
-        'litellm': LITELLM_AVAILABLE,
+        # Backward-compatible keys
+        'httpx': httpx_available,
+        'litellm': litellm_available,
         'ollama': False,
+        # Extended provider keys
+        'auto': False,
+        'openrouter': False,
+        'litellm_provider': False,
     }
 
-    if HTTPX_AVAILABLE:
-        try:
-            client = OllamaClient(LLMConfig())
-            status['ollama'] = client.is_available()
-        except Exception:
-            pass
+    try:
+        status['auto'] = bool(get_client('auto'))
+    except Exception:
+        pass
+
+    try:
+        status['openrouter'] = bool(getattr(OpenRouterClient(), 'is_available', lambda: False)())
+    except Exception:
+        pass
+
+    try:
+        if httpx_available:
+            status['ollama'] = bool(getattr(OllamaLocalClient(), 'is_available', lambda: False)())
+    except Exception:
+        pass
+
+    try:
+        if litellm_available:
+            status['litellm_provider'] = bool(getattr(LiteLLMClient(), 'is_available', lambda: False)())
+    except Exception:
+        pass
 
     return status
