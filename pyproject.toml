@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "code2logic"
-version = "1.0.19"
+version = "1.0.20"
 description = "Convert source code to logical representation for LLM analysis"
 readme = "README.md"
 license = "Apache-2.0"
@@ -183,7 +183,7 @@ module = [
 ignore_missing_imports = true
 
 [tool.bumpver]
-current_version = "1.0.19"
+current_version = "1.0.20"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit = false
 tag = false
