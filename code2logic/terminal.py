@@ -8,7 +8,7 @@ Based on: /home/tom/github/wronai/contract/src/python/reclapp/evolution/shell_re
 
 Usage:
     from code2logic.terminal import render, ShellRenderer
-    
+
     render.heading(2, "Benchmark Results")
     render.codeblock("yaml", "score: 95.5\\nformat: yaml")
     render.success("All tests passed")
@@ -20,8 +20,7 @@ Usage:
 import os
 import re
 import sys
-from typing import Literal, Optional, List, Any
-
+from typing import Any, List, Literal, Optional
 
 # ANSI color codes
 COLORS = {
@@ -30,7 +29,7 @@ COLORS = {
     "dim": "\033[2m",
     "italic": "\033[3m",
     "underline": "\033[4m",
-    
+
     # Foreground
     "black": "\033[30m",
     "red": "\033[31m",
@@ -41,7 +40,7 @@ COLORS = {
     "cyan": "\033[36m",
     "white": "\033[37m",
     "gray": "\033[90m",
-    
+
     # Bright foreground
     "bright_red": "\033[91m",
     "bright_green": "\033[92m",
@@ -49,7 +48,7 @@ COLORS = {
     "bright_blue": "\033[94m",
     "bright_magenta": "\033[95m",
     "bright_cyan": "\033[96m",
-    
+
     # Background
     "bg_black": "\033[40m",
     "bg_red": "\033[41m",
@@ -60,7 +59,7 @@ COLORS = {
 }
 
 Language = Literal[
-    "yaml", "yml", "json", "python", "py", "bash", "sh", 
+    "yaml", "yml", "json", "python", "py", "bash", "sh",
     "typescript", "ts", "javascript", "js", "markdown", "md",
     "log", "text", "txt", "gherkin", "feature"
 ]
@@ -69,7 +68,7 @@ Language = Literal[
 class ShellRenderer:
     """
     Renders colorized markdown output in terminal.
-    
+
     Supports syntax highlighting for:
     - YAML/YML
     - JSON
@@ -79,7 +78,7 @@ class ShellRenderer:
     - Markdown
     - Gherkin/Feature
     - Log messages
-    
+
     Color scheme:
     - cyan:    Keys, headers, identifiers
     - green:   String values, success, commands
@@ -88,21 +87,21 @@ class ShellRenderer:
     - gray:    Comments, dim text
     - red:     Errors
     - blue:    Links
-    
+
     Example:
         renderer = ShellRenderer()
         renderer.heading(2, "Status")
         renderer.codeblock("yaml", "status: ok\\ncount: 42")
         renderer.success("Done!")
     """
-    
+
     def __init__(self, use_colors: bool = True, verbose: bool = True):
         self.verbose = verbose
         # Detect if terminal supports colors
         self.use_colors = use_colors and self._supports_colors()
         self.log_buffer: List[str] = []
         self.log_enabled = False
-    
+
     def _supports_colors(self) -> bool:
         """Check if terminal supports ANSI colors."""
         # Check for NO_COLOR env var (standard)
@@ -115,20 +114,20 @@ class ShellRenderer:
         if not hasattr(sys.stdout, "isatty"):
             return False
         return sys.stdout.isatty()
-    
+
     def enable_log(self) -> None:
         """Enable log buffering for markdown export."""
         self.log_enabled = True
         self.log_buffer = []
-    
+
     def get_log(self) -> str:
         """Get buffered log as clean markdown (no ANSI codes)."""
         return "\n".join(self.log_buffer)
-    
+
     def clear_log(self) -> None:
         """Clear log buffer."""
         self.log_buffer = []
-    
+
     def _log(self, text: str) -> None:
         """Log a line (strips ANSI codes for markdown)."""
         if not self.verbose:
@@ -138,38 +137,38 @@ class ShellRenderer:
             # Strip ANSI codes for clean markdown
             clean = re.sub(r'\033\[[0-9;]*m', '', text)
             self.log_buffer.append(clean)
-    
+
     def _c(self, color: str, text: str) -> str:
         """Apply color to text."""
         if not self.use_colors:
             return text
         code = COLORS.get(color, "")
         return f"{code}{text}{COLORS['reset']}"
-    
+
     # =========================================================================
     # MARKDOWN ELEMENTS
     # =========================================================================
-    
+
     def heading(self, level: int, text: str) -> None:
         """Print a markdown heading."""
         prefix = "#" * level
         self._log(f"\n{self._c('bold', self._c('cyan', f'{prefix} {text}'))}\n")
-    
+
     def codeblock(self, language: Language, content: str) -> None:
         """Print a syntax-highlighted code block."""
         border = self._c("gray", f"```{language}")
         border_end = self._c("gray", "```")
-        
+
         self._log("")
         self._log(border)
-        
+
         for line in content.split("\n"):
             highlighted = self._highlight_line(line, language)
             self._log(highlighted)
-        
+
         self._log(border_end)
         self._log("")
-    
+
     def render_markdown(self, text: str) -> None:
         """Render full markdown text with syntax highlighting."""
         lines = text.split("\n")
@@ -177,13 +176,13 @@ class ShellRenderer:
         fence = "```"
         lang = "text"
         buf: List[str] = []
-        
+
         for line in lines:
             trimmed = line.rstrip()
-            
+
             # Check for fence markers
             match = re.match(r'^(`{3,})(.*)$', trimmed)
-            
+
             if not in_fence:
                 if match:
                     in_fence = True
@@ -203,32 +202,32 @@ class ShellRenderer:
                     buf = []
                 else:
                     buf.append(line)
-        
+
         # Flush remaining buffer
         if buf:
             self.codeblock(lang, "\n".join(buf))
-    
+
     # =========================================================================
     # STATUS MESSAGES
     # =========================================================================
-    
+
     def success(self, message: str) -> None:
         """Print success message."""
         self._log(f"{self._c('green', '✅')} {self._c('green', message)}")
-    
+
     def error(self, message: str) -> None:
         """Print error message."""
         self._log(f"{self._c('red', '❌')} {self._c('red', message)}")
-    
+
     def warning(self, message: str) -> None:
         """Print warning message."""
         self._log(f"{self._c('yellow', '⚠️')} {self._c('yellow', message)}")
-    
+
     def info(self, message: str) -> None:
         """Print info message."""
         self._log(f"{self._c('cyan', 'ℹ️')} {self._c('cyan', message)}")
-    
-    def status(self, icon: str, message: str, 
+
+    def status(self, icon: str, message: str,
                type: Literal["info", "success", "warning", "error"] = "info") -> None:
         """Print status message with icon."""
         color_map = {
@@ -238,15 +237,15 @@ class ShellRenderer:
             "error": "red"
         }
         self._log(f"{icon} {self._c(color_map[type], message)}")
-    
+
     # =========================================================================
     # FORMATTING
     # =========================================================================
-    
+
     def kv(self, key: str, value: Any) -> None:
         """Print key-value pair."""
         self._log(f"  {self._c('cyan', key)}: {self._c('white', str(value))}")
-    
+
     def progress(self, done: int, total: int, label: str = "") -> None:
         """Print progress bar."""
         pct = int((done / total) * 100) if total > 0 else 0
@@ -257,33 +256,33 @@ class ShellRenderer:
             f"{self._c('gray', '[')} {self._c('green', bar)} {self._c('gray', ']')} "
             f"{self._c('cyan', f'{pct}%')}{label_str}"
         )
-    
+
     def separator(self, char: str = "─", width: int = 60) -> None:
         """Print separator line."""
         self._log(self._c("gray", char * width))
-    
-    def table(self, headers: List[str], rows: List[List[Any]], 
+
+    def table(self, headers: List[str], rows: List[List[Any]],
               widths: Optional[List[int]] = None) -> None:
         """Print a simple table."""
         if not widths:
-            widths = [max(len(str(h)), max(len(str(r[i])) for r in rows) if rows else 0) + 2 
+            widths = [max(len(str(h)), max(len(str(r[i])) for r in rows) if rows else 0) + 2
                       for i, h in enumerate(headers)]
-        
+
         # Header
         header_line = "".join(
             self._c("cyan", str(h).ljust(w)) for h, w in zip(headers, widths)
         )
         self._log(header_line)
         self._log(self._c("gray", "-" * sum(widths)))
-        
+
         # Rows
         for row in rows:
             row_line = "".join(
                 str(v).ljust(w) for v, w in zip(row, widths)
             )
             self._log(row_line)
-    
-    def task(self, name: str, 
+
+    def task(self, name: str,
              status: Literal["pending", "running", "done", "failed"],
              duration: Optional[float] = None) -> None:
         """Print task status."""
@@ -299,33 +298,33 @@ class ShellRenderer:
             "done": "green",
             "failed": "red"
         }
-        
+
         duration_str = f" ({duration:.1f}s)" if duration is not None else ""
         self._log(
             f"{icons[status]} {self._c(colors[status], name)}"
             f"{self._c('gray', duration_str)}"
         )
-    
+
     def inline(self, text: str) -> str:
         """Return inline code styled text."""
         return self._c("cyan", text)
-    
+
     def print(self, text: str, color: Optional[str] = None) -> None:
         """Print raw text with optional color."""
         self._log(self._c(color, text) if color else text)
-    
+
     def newline(self) -> None:
         """Print empty line."""
         self._log("")
-    
+
     # =========================================================================
     # SYNTAX HIGHLIGHTING
     # =========================================================================
-    
+
     def _highlight_line(self, line: str, language: str) -> str:
         """Apply syntax highlighting to a line."""
         lang = language.lower()
-        
+
         if lang in ("yaml", "yml"):
             return self._highlight_yaml(line)
         elif lang == "json":
@@ -344,18 +343,18 @@ class ShellRenderer:
             return self._highlight_markdown(line)
         else:
             return self._c("white", line)
-    
+
     def _highlight_yaml(self, line: str) -> str:
         """Highlight YAML syntax."""
         # Comments
         if line.strip().startswith("#"):
             return self._c("gray", line)
-        
+
         # Key: value
         match = re.match(r'^(\s*)([^:]+)(:)(.*)$', line)
         if match:
             indent, key, colon, value = match.groups()
-            
+
             # Color value based on type
             trimmed = value.strip()
             if trimmed.isdigit() or re.match(r'^-?\d+\.?\d*$', trimmed):
@@ -368,22 +367,22 @@ class ShellRenderer:
                 value_colored = self._c("green", value)
             else:
                 value_colored = value
-            
+
             return f"{indent}{self._c('cyan', key)}{colon}{value_colored}"
-        
+
         # List item
         if line.strip().startswith("-"):
             match = re.match(r'^(\s*)(-)(.*)$', line)
             if match:
                 indent, dash, rest = match.groups()
                 return f"{indent}{self._c('white', dash)}{self._c('green', rest)}"
-        
+
         return line
-    
+
     def _highlight_json(self, line: str) -> str:
         """Highlight JSON syntax."""
         result = line
-        
+
         # Keys
         def color_key(m):
             return self._c("cyan", '"' + m.group(1) + '"') + ": "
@@ -396,22 +395,22 @@ class ShellRenderer:
         def color_num(m):
             return ": " + self._c("magenta", m.group(1))
         result = re.sub(r':\s*(-?\d+\.?\d*)', color_num, result)
-        
+
         # Booleans/null
         def color_bool(m):
             return ": " + self._c("yellow", m.group(1))
         result = re.sub(r':\s*(true|false|null)', color_bool, result)
-        
+
         return result
-    
+
     def _highlight_python(self, line: str) -> str:
         """Highlight Python syntax."""
         # Comments
         if line.strip().startswith("#"):
             return self._c("gray", line)
-        
+
         result = line
-        
+
         # Keywords
         keywords = [
             "def", "class", "import", "from", "return", "if", "elif", "else",
@@ -425,28 +424,28 @@ class ShellRenderer:
                 self._c("magenta", kw),
                 result
             )
-        
+
         # Decorators
         result = re.sub(r'(@\w+)', self._c("yellow", r'\1'), result)
-        
+
         # Strings
         result = re.sub(
             r'(["\'])(?:(?!\1).)*\1',
             lambda m: self._c("green", m.group(0)),
             result
         )
-        
+
         return result
-    
+
     def _highlight_bash(self, line: str) -> str:
         """Highlight Bash syntax."""
         # Comments
         if line.strip().startswith("#"):
             return self._c("gray", line)
-        
+
         # Commands at start of line
         commands = [
-            "cd", "npm", "node", "python", "pip", "git", "docker", 
+            "cd", "npm", "node", "python", "pip", "git", "docker",
             "code2logic", "pytest", "make", "echo", "export", "source"
         ]
         for cmd in commands:
@@ -455,17 +454,17 @@ class ShellRenderer:
                 if len(parts) == 2:
                     return f"{self._c('green', parts[0])} {parts[1]}"
                 return self._c("green", line)
-        
+
         return line
-    
+
     def _highlight_js(self, line: str) -> str:
         """Highlight JavaScript/TypeScript syntax."""
         # Comments
         if line.strip().startswith("//"):
             return self._c("gray", line)
-        
+
         result = line
-        
+
         # Keywords
         keywords = [
             "const", "let", "var", "function", "async", "await", "return",
@@ -478,20 +477,20 @@ class ShellRenderer:
                 self._c("magenta", kw),
                 result
             )
-        
+
         # Strings
         result = re.sub(
             r'(["\'])(?:(?!\1).)*\1',
             lambda m: self._c("green", m.group(0)),
             result
         )
-        
+
         return result
-    
+
     def _highlight_gherkin(self, line: str) -> str:
         """Highlight Gherkin/BDD syntax."""
         trimmed = line.strip()
-        
+
         # Keywords
         if trimmed.startswith("Feature:"):
             return self._c("cyan", line)
@@ -511,9 +510,9 @@ class ShellRenderer:
             return self._c("magenta", line)
         if trimmed.startswith("#"):
             return self._c("gray", line)
-        
+
         return line
-    
+
     def _highlight_log(self, line: str) -> str:
         """Highlight log messages."""
         if "✅" in line or "success" in line.lower():
@@ -532,9 +531,9 @@ class ShellRenderer:
             return self._c("green", line)
         if "📦" in line or "💬" in line:
             return self._c("cyan", line)
-        
+
         return self._c("white", line)
-    
+
     def _highlight_markdown(self, line: str) -> str:
         """Highlight Markdown syntax."""
         # Headers
@@ -553,9 +552,9 @@ class ShellRenderer:
         # Inline code
         if "`" in line:
             line = re.sub(r'`([^`]+)`', lambda m: self._c("cyan", f"`{m.group(1)}`"), line)
-        
+
         return line
-    
+
     def save_log(self, filepath: str) -> None:
         """Save log buffer to file as markdown."""
         import os
@@ -587,75 +586,75 @@ def set_renderer(renderer: ShellRenderer) -> None:
 
 class RenderAPI:
     """Convenience API for terminal rendering."""
-    
+
     @staticmethod
     def heading(level: int, text: str) -> None:
         get_renderer().heading(level, text)
-    
+
     @staticmethod
     def code(lang: Language, content: str) -> None:
         get_renderer().codeblock(lang, content)
-    
+
     @staticmethod
     def codeblock(lang: Language, content: str) -> None:
         get_renderer().codeblock(lang, content)
-    
+
     @staticmethod
     def markdown(text: str) -> None:
         get_renderer().render_markdown(text)
-    
+
     @staticmethod
     def success(message: str) -> None:
         get_renderer().success(message)
-    
+
     @staticmethod
     def error(message: str) -> None:
         get_renderer().error(message)
-    
+
     @staticmethod
     def warning(message: str) -> None:
         get_renderer().warning(message)
-    
+
     @staticmethod
     def info(message: str) -> None:
         get_renderer().info(message)
-    
+
     @staticmethod
-    def status(icon: str, message: str, 
+    def status(icon: str, message: str,
                type: Literal["info", "success", "warning", "error"] = "info") -> None:
         get_renderer().status(icon, message, type)
-    
+
     @staticmethod
     def kv(key: str, value: Any) -> None:
         get_renderer().kv(key, value)
-    
+
     @staticmethod
     def progress(done: int, total: int, label: str = "") -> None:
         get_renderer().progress(done, total, label)
-    
+
     @staticmethod
     def separator(char: str = "─", width: int = 60) -> None:
         get_renderer().separator(char, width)
-    
+
     @staticmethod
-    def table(headers: List[str], rows: List[List[Any]], 
+    def table(headers: List[str], rows: List[List[Any]],
               widths: Optional[List[int]] = None) -> None:
         get_renderer().table(headers, rows, widths)
-    
+
     @staticmethod
-    def task(name: str, 
+    def task(name: str,
              status: Literal["pending", "running", "done", "failed"],
              duration: Optional[float] = None) -> None:
         get_renderer().task(name, status, duration)
-    
+
     @staticmethod
     def inline(text: str) -> str:
         return get_renderer().inline(text)
-    
+
     @staticmethod
     def print(text: str, color: Optional[str] = None) -> None:
         get_renderer().print(text, color)
-    
+
     @staticmethod
     def newline() -> None:
         get_renderer().newline()

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List, Tuple
 
-from .models import ProjectInfo, FunctionInfo
+from .models import FunctionInfo, ProjectInfo
 from .shared_utils import remove_self_from_params, truncate_docstring
 from .toon_format import TOONGenerator
 

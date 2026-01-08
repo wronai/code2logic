@@ -2,16 +2,17 @@
 
 Re-exports from parent package for backward compatibility.
 """
-from ..models import (
-    FunctionInfo, ClassInfo, TypeInfo, ModuleInfo,
-    DependencyNode, ProjectInfo
-)
 from ..analyzer import ProjectAnalyzer, analyze_project
 from ..dependency import DependencyAnalyzer
 from ..errors import (
-    ErrorSeverity, ErrorType, AnalysisError, AnalysisResult,
-    ErrorHandler, create_error_handler
+    AnalysisError,
+    AnalysisResult,
+    ErrorHandler,
+    ErrorSeverity,
+    ErrorType,
+    create_error_handler,
 )
+from ..models import ClassInfo, DependencyNode, FunctionInfo, ModuleInfo, ProjectInfo, TypeInfo
 
 __all__ = [
     'FunctionInfo', 'ClassInfo', 'TypeInfo', 'ModuleInfo',

@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+import json
 from datetime import datetime
 from pathlib import Path
-import json
 
-from ..gherkin import GherkinGenerator
 from ..generators import JSONGenerator, YAMLGenerator
+from ..gherkin import GherkinGenerator
 from ..logicml import LogicMLGenerator
 from ..markdown_format import MarkdownHybridGenerator
-from ..toon_format import TOONGenerator
 from ..models import ProjectInfo
+from ..toon_format import TOONGenerator
 
 
 def create_single_project(module_info, file_path: Path) -> ProjectInfo:
@@ -146,7 +146,7 @@ Match the structure exactly with all classes and functions.
 
 Requirements:
 - Generate complete, working Python code for {file_name}
-- Include all imports  
+- Include all imports
 - Use type hints
 - Implement all methods with actual logic""",
         "markdown": f"""Generate Python code from this Markdown specification.

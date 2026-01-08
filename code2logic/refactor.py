@@ -16,15 +16,15 @@ Usage:
     )
 """
 
-from typing import Dict, List, Any
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
+from typing import Any, Dict, List
 
 from .analyzer import analyze_project
 from .code_review import (
     analyze_code_quality,
     check_security_issues,
 )
-from .llm_clients import get_client, BaseLLMClient
+from .llm_clients import BaseLLMClient, get_client
 
 
 @dataclass
@@ -36,7 +36,7 @@ class DuplicateGroup:
     effort: str = "low"
 
 
-@dataclass 
+@dataclass
 class RefactoringSuggestion:
     """Single refactoring suggestion."""
     type: str
@@ -57,10 +57,10 @@ class RefactoringReport:
     quality_issues: List[RefactoringSuggestion] = field(default_factory=list)
     security_issues: List[RefactoringSuggestion] = field(default_factory=list)
     suggestions: List[RefactoringSuggestion] = field(default_factory=list)
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
-    
+
     def to_markdown(self) -> str:
         """Generate markdown report."""
         lines = [
@@ -74,7 +74,7 @@ class RefactoringReport:
             f"- **Security issues:** {len(self.security_issues)}",
             "",
         ]
-        
+
         if self.duplicates:
             lines.append("## Duplicates")
             lines.append("")
@@ -85,7 +85,7 @@ class RefactoringReport:
                 for func in dup.functions[:5]:
                     lines.append(f"- `{func}`")
                 lines.append("")
-        
+
         if self.quality_issues:
             lines.append("## Quality Issues")
             lines.append("")
@@ -94,14 +94,14 @@ class RefactoringReport:
                 lines.append(f"- {icon} **{issue.type}** at `{issue.location}`")
                 lines.append(f"  - {issue.description}")
             lines.append("")
-        
+
         if self.security_issues:
             lines.append("## Security Issues")
             lines.append("")
             for issue in self.security_issues[:10]:
                 lines.append(f"- 🔒 **{issue.type}** at `{issue.location}`")
             lines.append("")
-        
+
         return '\n'.join(lines)
 
 
@@ -110,16 +110,16 @@ def find_duplicates(
     threshold: float = 0.8,
 ) -> List[DuplicateGroup]:
     """Find duplicate functions in a project.
-    
+
     Args:
         project_path: Path to project
         threshold: Similarity threshold (0-1)
-        
+
     Returns:
         List of duplicate groups
     """
     project = analyze_project(project_path)
-    
+
     # Collect all functions
     functions = []
     for module in project.modules:
@@ -138,7 +138,7 @@ def find_duplicates(
                     'signature': f"{method.name}({', '.join(method.params)})",
                     'full_name': f"{module.path}::{cls.name}.{method.name}",
                 })
-    
+
     # Find duplicates by signature
     signature_groups = {}
     for func in functions:
@@ -146,7 +146,7 @@ def find_duplicates(
         if sig not in signature_groups:
             signature_groups[sig] = []
         signature_groups[sig].append(func['full_name'])
-    
+
     duplicates = []
     for sig, funcs in signature_groups.items():
         if len(funcs) > 1:
@@ -158,7 +158,7 @@ def find_duplicates(
                 suggestion="Extract to shared utility function",
                 effort="low" if len(funcs) <= 3 else "medium",
             ))
-    
+
     return duplicates
 
 
@@ -168,32 +168,32 @@ def analyze_quality(
     include_performance: bool = True,
 ) -> RefactoringReport:
     """Analyze code quality and generate refactoring report.
-    
+
     Args:
         project_path: Path to project
         include_security: Include security checks
         include_performance: Include performance checks
-        
+
     Returns:
         RefactoringReport
     """
     project = analyze_project(project_path)
-    
+
     # Count functions
     total_functions = sum(
         len(m.functions) + sum(len(c.methods) for c in m.classes)
         for m in project.modules
     )
-    
+
     report = RefactoringReport(
         project_path=project_path,
         total_files=project.total_files,
         total_functions=total_functions,
     )
-    
+
     # Find duplicates
     report.duplicates = find_duplicates(project_path)
-    
+
     # Quality issues
     quality = analyze_code_quality(project)
     for category, issues in quality.items():
@@ -206,7 +206,7 @@ def analyze_quality(
                 suggestion=f"Refactor to reduce {category}",
                 effort="medium",
             ))
-    
+
     # Security issues
     if include_security:
         security = check_security_issues(project)
@@ -220,7 +220,7 @@ def analyze_quality(
                     suggestion=f"Review and fix {category}",
                     effort="medium",
                 ))
-    
+
     return report
 
 
@@ -230,21 +230,21 @@ def suggest_refactoring(
     client: BaseLLMClient = None,
 ) -> RefactoringReport:
     """Generate refactoring suggestions for a project.
-    
+
     Args:
         project_path: Path to project
         use_llm: Use LLM for detailed suggestions
         client: LLM client (optional)
-        
+
     Returns:
         RefactoringReport with suggestions
     """
     report = analyze_quality(project_path)
-    
+
     if use_llm and (client or True):
         try:
             client = client or get_client()
-            
+
             # Prepare context
             context = f"""Project: {project_path}
 Files: {report.total_files}
@@ -252,7 +252,7 @@ Functions: {report.total_functions}
 Duplicates: {len(report.duplicates)}
 Quality issues: {len(report.quality_issues)}
 """
-            
+
             prompt = f"""Based on this code analysis, provide 3-5 specific refactoring suggestions:
 
 {context}
@@ -272,7 +272,7 @@ Provide actionable suggestions with:
                 system="You are a senior software architect. Provide concise, actionable refactoring suggestions.",
                 max_tokens=1000,
             )
-            
+
             # Parse suggestions (simplified)
             report.suggestions.append(RefactoringSuggestion(
                 type="llm_suggestion",
@@ -282,10 +282,10 @@ Provide actionable suggestions with:
                 suggestion=response[:500],
                 effort="varies",
             ))
-            
+
         except Exception:
             pass
-    
+
     return report
 
 
@@ -294,17 +294,17 @@ def compare_codebases(
     project2: str,
 ) -> Dict[str, Any]:
     """Compare two codebases for similarities and differences.
-    
+
     Args:
         project1: Path to first project
         project2: Path to second project
-        
+
     Returns:
         Comparison results
     """
     p1 = analyze_project(project1)
     p2 = analyze_project(project2)
-    
+
     # Collect elements
     def get_elements(project):
         elements = set()
@@ -316,16 +316,16 @@ def compare_codebases(
                 for method in cls.methods:
                     elements.add(f"method:{cls.name}.{method.name}")
         return elements
-    
+
     e1 = get_elements(p1)
     e2 = get_elements(p2)
-    
+
     common = e1 & e2
     only_in_1 = e1 - e2
     only_in_2 = e2 - e1
-    
+
     similarity = len(common) / max(len(e1 | e2), 1) * 100
-    
+
     return {
         'project1': {
             'path': project1,
@@ -347,30 +347,30 @@ def compare_codebases(
 
 def quick_analyze(project_path: str) -> Dict[str, Any]:
     """Quick analysis for a project.
-    
+
     Args:
         project_path: Path to project
-        
+
     Returns:
         Quick analysis results
     """
     project = analyze_project(project_path)
-    
+
     # Count elements
     total_classes = sum(len(m.classes) for m in project.modules)
     total_functions = sum(len(m.functions) for m in project.modules)
     total_methods = sum(
-        sum(len(c.methods) for c in m.classes) 
+        sum(len(c.methods) for c in m.classes)
         for m in project.modules
     )
-    
+
     # Find complex functions
     complex_funcs = []
     for module in project.modules:
         for func in module.functions:
             if func.complexity > 10:
                 complex_funcs.append(f"{module.path}::{func.name}")
-    
+
     return {
         'project': project.name,
         'files': project.total_files,

@@ -62,20 +62,20 @@ def get_reproduction_prompt(
     max_spec_length: int = 5000,
 ) -> str:
     """Generate optimized reproduction prompt.
-    
+
     Args:
         spec: Specification content
         fmt: Format name (yaml, logicml, gherkin, etc.)
         file_name: Target file name
         language: Target programming language
         max_spec_length: Maximum spec length to include
-        
+
     Returns:
         Formatted prompt string
     """
     hint = FORMAT_HINTS.get(fmt, '')
     spec_truncated = spec[:max_spec_length] if len(spec) > max_spec_length else spec
-    
+
     return f"""Generate {language} code from this {fmt.upper()} specification.
 {hint}
 
@@ -93,12 +93,12 @@ Requirements:
 
 def get_review_prompt(code: str, spec: str, fmt: str) -> str:
     """Generate code review prompt.
-    
+
     Args:
         code: Generated code to review
         spec: Original specification
         fmt: Format name
-        
+
     Returns:
         Review prompt string
     """
@@ -128,17 +128,17 @@ Provide a JSON response:
 
 def get_fix_prompt(code: str, issues: list, spec: str) -> str:
     """Generate code fix prompt.
-    
+
     Args:
         code: Code with issues
         issues: List of identified issues
         spec: Original specification
-        
+
     Returns:
         Fix prompt string
     """
     issues_text = '\n'.join(f"- {issue}" for issue in issues)
-    
+
     return f"""Fix the following issues in this code:
 
 ISSUES:

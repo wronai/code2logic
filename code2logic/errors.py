@@ -4,11 +4,11 @@ Error handling for Code2Logic.
 Provides robust error handling for file/folder analysis with graceful degradation.
 """
 
+import logging
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import List, Dict, Any, Optional, Callable
-import logging
+from typing import Any, Callable, Dict, List, Optional
 
 
 class ErrorSeverity(Enum):
@@ -28,19 +28,19 @@ class ErrorType(Enum):
     SYMLINK_LOOP = "symlink_loop"
     DISK_FULL = "disk_full"
     PATH_TOO_LONG = "path_too_long"
-    
+
     # Parsing errors
     SYNTAX_ERROR = "syntax_error"
     PARSE_TIMEOUT = "parse_timeout"
     UNSUPPORTED_LANGUAGE = "unsupported_language"
     BINARY_FILE = "binary_file"
     EMPTY_FILE = "empty_file"
-    
+
     # Generation errors
     YAML_SERIALIZATION = "yaml_serialization"
     JSON_SERIALIZATION = "json_serialization"
     OUTPUT_WRITE_ERROR = "output_write_error"
-    
+
     # System errors
     MEMORY_ERROR = "memory_error"
     TIMEOUT = "timeout"
@@ -56,7 +56,7 @@ class AnalysisError:
     message: str
     exception: Optional[str] = None
     suggestion: str = ""
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return {
             'type': self.type.value,
@@ -77,7 +77,7 @@ class AnalysisResult:
     skipped_files: List[str] = field(default_factory=list)
     processed_files: int = 0
     total_files: int = 0
-    
+
     def add_error(self, error: AnalysisError):
         """Add an error to the result."""
         if error.severity == ErrorSeverity.WARNING:
@@ -86,10 +86,10 @@ class AnalysisResult:
             self.errors.append(error)
             if error.severity == ErrorSeverity.CRITICAL:
                 self.success = False
-    
+
     def has_errors(self) -> bool:
         return len(self.errors) > 0
-    
+
     def summary(self) -> str:
         """Generate error summary."""
         lines = [
@@ -104,13 +104,13 @@ class AnalysisResult:
 class ErrorHandler:
     """
     Handles errors during analysis with configurable behavior.
-    
+
     Modes:
     - strict: Stop on first error
     - lenient: Log errors and continue (default)
     - silent: Continue without logging
     """
-    
+
     # Error suggestions
     SUGGESTIONS = {
         ErrorType.FILE_NOT_FOUND: "Check if file exists and path is correct",
@@ -132,7 +132,7 @@ class ErrorHandler:
         ErrorType.TIMEOUT: "Operation timed out. Try smaller scope",
         ErrorType.UNKNOWN: "Unknown error occurred",
     }
-    
+
     def __init__(
         self,
         mode: str = "lenient",
@@ -145,11 +145,11 @@ class ErrorHandler:
         self.timeout = timeout_seconds
         self.logger = logger or logging.getLogger(__name__)
         self.result = AnalysisResult()
-    
+
     def reset(self):
         """Reset error state for new analysis."""
         self.result = AnalysisResult()
-    
+
     def handle_error(
         self,
         error_type: ErrorType,
@@ -160,13 +160,13 @@ class ErrorHandler:
     ) -> bool:
         """
         Handle an error.
-        
+
         Returns:
             True if processing should continue, False to stop
         """
         if severity is None:
             severity = self._default_severity(error_type)
-        
+
         error = AnalysisError(
             type=error_type,
             severity=severity,
@@ -175,17 +175,17 @@ class ErrorHandler:
             exception=str(exception) if exception else None,
             suggestion=self.SUGGESTIONS.get(error_type, ""),
         )
-        
+
         self.result.add_error(error)
-        
+
         if self.mode != "silent":
             self._log_error(error)
-        
+
         if self.mode == "strict" and severity != ErrorSeverity.WARNING:
             return False
-        
+
         return severity != ErrorSeverity.CRITICAL
-    
+
     def _default_severity(self, error_type: ErrorType) -> ErrorSeverity:
         """Get default severity for error type."""
         critical_types = {
@@ -197,13 +197,13 @@ class ErrorHandler:
             ErrorType.UNSUPPORTED_LANGUAGE,
             ErrorType.BINARY_FILE,
         }
-        
+
         if error_type in critical_types:
             return ErrorSeverity.CRITICAL
         if error_type in warning_types:
             return ErrorSeverity.WARNING
         return ErrorSeverity.ERROR
-    
+
     def _log_error(self, error: AnalysisError):
         """Log an error."""
         msg = f"[{error.severity.value}] {error.type.value}: {error.path} - {error.message}"
@@ -213,11 +213,11 @@ class ErrorHandler:
             self.logger.critical(msg)
         else:
             self.logger.error(msg)
-    
+
     def safe_read_file(self, path: Path) -> Optional[str]:
         """
         Safely read a file with error handling.
-        
+
         Returns:
             File content or None if error
         """
@@ -230,7 +230,7 @@ class ErrorHandler:
                     f"File size {path.stat().st_size} exceeds limit {self.max_file_size}",
                 )
                 return None
-            
+
             # Check if binary
             try:
                 with open(path, 'rb') as f:
@@ -245,7 +245,7 @@ class ErrorHandler:
                         return None
             except Exception:
                 pass
-            
+
             # Try reading with different encodings
             encodings = ['utf-8', 'latin-1', 'cp1252', 'utf-16']
             for encoding in encodings:
@@ -254,7 +254,7 @@ class ErrorHandler:
                     return content
                 except UnicodeDecodeError:
                     continue
-            
+
             # Last resort: ignore errors
             try:
                 return path.read_text(encoding='utf-8', errors='ignore')
@@ -266,7 +266,7 @@ class ErrorHandler:
                     exception=e,
                 )
                 return None
-        
+
         except FileNotFoundError as e:
             self.handle_error(
                 ErrorType.FILE_NOT_FOUND,
@@ -275,7 +275,7 @@ class ErrorHandler:
                 exception=e,
             )
             return None
-        
+
         except PermissionError as e:
             self.handle_error(
                 ErrorType.PERMISSION_DENIED,
@@ -284,7 +284,7 @@ class ErrorHandler:
                 exception=e,
             )
             return None
-        
+
         except OSError as e:
             if "name too long" in str(e).lower():
                 self.handle_error(
@@ -308,7 +308,7 @@ class ErrorHandler:
                     exception=e,
                 )
             return None
-        
+
         except MemoryError as e:
             self.handle_error(
                 ErrorType.MEMORY_ERROR,
@@ -317,7 +317,7 @@ class ErrorHandler:
                 exception=e,
             )
             return None
-        
+
         except Exception as e:
             self.handle_error(
                 ErrorType.UNKNOWN,
@@ -326,11 +326,11 @@ class ErrorHandler:
                 exception=e,
             )
             return None
-    
+
     def safe_write_file(self, path: Path, content: str) -> bool:
         """
         Safely write a file with error handling.
-        
+
         Returns:
             True if successful, False otherwise
         """
@@ -338,7 +338,7 @@ class ErrorHandler:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content, encoding='utf-8')
             return True
-        
+
         except PermissionError as e:
             self.handle_error(
                 ErrorType.PERMISSION_DENIED,
@@ -347,7 +347,7 @@ class ErrorHandler:
                 exception=e,
             )
             return False
-        
+
         except OSError as e:
             if "no space" in str(e).lower():
                 self.handle_error(
@@ -364,7 +364,7 @@ class ErrorHandler:
                     exception=e,
                 )
             return False
-        
+
         except Exception as e:
             self.handle_error(
                 ErrorType.OUTPUT_WRITE_ERROR,
@@ -373,7 +373,7 @@ class ErrorHandler:
                 exception=e,
             )
             return False
-    
+
     def safe_parse(
         self,
         path: str,
@@ -384,13 +384,13 @@ class ErrorHandler:
     ) -> Any:
         """
         Safely parse content with error handling.
-        
+
         Returns:
             Parse result or None if error
         """
         try:
             return parser_func(path, content, *args, **kwargs)
-        
+
         except SyntaxError as e:
             self.handle_error(
                 ErrorType.SYNTAX_ERROR,
@@ -399,7 +399,7 @@ class ErrorHandler:
                 exception=e,
             )
             return None
-        
+
         except RecursionError as e:
             self.handle_error(
                 ErrorType.PARSE_TIMEOUT,
@@ -408,7 +408,7 @@ class ErrorHandler:
                 exception=e,
             )
             return None
-        
+
         except MemoryError as e:
             self.handle_error(
                 ErrorType.MEMORY_ERROR,
@@ -417,7 +417,7 @@ class ErrorHandler:
                 exception=e,
             )
             return None
-        
+
         except Exception as e:
             self.handle_error(
                 ErrorType.UNKNOWN,

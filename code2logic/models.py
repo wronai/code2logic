@@ -7,13 +7,13 @@ Data models for Code2Logic.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional, List, Dict
+from typing import Dict, List, Optional
 
 
 @dataclass
 class FunctionInfo:
     """Information about a function or method.
-    
+
     Attributes:
         name: Function name
         params: List of parameter strings (e.g., ["x:int", "y:str"])
@@ -51,7 +51,7 @@ class FunctionInfo:
 @dataclass
 class ClassInfo:
     """Information about a class or interface.
-    
+
     Attributes:
         name: Class name
         bases: List of base class names
@@ -77,7 +77,7 @@ class ClassInfo:
 @dataclass
 class TypeInfo:
     """Information about a type alias, interface, or enum.
-    
+
     Attributes:
         name: Type name
         kind: Type kind ('type', 'interface', 'enum', 'struct', 'trait')
@@ -92,7 +92,7 @@ class TypeInfo:
 @dataclass
 class ModuleInfo:
     """Information about a source file/module.
-    
+
     Attributes:
         path: Relative path to the file
         language: Programming language
@@ -122,11 +122,11 @@ class ModuleInfo:
 @dataclass
 class DependencyNode:
     """Node in the dependency graph with metrics.
-    
+
     Attributes:
         path: Module path
         in_degree: Number of incoming dependencies
-        out_degree: Number of outgoing dependencies  
+        out_degree: Number of outgoing dependencies
         pagerank: PageRank score (importance metric)
         is_hub: Whether this is a hub module (high centrality)
         cluster: Cluster ID for grouping related modules
@@ -142,7 +142,7 @@ class DependencyNode:
 @dataclass
 class ProjectInfo:
     """Complete project analysis results.
-    
+
     Attributes:
         name: Project name (directory name)
         root_path: Absolute path to project root
@@ -226,7 +226,7 @@ class OptionalImport:
 @dataclass
 class ClassInfo:
     """Information about a class or interface.
-    
+
     Attributes:
         name: Class name
         bases: List of base class names
@@ -258,7 +258,7 @@ class ClassInfo:
 @dataclass
 class FunctionInfo:
     """Information about a function or method.
-    
+
     Attributes:
         name: Function name
         params: List of parameter strings (without defaults for backward compatibility)
@@ -303,7 +303,7 @@ class FunctionInfo:
 @dataclass
 class ModuleInfo:
     """Information about a source file/module.
-    
+
     Attributes:
         path: Relative path to the file
         language: Programming language

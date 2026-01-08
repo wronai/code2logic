@@ -44,9 +44,9 @@ exports:
 ```
 """
 
+import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
-import re
 
 
 @dataclass
@@ -91,7 +91,7 @@ class LogicMLModule:
 class LogicMLSchema:
     """
     Complete LogicML specification schema.
-    
+
     Design Principles:
     1. Minimal tokens - 40% better than YAML
     2. Precise signatures with full type hints
@@ -100,7 +100,7 @@ class LogicMLSchema:
     5. Side effects explicitly noted
     """
     modules: List[LogicMLModule] = field(default_factory=list)
-    
+
     # Metrics
     token_estimate: int = 0
     file_count: int = 0
@@ -111,45 +111,45 @@ class LogicMLSchema:
 def validate_logicml(spec: str) -> Tuple[bool, List[str]]:
     """
     Validate LogicML specification.
-    
+
     Args:
         spec: LogicML specification string
-        
+
     Returns:
         Tuple of (is_valid, errors)
     """
     errors: List[str] = []
-    
+
     if not spec or not spec.strip():
         return False, ["Empty specification"]
-    
+
     lines = spec.split('\n')
-    
+
     # Check for header comment
     has_header = False
     for line in lines[:5]:
         if line.startswith('#') and '|' in line:
             has_header = True
             break
-    
+
     if not has_header:
         errors.append("Missing header comment (# filename | class | N lines)")
-    
+
     # Validate structure
     in_methods = False
     in_attrs = False
-    
+
     for i, line in enumerate(lines):
         stripped = line.strip()
         if not stripped or stripped.startswith('#'):
             continue
-        
+
         # Check for class definition
         if re.match(r'^[A-Z][a-zA-Z0-9_]*:$', stripped):
             in_methods = False
             in_attrs = False
             continue
-        
+
         # Check for section headers
         if stripped == 'methods:':
             in_methods = True
@@ -167,7 +167,7 @@ def validate_logicml(spec: str) -> Tuple[bool, List[str]]:
             continue
         elif stripped == 'exports:':
             continue
-        
+
         # Validate method signatures
         if in_methods and 'sig:' in stripped:
             sig_match = re.search(r'sig:\s*(.+)', stripped)
@@ -179,22 +179,22 @@ def validate_logicml(spec: str) -> Tuple[bool, List[str]]:
                 # Check for return type
                 if '->' not in sig and not sig.startswith('@property'):
                     errors.append(f"Line {i+1}: Missing return type in signature: {sig}")
-        
+
         # Validate attrs
         if in_attrs and ':' in stripped and not stripped.endswith(':'):
             parts = stripped.split(':')
             if len(parts) < 2:
                 errors.append(f"Line {i+1}: Invalid attribute format: {stripped}")
-    
+
     # Check for required elements
     has_content = any(
         line.strip() and not line.strip().startswith('#')
         for line in lines
     )
-    
+
     if not has_content:
         errors.append("No content found in specification")
-    
+
     return len(errors) == 0, errors
 
 
@@ -219,24 +219,24 @@ def extract_logicml_signature(sig_line: str) -> Dict[str, Any]:
         'params': [],
         'return_type': 'None'
     }
-    
+
     sig = sig_line.strip()
     if sig.startswith('sig:'):
         sig = sig[4:].strip()
-    
+
     if sig.startswith('async'):
         result['is_async'] = True
         sig = sig[5:].strip()
-    
+
     if sig.startswith('@property'):
         result['is_property'] = True
         sig = sig[9:].strip()
-    
+
     # Extract params and return type
     match = re.match(r'\(([^)]*)\)\s*->\s*(.+)', sig)
     if match:
         params_str = match.group(1)
         result['params'] = [p.strip() for p in params_str.split(',') if p.strip()]
         result['return_type'] = match.group(2).strip()
-    
+
     return result

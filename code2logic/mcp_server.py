@@ -7,10 +7,10 @@ with Claude Desktop and other MCP-compatible clients.
 Usage:
     # Start server
     python -m code2logic.mcp_server
-    
+
     # Or via CLI
     code2logic-mcp
-    
+
 Configuration for Claude Desktop (claude_desktop_config.json):
 {
   "mcpServers": {
@@ -36,7 +36,7 @@ def handle_request(request: dict) -> dict:
     method = request.get("method", "")
     params = request.get("params", {})
     request_id = request.get("id")
-    
+
     if method == "initialize":
         return {
             "jsonrpc": "2.0",
@@ -52,7 +52,7 @@ def handle_request(request: dict) -> dict:
                 }
             }
         }
-    
+
     elif method == "tools/list":
         return {
             "jsonrpc": "2.0",
@@ -134,11 +134,11 @@ def handle_request(request: dict) -> dict:
                 ]
             }
         }
-    
+
     elif method == "tools/call":
         tool_name = params.get("name")
         arguments = params.get("arguments", {})
-        
+
         try:
             result = call_tool(tool_name, arguments)
             return {
@@ -162,7 +162,7 @@ def handle_request(request: dict) -> dict:
                     "message": str(e)
                 }
             }
-    
+
     return {
         "jsonrpc": "2.0",
         "id": request_id,
@@ -176,16 +176,22 @@ def handle_request(request: dict) -> dict:
 def call_tool(tool_name: str, arguments: dict) -> str:
     """Execute a tool and return result."""
     from .analyzer import ProjectAnalyzer
-    from .generators import CSVGenerator, JSONGenerator, YAMLGenerator, CompactGenerator, MarkdownGenerator
-    
+    from .generators import (
+        CompactGenerator,
+        CSVGenerator,
+        JSONGenerator,
+        MarkdownGenerator,
+        YAMLGenerator,
+    )
+
     if tool_name == "analyze_project":
         path = arguments.get("path")
         format_type = arguments.get("format", "csv")
         detail = arguments.get("detail", "standard")
-        
+
         analyzer = ProjectAnalyzer(path)
         project = analyzer.analyze()
-        
+
         generators = {
             "csv": CSVGenerator(),
             "json": JSONGenerator(),
@@ -193,9 +199,9 @@ def call_tool(tool_name: str, arguments: dict) -> str:
             "compact": CompactGenerator(),
             "markdown": MarkdownGenerator(),
         }
-        
+
         gen = generators.get(format_type, CSVGenerator())
-        
+
         if format_type in ("csv", "yaml"):
             return gen.generate(project, detail=detail)
         elif format_type == "json":
@@ -204,54 +210,54 @@ def call_tool(tool_name: str, arguments: dict) -> str:
             return gen.generate(project)
         else:
             return gen.generate(project, detail)
-    
+
     elif tool_name == "find_duplicates":
         path = arguments.get("path")
-        
+
         analyzer = ProjectAnalyzer(path)
         project = analyzer.analyze()
-        
+
         # Find duplicates by hash
         from collections import defaultdict
         hash_groups = defaultdict(list)
-        
+
         for m in project.modules:
             for f in m.functions:
                 sig = f"({','.join(f.params)})->{f.return_type or ''}"
                 import hashlib
                 h = hashlib.md5(f"{f.name}:{sig}".encode()).hexdigest()[:8]
                 hash_groups[h].append(f"{m.path}::{f.name}")
-            
+
             for c in m.classes:
                 for method in c.methods:
                     sig = f"({','.join(method.params)})->{method.return_type or ''}"
                     import hashlib
                     h = hashlib.md5(f"{method.name}:{sig}".encode()).hexdigest()[:8]
                     hash_groups[h].append(f"{m.path}::{c.name}.{method.name}")
-        
+
         duplicates = {h: paths for h, paths in hash_groups.items() if len(paths) > 1}
-        
+
         result = ["# Duplicate Detection Results\n"]
         result.append(f"Total unique elements: {len(hash_groups)}")
         result.append(f"Duplicate groups: {len(duplicates)}\n")
-        
+
         for h, paths in list(duplicates.items())[:20]:
             result.append(f"\n## Hash: {h}")
             for p in paths:
                 result.append(f"  - {p}")
-        
+
         return '\n'.join(result)
-    
+
     elif tool_name == "compare_projects":
         path1 = arguments.get("path1")
         path2 = arguments.get("path2")
-        
+
         analyzer1 = ProjectAnalyzer(path1)
         analyzer2 = ProjectAnalyzer(path2)
-        
+
         project1 = analyzer1.analyze()
         project2 = analyzer2.analyze()
-        
+
         # Compare
         def get_hashes(project):
             hashes = {}
@@ -262,36 +268,36 @@ def call_tool(tool_name: str, arguments: dict) -> str:
                     h = hashlib.md5(f"{f.name}:{sig}".encode()).hexdigest()[:8]
                     hashes[h] = f"{m.path}::{f.name}"
             return hashes
-        
+
         h1 = get_hashes(project1)
         h2 = get_hashes(project2)
-        
+
         common = set(h1.keys()) & set(h2.keys())
         only1 = set(h1.keys()) - set(h2.keys())
         only2 = set(h2.keys()) - set(h1.keys())
-        
+
         result = ["# Project Comparison Results\n"]
         result.append(f"Project 1: {project1.name} ({project1.total_files} files)")
         result.append(f"Project 2: {project2.name} ({project2.total_files} files)\n")
         result.append(f"Identical elements: {len(common)}")
         result.append(f"Only in Project 1: {len(only1)}")
         result.append(f"Only in Project 2: {len(only2)}")
-        
+
         if common:
             result.append("\n## Identical Elements (first 10)")
             for h in list(common)[:10]:
                 result.append(f"  - {h1[h]} <-> {h2[h]}")
-        
+
         return '\n'.join(result)
-    
+
     elif tool_name == "suggest_refactoring":
         path = arguments.get("path")
-        
+
         analyzer = ProjectAnalyzer(path)
         project = analyzer.analyze()
-        
+
         issues = []
-        
+
         # Find high complexity (approximation based on lines)
         for m in project.modules:
             for f in m.functions:
@@ -303,7 +309,7 @@ def call_tool(tool_name: str, arguments: dict) -> str:
                         'lines': f.lines,
                         'suggestion': 'Consider breaking into smaller functions'
                     })
-            
+
             if m.lines_code > 500:
                 issues.append({
                     'type': 'long_file',
@@ -311,10 +317,10 @@ def call_tool(tool_name: str, arguments: dict) -> str:
                     'lines': m.lines_code,
                     'suggestion': 'Consider splitting into multiple modules'
                 })
-        
+
         result = ["# Refactoring Suggestions\n"]
         result.append(f"Issues found: {len(issues)}\n")
-        
+
         for issue in issues[:20]:
             result.append(f"\n## [{issue['type'].upper()}] {issue.get('path', '')}")
             if 'name' in issue:
@@ -322,28 +328,28 @@ def call_tool(tool_name: str, arguments: dict) -> str:
             if 'lines' in issue:
                 result.append(f"Lines: {issue['lines']}")
             result.append(f"Suggestion: {issue['suggestion']}")
-        
+
         return '\n'.join(result)
-    
+
     raise ValueError(f"Unknown tool: {tool_name}")
 
 
 def run_server():
     """Run the MCP server."""
     print("Code2Logic MCP Server started", file=sys.stderr)
-    
+
     while True:
         try:
             line = sys.stdin.readline()
             if not line:
                 break
-            
+
             request = json.loads(line)
             response = handle_request(request)
-            
+
             sys.stdout.write(json.dumps(response) + "\n")
             sys.stdout.flush()
-            
+
         except json.JSONDecodeError as e:
             print(f"JSON error: {e}", file=sys.stderr)
         except Exception as e:

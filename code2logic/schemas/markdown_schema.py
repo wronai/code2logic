@@ -45,9 +45,9 @@ signature: (params) -> ReturnType
 ```
 """
 
+import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Tuple
-import re
 
 
 @dataclass
@@ -89,34 +89,34 @@ class MarkdownSchema:
 def validate_markdown(spec: str) -> Tuple[bool, List[str]]:
     """
     Validate Markdown specification.
-    
+
     Args:
         spec: Markdown specification string
-        
+
     Returns:
         Tuple of (is_valid, errors)
     """
     errors: List[str] = []
-    
+
     if not spec or not spec.strip():
         return False, ["Empty specification"]
-    
+
     lines = spec.split('\n')
-    
+
     # Check for module header
     has_module_header = False
     for line in lines[:10]:
         if line.startswith('# Module:') or line.startswith('# '):
             has_module_header = True
             break
-    
+
     if not has_module_header:
         errors.append("Missing module header (# Module: filename)")
-    
+
     # Check for code blocks
     in_code_block = False
     code_block_start = 0
-    
+
     for i, line in enumerate(lines):
         if line.startswith('```'):
             if not in_code_block:
@@ -124,10 +124,10 @@ def validate_markdown(spec: str) -> Tuple[bool, List[str]]:
                 code_block_start = i
             else:
                 in_code_block = False
-    
+
     if in_code_block:
         errors.append(f"Unclosed code block starting at line {code_block_start + 1}")
-    
+
     # Check for YAML blocks validity
     yaml_blocks = re.findall(r'```yaml\n(.*?)```', spec, re.DOTALL)
     for i, block in enumerate(yaml_blocks):
@@ -136,14 +136,14 @@ def validate_markdown(spec: str) -> Tuple[bool, List[str]]:
             yaml.safe_load(block)
         except Exception as e:
             errors.append(f"Invalid YAML in block {i+1}: {e}")
-    
+
     # Check for required sections
     has_classes = '## Classes' in spec or '### ' in spec
     has_content = has_module_header or has_classes
-    
+
     if not has_content:
         errors.append("Missing content sections")
-    
+
     return len(errors) == 0, errors
 
 
@@ -154,7 +154,7 @@ def extract_markdown_sections(spec: str) -> Dict[str, Any]:
         'classes': [],
         'functions': []
     }
-    
+
     # Extract metadata
     metadata_match = re.search(r'## Metadata\n(.*?)(?=##|\Z)', spec, re.DOTALL)
     if metadata_match:
@@ -163,9 +163,9 @@ def extract_markdown_sections(spec: str) -> Dict[str, Any]:
             if ':' in line and line.startswith('-'):
                 key, value = line[1:].split(':', 1)
                 sections['metadata'][key.strip()] = value.strip()
-    
+
     # Extract class names
     class_matches = re.findall(r'### (\w+)', spec)
     sections['classes'] = class_matches
-    
+
     return sections

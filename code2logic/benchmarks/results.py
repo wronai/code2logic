@@ -14,11 +14,11 @@ Usage:
     )
 """
 
-from dataclasses import dataclass, field, asdict
-from datetime import datetime
-from typing import Dict, List, Optional, Any
-from pathlib import Path
 import json
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -28,23 +28,23 @@ class FormatResult:
     spec_size: int = 0
     spec_tokens: int = 0
     generated_size: int = 0
-    
+
     # Quality metrics
     score: float = 0.0
     similarity: float = 0.0
     syntax_ok: bool = False
     runs_ok: bool = False
-    
+
     # Efficiency metrics
     compression_ratio: float = 0.0
     token_efficiency: float = 0.0
-    
+
     # Timing
     gen_time: float = 0.0
-    
+
     # Error handling
     error: str = ""
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
@@ -54,25 +54,25 @@ class FileResult:
     """Result for single file reproduction."""
     file_path: str
     language: str
-    
+
     # Sizes
     original_size: int = 0
     spec_size: int = 0
     generated_size: int = 0
-    
+
     # Quality
     score: float = 0.0
     similarity: float = 0.0
     syntax_ok: bool = False
     runs_ok: bool = False
-    
+
     # Format results (when testing multiple formats)
     format_results: Dict[str, FormatResult] = field(default_factory=dict)
-    
+
     # Timing
     gen_time: float = 0.0
     error: str = ""
-    
+
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
         d['format_results'] = {k: v.to_dict() for k, v in self.format_results.items()}
@@ -85,19 +85,19 @@ class FunctionResult:
     file_path: str
     function_name: str
     language: str
-    
+
     # Code
     original_code: str = ""
     reproduced_code: str = ""
-    
+
     # Quality
     similarity: float = 0.0
     syntax_ok: bool = False
-    
+
     # Timing
     gen_time: float = 0.0
     error: str = ""
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
@@ -107,41 +107,41 @@ class BenchmarkResult:
     """Complete benchmark result."""
     benchmark_type: str  # 'file', 'function', 'format', 'project'
     timestamp: str = ""
-    
+
     # Source info
     source_path: str = ""
     total_files: int = 0
     total_functions: int = 0
-    
+
     # Aggregate metrics
     avg_score: float = 0.0
     avg_similarity: float = 0.0
     syntax_ok_rate: float = 0.0
     runs_ok_rate: float = 0.0
-    
+
     # Best format (for format comparisons)
     best_format: str = ""
     best_score: float = 0.0
-    
+
     # Detailed results
     file_results: List[FileResult] = field(default_factory=list)
     function_results: List[FunctionResult] = field(default_factory=list)
     format_results: List[FormatResult] = field(default_factory=list)
-    
+
     # Per-format aggregates
     format_scores: Dict[str, float] = field(default_factory=dict)
-    
+
     # LLM info
     provider: str = ""
     model: str = ""
-    
+
     # Timing
     total_time: float = 0.0
-    
+
     def __post_init__(self):
         if not self.timestamp:
             self.timestamp = datetime.now().isoformat()
-    
+
     def calculate_aggregates(self):
         """Calculate aggregate metrics from detailed results."""
         # File results
@@ -150,12 +150,12 @@ class BenchmarkResult:
             self.avg_score = sum(scores) / len(scores) if scores else 0
             self.syntax_ok_rate = sum(1 for r in self.file_results if r.syntax_ok) / len(self.file_results) * 100
             self.runs_ok_rate = sum(1 for r in self.file_results if r.runs_ok) / len(self.file_results) * 100
-        
+
         # Function results
         if self.function_results:
             sims = [r.similarity for r in self.function_results if r.similarity > 0]
             self.avg_similarity = sum(sims) / len(sims) if sims else 0
-        
+
         # Format results
         if self.format_results:
             for r in self.format_results:
@@ -166,22 +166,22 @@ class BenchmarkResult:
             best = max(self.format_scores.items(), key=lambda x: x[1])
             self.best_format = best[0]
             self.best_score = best[1]
-    
+
     def to_dict(self) -> Dict[str, Any]:
         d = asdict(self)
         d['file_results'] = [r.to_dict() for r in self.file_results]
         d['function_results'] = [r.to_dict() for r in self.function_results]
         d['format_results'] = [r.to_dict() for r in self.format_results]
         return d
-    
+
     def to_json(self, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), indent=indent)
-    
+
     def save(self, path: str):
         """Save result to JSON file."""
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         Path(path).write_text(self.to_json())
-    
+
     @classmethod
     def load(cls, path: str) -> 'BenchmarkResult':
         """Load result from JSON file."""
@@ -190,7 +190,7 @@ class BenchmarkResult:
         file_results = [FileResult(**r) for r in data.pop('file_results', [])]
         function_results = [FunctionResult(**r) for r in data.pop('function_results', [])]
         format_results = [FormatResult(**r) for r in data.pop('format_results', [])]
-        
+
         result = cls(**data)
         result.file_results = file_results
         result.function_results = function_results
@@ -203,27 +203,27 @@ class BenchmarkConfig:
     """Configuration for benchmark runs."""
     # Formats to test
     formats: List[str] = field(default_factory=lambda: ['yaml', 'toon', 'json'])
-    
+
     # Limits
     max_files: Optional[int] = None
     max_functions: Optional[int] = None
     max_spec_tokens: int = 5000
-    
+
     # Parallelization
     workers: int = 3
-    
+
     # Output
     output_dir: str = "benchmark_output"
     save_generated: bool = True
-    
+
     # Verbosity
     verbose: bool = False
 
     # Execution mode
     use_llm: bool = True
-    
+
     # LLM settings
     max_tokens: int = 4000
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

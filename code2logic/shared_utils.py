@@ -12,10 +12,9 @@ Key Legend (for LLM transparency):
 - truncate_docstring: Limits docstrings to first sentence
 """
 
-from typing import List, Dict, Set, Optional
 import hashlib
 import re
-
+from typing import Dict, List, Optional, Set
 
 # ============================================================================
 # Import Handling
@@ -24,23 +23,23 @@ import re
 def compact_imports(imports: List[str], max_items: int = 10) -> List[str]:
     """
     Compact imports by grouping submodules.
-    
+
     Example:
         ['typing', 'typing.Dict', 'typing.List'] -> ['typing.{Dict,List}']
-    
+
     Args:
         imports: List of import strings
         max_items: Maximum number of items to return
-        
+
     Returns:
         Compacted import list
     """
     if not imports:
         return []
-    
+
     groups: Dict[str, Set[str]] = {}
     standalone: List[str] = []
-    
+
     for imp in imports[:max_items * 2]:  # Process more to allow grouping
         if '.' in imp:
             base, sub = imp.rsplit('.', 1)
@@ -52,7 +51,7 @@ def compact_imports(imports: List[str], max_items: int = 10) -> List[str]:
         else:
             if imp not in standalone:
                 standalone.append(imp)
-    
+
     result = standalone.copy()
     for base, subs in sorted(groups.items()):
         if len(subs) == 1:
@@ -62,32 +61,32 @@ def compact_imports(imports: List[str], max_items: int = 10) -> List[str]:
         else:
             # Too many - just list base
             result.append(base)
-    
+
     return result[:max_items]
 
 
 def deduplicate_imports(imports: List[str]) -> List[str]:
     """
     Remove redundant imports.
-    
+
     Example:
         ['typing', 'typing.Dict'] -> ['typing.Dict']
-        
+
     Args:
         imports: List of import strings
-        
+
     Returns:
         Deduplicated import list
     """
     if not imports:
         return []
-    
+
     seen_bases: Set[str] = set()
     result: List[str] = []
-    
+
     # Sort by specificity (more dots = more specific)
     sorted_imports = sorted(imports, key=lambda x: -x.count('.'))
-    
+
     for imp in sorted_imports:
         base = imp.split('.')[0]
         # If we have a more specific import, skip the base
@@ -95,7 +94,7 @@ def deduplicate_imports(imports: List[str]) -> List[str]:
             continue
         result.append(imp)
         seen_bases.add(base)
-    
+
     return result
 
 
@@ -107,7 +106,7 @@ def deduplicate_imports(imports: List[str]) -> List[str]:
 # Used to reduce token count in specifications
 TYPE_ABBREVIATIONS = {
     'str': 's',
-    'int': 'i', 
+    'int': 'i',
     'bool': 'b',
     'float': 'f',
     'None': 'N',
@@ -128,20 +127,20 @@ TYPE_ABBREVIATIONS = {
 def abbreviate_type(type_str: str) -> str:
     """
     Abbreviate type annotations for compactness.
-    
+
     Example:
         'Dict[str, Any]' -> 'D[s,A]'
         'Optional[List[str]]' -> '?[L[s]]'
-        
+
     Args:
         type_str: Full type annotation string
-        
+
     Returns:
         Abbreviated type string
     """
     if not type_str:
         return ''
-    
+
     result = type_str
     for full, short in TYPE_ABBREVIATIONS.items():
         result = result.replace(full, short)
@@ -155,19 +154,19 @@ def abbreviate_type(type_str: str) -> str:
 def expand_type(abbrev: str) -> str:
     """
     Expand abbreviated type back to full form.
-    
+
     Args:
         abbrev: Abbreviated type string
-        
+
     Returns:
         Full type annotation string
     """
     if not abbrev:
         return ''
-    
+
     result = abbrev
     # Reverse mapping (process longer abbreviations first)
-    for full, short in sorted(TYPE_ABBREVIATIONS.items(), 
+    for full, short in sorted(TYPE_ABBREVIATIONS.items(),
                                key=lambda x: -len(x[1])):
         result = result.replace(short, full)
     return result
@@ -186,64 +185,64 @@ def build_signature(
 ) -> str:
     """
     Build compact function signature.
-    
+
     Args:
         params: List of parameter strings (e.g., ['self', 'name:str'])
         return_type: Return type annotation
         include_self: Whether to include self/cls (default: False)
         abbreviate: Whether to abbreviate types (default: False)
         max_params: Maximum parameters to include (default: 6)
-    
+
     Returns:
         Signature string like "(param1,param2)->ReturnType"
     """
     clean_params = []
     for p in params[:max_params + 1]:  # +1 to account for self
         p_clean = p.replace('\n', ' ').replace('  ', ' ').strip()
-        
+
         # Skip self/cls unless requested
         if p_clean in ('self', 'cls') and not include_self:
             continue
         if p_clean.startswith('self:') and not include_self:
             continue
-        
+
         # Abbreviate types if requested
         if abbreviate and ':' in p_clean:
             name, typ = p_clean.split(':', 1)
             typ = abbreviate_type(typ.strip())
             p_clean = f"{name.strip()}:{typ}"
-        
+
         if p_clean:
             clean_params.append(p_clean)
-    
+
     # Limit to max_params
     if len(clean_params) > max_params:
         overflow = len(params) - max_params - 1  # -1 for self
         clean_params = clean_params[:max_params]
         clean_params.append(f'...+{overflow}')
-    
+
     params_str = ','.join(clean_params)
-    
+
     ret = ''
     if return_type:
         ret_type = abbreviate_type(return_type) if abbreviate else return_type
         ret = f"->{ret_type}"
-    
+
     return f"({params_str}){ret}"
 
 
 def remove_self_from_params(params: List[str]) -> List[str]:
     """
     Remove 'self' and 'cls' from parameter list.
-    
+
     Args:
         params: List of parameter strings
-        
+
     Returns:
         Filtered parameter list
     """
-    return [p for p in params 
-            if p.strip() not in ('self', 'cls') 
+    return [p for p in params
+            if p.strip() not in ('self', 'cls')
             and not p.strip().startswith('self:')]
 
 
@@ -268,20 +267,20 @@ CATEGORY_PATTERNS = {
 def categorize_function(name: str) -> str:
     """
     Categorize function by name pattern.
-    
+
     Args:
         name: Function name (may include class prefix like 'Class.method')
-        
+
     Returns:
-        Category string: 'read', 'create', 'update', 'delete', 
+        Category string: 'read', 'create', 'update', 'delete',
                         'validate', 'transform', 'lifecycle', 'communicate', 'other'
     """
     name_lower = name.lower().split('.')[-1]  # Handle method names
-    
+
     for category, patterns in CATEGORY_PATTERNS.items():
         if any(p in name_lower for p in patterns):
             return category
-    
+
     return 'other'
 
 
@@ -297,20 +296,20 @@ DOMAIN_KEYWORDS = [
 def extract_domain(path: str) -> str:
     """
     Extract domain from file path.
-    
+
     Args:
         path: File path string
-        
+
     Returns:
         Domain string (e.g., 'auth', 'user', 'config')
     """
     parts = path.lower().replace('\\', '/').split('/')
-    
+
     for part in parts:
         for domain in DOMAIN_KEYWORDS:
             if domain in part:
                 return domain
-    
+
     # Return parent folder name
     return parts[-2] if len(parts) > 1 else 'root'
 
@@ -322,12 +321,12 @@ def extract_domain(path: str) -> str:
 def compute_hash(name: str, signature: str, length: int = 8) -> str:
     """
     Compute short hash for quick comparison.
-    
+
     Args:
         name: Function/method name
         signature: Function signature
         length: Hash length (default: 8)
-        
+
     Returns:
         Short hex hash string
     """
@@ -342,70 +341,70 @@ def compute_hash(name: str, signature: str, length: int = 8) -> str:
 def truncate_docstring(docstring: Optional[str], max_length: int = 60) -> str:
     """
     Truncate docstring to first sentence or max_length.
-    
+
     Args:
         docstring: Full docstring text
         max_length: Maximum length (default: 60)
-        
+
     Returns:
         Truncated docstring
     """
     if not docstring:
         return ''
-    
+
     # Get first line
     first_line = docstring.split('\n')[0].strip()
-    
+
     # Remove docstring markers
     first_line = first_line.strip('"""').strip("'''").strip()
-    
+
     # Find first sentence end
     for end in ['. ', '.\n', '.\t']:
         idx = first_line.find(end)
         if 0 < idx < max_length:
             first_line = first_line[:idx + 1].strip()
             break
-    
+
     # Truncate if still too long
     if len(first_line) > max_length:
         first_line = first_line[:max_length-3].rstrip() + '...'
-    
+
     # Escape quotes
     first_line = first_line.replace('"', "'")
-    
+
     return first_line
 
 
 def escape_for_yaml(text: str) -> str:
     """
     Escape text for safe YAML inclusion.
-    
+
     Args:
         text: Raw text string
-        
+
     Returns:
         YAML-safe text string
     """
     if not text:
         return ''
-    
+
     text = text.replace('\n', ' ').replace('\r', '').replace('\t', ' ')
     text = re.sub(r'\s+', ' ', text)  # Collapse whitespace
-    
+
     # Quote if contains special chars
     if any(c in text for c in ':#[]{}|>'):
         text = f'"{text.replace(chr(34), chr(39))}"'
-    
+
     return text.strip()
 
 
 def clean_identifier(name: str) -> str:
     """
     Clean identifier by removing whitespace and special characters.
-    
+
     Args:
         name: Raw identifier string
-        
+
     Returns:
         Cleaned identifier
     """

@@ -9,21 +9,21 @@ Supports loading API keys and settings from:
 
 Usage:
     from code2logic.config import Config
-    
+
     config = Config()
     api_key = config.get_api_key('openrouter')
     model = config.get_model('openrouter')
 """
 
-import os
 import json
+import os
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 
 class Config:
     """Configuration manager for Code2Logic."""
-    
+
     # Default models for each provider (optimized for code tasks, <32B)
     DEFAULT_MODELS = {
         'openrouter': 'qwen/qwen-2.5-coder-32b-instruct',
@@ -33,7 +33,7 @@ class Config:
         'together': 'Qwen/Qwen2.5-Coder-32B-Instruct',
         'ollama': 'qwen2.5-coder:14b',
     }
-    
+
     # API key environment variable names
     API_KEY_VARS = {
         'openrouter': 'OPENROUTER_API_KEY',
@@ -42,7 +42,7 @@ class Config:
         'groq': 'GROQ_API_KEY',
         'together': 'TOGETHER_API_KEY',
     }
-    
+
     # Model environment variable names
     MODEL_VARS = {
         'openrouter': 'OPENROUTER_MODEL',
@@ -52,17 +52,17 @@ class Config:
         'together': 'TOGETHER_MODEL',
         'ollama': 'OLLAMA_MODEL',
     }
-    
+
     def __init__(self, env_file: str = None):
         """Initialize configuration.
-        
+
         Args:
             env_file: Path to .env file (default: .env in current dir or project root)
         """
         self._config: Dict[str, Any] = {}
         self._load_env_file(env_file)
         self._load_config_file()
-    
+
     def _load_env_file(self, env_file: str = None):
         """Load environment variables from .env file."""
         # Try multiple locations
@@ -72,12 +72,12 @@ class Config:
             Path(__file__).parent.parent / '.env',
             Path.home() / '.code2logic' / '.env',
         ]
-        
+
         for env_path in env_paths:
             if env_path and Path(env_path).exists():
                 self._parse_env_file(Path(env_path))
                 break
-    
+
     def _parse_env_file(self, path: Path):
         """Parse .env file and set environment variables."""
         try:
@@ -92,7 +92,7 @@ class Config:
                             os.environ[key] = value
         except Exception:
             pass
-    
+
     def _load_config_file(self):
         """Load configuration from JSON file."""
         config_path = Path.home() / '.code2logic' / 'llm_config.json'
@@ -102,13 +102,13 @@ class Config:
                     self._config = json.load(f)
             except Exception:
                 pass
-    
+
     def get_api_key(self, provider: str) -> Optional[str]:
         """Get API key for a provider.
-        
+
         Args:
             provider: Provider name (openrouter, openai, anthropic, groq, together)
-        
+
         Returns:
             API key or None if not configured
         """
@@ -116,13 +116,13 @@ class Config:
         if var_name:
             return os.environ.get(var_name)
         return None
-    
+
     def get_model(self, provider: str) -> str:
         """Get model for a provider.
-        
+
         Args:
             provider: Provider name
-        
+
         Returns:
             Model name
         """
@@ -132,43 +132,43 @@ class Config:
             env_model = os.environ.get(var_name)
             if env_model:
                 return env_model
-        
+
         # Check config file
         recommendations = self._config.get('recommendations', {})
         if provider == 'ollama' and recommendations.get('code_analysis'):
             return recommendations['code_analysis'].replace('ollama/', '')
-        
+
         # Return default
         return self.DEFAULT_MODELS.get(provider, 'gpt-4')
-    
+
     def get_ollama_host(self) -> str:
         """Get Ollama host URL."""
         return os.environ.get('OLLAMA_HOST', 'http://localhost:11434')
-    
+
     def get_default_provider(self) -> str:
         """Get default LLM provider."""
         return os.environ.get('CODE2LOGIC_DEFAULT_PROVIDER', 'ollama')
-    
+
     def is_verbose(self) -> bool:
         """Check if verbose mode is enabled."""
         return os.environ.get('CODE2LOGIC_VERBOSE', '').lower() in ('true', '1', 'yes')
-    
+
     def get_cache_dir(self) -> Path:
         """Get cache directory path."""
         cache_dir = os.environ.get('CODE2LOGIC_CACHE_DIR', '~/.code2logic/cache')
         return Path(cache_dir).expanduser()
-    
+
     def list_configured_providers(self) -> Dict[str, bool]:
         """List all providers and their configuration status."""
         result = {}
         for provider in self.API_KEY_VARS:
             result[provider] = bool(self.get_api_key(provider))
-        
+
         # Check Ollama separately (no API key needed)
         result['ollama'] = self._config.get('ollama', {}).get('available', False)
-        
+
         return result
-    
+
     def to_dict(self) -> Dict[str, Any]:
         """Export configuration as dictionary."""
         return {
@@ -183,7 +183,7 @@ class Config:
 
 def load_env():
     """Load environment variables from .env file.
-    
+
     Call this at the start of your script to ensure .env is loaded.
     """
     Config()
@@ -208,7 +208,7 @@ SHELL_COMMANDS = """
 # Set OpenRouter API key
 export OPENROUTER_API_KEY="sk-or-v1-your-key-here"
 
-# Set OpenAI API key  
+# Set OpenAI API key
 export OPENAI_API_KEY="sk-your-key-here"
 
 # Set Anthropic API key

@@ -9,16 +9,24 @@ Includes:
 import ast
 import re
 import textwrap
-from typing import Optional, List
+from typing import List, Optional
 
-from .models import FunctionInfo, ClassInfo, TypeInfo, ModuleInfo, ConstantInfo, FieldInfo, AttributeInfo
 from .intent import EnhancedIntentGenerator
+from .models import (
+    AttributeInfo,
+    ClassInfo,
+    ConstantInfo,
+    FieldInfo,
+    FunctionInfo,
+    ModuleInfo,
+    TypeInfo,
+)
 
 # Optional Tree-sitter imports
 TREE_SITTER_AVAILABLE = False
 try:
-    import tree_sitter_python as tspython
     import tree_sitter_javascript as tsjavascript
+    import tree_sitter_python as tspython
     from tree_sitter import Language, Parser
     TREE_SITTER_AVAILABLE = True
 except ImportError:
@@ -211,36 +219,36 @@ def _analyze_python_function_node(func_node):
 class TreeSitterParser:
     """
     Parser using Tree-sitter for high-accuracy AST parsing.
-    
+
     Supports Python, JavaScript, and TypeScript with 99% accuracy.
     Falls back gracefully if Tree-sitter libraries are not installed.
-    
+
     Example:
         >>> parser = TreeSitterParser()
         >>> if parser.is_available('python'):
         ...     module = parser.parse('main.py', content, 'python')
     """
-    
+
     def __init__(self):
         """Initialize Tree-sitter parsers for available languages."""
         self.parsers: dict = {}
         self.languages: dict = {}
         self.intent_gen = EnhancedIntentGenerator()
-        
+
         if TREE_SITTER_AVAILABLE:
             self._init_parsers()
-    
+
     def _init_parsers(self):
         """Initialize parsers for each supported language."""
         try:
             # Python
             self.languages['python'] = Language(tspython.language())
             self.parsers['python'] = Parser(self.languages['python'])
-            
+
             # JavaScript
             self.languages['javascript'] = Language(tsjavascript.language())
             self.parsers['javascript'] = Parser(self.languages['javascript'])
-            
+
             # TypeScript - try dedicated parser, fall back to JS
             try:
                 import tree_sitter_typescript as tstypescript
@@ -249,71 +257,71 @@ class TreeSitterParser:
             except ImportError:
                 self.languages['typescript'] = self.languages['javascript']
                 self.parsers['typescript'] = self.parsers['javascript']
-                
+
         except Exception as e:
             import sys
             print(f"Tree-sitter init warning: {e}", file=sys.stderr)
-    
+
     def is_available(self, language: str) -> bool:
         """Check if Tree-sitter parser is available for a language."""
         return language in self.parsers
-    
+
     @classmethod
     def get_supported_languages(cls) -> List[str]:
         """Get list of potentially supported languages."""
         return ['python', 'javascript', 'typescript']
-    
+
     def parse(self, filepath: str, content: str, language: str) -> Optional[ModuleInfo]:
         """
         Parse a source file using Tree-sitter.
-        
+
         Args:
             filepath: Relative path to the file
             content: File content as string
             language: Programming language
-            
+
         Returns:
             ModuleInfo if parsing succeeds, None otherwise
         """
         if language not in self.parsers:
             return None
-        
+
         parser = self.parsers[language]
         tree = parser.parse(bytes(content, 'utf8'))
-        
+
         if language == 'python':
             return self._parse_python(filepath, content, tree)
         elif language in ('javascript', 'typescript'):
             return self._parse_js_ts(filepath, content, tree, language)
-        
+
         return None
-    
+
     def _parse_python(self, filepath: str, content: str, tree) -> ModuleInfo:
         """Parse Python source using Tree-sitter AST."""
         root = tree.root_node
         imports, classes, functions, types, constants, exports = [], [], [], [], [], []
         docstring = None
-        
+
         # Track conditional imports (try/except)
         conditional_imports = []
         type_checking_imports = []
         aliases = {}
-        
+
         for child in root.children:
             node_type = child.type
-            
+
             # Module docstring
             if node_type == 'expression_statement' and not docstring:
                 expr = child.children[0] if child.children else None
                 if expr and expr.type == 'string':
                     docstring = self._extract_string(expr, content)
-            
+
             # Regular imports
             elif node_type == 'import_statement':
                 imports.extend(self._extract_py_import(child, content))
             elif node_type in ('import_from_statement', 'from_import_statement', 'import_from'):
                 imports.extend(self._extract_py_from_import(child, content))
-            
+
             # Conditional imports (try/except blocks)
             elif node_type == 'try_statement':
                 try_imports = self._extract_conditional_imports(child, content)
@@ -321,7 +329,7 @@ class TreeSitterParser:
                     conditional_imports.extend(try_imports)
                     # Also add to regular imports but mark as conditional
                     imports.extend(try_imports)
-            
+
             # Classes
             elif node_type == 'class_definition':
                 cls = self._extract_py_class(child, content)
@@ -349,7 +357,7 @@ class TreeSitterParser:
                         functions.append(func)
                         if not func.name.startswith('_'):
                             exports.append(func.name)
-                
+
                 # Handle decorated classes (e.g., @dataclass)
                 inner_class = self._find_child(child, 'class_definition')
                 if inner_class:
@@ -358,11 +366,11 @@ class TreeSitterParser:
                         classes.append(cls)
                         if not cls.name.startswith('_'):
                             exports.append(cls.name)
-                        
+
                         enum_type = self._extract_py_enum(inner_class, content)
                         if enum_type:
                             types.append(enum_type)
-            
+
             # Constants with enhanced extraction
             if node_type == 'expression_statement':
                 const = self._extract_py_constant(child, content)
@@ -371,20 +379,20 @@ class TreeSitterParser:
                     # Add constants to exports if they're uppercase (convention)
                     if const.name.isupper():
                         exports.append(const.name)
-        
+
         # Deduplicate imports and normalize names at extraction time
         lines = content.split('\n')
         file_bytes = len(content.encode('utf-8', errors='ignore'))
-        
+
         # Extract TYPE_CHECKING and aliases from the entire tree
         type_checking_imports = self._extract_type_checking_imports(root, content)
         aliases = self._extract_aliases(root, content)
-        
+
         # Create enhanced constants with conditional imports
         enhanced_constants = constants[:10]
         if conditional_imports:
             enhanced_constants.extend([f"conditional:{imp}" for imp in conditional_imports[:5]])
-        
+
         return ModuleInfo(
             path=filepath,
             language='python',
@@ -402,7 +410,7 @@ class TreeSitterParser:
             lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('#')]),
             file_bytes=file_bytes,
         )
-    
+
     def _extract_constants(self, tree, content: str) -> List[ConstantInfo]:
         """Extract module-level UPPERCASE constants."""
         constants = []
@@ -416,28 +424,28 @@ class TreeSitterParser:
                         name = self._text(left, content)
                         if name.isupper():  # Convention: CONSTANTS are UPPERCASE
                             const = ConstantInfo(name=name)
-                            
+
                             # Get the value
                             right = expr.children[1] if len(expr.children) > 1 else None
                             if right:
                                 value_text = self._text(right, content).strip()
                                 const.value = value_text if len(value_text) <= 200 else None
-                                
+
                                 # For dictionaries, extract keys
                                 if value_text.startswith('{') and value_text.endswith('}'):
                                     # Simple regex to extract keys
                                     import re
                                     keys = re.findall(r"'([^']+)'|'([^']+)'", value_text[:500])
                                     const.value_keys = [k for pair in keys for k in pair if k][:10]
-                            
+
                             constants.append(const)
-        
+
         return constants[:15]
 
     def _extract_type_checking_imports(self, tree, content: str) -> List[str]:
         """Extract TYPE_CHECKING block imports."""
         type_checking_imports = []
-        
+
         for node in tree.children:  # tree is already the root node
             if node.type == 'if_statement':
                 # Check if this is `if TYPE_CHECKING:`
@@ -454,13 +462,13 @@ class TreeSitterParser:
                                 elif child.type in ('import_from_statement', 'from_import_statement', 'import_from'):
                                     type_checking_imports.extend(self._extract_py_from_import(child, content))
                         break
-        
+
         return type_checking_imports
 
     def _extract_conditional_imports(self, node, content: str) -> List[str]:
         """Extract imports from try/except blocks."""
         imports = []
-        
+
         # Find the try body
         try_body = self._find_child(node, 'block')
         if try_body:
@@ -469,43 +477,43 @@ class TreeSitterParser:
                     imports.extend(self._extract_py_import(child, content))
                 elif child.type in ('import_from_statement', 'from_import_statement', 'import_from'):
                     imports.extend(self._extract_py_from_import(child, content))
-        
+
         return imports
 
     def _extract_aliases(self, tree, content: str) -> dict:
         """Extract module aliases (import X as Y)."""
         aliases = {}
-        
+
         for node in tree.children:  # tree is already the root node
             if node.type == 'import_statement':
                 for c in node.children:
                     if c.type == 'aliased_import':
                         orig_name = None
                         alias_name = None
-                        
+
                         # Find the original name and alias
                         for subchild in c.children:
                             if subchild.type == 'dotted_name':
                                 orig_name = self._text(subchild, content)
                             elif subchild.type == 'identifier' and subchild != c.children[0]:
                                 alias_name = self._text(subchild, content)
-                        
+
                         if orig_name and alias_name:
                             aliases[alias_name] = orig_name
-            
+
             elif node.type in ('import_from_statement', 'from_import_statement', 'import_from'):
                 for c in node.children:
                     if c.type == 'aliased_import':
                         orig_name = None
                         alias_name = None
-                        
+
                         for subchild in c.children:
                             if subchild.type == 'identifier' and 'as' not in self._text(subchild, content):
                                 orig_name = self._text(subchild, content)
                             elif subchild.type == 'identifier' and 'as' in self._text(subchild, content):
                                 # This is the alias part
                                 pass
-                        
+
                         # Extract from the full text
                         text = self._text(c, content)
                         if ' as ' in text:
@@ -513,13 +521,13 @@ class TreeSitterParser:
                             if len(parts) == 2:
                                 orig_name = parts[0].strip()
                                 alias_name = parts[1].strip()
-                        
+
                         if orig_name and alias_name:
                             aliases[alias_name] = orig_name
-        
+
         return aliases
-    
-    def _extract_py_function(self, node, content: str, 
+
+    def _extract_py_function(self, node, content: str,
                               decorated_node=None) -> Optional[FunctionInfo]:
         """Extract Python function from AST node."""
         name_node = self._find_child(node, 'identifier')
@@ -548,7 +556,7 @@ class TreeSitterParser:
                 calls, raises, complexity = _analyze_python_function_node(parsed.body[0])
         except Exception:
             pass
-        
+
         # Parameters - use AST-parsed function (includes defaults) when possible
         params: List[str] = []
         if func_node_for_ast is not None:
@@ -556,7 +564,7 @@ class TreeSitterParser:
                 params = UniversalParser()._extract_ast_function(func_node_for_ast).params[:8]
             except Exception:
                 params = []
-        
+
         # If AST parsing failed, fall back to TreeSitter extraction
         if not params:
             params_node = self._find_child(node, 'parameters')
@@ -577,7 +585,7 @@ class TreeSitterParser:
                                 params.append(f"{param_name}:{param_type}")
                             else:
                                 params.append(param_name)
-        
+
         # Decorators
         decorators = []
         if decorated_node:
@@ -585,13 +593,13 @@ class TreeSitterParser:
                 if c.type == 'decorator':
                     dec_text = self._text(c, content).lstrip('@')
                     decorators.append(dec_text.split('(')[0])
-        
+
         # Return type
         return_type = None
         return_ann = self._find_child(node, 'type')
         if return_ann:
             return_type = self._text(return_ann, content)
-        
+
         # Docstring
         docstring = None
         body = self._find_child(node, 'block')
@@ -601,7 +609,7 @@ class TreeSitterParser:
                 expr = first_child.children[0] if first_child.children else None
                 if expr and expr.type == 'string':
                     docstring = self._extract_string(expr, content)
-        
+
         return FunctionInfo(
             name=name,
             params=params[:8],
@@ -663,14 +671,14 @@ class TreeSitterParser:
             return TypeInfo(name=name, kind='enum', definition='', values=values or None)
         except Exception:
             return None
-    
+
     def _extract_py_class(self, node, content: str, decorated_node=None) -> Optional[ClassInfo]:
         """Extract Python class from AST node."""
         name_node = self._find_child(node, 'identifier')
         if not name_node:
             return None
         name = self._text(name_node, content).strip()
-        
+
         # Base classes
         bases = []
         arg_list = self._find_child(node, 'argument_list')
@@ -678,7 +686,7 @@ class TreeSitterParser:
             for c in arg_list.children:
                 if c.type in ('identifier', 'attribute'):
                     bases.append(self._text(c, content))
-        
+
         # Check for dataclass decorator
         decorators = []
         is_dataclass = False
@@ -691,7 +699,7 @@ class TreeSitterParser:
                     decorators.append(dec_text.split('(')[0])
                     if 'dataclass' in dec_text:
                         is_dataclass = True
-        
+
         # Docstring and methods
         docstring = None
         methods = []
@@ -705,7 +713,7 @@ class TreeSitterParser:
                     expr = child.children[0] if child.children else None
                     if expr and expr.type == 'string':
                         docstring = self._extract_string(expr, content)
-                
+
                 if child.type == 'function_definition':
                     m = self._extract_py_function(child, content)
                     if m:
@@ -720,20 +728,20 @@ class TreeSitterParser:
                         m = self._extract_py_function(inner, content, child)
                         if m:
                             methods.append(m)
-                
+
                 # Extract dataclass fields (class-level annotated assignments)
                 elif is_dataclass and child.type == 'expression_statement':
                     field = self._extract_dataclass_field(child, content)
                     if field:
                         fields.append(field)
-                
+
                 # Extract class-level properties (annotated assignments without dataclass)
                 elif child.type == 'expression_statement' and not is_dataclass:
                     # Check for annotated assignment like "x: int" or "x: int = 5"
                     prop = self._extract_class_property(child, content)
                     if prop:
                         properties.append(prop)
-        
+
         return ClassInfo(
             name=name,
             bases=bases,
@@ -748,7 +756,7 @@ class TreeSitterParser:
             is_abstract='ABC' in bases or 'ABCMeta' in bases,
             generic_params=[]
         )
-    
+
     def _extract_dataclass_field(self, node, content: str) -> Optional[FieldInfo]:
         """Extract dataclass field from assignment."""
         # Fallback: parse annotated assignment text (e.g. "x: int = 1")
@@ -785,17 +793,17 @@ class TreeSitterParser:
                 left = expr.children[0] if expr.children else None
                 if left and left.type == 'identifier':
                     name = self._text(left, content)
-                    
+
                     # Check if this looks like a field assignment
                     right = expr.children[-1] if len(expr.children) > 1 else None
                     if right:
                         right_text = self._text(right, content).strip()
-                        
+
                         # Extract type annotation from field() call or direct assignment
                         type_annotation = ""
                         default = None
                         default_factory = None
-                        
+
                         if right_text.startswith('field('):
                             # field(default_factory=list)
                             if 'default_factory=' in right_text:
@@ -804,7 +812,7 @@ class TreeSitterParser:
                         else:
                             # Direct value assignment
                             default = right_text
-                        
+
                         return FieldInfo(
                             name=name,
                             type_annotation=type_annotation,
@@ -812,7 +820,7 @@ class TreeSitterParser:
                             default_factory=default_factory
                         )
         return None
-    
+
     def _extract_class_attribute(self, node, content: str) -> Optional[AttributeInfo]:
         """Extract class attribute from self.x = ... assignment."""
         if node.children:
@@ -840,7 +848,7 @@ class TreeSitterParser:
 
                     if obj and attr and obj.type == 'identifier' and self._text(obj, content) == 'self' and attr.type == 'identifier':
                         attr_name = self._text(attr, content)
-                        
+
                         # Try to infer type from the assignment
                         type_annotation = ""
                         right = expr.children[-1] if len(expr.children) > 1 else None
@@ -849,19 +857,19 @@ class TreeSitterParser:
                             # Simple type inference
                             if right_text in ('[]', 'list()', 'dict()', '{}'):
                                 type_annotation = "List" if right_text in ('[]', 'list()') else "Dict"
-                        
+
                         return AttributeInfo(
                             name=attr_name,
                             type_annotation=type_annotation,
                             set_in_init=True
                         )
         return None
-    
+
     def _extract_init_attributes(self, func_node, content: str) -> List[AttributeInfo]:
         """Extract self.x = ... assignments from __init__ method body."""
         attributes = []
         seen_names = set()
-        
+
         def scan_block(block_node):
             """Recursively scan block for self.x assignments."""
             if not block_node:
@@ -877,18 +885,18 @@ class TreeSitterParser:
                     for sub in child.children:
                         if sub.type == 'block':
                             scan_block(sub)
-        
+
         body = self._find_child(func_node, 'block')
         scan_block(body)
         return attributes[:15]  # Limit to 15 attributes
-    
+
     def _extract_class_property(self, node, content: str) -> Optional[str]:
         """Extract class-level property from annotated assignment."""
         try:
             stmt_text = self._text(node, content).strip()
         except Exception:
             return None
-        
+
         # Match annotated assignment: "name: Type" or "name: Type = value"
         m = re.match(r'^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*([^=]+?)(?:\s*=.*)?$', stmt_text)
         if m:
@@ -896,7 +904,7 @@ class TreeSitterParser:
             type_ann = m.group(2).strip()
             return f"{name}: {type_ann}"
         return None
-    
+
     def _extract_py_import(self, node, content: str) -> List[str]:
         """Extract import statement."""
         imports = []
@@ -908,7 +916,7 @@ class TreeSitterParser:
                 if n:
                     imports.append(self._text(n, content))
         return imports
-    
+
     def _extract_py_from_import(self, node, content: str) -> List[str]:
         """Extract from ... import ... statement."""
         imports = []
@@ -948,7 +956,7 @@ class TreeSitterParser:
                     name = self._text(n, content)
                     imports.append(_combine_import_name(module, name))
         return imports
-    
+
     def _extract_py_constant(self, node, content: str) -> Optional[ConstantInfo]:
         """Extract constant (UPPERCASE assignment) with value."""
         stmt_text = ''
@@ -973,7 +981,7 @@ class TreeSitterParser:
                             m = re.match(r'^\s*([A-Z][A-Z0-9_]*)\s*:\s*([^=]+?)\s*=\s*.+$', stmt_text)
                             if m:
                                 const.type_annotation = (m.group(2) or '').strip()
-                        
+
                         # Get the value
                         if right:
                             value_text = self._text(right, content).strip()
@@ -998,21 +1006,21 @@ class TreeSitterParser:
                                 elif (vt.startswith('"') and vt.endswith('"')) or (vt.startswith("'") and vt.endswith("'")):
                                     t = 'str'
                                 const.type_annotation = t
-                            
+
                             # For dictionaries, extract keys
                             if value_text.startswith('{') and value_text.endswith('}'):
                                 # Simple regex to extract keys
                                 keys = re.findall(r"'([^']+)'|'([^']+)'", value_text[:500])
                                 const.value_keys = [k for pair in keys for k in pair if k][:10]
-                        
+
                         return const
         return None
 
-    
+
     def _extract_conditional_imports(self, node, content: str) -> List[str]:
         """Extract imports from try/except blocks."""
         imports = []
-        
+
         # Find the try body
         try_body = self._find_child(node, 'block')
         if try_body:
@@ -1021,24 +1029,24 @@ class TreeSitterParser:
                     imports.extend(self._extract_py_import(child, content))
                 elif child.type in ('import_from_statement', 'from_import_statement', 'import_from'):
                     imports.extend(self._extract_py_from_import(child, content))
-        
+
         return imports
-    
+
     def _parse_js_ts(self, filepath: str, content: str, tree, language: str) -> ModuleInfo:
         """Parse JavaScript/TypeScript source using Tree-sitter AST."""
         root = tree.root_node
         imports, classes, functions, types, constants, exports = [], [], [], [], [], []
         docstring = None
-        
+
         for child in root.children:
             node_type = child.type
-            
+
             # Imports
             if node_type == 'import_statement':
                 for c in child.children:
                     if c.type == 'string':
                         imports.append(self._text(c, content).strip('"\''))
-            
+
             # Exports
             elif node_type == 'export_statement':
                 for c in child.children:
@@ -1067,7 +1075,7 @@ class TreeSitterParser:
                         if t:
                             types.append(t)
                             exports.append(t.name)
-            
+
             # Non-exported declarations
             elif node_type == 'class_declaration':
                 cls = self._extract_js_class(child, content)
@@ -1091,11 +1099,11 @@ class TreeSitterParser:
                 if t:
                     types.append(t)
                     exports.append(t.name)
-            
+
             # Leading comment as docstring
             elif node_type == 'comment' and not docstring:
                 docstring = self._extract_js_comment(child, content)
-        
+
         lines = content.split('\n')
         return ModuleInfo(
             path=filepath,
@@ -1110,14 +1118,14 @@ class TreeSitterParser:
             lines_total=len(lines),
             lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('//')])
         )
-    
+
     def _extract_js_class(self, node, content: str) -> Optional[ClassInfo]:
         """Extract JS/TS class from AST node."""
         name_node = self._find_child(node, 'type_identifier') or self._find_child(node, 'identifier')
         if not name_node:
             return None
         name = self._text(name_node, content)
-        
+
         # Base classes
         bases = []
         heritage = self._find_child(node, 'class_heritage')
@@ -1125,7 +1133,7 @@ class TreeSitterParser:
             for c in heritage.children:
                 if c.type == 'identifier':
                     bases.append(self._text(c, content))
-        
+
         # Methods
         methods = []
         body = self._find_child(node, 'class_body')
@@ -1135,7 +1143,7 @@ class TreeSitterParser:
                     m = self._extract_js_method(c, content)
                     if m:
                         methods.append(m)
-        
+
         return ClassInfo(
             name=name,
             bases=bases,
@@ -1146,30 +1154,30 @@ class TreeSitterParser:
             is_abstract='abstract' in self._text(node, content)[:50],
             generic_params=[]
         )
-    
+
     def _extract_js_method(self, node, content: str) -> Optional[FunctionInfo]:
         """Extract JS/TS method from AST node."""
         name_node = self._find_child(node, 'property_identifier')
         if not name_node:
             return None
         name = self._text(name_node, content)
-        
+
         node_text = self._text(node, content)[:100]
         is_async = 'async' in node_text.split(name)[0] if name in node_text else False
         is_static = 'static' in node_text.split(name)[0] if name in node_text else False
-        
+
         # Parameters
         params = []
         params_node = self._find_child(node, 'formal_parameters')
         if params_node:
             params = self._extract_js_params(params_node, content)
-        
+
         # Return type
         return_type = None
         type_ann = self._find_child(node, 'type_annotation')
         if type_ann:
             return_type = self._text(type_ann, content).lstrip(':').strip()
-        
+
         return FunctionInfo(
             name=name,
             params=params[:8],
@@ -1187,7 +1195,7 @@ class TreeSitterParser:
             start_line=node.start_point[0] + 1,
             end_line=node.end_point[0] + 1
         )
-    
+
     def _extract_js_function(self, node, content: str) -> Optional[FunctionInfo]:
         """Extract JS/TS function from AST node."""
         name_node = self._find_child(node, 'identifier')
@@ -1195,17 +1203,17 @@ class TreeSitterParser:
             return None
         name = self._text(name_node, content)
         is_async = self._text(node, content)[:50].strip().startswith('async')
-        
+
         params = []
         params_node = self._find_child(node, 'formal_parameters')
         if params_node:
             params = self._extract_js_params(params_node, content)
-        
+
         return_type = None
         type_ann = self._find_child(node, 'type_annotation')
         if type_ann:
             return_type = self._text(type_ann, content).lstrip(':').strip()
-        
+
         return FunctionInfo(
             name=name,
             params=params[:8],
@@ -1223,7 +1231,7 @@ class TreeSitterParser:
             start_line=node.start_point[0] + 1,
             end_line=node.end_point[0] + 1
         )
-    
+
     def _extract_js_arrow_fn(self, node, content: str) -> Optional[FunctionInfo]:
         """Extract arrow function assigned to const."""
         for c in node.children:
@@ -1255,7 +1263,7 @@ class TreeSitterParser:
                         end_line=node.end_point[0] + 1
                     )
         return None
-    
+
     def _extract_js_params(self, params_node, content: str) -> List[str]:
         """Extract JS/TS function parameters."""
         params = []
@@ -1275,7 +1283,7 @@ class TreeSitterParser:
                 if n:
                     params.append(self._text(n, content) + '?')
         return params
-    
+
     def _extract_ts_type(self, node, content: str) -> Optional[TypeInfo]:
         """Extract TypeScript interface or type alias."""
         name_node = self._find_child(node, 'type_identifier') or self._find_child(node, 'identifier')
@@ -1284,7 +1292,7 @@ class TreeSitterParser:
         name = self._text(name_node, content)
         kind = 'interface' if node.type == 'interface_declaration' else 'type'
         return TypeInfo(name=name, kind=kind, definition=self._text(node, content)[:100])
-    
+
     def _extract_ts_enum(self, node, content: str) -> Optional[TypeInfo]:
         """Extract TypeScript enum."""
         name_node = self._find_child(node, 'identifier')
@@ -1307,7 +1315,7 @@ class TreeSitterParser:
         except Exception:
             values = []
         return TypeInfo(name=name, kind='enum', definition='', values=values or None)
-    
+
     def _extract_js_constant(self, node, content: str) -> Optional[str]:
         """Extract constant (UPPERCASE const)."""
         for c in node.children:
@@ -1318,19 +1326,19 @@ class TreeSitterParser:
                     if name.isupper():
                         return name
         return None
-    
+
     def _extract_js_comment(self, node, content: str) -> Optional[str]:
         """Extract JS comment content."""
         text = self._text(node, content)
         if text.startswith('/**'):
             lines = text[3:-2].split('\n')
-            clean = [l.strip().lstrip('*').strip() for l in lines 
+            clean = [l.strip().lstrip('*').strip() for l in lines
                     if l.strip().lstrip('*').strip() and not l.strip().startswith('@')]
             return ' '.join(clean)[:100] if clean else None
         elif text.startswith('//'):
             return text[2:].strip()[:100]
         return None
-    
+
     # Helper methods
     def _find_child(self, node, type_name: str):
         """Find first child of given type."""
@@ -1338,15 +1346,15 @@ class TreeSitterParser:
             if c.type == type_name:
                 return c
         return None
-    
+
     def _text(self, node, content: str) -> str:
         """Get text content of node.
-        
+
         Tree-sitter returns byte offsets, so we must slice bytes, not chars.
         """
         content_bytes = content.encode('utf8')
         return content_bytes[node.start_byte:node.end_byte].decode('utf8', errors='replace')
-    
+
     def _extract_string(self, node, content: str) -> str:
         """Extract string content without quotes."""
         text = self._text(node, content)
@@ -1355,14 +1363,14 @@ class TreeSitterParser:
         elif text.startswith('"') or text.startswith("'"):
             return text[1:-1].strip()
         return text
-    
+
     def _truncate_docstring(self, docstring: Optional[str], max_len: int = 80) -> Optional[str]:
         """Truncate docstring to first sentence or max_len characters.
-        
+
         Args:
             docstring: Full docstring text
             max_len: Maximum length (default 80)
-            
+
         Returns:
             Truncated docstring or None
         """
@@ -1384,29 +1392,29 @@ class TreeSitterParser:
 class UniversalParser:
     """
     Fallback parser using Python AST and regex.
-    
+
     Used when Tree-sitter is not available. Provides reasonable
     accuracy for Python (using built-in AST) and basic support
     for JavaScript/TypeScript using regex patterns.
-    
+
     Example:
         >>> parser = UniversalParser()
         >>> module = parser.parse('main.py', content, 'python')
     """
-    
+
     def __init__(self):
         """Initialize the universal parser."""
         self.intent_gen = EnhancedIntentGenerator()
-    
+
     def parse(self, filepath: str, content: str, language: str) -> Optional[ModuleInfo]:
         """
         Parse a source file using AST or regex.
-        
+
         Args:
             filepath: Relative path to the file
             content: File content as string
             language: Programming language
-            
+
         Returns:
             ModuleInfo if parsing succeeds, None otherwise
         """
@@ -1419,7 +1427,7 @@ class UniversalParser:
         elif language in ('javascript', 'typescript'):
             return self._parse_js_ts(filepath, content, language)
         return None
-    
+
     def _parse_python(self, filepath: str, content: str) -> Optional[ModuleInfo]:
         """Parse Python using built-in AST."""
         try:
@@ -1431,9 +1439,9 @@ class UniversalParser:
                 classes=[], functions=[], types=[], constants=[], docstring=None,
                 lines_total=len(lines), lines_code=len([l for l in lines if l.strip()])
             )
-        
+
         imports, classes, functions, types, constants = [], [], [], [], []
-        
+
         for node in ast.iter_child_nodes(tree):
             if isinstance(node, ast.Import):
                 imports.extend(a.name for a in node.names)
@@ -1475,11 +1483,11 @@ class UniversalParser:
                         const.value = None
                     if const.value:
                         constants.append(const)
-        
+
         exports = [c.name for c in classes if not c.name.startswith('_')]
         exports += [f.name for f in functions if not f.name.startswith('_')]
         lines = content.split('\n')
-        
+
         return ModuleInfo(
             path=filepath,
             language='python',
@@ -1539,11 +1547,11 @@ class UniversalParser:
             return TypeInfo(name=node.name, kind='enum', definition='', values=values or None)
         except Exception:
             return None
-    
+
     def _extract_ast_function(self, node) -> FunctionInfo:
         """Extract function from Python AST node."""
         is_async = isinstance(node, ast.AsyncFunctionDef)
-        
+
         # Extract parameters with defaults
         params = []
         defaults = []
@@ -1552,7 +1560,7 @@ class UniversalParser:
             if arg.annotation:
                 p += ':' + self._ann_str(arg.annotation)
             params.append(p)
-        
+
         # Extract default values
         for default in node.args.defaults:
             if isinstance(default, ast.Constant):
@@ -1565,10 +1573,10 @@ class UniversalParser:
                 defaults.append(default.id)
             else:
                 defaults.append(str(ast.unparse(default) if hasattr(ast, 'unparse') else repr(default)))
-        
+
         # Align defaults with parameters (defaults apply to last N parameters)
         param_defaults = [None] * (len(params) - len(defaults)) + defaults
-        
+
         # Create enhanced params with defaults
         enhanced_params = []
         for i, param in enumerate(params[:8]):
@@ -1576,14 +1584,14 @@ class UniversalParser:
                 enhanced_params.append(f"{param}={param_defaults[i]}")
             else:
                 enhanced_params.append(param)
-        
+
         decorators = []
         for dec in node.decorator_list:
             if isinstance(dec, ast.Name):
                 decorators.append(dec.id)
             elif isinstance(dec, ast.Call) and isinstance(dec.func, ast.Name):
                 decorators.append(dec.func.id)
-        
+
         docstring = ast.get_docstring(node)
 
         calls: List[str] = []
@@ -1610,7 +1618,7 @@ class UniversalParser:
             start_line=node.lineno,
             end_line=getattr(node, 'end_lineno', node.lineno)
         )
-    
+
     def _extract_ast_class(self, node: ast.ClassDef) -> ClassInfo:
         """Extract class from Python AST node."""
         bases = []
@@ -1619,10 +1627,10 @@ class UniversalParser:
                 bases.append(b.id)
             elif isinstance(b, ast.Attribute):
                 bases.append(b.attr)
-        
+
         methods = []
         properties = []
-        
+
         # Check if this is a dataclass
         is_dataclass = any(
             (isinstance(d, ast.Name) and d.id == 'dataclass') or
@@ -1636,7 +1644,7 @@ class UniversalParser:
 
         fields: List[FieldInfo] = []
         attributes: List[AttributeInfo] = []
-        
+
         for item in node.body:
             if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 methods.append(self._extract_ast_function(item))
@@ -1695,7 +1703,7 @@ class UniversalParser:
                 for target in item.targets:
                     if isinstance(target, ast.Name):
                         properties.append(target.id)
-        
+
         # Extract decorators
         decorators = []
         for dec in node.decorator_list:
@@ -1705,7 +1713,7 @@ class UniversalParser:
                 decorators.append(dec.func.id)
             elif isinstance(dec, ast.Attribute):
                 decorators.append(dec.attr)
-        
+
         return ClassInfo(
             name=node.name,
             bases=bases,
@@ -1782,7 +1790,7 @@ class UniversalParser:
         if isinstance(value_node, ast.Constant):
             return repr(value_node.value)
         return ''
-    
+
     def _ann_str(self, node) -> str:
         """Convert AST annotation to string."""
         if isinstance(node, ast.Name):
@@ -1797,15 +1805,15 @@ class UniversalParser:
                 args = self._ann_str(node.slice)
             return f"{base}[{args}]"
         return "Any"
-    
+
     def _parse_js_ts(self, filepath: str, content: str, language: str) -> ModuleInfo:
         """Parse JS/TS using regex patterns."""
         imports, classes, functions, types, constants, exports = [], [], [], [], [], []
-        
+
         # Import patterns
         for m in re.finditer(r"import\s+.*?from\s+['\"]([^'\"]+)['\"]", content):
             imports.append(m.group(1))
-        
+
         # Class patterns
         for m in re.finditer(
             r'(?:export\s+)?(?:abstract\s+)?class\s+(\w+)(?:\s+extends\s+(\w+))?',
@@ -1822,7 +1830,7 @@ class UniversalParser:
                 generic_params=[]
             ))
             exports.append(m.group(1))
-        
+
         # Function patterns
         for m in re.finditer(
             r'(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(([^)]*)\)(?:\s*:\s*([^{]+))?',
@@ -1846,7 +1854,7 @@ class UniversalParser:
                 intent=self.intent_gen.generate(name)
             ))
             exports.append(name)
-        
+
         # Arrow function patterns
         for m in re.finditer(
             r'(?:export\s+)?const\s+(\w+)\s*=\s*(?:async\s+)?\([^)]*\)\s*(?::\s*[^=]+)?\s*=>',
@@ -1869,16 +1877,16 @@ class UniversalParser:
                 intent=self.intent_gen.generate(name)
             ))
             exports.append(name)
-        
+
         # Interface/Type patterns
         for m in re.finditer(r'(?:export\s+)?(interface|type)\s+(\w+)', content):
             types.append(TypeInfo(name=m.group(2), kind=m.group(1), definition=''))
             exports.append(m.group(2))
-        
+
         # Constant patterns
         for m in re.finditer(r'const\s+([A-Z][A-Z0-9_]+)\s*=', content):
             constants.append(m.group(1))
-        
+
         lines = content.split('\n')
         return ModuleInfo(
             path=filepath,

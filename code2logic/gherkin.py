@@ -14,26 +14,26 @@ Token efficiency comparison (per 100 functions):
 
 LLM Accuracy by format (models <30B):
 - Gherkin: 95% accuracy
-- YAML: 90% accuracy  
+- YAML: 90% accuracy
 - JSON: 75% accuracy
 - Raw Python: 25% accuracy
 
 Usage:
     from code2logic.gherkin import GherkinGenerator, CucumberYAMLGenerator
-    
+
     generator = GherkinGenerator()
     features = generator.generate(project)
-    
+
     yaml_gen = CucumberYAMLGenerator()
     cucumber_yaml = yaml_gen.generate(project)
 """
 
-from typing import List, Dict, Optional, Any
+import re
 from collections import defaultdict
 from dataclasses import dataclass
-import re
+from typing import Any, Dict, List, Optional
 
-from .models import ProjectInfo, FunctionInfo
+from .models import FunctionInfo, ProjectInfo
 
 
 @dataclass
@@ -72,20 +72,20 @@ class StepDefinition:
 class GherkinGenerator:
     """
     Generates Gherkin feature files from code analysis.
-    
+
     Achieves ~50x token compression compared to CSV while
     preserving full semantic information for LLM processing.
-    
+
     Example:
         >>> from code2logic import analyze_project
         >>> from code2logic.gherkin import GherkinGenerator
-        >>> 
+        >>>
         >>> project = analyze_project("/path/to/project")
         >>> generator = GherkinGenerator()
         >>> features = generator.generate(project)
         >>> print(features)  # Gherkin feature files
     """
-    
+
     # Category to Gherkin verb mapping (action, passive, assertion)
     CATEGORY_VERBS = {
         'create': ('creates', 'is created', 'should exist'),
@@ -98,7 +98,7 @@ class GherkinGenerator:
         'communicate': ('sends', 'is sent', 'should be delivered'),
         'other': ('processes', 'is processed', 'should complete'),
     }
-    
+
     # Domain to business context mapping
     DOMAIN_CONTEXTS = {
         'auth': 'authentication and authorization',
@@ -116,7 +116,7 @@ class GherkinGenerator:
         'parser': 'parsing and analysis',
         'test': 'testing utilities',
     }
-    
+
     # Gherkin keywords by language
     KEYWORDS = {
         'en': {
@@ -159,61 +159,61 @@ class GherkinGenerator:
             'rule': 'Regel',
         },
     }
-    
+
     def __init__(self, language: str = 'en'):
         """
         Initialize GherkinGenerator.
-        
+
         Args:
             language: Language for Gherkin keywords ('en', 'pl', 'de')
         """
         self.language = language
         self.keywords = self.KEYWORDS.get(language, self.KEYWORDS['en'])
         self._step_registry: Dict[str, StepDefinition] = {}
-    
+
     def generate(self, project: ProjectInfo, detail: str = 'standard',
                  group_by: str = 'domain') -> str:
         """
         Generate Gherkin feature files from project analysis.
-        
+
         Args:
             project: ProjectInfo from code2logic analysis
             detail: 'minimal', 'standard', or 'full'
             group_by: 'domain', 'category', or 'module'
-            
+
         Returns:
             Gherkin feature file content
         """
         features = self._extract_features(project, group_by)
         return self._render_features(features, detail)
-    
+
     def generate_test_scenarios(self, project: ProjectInfo,
                                  group_by: str = 'domain') -> List[GherkinFeature]:
         """
         Generate structured test scenarios for programmatic use.
-        
+
         Args:
             project: ProjectInfo from code2logic analysis
             group_by: Grouping strategy
-            
+
         Returns:
             List of GherkinFeature objects
         """
         return self._extract_features(project, group_by)
-    
+
     def get_step_definitions(self) -> List[StepDefinition]:
         """Get all unique step definitions from generated features."""
         return list(self._step_registry.values())
-    
-    def _extract_features(self, project: ProjectInfo, 
+
+    def _extract_features(self, project: ProjectInfo,
                           group_by: str) -> List[GherkinFeature]:
         """Extract Gherkin features from project."""
         # Collect all functions/methods with metadata
         elements = []
-        
+
         for module in project.modules:
             domain = self._extract_domain(module.path)
-            
+
             for func in module.functions:
                 elements.append({
                     'module': module,
@@ -222,7 +222,7 @@ class GherkinGenerator:
                     'domain': domain,
                     'category': self._categorize(func.name),
                 })
-            
+
             for cls in module.classes:
                 for method in cls.methods:
                     elements.append({
@@ -233,7 +233,7 @@ class GherkinGenerator:
                         'domain': domain,
                         'category': self._categorize(method.name),
                     })
-        
+
         # Group elements
         if group_by == 'domain':
             groups = defaultdict(list)
@@ -247,17 +247,17 @@ class GherkinGenerator:
             groups = defaultdict(list)
             for elem in elements:
                 groups[elem['module'].path].append(elem)
-        
+
         # Create features
         features = []
         for group_name, items in groups.items():
             feature = self._create_feature(group_name, items, project, group_by)
             if feature.scenarios:
                 features.append(feature)
-        
+
         return features
-    
-    def _create_feature(self, group_name: str, items: List[dict], 
+
+    def _create_feature(self, group_name: str, items: List[dict],
                         project: ProjectInfo, group_by: str) -> GherkinFeature:
         """Create a Gherkin feature from grouped items."""
         # Determine context
@@ -270,32 +270,32 @@ class GherkinGenerator:
         else:
             feature_name = f"Module: {group_name}"
             context = f"Tests for {group_name}"
-        
+
         # Group by category for scenarios
         category_groups = defaultdict(list)
         for item in items:
             category_groups[item['category']].append(item)
-        
+
         scenarios = []
         for category, cat_items in category_groups.items():
             # Create main scenario
             scenario = self._create_scenario(category, cat_items, group_name)
             scenarios.append(scenario)
-            
+
             # Add edge case scenarios for 'full' detail
             edge_scenarios = self._create_edge_case_scenarios(category, cat_items)
             scenarios.extend(edge_scenarios)
-        
+
         # Feature tags
         tags = [f'@{group_name}']
         if any(i['function'].is_async for i in items):
             tags.append('@async')
         if len(items) > 20:
             tags.append('@large')
-        
+
         # Background (common setup)
         background = self._create_background(group_name, items)
-        
+
         return GherkinFeature(
             name=feature_name,
             description=f"BDD tests for {context} in {project.name}\n  Generated by code2logic",
@@ -303,37 +303,37 @@ class GherkinGenerator:
             scenarios=scenarios,
             background=background,
         )
-    
-    def _create_scenario(self, category: str, items: List[dict], 
+
+    def _create_scenario(self, category: str, items: List[dict],
                          domain: str) -> GherkinScenario:
         """Create a scenario from category items."""
         verbs = self.CATEGORY_VERBS.get(category, self.CATEGORY_VERBS['other'])
-        
+
         # Extract function info
         intents = [i['function'].intent for i in items if i['function'].intent][:5]
-        
+
         # Build scenario steps
         given = []
         when = []
         then = []
-        
+
         # Given: Setup context
         given.append(f"the {domain} system is initialized")
         if items[0].get('class'):
             given.append(f"a {items[0]['class'].name} instance exists")
-        
+
         # When: Actions based on functions
         for item in items[:3]:
             func = item['function']
             step = self._create_when_step(func, verbs[0])
             when.append(step)
             self._register_step('when', step, func)
-        
+
         # Then: Assertions
         then.append(f"the operation {verbs[2]}")
         if intents:
-            then.append(f"the result matches expected behavior")
-        
+            then.append("the result matches expected behavior")
+
         # Tags
         tags = [f'@{category}']
         if any(i['function'].is_async for i in items):
@@ -342,10 +342,10 @@ class GherkinGenerator:
             tags.append('@complex')
         if len(items) > 10:
             tags.append('@parametrized')
-        
+
         # Examples table (Scenario Outline)
         examples = self._create_examples_table(items)
-        
+
         return GherkinScenario(
             name=f"{category.title()} operations ({len(items)} functions)",
             given=given,
@@ -354,22 +354,22 @@ class GherkinGenerator:
             tags=tags,
             examples=examples if len(items) > 1 else None,
         )
-    
-    def _create_edge_case_scenarios(self, category: str, 
+
+    def _create_edge_case_scenarios(self, category: str,
                                      items: List[dict]) -> List[GherkinScenario]:
         """Create edge case scenarios for thorough testing."""
         scenarios = []
-        
+
         # Error handling scenario
         if category in ('create', 'update', 'delete'):
             scenarios.append(GherkinScenario(
                 name=f"{category.title()} with invalid input",
-                given=[f"the system is initialized", "invalid input data is prepared"],
+                given=["the system is initialized", "invalid input data is prepared"],
                 when=[f"user attempts to {category} with invalid data"],
                 then=["the operation should fail gracefully", "appropriate error is returned"],
                 tags=[f'@{category}', '@negative', '@error-handling'],
             ))
-        
+
         # Async scenario
         async_items = [i for i in items if i['function'].is_async]
         if async_items:
@@ -380,13 +380,13 @@ class GherkinGenerator:
                 then=["the operation completes asynchronously", "no deadlocks occur"],
                 tags=[f'@{category}', '@async', '@concurrency'],
             ))
-        
+
         return scenarios
-    
+
     def _create_when_step(self, func: FunctionInfo, verb: str) -> str:
         """Create a When step from function info."""
         params = self._extract_param_placeholders(func)
-        
+
         if func.intent:
             # Use intent for natural language step
             intent_clean = func.intent.lower().rstrip('.')
@@ -399,29 +399,29 @@ class GherkinGenerator:
             if params:
                 return f"user {verb} {name_readable} with {params}"
             return f"user calls {func.name}"
-    
-    def _create_background(self, domain: str, 
+
+    def _create_background(self, domain: str,
                            items: List[dict]) -> Optional[List[str]]:
         """Create background steps for common setup."""
         background = [f"the {domain} module is loaded"]
-        
+
         # Check for common imports
         all_imports = set()
         for item in items:
             all_imports.update(item['module'].imports[:5])
-        
+
         if 'logging' in all_imports or 'logger' in all_imports:
             background.append("logging is configured")
-        
+
         if 'config' in all_imports or 'settings' in all_imports:
             background.append("configuration is loaded")
-        
+
         return background if len(background) > 1 else None
-    
+
     def _create_examples_table(self, items: List[dict]) -> List[Dict[str, str]]:
         """Create Examples table for Scenario Outline."""
         examples = []
-        
+
         for item in items[:10]:
             func = item['function']
             example = {
@@ -430,15 +430,15 @@ class GherkinGenerator:
                 'returns': func.return_type or 'void',
                 'async': 'yes' if func.is_async else 'no',
             }
-            
+
             # Add intent as description
             if func.intent:
                 example['description'] = func.intent[:40]
-            
+
             examples.append(example)
-        
+
         return examples
-    
+
     def _extract_param_placeholders(self, func: FunctionInfo) -> str:
         """Extract parameter placeholders for Gherkin steps."""
         params = []
@@ -447,12 +447,12 @@ class GherkinGenerator:
             if name and name not in ('self', 'cls'):
                 params.append(f'"<{name}>"')
         return ', '.join(params)
-    
+
     def _register_step(self, step_type: str, pattern: str, func: FunctionInfo):
         """Register a step definition for later generation."""
         # Normalize pattern
         pattern_key = re.sub(r'<\w+>', '{param}', pattern)
-        
+
         if pattern_key not in self._step_registry:
             params = re.findall(r'<(\w+)>', pattern)
             self._step_registry[pattern_key] = StepDefinition(
@@ -462,101 +462,101 @@ class GherkinGenerator:
                 params=params,
                 implementation_hint=func.intent or f"Implement {func.name}",
             )
-    
-    def _render_features(self, features: List[GherkinFeature], 
+
+    def _render_features(self, features: List[GherkinFeature],
                          detail: str) -> str:
         """Render features to Gherkin text."""
         output = []
-        
+
         # Add header comment
         output.append("# Auto-generated by code2logic")
         output.append("# Token-efficient BDD specification (~50x compression vs CSV)")
         output.append("")
-        
+
         for feature in features:
             feature_text = self._render_feature(feature, detail)
             output.append(feature_text)
-        
+
         return '\n'.join(output)
-    
+
     def _render_feature(self, feature: GherkinFeature, detail: str) -> str:
         """Render a single feature."""
         lines = []
-        
+
         # Tags
         if feature.tags:
             lines.append(' '.join(feature.tags))
-        
+
         # Feature header
         lines.append(f"{self.keywords['feature']}: {feature.name}")
         if feature.description and detail != 'minimal':
             for desc_line in feature.description.split('\n'):
                 lines.append(f"  {desc_line}")
         lines.append("")
-        
+
         # Background
         if feature.background and detail == 'full':
             lines.append(f"  {self.keywords['background']}:")
             for step in feature.background:
                 lines.append(f"    {self.keywords['given']} {step}")
             lines.append("")
-        
+
         # Scenarios
         for scenario in feature.scenarios:
             scenario_text = self._render_scenario(scenario, detail)
             lines.append(scenario_text)
-        
+
         return '\n'.join(lines)
-    
+
     def _render_scenario(self, scenario: GherkinScenario, detail: str) -> str:
         """Render a single scenario."""
         lines = []
-        
+
         # Tags
         if scenario.tags:
             tags_to_show = scenario.tags[:3] if detail == 'minimal' else scenario.tags
             lines.append(f"  {' '.join(tags_to_show)}")
-        
+
         # Scenario header
         keyword = self.keywords['scenario_outline'] if scenario.examples else self.keywords['scenario']
         lines.append(f"  {keyword}: {scenario.name}")
-        
+
         # Given
         for i, step in enumerate(scenario.given):
             kw = self.keywords['given'] if i == 0 else self.keywords['and']
             lines.append(f"    {kw} {step}")
-        
+
         # When
         max_when = 2 if detail == 'minimal' else 5
         for i, step in enumerate(scenario.when[:max_when]):
             kw = self.keywords['when'] if i == 0 else self.keywords['and']
             lines.append(f"    {kw} {step}")
-        
+
         # Then
         for i, step in enumerate(scenario.then):
             kw = self.keywords['then'] if i == 0 else self.keywords['and']
             lines.append(f"    {kw} {step}")
-        
+
         # Examples
         if scenario.examples and detail != 'minimal':
             lines.append("")
             lines.append(f"    {self.keywords['examples']}:")
-            
+
             headers = list(scenario.examples[0].keys())
             lines.append(f"      | {' | '.join(headers)} |")
-            
+
             max_examples = 5 if detail == 'standard' else 15
             for example in scenario.examples[:max_examples]:
                 values = [str(example.get(h, ''))[:20] for h in headers]
                 lines.append(f"      | {' | '.join(values)} |")
-        
+
         lines.append("")
         return '\n'.join(lines)
-    
+
     def _categorize(self, name: str) -> str:
         """Categorize function by name pattern."""
         name_lower = name.lower()
-        
+
         patterns = {
             'create': ('create', 'add', 'insert', 'new', 'make', 'build', 'generate'),
             'read': ('get', 'fetch', 'find', 'load', 'read', 'query', 'list', 'search'),
@@ -567,24 +567,24 @@ class GherkinGenerator:
             'lifecycle': ('init', 'setup', 'configure', 'start', 'stop', 'close', 'dispose'),
             'communicate': ('send', 'emit', 'notify', 'publish', 'broadcast', 'dispatch'),
         }
-        
+
         for cat, verbs in patterns.items():
             if any(v in name_lower for v in verbs):
                 return cat
-        
+
         return 'other'
-    
+
     def _extract_domain(self, path: str) -> str:
         """Extract domain from file path."""
         parts = path.lower().replace('\\', '/').split('/')
-        
+
         for part in parts:
             for domain in self.DOMAIN_CONTEXTS.keys():
                 if domain in part:
                     return domain
-        
+
         return parts[-2] if len(parts) > 1 else 'core'
-    
+
     def _name_to_readable(self, name: str) -> str:
         """Convert function name to readable text."""
         # Handle snake_case
@@ -592,7 +592,7 @@ class GherkinGenerator:
         # Handle camelCase/PascalCase
         name = re.sub(r'([a-z])([A-Z])', r'\1 \2', name)
         return name.lower()
-    
+
     def _step_to_func_name(self, step: str) -> str:
         """Convert step text to valid function name."""
         name = re.sub(r'[^\w\s]', '', step.lower())
@@ -603,14 +603,14 @@ class GherkinGenerator:
 class StepDefinitionGenerator:
     """
     Generates step definition stubs from Gherkin features.
-    
+
     Supports multiple frameworks:
     - pytest-bdd (Python)
     - behave (Python)
     - Cucumber.js (JavaScript)
     - Cucumber-JVM (Java)
     """
-    
+
     def generate_pytest_bdd(self, features: List[GherkinFeature]) -> str:
         """Generate pytest-bdd step definitions."""
         lines = [
@@ -636,44 +636,44 @@ class StepDefinitionGenerator:
             '    return {}',
             '',
         ]
-        
+
         # Collect unique steps
         steps = {'given': set(), 'when': set(), 'then': set()}
-        
+
         for feature in features:
             for scenario in feature.scenarios:
                 steps['given'].update(scenario.given)
                 steps['when'].update(scenario.when)
                 steps['then'].update(scenario.then)
-        
+
         # Generate step functions
         for step_type, step_set in steps.items():
             lines.append(f'# {step_type.upper()} steps')
             lines.append('')
-            
+
             decorator = step_type
             for step in sorted(step_set):
                 func_name = self._step_to_func_name(step)
-                
+
                 # Handle parameterized steps
                 if '<' in step:
                     pattern = re.sub(r'"<(\w+)>"', r'"{\\1}"', step)
                     pattern = re.sub(r'<(\w+)>', r'{\\1}', pattern)
                     params = re.findall(r'{(\w+)}', pattern)
-                    
+
                     lines.append(f'@{decorator}(parsers.parse(\'{pattern}\'))')
                     lines.append(f'def {func_name}(context, {", ".join(params)}):')
                 else:
                     lines.append(f'@{decorator}(\'{step}\')')
                     lines.append(f'def {func_name}(context):')
-                
+
                 lines.append(f'    """Step: {step}"""')
                 lines.append('    # TODO: Implement')
                 lines.append('    pass')
                 lines.append('')
-        
+
         return '\n'.join(lines)
-    
+
     def generate_behave(self, features: List[GherkinFeature]) -> str:
         """Generate behave step definitions."""
         lines = [
@@ -687,18 +687,18 @@ class StepDefinitionGenerator:
             'from behave import given, when, then, step',
             '',
         ]
-        
+
         steps = {'given': set(), 'when': set(), 'then': set()}
         for feature in features:
             for scenario in feature.scenarios:
                 steps['given'].update(scenario.given)
                 steps['when'].update(scenario.when)
                 steps['then'].update(scenario.then)
-        
+
         for step_type, step_set in steps.items():
             for step in sorted(step_set):
                 func_name = self._step_to_func_name(step)
-                
+
                 if '<' in step:
                     pattern = re.sub(r'"<(\w+)>"', r'{\\1}', step)
                     pattern = re.sub(r'<(\w+)>', r'{\\1}', pattern)
@@ -707,13 +707,13 @@ class StepDefinitionGenerator:
                 else:
                     lines.append(f'@{step_type}(\'{step}\')')
                     lines.append(f'def {func_name}(context):')
-                
+
                 lines.append(f'    """Step: {step}"""')
                 lines.append('    pass')
                 lines.append('')
-        
+
         return '\n'.join(lines)
-    
+
     def generate_cucumber_js(self, features: List[GherkinFeature]) -> str:
         """Generate Cucumber.js step definitions."""
         lines = [
@@ -734,14 +734,14 @@ class StepDefinitionGenerator:
             '});',
             '',
         ]
-        
+
         steps = {'Given': set(), 'When': set(), 'Then': set()}
         for feature in features:
             for scenario in feature.scenarios:
                 steps['Given'].update(scenario.given)
                 steps['When'].update(scenario.when)
                 steps['Then'].update(scenario.then)
-        
+
         for step_type, step_set in steps.items():
             for step in sorted(step_set):
                 if '<' in step:
@@ -751,13 +751,13 @@ class StepDefinitionGenerator:
                     lines.append(f'{step_type}(\'{pattern}\', function({", ".join(params)}) {{')
                 else:
                     lines.append(f'{step_type}(\'{step}\', function() {{')
-                
-                lines.append(f'  // TODO: Implement')
+
+                lines.append('  // TODO: Implement')
                 lines.append('});')
                 lines.append('')
-        
+
         return '\n'.join(lines)
-    
+
     def _step_to_func_name(self, step: str) -> str:
         """Convert step text to valid function name."""
         name = re.sub(r'[^\w\s]', '', step.lower())
@@ -768,18 +768,18 @@ class StepDefinitionGenerator:
 class CucumberYAMLGenerator:
     """
     Generates Cucumber YAML configuration and test data.
-    
+
     YAML format provides ~5x token compression with 90% LLM accuracy.
     """
-    
+
     def generate(self, project: ProjectInfo, detail: str = 'standard') -> str:
         """Generate Cucumber YAML configuration."""
         # Collect test data
         test_suites = defaultdict(list)
-        
+
         for module in project.modules:
             domain = self._extract_domain(module.path)
-            
+
             for func in module.functions:
                 test_suites[domain].append({
                     'name': func.name,
@@ -789,7 +789,7 @@ class CucumberYAMLGenerator:
                     'returns': func.return_type or 'void',
                     'async': func.is_async,
                 })
-            
+
             for cls in module.classes:
                 for method in cls.methods:
                     test_suites[domain].append({
@@ -801,7 +801,7 @@ class CucumberYAMLGenerator:
                         'returns': method.return_type or 'void',
                         'async': method.is_async,
                     })
-        
+
         # Build YAML structure
         yaml_lines = [
             '# Cucumber Test Configuration',
@@ -813,18 +813,18 @@ class CucumberYAMLGenerator:
             '',
             'test_suites:',
         ]
-        
+
         for domain, tests in test_suites.items():
             yaml_lines.append(f'  {domain}:')
             yaml_lines.append(f'    count: {len(tests)}')
             yaml_lines.append('    tests:')
-            
+
             # Group by category
             categories = defaultdict(list)
             for test in tests:
                 cat = self._categorize(test['name'])
                 categories[cat].append(test)
-            
+
             for cat, cat_tests in categories.items():
                 yaml_lines.append(f'      {cat}:')
                 for test in cat_tests[:10 if detail == 'standard' else 20]:
@@ -836,26 +836,26 @@ class CucumberYAMLGenerator:
                         yaml_lines.append(f'          returns: {test["returns"]}')
                         if test['async']:
                             yaml_lines.append('          async: true')
-        
+
         return '\n'.join(yaml_lines)
-    
+
     def _extract_domain(self, path: str) -> str:
         """Extract domain from path."""
         parts = path.lower().replace('\\', '/').split('/')
-        domains = ['auth', 'user', 'order', 'payment', 'api', 'service', 
+        domains = ['auth', 'user', 'order', 'payment', 'api', 'service',
                    'model', 'validation', 'generator', 'parser', 'test']
-        
+
         for part in parts:
             for domain in domains:
                 if domain in part:
                     return domain
-        
+
         return parts[-2] if len(parts) > 1 else 'core'
-    
+
     def _categorize(self, name: str) -> str:
         """Categorize by name pattern."""
         name_lower = name.lower().split('.')[-1]
-        
+
         if any(v in name_lower for v in ('get', 'fetch', 'find', 'read')):
             return 'read'
         if any(v in name_lower for v in ('create', 'add', 'new')):
@@ -866,58 +866,58 @@ class CucumberYAMLGenerator:
             return 'delete'
         if any(v in name_lower for v in ('validate', 'check', 'is')):
             return 'validate'
-        
+
         return 'other'
 
 
 def csv_to_gherkin(csv_content: str, language: str = 'en') -> str:
     """
     Convert CSV analysis directly to Gherkin.
-    
+
     This achieves ~50x token compression:
     - CSV (16 columns): ~16K tokens per 100 functions
     - Gherkin: ~300 tokens per 100 functions
-    
+
     Args:
         csv_content: CSV content from CSVGenerator
         language: Gherkin language ('en', 'pl', 'de')
-        
+
     Returns:
         Gherkin feature file content
     """
     import csv
     from io import StringIO
-    
+
     keywords = GherkinGenerator.KEYWORDS.get(language, GherkinGenerator.KEYWORDS['en'])
-    
+
     reader = csv.DictReader(StringIO(csv_content))
     rows = list(reader)
-    
+
     # Group by domain
     domains = defaultdict(list)
     for row in rows:
         domain = row.get('domain', 'core')
         domains[domain].append(row)
-    
+
     output = [
         "# Auto-generated by code2logic",
         f"# Language: {language}",
         f"# Source: {len(rows)} elements → ~{len(rows) * 3} tokens (vs ~{len(rows) * 160} in CSV)",
         "",
     ]
-    
+
     for domain, items in domains.items():
         output.append(f"@{domain}")
         output.append(f"{keywords['feature']}: {domain.title()} Domain")
         output.append(f"  BDD tests for {domain} functionality")
         output.append("")
-        
+
         # Group by category
         categories = defaultdict(list)
         for item in items:
             cat = item.get('category', 'other')
             categories[cat].append(item)
-        
+
         for category, cat_items in categories.items():
             output.append(f"  @{category}")
             output.append(f"  {keywords['scenario_outline']}: {category.title()} operations")
@@ -927,49 +927,49 @@ def csv_to_gherkin(csv_content: str, language: str = 'en') -> str:
             output.append("")
             output.append(f"    {keywords['examples']}:")
             output.append("      | function | intent |")
-            
+
             for item in cat_items[:15]:
                 name = item.get('name', '')[:25]
                 intent = item.get('intent', '')[:35]
                 output.append(f"      | {name} | {intent} |")
-            
+
             output.append("")
-    
+
     return '\n'.join(output)
 
 
 def gherkin_to_test_data(gherkin_content: str) -> Dict[str, Any]:
     """
     Extract structured test data from Gherkin for LLM processing.
-    
+
     Returns a minimal JSON structure that preserves all test semantics
     while achieving maximum token efficiency.
     """
     features = []
     current_feature = None
     current_scenario = None
-    
+
     for line in gherkin_content.split('\n'):
         line = line.strip()
-        
+
         if line.startswith('Feature:'):
             current_feature = {
                 'name': line[8:].strip(),
                 'scenarios': []
             }
             features.append(current_feature)
-        
+
         elif line.startswith('Scenario') and current_feature:
             current_scenario = {
                 'name': line.split(':', 1)[1].strip() if ':' in line else '',
                 'steps': []
             }
             current_feature['scenarios'].append(current_scenario)
-        
-        elif current_scenario and any(line.startswith(kw) for kw in 
+
+        elif current_scenario and any(line.startswith(kw) for kw in
                                        ['Given', 'When', 'Then', 'And', 'But']):
             current_scenario['steps'].append(line)
-    
+
     return {
         'features': features,
         'total_scenarios': sum(len(f['scenarios']) for f in features),
