@@ -22,7 +22,6 @@ from lolm import (
     RECOMMENDED_MODELS,
     DEFAULT_MODELS,
     DEFAULT_PROVIDER_PRIORITIES,
-    load_config as _load_lolm_config,
     get_provider_model,
     get_provider_priorities_from_litellm as _get_provider_priorities_from_litellm_yaml,
 )

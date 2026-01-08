@@ -14,7 +14,7 @@ from collections import defaultdict
 
 from .models import (
     ProjectInfo, ModuleInfo, ClassInfo, FunctionInfo,
-    DependencyNode, ConstantInfo, FieldInfo
+    ConstantInfo, FieldInfo
 )
 from .shared_utils import categorize_function, extract_domain, compute_hash, remove_self_from_params, compact_imports, deduplicate_imports
 

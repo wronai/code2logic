@@ -12,12 +12,11 @@ Benchmark results show:
 - Combined: better overall reproduction quality
 """
 
-import os
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 from dataclasses import dataclass
 
-from .models import ProjectInfo, ModuleInfo, FunctionInfo, ClassInfo
+from .models import ProjectInfo
 from .gherkin import GherkinGenerator
 from .generators import YAMLGenerator
 

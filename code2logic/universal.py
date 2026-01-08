@@ -18,14 +18,12 @@ Usage:
     result = reproducer.reproduce("path/to/file.py", target_lang="python")
 """
 
-import os
 import re
 import json
 import hashlib
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple, Union
+from typing import Dict, Any, List, Union
 from dataclasses import dataclass, field, asdict
-from datetime import datetime
 from enum import Enum
 
 # Load .env

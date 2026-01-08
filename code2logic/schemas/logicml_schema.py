@@ -136,23 +136,16 @@ def validate_logicml(spec: str) -> Tuple[bool, List[str]]:
         errors.append("Missing header comment (# filename | class | N lines)")
     
     # Validate structure
-    current_class = None
     in_methods = False
     in_attrs = False
-    in_functions = False
-    indent_stack = []
     
     for i, line in enumerate(lines):
         stripped = line.strip()
         if not stripped or stripped.startswith('#'):
             continue
         
-        # Calculate indent
-        indent = len(line) - len(line.lstrip())
-        
         # Check for class definition
         if re.match(r'^[A-Z][a-zA-Z0-9_]*:$', stripped):
-            current_class = stripped[:-1]
             in_methods = False
             in_attrs = False
             continue
@@ -167,7 +160,6 @@ def validate_logicml(spec: str) -> Tuple[bool, List[str]]:
             in_methods = False
             continue
         elif stripped == 'functions:':
-            in_functions = True
             in_methods = False
             in_attrs = False
             continue

@@ -8,7 +8,6 @@ Provides common functionality:
 """
 
 import logging
-from typing import Optional
 
 
 class VerboseMixin:

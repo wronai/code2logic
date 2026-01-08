@@ -30,7 +30,7 @@ ClassName:
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Any
+from typing import Dict, List, Optional, Set
 from dataclasses import dataclass
 
 from .models import ProjectInfo, ModuleInfo, FunctionInfo, ClassInfo

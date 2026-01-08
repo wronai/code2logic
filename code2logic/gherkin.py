@@ -28,13 +28,12 @@ Usage:
     cucumber_yaml = yaml_gen.generate(project)
 """
 
-from typing import List, Dict, Optional, Set, Any
+from typing import List, Dict, Optional, Any
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import re
-import hashlib
 
-from .models import ProjectInfo, ModuleInfo, FunctionInfo, ClassInfo
+from .models import ProjectInfo, FunctionInfo
 
 
 @dataclass
@@ -311,7 +310,6 @@ class GherkinGenerator:
         verbs = self.CATEGORY_VERBS.get(category, self.CATEGORY_VERBS['other'])
         
         # Extract function info
-        func_names = [i['function'].name for i in items[:10]]
         intents = [i['function'].intent for i in items if i['function'].intent][:5]
         
         # Build scenario steps

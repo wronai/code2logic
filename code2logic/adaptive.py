@@ -13,10 +13,8 @@ Usage:
     result = reproducer.reproduce("path/to/file.py")
 """
 
-import os
-import re
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Dict, Any, List
 from dataclasses import dataclass
 
 # Load .env file

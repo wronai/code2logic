@@ -12,11 +12,9 @@ Features:
 """
 
 import re
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
-from pathlib import Path
+from dataclasses import dataclass
+from typing import List
 
-from .models import ProjectInfo, ModuleInfo, FunctionInfo, ClassInfo
 from .utils import estimate_tokens
 
 

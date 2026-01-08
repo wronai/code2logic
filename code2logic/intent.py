@@ -8,10 +8,10 @@ to generate human-readable intent descriptions for functions.
 import re
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional, List, Tuple, Any, TYPE_CHECKING
+from typing import Optional, List, Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from code2logic.models import ProjectInfo
+    pass
 
 
 class IntentType(Enum):

@@ -8,13 +8,12 @@ Provides:
 - Comparison with original files
 """
 
-import os
 import yaml
 import json
 import re
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional, Callable
+from typing import List, Dict, Any, Optional
 from enum import Enum
 
 

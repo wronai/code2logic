@@ -46,7 +46,7 @@ signature: (params) -> ReturnType
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 import re
 
 
@@ -115,18 +115,15 @@ def validate_markdown(spec: str) -> Tuple[bool, List[str]]:
     
     # Check for code blocks
     in_code_block = False
-    code_block_type = None
     code_block_start = 0
     
     for i, line in enumerate(lines):
         if line.startswith('```'):
             if not in_code_block:
                 in_code_block = True
-                code_block_type = line[3:].strip()
                 code_block_start = i
             else:
                 in_code_block = False
-                code_block_type = None
     
     if in_code_block:
         errors.append(f"Unclosed code block starting at line {code_block_start + 1}")

@@ -24,8 +24,6 @@ Configuration for Claude Desktop (claude_desktop_config.json):
 
 import json
 import sys
-from pathlib import Path
-from typing import Optional
 
 from . import __version__
 

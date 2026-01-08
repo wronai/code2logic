@@ -5,7 +5,7 @@ Defines the structure and validation for YAML specifications.
 """
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 import yaml
 
 

@@ -15,28 +15,24 @@ Usage:
     result.save('output/benchmark.json')
 """
 
-import re
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Callable
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
+from typing import List, Optional
 
 from ..analyzer import analyze_project
 from ..llm_clients import get_client, BaseLLMClient
-from ..reproduction import extract_code_block
 from ..utils import estimate_tokens
 from ..metrics import ReproductionMetrics
-from ..terminal import render, ShellRenderer
+from ..terminal import render
 
 from .results import (
     BenchmarkResult, BenchmarkConfig, FileResult, 
     FunctionResult, FormatResult
 )
 from .common import (
-    generate_spec, generate_spec_token, create_single_project,
-    get_token_reproduction_prompt, get_simple_reproduction_prompt
+    generate_spec_token, create_single_project,
+    get_token_reproduction_prompt
 )
 
 
@@ -605,7 +601,6 @@ Requirements:
             result.similarity = SequenceMatcher(None, orig_norm, repr_norm).ratio() * 100
             
             if verbose:
-                status = "✓" if result.similarity > 50 else "○"
                 syntax = "S✓" if result.syntax_ok else "S✗"
                 print(f"  {func.name}: {result.similarity:.1f}% {syntax}")
                 

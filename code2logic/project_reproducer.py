@@ -14,11 +14,9 @@ Usage:
     result = reproducer.reproduce_project("path/to/project")
 """
 
-import os
 import json
-import hashlib
 from pathlib import Path
-from typing import Dict, Any, List, Optional, Set
+from typing import Dict, List, Optional, Set
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -33,11 +31,9 @@ except ImportError:
 from .universal import (
     UniversalReproducer,
     UniversalParser,
-    CodeLogic,
     Language,
 )
 from .llm_clients import BaseLLMClient, get_client
-from .reproduction import compare_code
 
 
 # Supported file extensions

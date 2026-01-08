@@ -20,7 +20,7 @@ Usage:
 import os
 import re
 import sys
-from typing import Literal, Optional, List, Dict, Any
+from typing import Literal, Optional, List, Any
 
 
 # ANSI color codes
@@ -385,17 +385,13 @@ class ShellRenderer:
         result = line
         
         # Keys
-        result = re.sub(
-            r'"([^"]+)"\s*:',
-            lambda m: f'{self._c("cyan", "\"" + m.group(1) + "\"")}: ',
-            result
-        )
+        def color_key(m):
+            return self._c("cyan", '"' + m.group(1) + '"') + ": "
+        result = re.sub(r'"([^"]+)"\s*:', color_key, result)
         # String values
-        result = re.sub(
-            r':\s*"([^"]*)"',
-            lambda m: f': {self._c("green", "\"" + m.group(1) + "\"")}',
-            result
-        )
+        def color_str(m):
+            return ": " + self._c("green", '"' + m.group(1) + '"')
+        result = re.sub(r':\s*"([^"]*)"', color_str, result)
         # Numbers
         def color_num(m):
             return ": " + self._c("magenta", m.group(1))

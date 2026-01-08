@@ -11,7 +11,7 @@ import re
 import textwrap
 from typing import Optional, List
 
-from .models import FunctionInfo, ClassInfo, TypeInfo, ModuleInfo, ConstantInfo, FieldInfo, AttributeInfo, OptionalImport
+from .models import FunctionInfo, ClassInfo, TypeInfo, ModuleInfo, ConstantInfo, FieldInfo, AttributeInfo
 from .intent import EnhancedIntentGenerator
 
 # Optional Tree-sitter imports
@@ -437,7 +437,6 @@ class TreeSitterParser:
     def _extract_type_checking_imports(self, tree, content: str) -> List[str]:
         """Extract TYPE_CHECKING block imports."""
         type_checking_imports = []
-        in_type_checking = False
         
         for node in tree.children:  # tree is already the root node
             if node.type == 'if_statement':
@@ -446,7 +445,6 @@ class TreeSitterParser:
                 if condition:
                     cond_text = self._text(condition, content).strip()
                     if 'TYPE_CHECKING' in cond_text:
-                        in_type_checking = True
                         # Extract imports from the body
                         body = self._find_child(node, 'body')
                         if body:

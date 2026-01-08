@@ -16,17 +16,13 @@ Usage:
     )
 """
 
-import json
-from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from dataclasses import dataclass, field, asdict
 
 from .analyzer import analyze_project
-from .similarity import SimilarityDetector
 from .code_review import (
     analyze_code_quality,
     check_security_issues,
-    check_performance_issues,
 )
 from .llm_clients import get_client, BaseLLMClient
 
@@ -123,7 +119,6 @@ def find_duplicates(
         List of duplicate groups
     """
     project = analyze_project(project_path)
-    detector = SimilarityDetector()
     
     # Collect all functions
     functions = []

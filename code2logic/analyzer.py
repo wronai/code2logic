@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 from datetime import datetime
 from collections import defaultdict
-from typing import Optional, List, Dict
+from typing import List, Dict
 
 from .models import ProjectInfo, ModuleInfo
 from .parsers import TreeSitterParser, UniversalParser, TREE_SITTER_AVAILABLE

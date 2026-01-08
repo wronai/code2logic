@@ -9,7 +9,7 @@ See: https://github.com/toon-format/toon
 """
 
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from .models import ProjectInfo, ModuleInfo, ClassInfo, FunctionInfo, TypeInfo
 from .shared_utils import compact_imports, truncate_docstring
 
@@ -606,7 +606,6 @@ class TOONParser:
                 continue
             
             # Parse key-value
-            indent = len(line) - len(line.lstrip())
             line = line.strip()
             
             if ':' not in line:

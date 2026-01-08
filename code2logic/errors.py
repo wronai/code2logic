@@ -9,7 +9,6 @@ from enum import Enum
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Callable
 import logging
-import traceback
 
 
 class ErrorSeverity(Enum):

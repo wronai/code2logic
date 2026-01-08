@@ -34,7 +34,6 @@ except ImportError:
 
 
 from .llm_clients import (
-    BaseLLMClient,
     OpenRouterClient,
     OllamaLocalClient,
     LiteLLMClient,

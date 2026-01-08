@@ -5,10 +5,9 @@ Generates detailed specifications for single files in various formats,
 optimized for LLM code reproduction.
 """
 
-import re
 import json
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 
 def generate_file_csv(file_path: Path) -> str:

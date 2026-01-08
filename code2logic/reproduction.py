@@ -17,7 +17,7 @@ Usage:
 import re
 import difflib
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 from datetime import datetime
 
 from .llm_clients import BaseLLMClient, get_client

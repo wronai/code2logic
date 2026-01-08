@@ -13,7 +13,6 @@ import os
 import sys
 import subprocess
 import time
-import logging
 import json
 import signal
 from datetime import datetime
@@ -719,9 +718,8 @@ code2logic [path] [options]
     from .analyzer import ProjectAnalyzer, get_library_status
     from .generators import (
         MarkdownGenerator, CompactGenerator, JSONGenerator,
-        YAMLGenerator, CSVGenerator
+        YAMLGenerator
     )
-    from .gherkin import GherkinGenerator
     from .toon_format import TOONGenerator
     from .logicml import LogicMLGenerator
     from .function_logic import FunctionLogicGenerator

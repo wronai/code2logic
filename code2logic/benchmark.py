@@ -15,7 +15,6 @@ Usage:
     results = benchmark.run_all("path/to/file.py")
 """
 
-import os
 import json
 import time
 
@@ -33,7 +32,6 @@ from dataclasses import dataclass, asdict
 from .analyzer import analyze_project
 from .generators import (
     MarkdownGenerator,
-    CompactGenerator,
     JSONGenerator,
     YAMLGenerator,
     CSVGenerator,
