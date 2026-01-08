@@ -59,7 +59,7 @@ build: clean
 	$(PYTHON) -m build
 
 bump-patch:
-	@$(PYTHON) -c 'import re; from pathlib import Path; pp=Path("pyproject.toml"); txt=pp.read_text(encoding="utf-8"); m=re.search(r"(?m)^version\s*=\s*\"(\d+)\.(\d+)\.(\d+)\"\s*$$", txt); (m is not None) or (_ for _ in ()).throw(SystemExit("Cannot find version in pyproject.toml")); maj, minor, patch = map(int, m.groups()); new_version=f"{maj}.{minor}.{patch+1}"; txt=re.sub(r"(?m)^version\s*=\s*\"\d+\.\d+\.\d+\"\s*$$", f"version = \"{new_version}\"", txt, count=1); pp.write_text(txt, encoding="utf-8"); init_py=Path("logic2code")/"__init__.py"; init_txt=init_py.read_text(encoding="utf-8"); init_txt, n=re.subn(r"(?m)^__version__\s*=\s*[\x27\x22]\d+\.\d+\.\d+[\x27\x22]\s*$$", f"__version__ = \x27{new_version}\x27", init_txt, count=1); n and init_py.write_text(init_txt, encoding="utf-8"); print(new_version)'
+	@$(PYTHON) -c 'import re; from pathlib import Path; pp=Path("pyproject.toml"); txt=pp.read_text(encoding="utf-8"); m=re.search(r"(?m)^version\s*=\s*\"(\d+)\.(\d+)\.(\d+)\"\s*$$", txt); (m is not None) or (_ for _ in ()).throw(SystemExit("Cannot find version in pyproject.toml")); maj, minor, patch = map(int, m.groups()); new_version=f"{maj}.{minor}.{patch+1}"; txt=re.sub(r"(?m)^version\s*=\s*\"\d+\.\d+\.\d+\"\s*$$", f"version = \"{new_version}\"", txt, count=1); pp.write_text(txt, encoding="utf-8"); init_py=Path("__init__.py"); init_txt=init_py.read_text(encoding="utf-8"); init_txt, n=re.subn(r"(?m)^__version__\s*=\s*[\x27\x22]\d+\.\d+\.\d+[\x27\x22]\s*$$", f"__version__ = \x27{new_version}\x27", init_txt, count=1); n and init_py.write_text(init_txt, encoding="utf-8"); print(new_version)'
 
 publish: bump-patch build
 	$(PYTHON) -m twine upload dist/*
