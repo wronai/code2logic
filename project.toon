@@ -1,0 +1,2570 @@
+# code2logic | 287f 59493L | python:285/javascript:1/rust:1/typescript:1/go:1
+# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
+M[287]:
+  multilang_reproduction_tester.py,1442
+  universal_validator.py,1063
+  reproduction_test_code.py,402
+  generated_code/analyzer.py,41
+  generated_code/__init__.py,8
+  code2logic/llm_profiler.py,490
+  code2logic/config.py,168
+  code2logic/file_formats.py,278
+  code2logic/project_reproducer.py,318
+  code2logic/base.py,49
+  code2logic/cli.py,798
+  code2logic/llm.py,287
+  code2logic/errors.py,371
+  code2logic/code_review.py,205
+  code2logic/analyzer.py,235
+  code2logic/quality.py,212
+  code2logic/shared_utils.py,279
+  code2logic/parsers.py,1592
+  code2logic/intent.py,429
+  code2logic/adaptive.py,469
+  code2logic/reproducer.py,533
+  code2logic/llm_clients.py,209
+  code2logic/prompts.py,120
+  code2logic/chunked_reproduction.py,355
+  code2logic/__init__.py,373
+  code2logic/metrics.py,446
+  code2logic/__main__.py,12
+  code2logic/refactor.py,308
+  code2logic/logicml.py,281
+  code2logic/function_logic.py,209
+  code2logic/utils.py,16
+  code2logic/generators.py,1767
+  code2logic/markdown_format.py,265
+  code2logic/models.py,296
+  code2logic/llm_clients_new.py,39
+  code2logic/similarity.py,178
+  code2logic/universal.py,829
+  code2logic/benchmark.py,349
+  code2logic/terminal.py,496
+  code2logic/toon_format.py,540
+  code2logic/dependency.py,187
+  code2logic/mcp_server.py,297
+  code2logic/reproduction.py,333
+  code2logic/gherkin.py,764
+  examples/05_llm_integration.py,87
+  examples/12_comprehensive_analysis_simple.py,0
+  examples/12_comprehensive_analysis.py,95
+  examples/01_quick_start.py,47
+  examples/token_efficiency.py,0
+  examples/15_unified_benchmark.py,130
+  examples/09_async_benchmark.py,60
+  examples/windsurf_mcp_integration.py,0
+  examples/11_token_benchmark.py,69
+  examples/06_metrics.py,85
+  examples/10_function_reproduction.py,51
+  examples/08_format_benchmark.py,90
+  examples/14_repeatability_test.py,331
+  examples/13_project_benchmark.py,70
+  examples/04_project.py,55
+  examples/03_reproduction.py,57
+  examples/06_metrics_simple.py,0
+  examples/16_terminal_demo.py,178
+  examples/duplicate_detection.py,0
+  examples/02_refactoring.py,45
+  tests/test_parser_integrity.py,234
+  tests/conftest.py,314
+  tests/test_yaml_compact.py,187
+  tests/test_formats.py,337
+  tests/test_e2e_projects.py,82
+  tests/test_error_handling.py,311
+  tests/__init__.py,3
+  tests/test_shared_utils.py,249
+  tests/test_llm_priority.py,44
+  tests/test_llm_profiler.py,416
+  tests/test_generators.py,207
+  tests/test_reproduction.py,208
+  tests/test_intent.py,353
+  tests/test_analyzer.py,180
+  logic2test/cli.py,131
+  logic2test/parsers.py,272
+  logic2test/generator.py,328
+  logic2test/__init__.py,14
+  logic2test/__main__.py,8
+  logic2test/templates.py,198
+  scripts/configure_llm.py,360
+  lolm/config.py,240
+  lolm/cli.py,231
+  lolm/manager.py,322
+  lolm/__init__.py,81
+  lolm/__main__.py,10
+  lolm/provider.py,121
+  lolm/clients.py,228
+  generated_code_full/llm_profiler.py,123
+  generated_code_full/config.py,49
+  generated_code_full/file_formats.py,18
+  generated_code_full/project_reproducer.py,68
+  generated_code_full/base.py,47
+  generated_code_full/cli.py,81
+  generated_code_full/llm.py,79
+  generated_code_full/errors.py,78
+  generated_code_full/code_review.py,33
+  generated_code_full/analyzer.py,41
+  generated_code_full/quality.py,56
+  generated_code_full/shared_utils.py,45
+  generated_code_full/parsers.py,134
+  generated_code_full/intent.py,74
+  generated_code_full/adaptive.py,67
+  generated_code_full/reproducer.py,68
+  generated_code_full/llm_clients.py,108
+  generated_code_full/prompts.py,16
+  generated_code_full/chunked_reproduction.py,73
+  generated_code_full/__init__.py,230
+  generated_code_full/metrics.py,119
+  generated_code_full/__main__.py,6
+  generated_code_full/refactor.py,54
+  generated_code_full/logicml.py,46
+  generated_code_full/function_logic.py,39
+  generated_code_full/utils.py,45
+  generated_code_full/generators.py,124
+  generated_code_full/markdown_format.py,49
+  generated_code_full/models.py,96
+  generated_code_full/similarity.py,28
+  generated_code_full/universal.py,131
+  generated_code_full/benchmark.py,64
+  generated_code_full/terminal.py,91
+  generated_code_full/toon_format.py,58
+  generated_code_full/dependency.py,43
+  generated_code_full/mcp_server.py,15
+  generated_code_full/reproduction.py,73
+  generated_code_full/gherkin.py,100
+  logic2code/cli.py,152
+  logic2code/generator.py,233
+  logic2code/renderers.py,297
+  logic2code/__init__.py,13
+  logic2code/__main__.py,8
+  generated_tests/test_project_reproducer.py,68
+  generated_tests/test_llm_clients.py,119
+  generated_tests/test___init__.py,6
+  generated_tests/test_reproducer.py,108
+  generated_tests/test_file_formats.py,18
+  generated_tests/test_logicml_schema.py,70
+  generated_tests/test_errors.py,105
+  generated_tests/test_llm.py,106
+  generated_tests/test_code_review.py,36
+  generated_tests/test_yaml_schema.py,75
+  generated_tests/test_shared_utils.py,62
+  generated_tests/test_config.py,57
+  generated_tests/test_markdown_schema.py,66
+  generated_tests/test_logicml.py,38
+  generated_tests/test_universal.py,119
+  generated_tests/test___main__.py,6
+  generated_tests/test_base.py,40
+  generated_tests/test_prompts.py,26
+  generated_tests/test_metrics.py,109
+  generated_tests/test_adaptive.py,69
+  generated_tests/test_chunked_reproduction.py,115
+  generated_tests/test_similarity.py,30
+  generated_tests/test_llm_profiler.py,98
+  generated_tests/test_results.py,105
+  generated_tests/test_mcp_server.py,18
+  generated_tests/test_benchmark.py,69
+  generated_tests/test_generators.py,81
+  generated_tests/test_common.py,40
+  generated_tests/test_toon_format.py,55
+  generated_tests/test_reproduction.py,39
+  generated_tests/test_quality.py,61
+  generated_tests/test_models.py,136
+  generated_tests/test_terminal.py,120
+  generated_tests/test_runner.py,51
+  generated_tests/test_refactor.py,79
+  generated_tests/test_gherkin.py,104
+  generated_tests/test_json_schema.py,79
+  generated_tests/test_markdown_format.py,41
+  generated_tests/test_dependency.py,46
+  generated_tests/test_function_logic.py,35
+  generated_tests/test_intent.py,66
+  generated_tests/test_cli.py,57
+  generated_tests/test_utils.py,20
+  generated_tests/test_parsers.py,46
+  generated_tests/test_analyzer.py,35
+  generated_tests_hybrid/property/test_properties.py,211
+  generated_tests_hybrid/unit/test_project_reproducer.py,68
+  generated_tests_hybrid/unit/test_llm_clients.py,115
+  generated_tests_hybrid/unit/test___init__.py,6
+  generated_tests_hybrid/unit/test_reproducer.py,108
+  generated_tests_hybrid/unit/test_file_formats.py,18
+  generated_tests_hybrid/unit/test_logicml_schema.py,70
+  generated_tests_hybrid/unit/test_errors.py,105
+  generated_tests_hybrid/unit/test_llm.py,106
+  generated_tests_hybrid/unit/test_code_review.py,36
+  generated_tests_hybrid/unit/test_yaml_schema.py,75
+  generated_tests_hybrid/unit/test_shared_utils.py,62
+  generated_tests_hybrid/unit/test_config.py,49
+  generated_tests_hybrid/unit/test_markdown_schema.py,66
+  generated_tests_hybrid/unit/test_logicml.py,37
+  generated_tests_hybrid/unit/test_universal.py,119
+  generated_tests_hybrid/unit/test___main__.py,6
+  generated_tests_hybrid/unit/test_base.py,40
+  generated_tests_hybrid/unit/test_prompts.py,26
+  generated_tests_hybrid/unit/test_metrics.py,109
+  generated_tests_hybrid/unit/test_adaptive.py,69
+  generated_tests_hybrid/unit/test_chunked_reproduction.py,114
+  generated_tests_hybrid/unit/test_similarity.py,30
+  generated_tests_hybrid/unit/test_llm_profiler.py,97
+  generated_tests_hybrid/unit/test_results.py,105
+  generated_tests_hybrid/unit/test_mcp_server.py,18
+  generated_tests_hybrid/unit/test_benchmark.py,69
+  generated_tests_hybrid/unit/test_generators.py,76
+  generated_tests_hybrid/unit/test_common.py,40
+  generated_tests_hybrid/unit/test_toon_format.py,47
+  generated_tests_hybrid/unit/test_reproduction.py,39
+  generated_tests_hybrid/unit/test_quality.py,61
+  generated_tests_hybrid/unit/test_models.py,110
+  generated_tests_hybrid/unit/test_terminal.py,85
+  generated_tests_hybrid/unit/test_runner.py,50
+  generated_tests_hybrid/unit/test_refactor.py,79
+  generated_tests_hybrid/unit/test_gherkin.py,104
+  generated_tests_hybrid/unit/test_json_schema.py,79
+  generated_tests_hybrid/unit/test_markdown_format.py,41
+  generated_tests_hybrid/unit/test_dependency.py,46
+  generated_tests_hybrid/unit/test_function_logic.py,34
+  generated_tests_hybrid/unit/test_intent.py,66
+  generated_tests_hybrid/unit/test_cli.py,48
+  generated_tests_hybrid/unit/test_utils.py,18
+  generated_tests_hybrid/unit/test_parsers.py,46
+  generated_tests_hybrid/unit/test_analyzer.py,35
+  generated_tests_hybrid/integration/test_integration.py,38
+  logic2code/examples/02_llm_enhanced.py,77
+  logic2code/examples/01_quickstart.py,72
+  logic2code/tests/__init__.py,1
+  logic2code/tests/test_basic.py,40
+  generated_code_full/schemas/logicml_schema.py,56
+  generated_code_full/schemas/__init__.py,6
+  generated_code_full/schemas/yaml_schema.py,61
+  generated_code_full/schemas/json_schema.py,64
+  generated_code_full/schemas/markdown_schema.py,41
+  generated_code_full/benchmarks/common.py,30
+  generated_code_full/benchmarks/runner.py,53
+  generated_code_full/benchmarks/__init__.py,6
+  generated_code_full/benchmarks/results.py,114
+  generated_code_full/core/__init__.py,6
+  generated_code_full/formats/__init__.py,6
+  generated_code_full/tools/__init__.py,6
+  generated_code_full/llm/__init__.py,6
+  generated_code_full/integrations/__init__.py,6
+  lolm/examples/03_code_generation.py,86
+  lolm/examples/01_quickstart.py,60
+  lolm/examples/02_configuration.py,88
+  lolm/tests/__init__.py,1
+  lolm/tests/test_basic.py,51
+  logic2test/examples/01_quickstart.py,62
+  logic2test/examples/02_custom_templates.py,92
+  logic2test/tests/__init__.py,1
+  logic2test/tests/test_basic.py,31
+  tests/samples/sample_dataclasses.py,68
+  tests/samples/sample_async.py,163
+  tests/samples/sample_class.py,74
+  tests/samples/sample_pydantic.py,62
+  tests/samples/sample_javascript.js,154
+  tests/samples/sample_sql_dsl.py,177
+  tests/samples/sample_typescript.ts,114
+  tests/samples/sample_enum.py,78
+  tests/samples/sample_algorithms.py,184
+  tests/samples/sample_api.py,106
+  tests/samples/sample_functions.py,89
+  tests/samples/sample_reexport/exceptions.py,7
+  tests/samples/sample_reexport/__init__.py,17
+  tests/samples/sample_reexport/utils.py,8
+  tests/samples/sample_reexport/models.py,21
+  examples/code2logic/sample_project/__init__.py,1
+  examples/code2logic/sample_project/calculator.py,22
+  examples/code2logic/sample_project/models/user.py,9
+  examples/code2logic/sample_project/api/client.py,15
+  code2logic/schemas/logicml_schema.py,184
+  code2logic/schemas/__init__.py,25
+  code2logic/schemas/yaml_schema.py,164
+  code2logic/schemas/json_schema.py,206
+  code2logic/schemas/markdown_schema.py,118
+  code2logic/benchmarks/common.py,206
+  code2logic/benchmarks/runner.py,627
+  code2logic/benchmarks/__init__.py,34
+  code2logic/benchmarks/results.py,148
+  code2logic/core/__init__.py,21
+  code2logic/formats/__init__.py,31
+  code2logic/tools/__init__.py,28
+  code2logic/llm/__init__.py,40
+  code2logic/integrations/__init__.py,5
+D:
+  multilang_reproduction_tester.py:
+    i: json,yaml,re,abc.{ABC,abstractmethod},dataclasses.{dataclass,field},enum.{Enum,auto},pathlib.Path
+    e: Language,ElementType,Severity,ValidationIssue,LanguageFeature,ValidationResult,LanguageRequirements,LANGUAGE_REQUIREMENTS
+    Language:   # Obsługiwane języki programowania.
+    ElementType:   # Typy elementów kodu.
+    Severity:   # Poziom ważności brakującej informacji.
+    ValidationIssue:   # Problem znaleziony podczas walidacji.
+    LanguageFeature:   # Cecha języka programowania.
+    run_tests(yaml_path:str=None;hybrid_path:str=None;toon_path:str=None)->None
+    main()->None
+  universal_validator.py:
+    i: json,yaml,re,sys,abc.{ABC,abstractmethod},dataclasses.{dataclass,field},enum.{Enum,auto}
+    e: LanguageConfig,LanguagePatterns,ValidationIssue,ValidationReport,UniversalValidator,FormatComparator,main
+    LanguageConfig: get(1),supported_languages(0)  # Konfiguracja wymagań dla każdego języka.
+    LanguagePatterns: get(1)  # Wzorce regex i walidatory dla każdego...
+    ValidationIssue:   # Problem znaleziony podczas walidacji.
+    ValidationReport:   # Raport z walidacji.
+    UniversalValidator: __init__(3),parse(0),_parse_toon(0),validate(0),_validate_module(1)  # Uniwersalny walidator formatów Code2L...
+    main()->None
+  reproduction_test_code.py:
+    i: re,dataclasses.dataclass,typing.{List,Tuple}
+    e: QualityResult,detect_signature_quality,detect_constant_quality,compute_quality_score,format_quality_summary,evaluate_formats,print_quality_report,ReproducedFromTOON
+    QualityResult: 
+    ReproducedFromTOON:   # Reprodukcja z TOON - ~55% poprawności...
+    ReproducedFromYAML:   # Reprodukcja z YAML - ~75% poprawności...
+    ReproducedFromHybrid:   # Reprodukcja z Hybrid YAML - ~85% popr...
+    IdealReproduction:   # Jak powinien wyglądać format dla ~90%...
+    detect_signature_quality(signature_block:str)->Tuple[dict, List[str]]
+    detect_constant_quality(constants_block:str)->Tuple[dict, List[str]]
+    compute_quality_score(name:str;sig_block:str;const_block:str)->QualityResult
+    format_quality_summary(result:QualityResult)->str
+    evaluate_formats()->List[QualityResult]
+    print_quality_report()->None
+  generated_code/analyzer.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: ProjectAnalyzer,analyze_project,get_library_status
+    ProjectAnalyzer: __init__(4),_print_status(0),analyze(0),_scan_files(0),_detect_entrypoints(0)  # Main class for analyzing software pro...
+    analyze_project(path:str;use_treesitter:bool=True;verbose:bool=False)->ProjectInfo
+    get_library_status()->Dict[str, bool]
+  code2logic/llm_profiler.py:
+    i: hashlib,json,time,datetime,dataclasses.{asdict,dataclass,field},difflib.SequenceMatcher,pathlib.Path,typing.Any
+    e: PROFILE_TEST_CASES,LLMProfile,ProfileTestResult,load_profiles,save_profile,get_profile,get_or_create_profile,LLMProfiler
+    LLMProfile: __post_init__(0)  # Profile of LLM capabilities for code...
+    ProfileTestResult:   # Result of a single profile test.
+    LLMProfiler: __init__(2),run_profile(1),_test_reproduction(2),_code_to_spec(1),_extract_code(1)  # Profile LLM capabilities for code rep...
+    AdaptiveChunker: __init__(1),get_optimal_settings(0),chunk_spec(2),recommend_format(1),estimate_chunks_needed(1)  # Adaptive chunking based on LLM profile.
+    _get_profiles_path()->Path
+    load_profiles()->dict[str, LLMProfile]
+    save_profile(profile:LLMProfile)->None
+    get_profile(provider:str;model:str)->Optional[LLMProfile]
+    get_or_create_profile(provider:str;model:str)->LLMProfile
+    _create_default_profile(provider:str;model:str)->LLMProfile
+    profile_llm(client;quick:bool=False)->LLMProfile
+    get_adaptive_chunker(provider:str;model:str)->AdaptiveChunker
+  code2logic/config.py:
+    i: json,os,pathlib.Path,typing.{Any,Dict,Optional}
+    e: Config,load_env,get_api_key,get_model,SHELL_COMMANDS
+    Config: __init__(1),_load_env_file(1),_parse_env_file(1),_load_config_file(0),get_api_key(1)  # Configuration manager for Code2Logic.
+    load_env()->None
+    get_api_key(provider:str)->Optional[str]
+    get_model(provider:str)->str
+  code2logic/file_formats.py:
+    i: json,pathlib.Path,typing.{Any,Dict}
+    e: generate_file_csv,generate_file_json,generate_file_yaml
+    generate_file_csv(file_path:Path)->str
+    generate_file_json(file_path:Path)->str
+    generate_file_yaml(file_path:Path)->str
+    _parse_file_elements(content:str)->Dict[str, Any]
+  code2logic/project_reproducer.py:
+    i: json,datetime,concurrent.futures.{ThreadPoolExecutor,as_completed},dataclasses.{asdict,dataclass,field},pathlib.Path,typing.{Dict,List}
+    e: SUPPORTED_EXTENSIONS,FileResult,ProjectResult,ProjectReproducer,reproduce_project
+    FileResult:   # Result for a single file reproduction.
+    ProjectResult:   # Result for project reproduction.
+    ProjectReproducer: __init__(4),_get_client(0),find_source_files(3),reproduce_file(2),reproduce_project(3)  # Multi-file project reproduction system.
+    reproduce_project(project_path:str;output_dir:str=None;target_lang:str=None;parallel:bool=False;use_llm:bool=True)->ProjectResult
+  code2logic/base.py:
+    i: logging
+    e: VerboseMixin,BaseParser,BaseGenerator
+    VerboseMixin: __init__(1),log(2),debug(1),info(1),warn(1)  # Mixin providing verbose logging funct...
+    BaseParser: __init__(1),parse(2),parse_file(1)  # Base class for code parsers.
+    BaseGenerator: __init__(1),generate(2)  # Base class for output generators.
+  code2logic/cli.py:
+    i: argparse,json,os,signal,subprocess,sys,time,datetime,__version__
+    e: Colors,Logger,ensure_dependencies,main
+    Colors: 
+    Logger: __init__(2),_elapsed(0),info(1),success(1),warning(1)  # Enhanced logger for CLI output.
+    ensure_dependencies()->None
+    _get_env_file_path()->str
+    _read_text_file(path:str)->str
+    _write_text_file(path:str;content:str)->None
+    _set_env_var(var_name:str;value:str)->str
+    _unset_env_var(var_name:str)->str
+    _get_litellm_config_path()->str
+    _get_user_llm_config_path()->str
+  code2logic/llm.py:
+    i: json,os,dataclasses.dataclass,importlib.util.find_spec,llm_clients.{LiteLLMClient,OllamaLocalClient,OpenRouterClient,get_client},typing.{Any,Optional}
+    e: LLMConfig,CodeAnalyzer,get_available_backends
+    LLMConfig:   # Configuration for LLM backend.
+    CodeAnalyzer: __init__(4),is_available(0),suggest_refactoring(1),find_semantic_duplicates(1),generate_code(3)  # LLM-powered code analysis for Code2Lo...
+    get_available_backends()->dict[str, bool]
+  code2logic/errors.py:
+    i: logging,dataclasses.{dataclass,field},enum.Enum,pathlib.Path,typing.{Any,Callable,Dict,List,Optional}
+    e: ErrorSeverity,ErrorType,AnalysisError,AnalysisResult,ErrorHandler,create_error_handler
+    ErrorSeverity:   # Error severity levels.
+    ErrorType:   # Types of errors that can occur during...
+    AnalysisError: to_dict(0)  # Represents an error during analysis.
+    AnalysisResult: add_error(1),has_errors(0),summary(0)  # Result of analysis with errors tracked.
+    ErrorHandler: __init__(4),reset(0),handle_error(5),_default_severity(1),_log_error(1)  # Handles errors during analysis with c...
+    create_error_handler(mode:str='lenient';max_file_size_mb:float=10.0)->ErrorHandler
+  code2logic/code_review.py:
+    i: collections.defaultdict,typing.{Any,Dict,List}
+    e: SECURITY_PATTERNS,PERFORMANCE_PATTERNS,COMPLEXITY_HIGH,COMPLEXITY_MEDIUM,LINES_MAX,FILE_LINES_MAX,analyze_code_quality,check_security_issues
+    CodeReviewer: __init__(1),review(2),generate_report(2)  # Automated code review with optional L...
+    analyze_code_quality(project)->Dict[str, List[Dict]]
+    check_security_issues(project)->Dict[str, List[Dict]]
+    check_performance_issues(project)->Dict[str, List[Dict]]
+  code2logic/analyzer.py:
+    i: sys,datetime,collections.defaultdict,dependency.{DependencyAnalyzer,NETWORKX_AVAILABLE},intent.{NLTK_AVAILABLE,SPACY_AVAILABLE},pathlib.Path,typing.{Dict,List}
+    e: ProjectAnalyzer,analyze_project,get_library_status
+    ProjectAnalyzer: __init__(4),_print_status(0),analyze(0),_scan_files(0),_detect_entrypoints(0)  # Main class for analyzing software pro...
+    analyze_project(path:str;use_treesitter:bool=True;verbose:bool=False)->ProjectInfo
+    get_library_status()->Dict[str, bool]
+  code2logic/quality.py:
+    i: dataclasses.{dataclass,field},models.{ModuleInfo,ProjectInfo},typing.{Any,Dict,List}
+    e: QualityIssue,QualityReport,QualityAnalyzer,analyze_quality,get_quality_summary
+    QualityIssue:   # Represents a code quality issue.
+    QualityReport: to_dict(0)  # Complete quality analysis report.
+    QualityAnalyzer: __init__(1),analyze(1),analyze_modules(1),_analyze_module(2),_check_function(3)  # Analyzes code quality and generates r...
+    analyze_quality(project:ProjectInfo;thresholds:Dict[str;int]=None)->QualityReport
+    get_quality_summary(report:QualityReport)->str
+  code2logic/shared_utils.py:
+    i: hashlib,re,typing.{Dict,List,Optional,Set}
+    e: compact_imports,deduplicate_imports,TYPE_ABBREVIATIONS,abbreviate_type,expand_type,build_signature,remove_self_from_params,CATEGORY_PATTERNS
+    compact_imports(imports:List[str];max_items:int=10)->List[str]
+    deduplicate_imports(imports:List[str])->List[str]
+    abbreviate_type(type_str:str)->str
+    expand_type(abbrev:str)->str
+    build_signature(params:List[str];return_type:Optional[str]=None;include_self:bool=False;abbreviate:bool=False;max_params:int=6)->str
+    remove_self_from_params(params:List[str])->List[str]
+    categorize_function(name:str)->str
+    extract_domain(path:str)->str
+  code2logic/parsers.py:
+    i: ast,re,textwrap,intent.EnhancedIntentGenerator,models.{AttributeInfo,ClassInfo,ConstantInfo,FieldInfo},typing.{List,Optional}
+    e: TREE_SITTER_AVAILABLE,TreeSitterParser,UniversalParser,is_tree_sitter_available
+    _PyFunctionBodyAnalyzer: __init__(0),_add_call(1),_add_raise(1),visit_Call(1),visit_Raise(1)
+    TreeSitterParser: __init__(0),_init_parsers(0),is_available(1),get_supported_languages(0),parse(3)  # Parser using Tree-sitter for high-acc...
+    UniversalParser: __init__(0),parse(3),_parse_python(2),_extract_ast_enum(1),_extract_ast_function(1)  # Fallback parser using Python AST and...
+    _normalize_import_path(import_path:str)->str
+    _clean_imports(imports:List[str])->List[str]
+    _combine_import_name(module_name:str;identifier:str)->str
+    _truncate_constant_value(value_text:str;limit:int=400)->str
+    _py_expr_to_dotted_name(expr)->str
+    _analyze_python_function_node(func_node)->None
+    is_tree_sitter_available()->bool
+  code2logic/intent.py:
+    i: re,nltk,dataclasses.{dataclass,field},enum.{Enum,auto},typing.{Any,List,Optional,TYPE_CHECKING}
+    e: IntentType,Intent,EnhancedIntentGenerator,IntentAnalyzer
+    IntentType:   # Types of user intents for code analysis.
+    Intent:   # Represents a detected user intent.
+    EnhancedIntentGenerator: __init__(1),generate(2),_extract_from_docstring(1),_split_name(1),get_available_features(0)  # Generator intencji z NLP - lemmatyzac...
+    IntentAnalyzer: __init__(0),_extract_keywords(1),_calculate_intent_confidence(2),_identify_target(2),_generate_description(2)  # Analyzes user queries to detect inten...
+  code2logic/adaptive.py:
+    i: dataclasses.dataclass,dotenv.load_dotenv,file_formats.{generate_file_csv,generate_file_json,generate_file_yaml},llm_clients.BaseLLMClient,pathlib.Path,typing.{Any,Dict,List}
+    e: LLM_CAPABILITIES,ChunkInfo,AdaptiveResult,AdaptiveReproducer,get_llm_capabilities
+    ChunkInfo:   # Information about a code chunk.
+    AdaptiveResult:   # Result of adaptive reproduction.
+    AdaptiveReproducer: __init__(2),_get_capabilities(0),select_format(2),should_chunk(1),chunk_content(2)  # Adaptive code reproduction with LLM c...
+    get_llm_capabilities(model:str)->Dict[str, Any]
+  code2logic/reproducer.py:
+    i: json,re,dataclasses.{dataclass,field},enum.Enum,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: ReproductionStatus,FileValidation,ReproductionResult,SpecReproducer,SpecValidator,reproduce_project,validate_files
+    ReproductionStatus:   # Status of file reproduction.
+    FileValidation: score(0),to_dict(0)  # Validation result for a single file.
+    ReproductionResult: success_rate(0),average_score(0),summary(0)  # Result of reproduction process.
+    SpecReproducer: __init__(1),reproduce_from_yaml(3),reproduce_from_json(3),_reproduce(3),_generate_file(2)  # Reproduces code structure from logic...
+    SpecValidator: __init__(0),validate(3),_validate_file(2),_check_python_syntax(2)  # Validates generated files against log...
+    reproduce_project(spec_path:str;output_dir:str;filter_paths:Optional[List[str]]=None;validate:bool=True;verbose:bool=True)->ReproductionResult
+    validate_files(spec_path:str;generated_dir:str;filter_paths:Optional[List[str]]=None)->List[FileValidation]
+  code2logic/llm_clients.py:
+    i: json,os,lolm,typing.{Any,Optional}
+    e: get_priority_mode,get_effective_provider_priorities
+    _get_user_llm_config_path()->str
+    _load_user_llm_config()->dict[str, Any]
+    _get_priority_mode()->str
+    get_priority_mode()->str
+    _get_provider_priority_overrides()->dict[str, int]
+    _get_model_priority_rules()->dict[str, dict[str, int]]
+    _get_model_priority(model_string:str)->Optional[int]
+    _get_provider_model_string(provider:str)->str
+  code2logic/prompts.py:
+    i: typing.Dict
+    e: FORMAT_HINTS,get_reproduction_prompt,get_review_prompt,get_fix_prompt
+    get_reproduction_prompt(spec:str;fmt:str;file_name:str;language:str='python';max_spec_length:int=5000)->str
+    get_review_prompt(code:str;spec:str;fmt:str)->str
+    get_fix_prompt(code:str;issues:list;spec:str)->str
+  code2logic/chunked_reproduction.py:
+    i: re,dataclasses.dataclass,typing.List,utils.estimate_tokens
+    e: LLM_CONTEXT_LIMITS,Chunk,ChunkedSpec,ChunkedResult,get_llm_limit,chunk_yaml_spec,chunk_gherkin_spec,chunk_markdown_spec
+    Chunk:   # A chunk of specification for reproduc...
+    ChunkedSpec:   # Chunked specification.
+    ChunkedResult:   # Result of chunked reproduction.
+    ChunkedReproducer: __init__(2),reproduce(3),_extract_code(1)  # Reproduce code from chunked specifica...
+    get_llm_limit(model_name:str)->int
+    chunk_yaml_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_gherkin_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_markdown_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_spec(spec:str;fmt:str;max_tokens:int=2000)->ChunkedSpec
+    get_chunk_prompt(chunk:Chunk;fmt:str;file_name:str;chunk_num:int;total_chunks:int)->str
+    merge_chunk_codes(codes:List[str];file_name:str)->str
+    auto_chunk_reproduce(spec:str;fmt:str;file_name:str;client;model_name:str='default')->ChunkedResult
+  code2logic/__init__.py:
+    i: adaptive.{AdaptiveReproducer,AdaptiveResult,LLM_CAPABILITIES,get_llm_capabilities},analyzer.{ProjectAnalyzer,analyze_project},base.{BaseGenerator,BaseParser,VerboseMixin},benchmark.BenchmarkResult
+    e: analyze_quality,reproduce_project
+    analyze_quality(target)->None
+    reproduce_project(source:str)->None
+  code2logic/metrics.py:
+    i: difflib,logging,re,collections.Counter,dataclasses.{asdict,dataclass,field},typing.{Any,Dict,List}
+    e: TextMetrics,StructuralMetrics,SemanticMetrics,FormatMetrics,ReproductionResult,ReproductionMetrics,analyze_reproduction,compare_formats
+    TextMetrics:   # Text-level similarity metrics.
+    StructuralMetrics:   # Structural code metrics.
+    SemanticMetrics:   # Semantic preservation metrics.
+    FormatMetrics:   # Format-specific efficiency metrics.
+    ReproductionResult: to_dict(0),to_report(0)  # Complete reproduction analysis result.
+    analyze_reproduction(original:str;generated:str;spec:str='';format_name:str='';verbose:bool=False)->ReproductionResult
+    compare_formats(original:str;results:Dict[str;Tuple[str;str]];verbose:bool=False)->Dict[str, Any]
+  code2logic/refactor.py:
+    i: analyzer.analyze_project,code_review.{analyze_code_quality,check_security_issues},dataclasses.{asdict,dataclass,field},llm_clients.BaseLLMClient,typing.{Any,Dict,List}
+    e: DuplicateGroup,RefactoringSuggestion,RefactoringReport,find_duplicates,analyze_quality,suggest_refactoring,compare_codebases,quick_analyze
+    DuplicateGroup:   # Group of duplicate functions.
+    RefactoringSuggestion:   # Single refactoring suggestion.
+    RefactoringReport: to_dict(0),to_markdown(0)  # Complete refactoring analysis report.
+    find_duplicates(project_path:str;threshold:float=0.8)->List[DuplicateGroup]
+    analyze_quality(project_path:str;include_security:bool=True;include_performance:bool=True)->RefactoringReport
+    suggest_refactoring(project_path:str;use_llm:bool=False;client:BaseLLMClient=None)->RefactoringReport
+    compare_codebases(project1:str;project2:str)->Dict[str, Any]
+    quick_analyze(project_path:str)->Dict[str, Any]
+  code2logic/logicml.py:
+    i: dataclasses.dataclass,models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo},pathlib.Path,typing.{Dict,List,Optional,Set}
+    e: LogicMLSpec,LogicMLGenerator,generate_logicml,LOGICML_EXAMPLE
+    LogicMLSpec:   # LogicML specification output.
+    LogicMLGenerator: __init__(1),generate(2),_generate_module(2),_generate_imports(1),_generate_class(2)  # Generates LogicML format - optimized...
+    generate_logicml(project:ProjectInfo;detail:str='standard')->str
+  code2logic/function_logic.py:
+    i: models.{FunctionInfo,ProjectInfo},shared_utils.{remove_self_from_params,truncate_docstring},toon_format.TOONGenerator,typing.{List,Tuple}
+    e: FunctionLogicGenerator
+    FunctionLogicGenerator: __init__(1),generate(2),generate_json(2),generate_yaml(2),generate_toon(2)
+  code2logic/utils.py:
+    i: shutil,pathlib.Path
+    e: estimate_tokens,write_text_atomic,cleanup_generated_root
+    estimate_tokens(text:str)->int
+    write_text_atomic(path:Path;content:str)->None
+    cleanup_generated_root(generated_root:Path;allowed_dirs:set[str])->None
+  code2logic/generators.py:
+    i: json,collections.defaultdict,models.{ClassInfo,ConstantInfo,FieldInfo,FunctionInfo,ModuleInfo},pathlib.Path,typing.{List,Optional}
+    e: bytes_to_kb,MarkdownGenerator,CompactGenerator,JSONGenerator,YAMLGenerator,CSVGenerator
+    MarkdownGenerator: generate(2),_gen_tree(2),_print_tree(4),_gen_module(4),_gen_class(3)  # Generates Markdown output for project...
+    CompactGenerator: generate(1)  # Generates ultra-compact output for to...
+    JSONGenerator: generate(3),generate_from_module(2),_generate_nested(2),_field_to_dict(1),_generate_flat(2)  # Generates JSON output for machine pro...
+    YAMLGenerator: generate(4),generate_schema(1),_generate_compact_schema(0),_generate_full_schema(0),_generate_hybrid_schema(0)  # Generates YAML output for human-reada...
+    CSVGenerator: generate(2),_build_row(7),_build_function_row(7),_build_signature(1),_categorize(1)  # Generates CSV output optimized for LL...
+    bytes_to_kb(bytes_value:int)->float
+  code2logic/markdown_format.py:
+    i: dataclasses.dataclass,generators.YAMLGenerator,gherkin.GherkinGenerator,models.ProjectInfo,pathlib.Path,typing.{Dict,List}
+    e: MarkdownSpec,MarkdownHybridGenerator,generate_markdown_hybrid,generate_file_markdown
+    MarkdownSpec:   # Markdown specification for a project.
+    MarkdownHybridGenerator: __init__(1),generate(2),_generate_header(1),_generate_tree(1),_generate_imports(1)  # Generates optimized Markdown hybrid f...
+    generate_markdown_hybrid(project:ProjectInfo;detail:str='full')->str
+    generate_file_markdown(file_path:str)->str
+  code2logic/models.py:
+    i: dataclasses.{dataclass,field},typing.{Dict,List,Optional}
+    e: FunctionInfo,ClassInfo,TypeInfo,ModuleInfo,DependencyNode,ProjectInfo,ConstantInfo,FieldInfo
+    FunctionInfo:   # Information about a function or method.
+    ClassInfo:   # Information about a class or interface.
+    TypeInfo:   # Information about a type alias, inter...
+    ModuleInfo:   # Information about a source file/module.
+    DependencyNode:   # Node in the dependency graph with met...
+  code2logic/llm_clients_new.py:
+    i: llm_clients
+    e: get_provider_priorities_from_litellm
+    get_provider_priorities_from_litellm()->dict[str, int]
+  code2logic/similarity.py:
+    i: models.ModuleInfo,rapidfuzz.{fuzz,process},typing.{Dict,List}
+    e: RAPIDFUZZ_AVAILABLE,SimilarityDetector,is_rapidfuzz_available,get_refactoring_suggestions
+    SimilarityDetector: __init__(1),find_similar_functions(1),find_duplicate_signatures(1),_build_signature(3)  # Detects similar functions using fuzzy...
+    is_rapidfuzz_available()->bool
+    get_refactoring_suggestions(similar_functions:Dict[str;List[str]])->List[Dict[str, any]]
+  code2logic/universal.py:
+    i: hashlib,json,re,dataclasses.{asdict,dataclass,field},enum.Enum,pathlib.Path,typing.{Any,Dict}
+    e: ElementType,Language,Parameter,CodeElement,CodeLogic,UniversalParser,CodeGenerator,UniversalReproducer
+    ElementType:   # Types of code elements.
+    Language:   # Supported languages.
+    Parameter:   # Function/method parameter.
+    CodeElement:   # Universal representation of a code el...
+    CodeLogic: to_dict(0),_element_to_dict(1),to_compact(0),_element_to_compact(2)  # Universal code logic representation f...
+    reproduce_file(source_path:str;target_lang:str=None;output_dir:str=None;use_llm:bool=True)->Dict[str, Any]
+  code2logic/benchmark.py:
+    i: json,time,datetime,dataclasses.{asdict,dataclass},dotenv.load_dotenv,pathlib.Path,typing.{Any,Dict,List}
+    e: FormatResult,BenchmarkResult,FORMAT_PROMPTS,ReproductionBenchmark,run_benchmark
+    FormatResult:   # Result for a single format test.
+    BenchmarkResult:   # Complete benchmark result.
+    ReproductionBenchmark: __init__(1),generate_spec(3),reproduce_with_format(3),run_single(2),run_all(2)  # Benchmark reproduction quality across...
+    run_benchmark(files:List[str];output_dir:str='benchmark_results';provider:str=None;model:str=None)->Dict[str, Any]
+  code2logic/terminal.py:
+    i: os,re,sys,typing.{Any,List,Literal,Optional}
+    e: COLORS,ShellRenderer,get_renderer,set_renderer,RenderAPI
+    ShellRenderer: __init__(2),_supports_colors(0),enable_log(0),get_log(0),clear_log(0)  # Renders colorized markdown output in...
+    RenderAPI: heading(2),code(2),codeblock(2),markdown(1),success(1)  # Convenience API for terminal rendering.
+    get_renderer(use_colors:bool=True;verbose:bool=True)->ShellRenderer
+    set_renderer(renderer:ShellRenderer)->None
+  code2logic/toon_format.py:
+    i: re,models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo,TypeInfo},shared_utils.compact_imports,typing.{Any,Dict,List}
+    e: TOONGenerator,TOONParser,generate_toon,parse_toon
+    TOONGenerator: __init__(2),generate(2),_generate_modules(2),_generate_types(2),_generate_classes(3)  # Generates TOON format output from Pro...
+    TOONParser: __init__(0),parse(1),_parse_value(1)  # Parse TOON format back to Python dict.
+    generate_toon(project:ProjectInfo;detail:str='standard';use_tabs:bool=False)->str
+    parse_toon(content:str)->Dict[str, Any]
+  code2logic/dependency.py:
+    i: networkx,models.{DependencyNode,ModuleInfo},pathlib.Path,typing.{Dict,List}
+    e: NETWORKX_AVAILABLE,DependencyAnalyzer,is_networkx_available
+    DependencyAnalyzer: __init__(0),build_graph(1),analyze_metrics(0),get_entrypoints(0),get_hubs(0)  # Analyzes dependency graphs using Netw...
+    is_networkx_available()->bool
+  code2logic/mcp_server.py:
+    i: json,sys,__version__
+    e: handle_request,call_tool,run_server
+    handle_request(request:dict)->dict
+    call_tool(tool_name:str;arguments:dict)->str
+    run_server()->None
+  code2logic/reproduction.py:
+    i: difflib,re,datetime,llm_clients.{BaseLLMClient,get_client},pathlib.Path,typing.{Any,Dict,List}
+    e: generate_file_gherkin,compare_code,extract_code_block,CodeReproducer
+    CodeReproducer: __init__(2),reproduce_file(2),generate_from_gherkin(2),_save_results(2),_generate_report(1)  # Code reproduction workflow using LLM.
+    generate_file_gherkin(file_path:Path)->str
+    compare_code(original:str;generated:str)->Dict[str, Any]
+    extract_code_block(text:str;language:str='python')->str
+  code2logic/gherkin.py:
+    i: re,collections.defaultdict,dataclasses.dataclass,models.{FunctionInfo,ProjectInfo},typing.{Any,Dict,List,Optional}
+    e: GherkinScenario,GherkinFeature,StepDefinition,GherkinGenerator,StepDefinitionGenerator,CucumberYAMLGenerator,csv_to_gherkin,gherkin_to_test_data
+    GherkinScenario:   # Represents a single Gherkin scenario.
+    GherkinFeature:   # Represents a Gherkin feature file.
+    StepDefinition:   # Represents a step definition.
+    GherkinGenerator: __init__(1),generate(3),generate_test_scenarios(2),get_step_definitions(0),_extract_features(2)  # Generates Gherkin feature files from...
+    StepDefinitionGenerator: generate_pytest_bdd(1),generate_behave(1),generate_cucumber_js(1),_step_to_func_name(1)  # Generates step definition stubs from...
+    csv_to_gherkin(csv_content:str;language:str='en')->str
+    gherkin_to_test_data(gherkin_content:str)->Dict[str, Any]
+  examples/05_llm_integration.py:
+    i: sys,argparse,os,code2logic.{LLM_CAPABILITIES,OllamaLocalClient,OpenRouterClient,get_client,suggest_refactoring},dotenv.load_dotenv,pathlib.Path
+    e: main
+    main()->None
+  examples/12_comprehensive_analysis.py:
+    i: argparse,sys,code2logic.benchmarks.{BenchmarkConfig,BenchmarkRunner},dotenv.load_dotenv,pathlib.Path
+    e: ALL_FORMATS,print_comprehensive_analysis,main
+    print_comprehensive_analysis(result)->None
+    main()->None
+  examples/01_quick_start.py:
+    i: sys,code2logic.{CSVGenerator,GherkinGenerator,analyze_project,quick_analyze},pathlib.Path
+    e: main
+    main()->None
+  examples/15_unified_benchmark.py:
+    i: argparse,sys,code2logic.benchmarks.{BenchmarkConfig,BenchmarkRunner,run_benchmark},dotenv.load_dotenv,pathlib.Path
+    e: print_format_results,print_function_results,print_project_results,main
+    print_format_results(result)->None
+    print_function_results(result)->None
+    print_project_results(result)->None
+    main()->None
+  examples/09_async_benchmark.py:
+    i: argparse,sys,code2logic.benchmarks.{BenchmarkConfig,BenchmarkRunner},dotenv.load_dotenv,pathlib.Path
+    e: print_results,main
+    print_results(result)->None
+    main()->None
+  examples/11_token_benchmark.py:
+    i: argparse,sys,code2logic.benchmarks.{BenchmarkConfig,BenchmarkRunner},dotenv.load_dotenv,pathlib.Path
+    e: print_token_efficiency,main
+    print_token_efficiency(result)->None
+    main()->None
+  examples/06_metrics.py:
+    i: sys,argparse,code2logic.{ReproductionMetrics,generate_file_gherkin,get_client},code2logic.reproduction.extract_code_block,dotenv.load_dotenv,pathlib.Path
+    e: analyze_file,main
+    analyze_file(source_path:str;verbose:bool=False;no_llm:bool=False)->None
+    _template_generate(spec:str)->str
+    main()->None
+  examples/10_function_reproduction.py:
+    i: argparse,sys,code2logic.benchmarks.{BenchmarkConfig,BenchmarkRunner},dotenv.load_dotenv,pathlib.Path
+    e: print_results,main
+    print_results(result)->None
+    main()->None
+  examples/08_format_benchmark.py:
+    i: argparse,sys,code2logic.benchmarks.{BenchmarkConfig,BenchmarkRunner},dotenv.load_dotenv,pathlib.Path
+    e: print_format_comparison,print_per_file_results,main
+    print_format_comparison(result)->None
+    print_per_file_results(result)->None
+    main()->None
+  examples/14_repeatability_test.py:
+    i: argparse,difflib,json,sys,time,datetime,dataclasses.{dataclass,field},pathlib.Path,typing.Dict
+    e: RunResult,RepeatabilityResult,generate_spec,get_reproduction_prompt,calculate_similarity,get_diff,test_syntax,run_repeatability_test
+    RunResult:   # Result of a single generation run.
+    RepeatabilityResult:   # Repeatability analysis for a format.
+    _template_generate(spec:str;fmt:str;file_name:str)->str
+    generate_spec(project:ProjectInfo;fmt:str)->str
+    get_reproduction_prompt(spec:str;fmt:str;file_name:str)->str
+    calculate_similarity(code1:str;code2:str)->float
+    get_diff(code1:str;code2:str;label1:str='Run 1';label2:str='Run 2')->List[str]
+    test_syntax(code:str)->bool
+    run_repeatability_test(file_path:str;formats:List[str];num_runs:int=3;verbose:bool=False;no_llm:bool=False)->Dict[str, RepeatabilityResult]
+    print_repeatability_summary(results:Dict[str;RepeatabilityResult])->None
+  examples/13_project_benchmark.py:
+    i: argparse,sys,code2logic.benchmarks.{BenchmarkConfig,BenchmarkRunner},dotenv.load_dotenv,pathlib.Path
+    e: print_project_results,main
+    print_project_results(result)->None
+    main()->None
+  examples/04_project.py:
+    i: sys,argparse,code2logic.{compare_codebases,reproduce_project},dotenv.load_dotenv,pathlib.Path
+    e: main
+    main()->None
+  examples/03_reproduction.py:
+    i: sys,argparse,code2logic.{UniversalReproducer,generate_file_gherkin,reproduce_file},dotenv.load_dotenv,pathlib.Path
+    e: main
+    main()->None
+  examples/16_terminal_demo.py:
+    i: argparse,sys,code2logic.terminal.{ShellRenderer,get_renderer,render,set_renderer},pathlib.Path
+    e: demo_headings,demo_codeblocks,demo_status_messages,demo_progress,demo_tasks,demo_key_value,demo_tables,demo_markdown
+    demo_headings()->None
+    demo_codeblocks()->None
+    demo_status_messages()->None
+    demo_progress()->None
+    demo_tasks()->None
+    demo_key_value()->None
+    demo_tables()->None
+    demo_markdown()->None
+  examples/02_refactoring.py:
+    i: sys,code2logic.{analyze_quality,find_duplicates,suggest_refactoring},pathlib.Path
+    e: main
+    main()->None
+  tests/test_parser_integrity.py:
+    i: pytest,code2logic.parsers.{TreeSitterParser,UniversalParser,is_tree_sitter_available}
+    e: parser,parse_python,TestFunctionNameExtraction,TestSignatureParsing,TestClassNameIntegrity,TestImportParsing,TestExportsCompleteness,TestDocstringTruncation
+    TestFunctionNameExtraction: test_function_name_not_truncated(1),test_multiple_function_names(1)  # Test 1: Verify complete function name...
+    TestSignatureParsing: test_signature_with_types(1),test_signature_with_defaults(1)  # Test 2: Verify complete signatures wi...
+    TestClassNameIntegrity: test_class_name_no_whitespace(1),test_class_with_bases(1)  # Test 3: Verify class names have no em...
+    TestImportParsing: test_import_from_statement(1),test_no_duplicate_imports(1)  # Test 4: Verify imports are correctly...
+    TestExportsCompleteness: test_exports_complete(1)  # Test 5: Verify exports contain full f...
+    parser()->None
+    parse_python(parser;code:str)->None
+  tests/conftest.py:
+    i: pytest,tempfile,code2logic.models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo},pathlib.Path,typing.{Any,Dict}
+    e: sample_python_code,sample_javascript_code,sample_java_code,temp_project_dir,sample_project,sample_module,sample_project_model,mock_llm_config
+    sample_python_code()->str
+    sample_javascript_code()->str
+    sample_java_code()->str
+    temp_project_dir()->None
+    sample_project(temp_project_dir;sample_python_code)->None
+    sample_module()->None
+    sample_project_model()->None
+    mock_llm_config()->None
+  tests/test_yaml_compact.py:
+    i: pytest,yaml,code2logic.analyze_project,code2logic.generators.YAMLGenerator,code2logic.models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo}
+    e: sample_project,TestYAMLShortKeys,TestSelfRemoval,TestImportDeduplication,TestEmptyFieldsOmitted,TestMetaLegend,TestCompactSizeReduction,TestDocstringTruncation
+    TestYAMLShortKeys: test_short_keys_in_module(1),test_short_keys_in_class(1)  # Test that YAML uses short keys.
+    TestSelfRemoval: test_no_self_in_signature(1)  # Test that 'self' is removed from meth...
+    TestImportDeduplication: test_typing_grouped(1)  # Test that imports are deduplicated.
+    TestEmptyFieldsOmitted: test_empty_bases_omitted(1),test_empty_decorators_omitted(1)  # Test that empty fields are omitted.
+    TestMetaLegend: test_meta_legend_structure(1),test_meta_legend_in_output(1)  # Test that meta.legend provides key tr...
+    sample_project()->None
+  tests/test_formats.py:
+    i: pytest,json,code2logic,pathlib.Path
+    e: sample_code,sample_project,samples_project,ALL_FORMATS,get_generator,generate_output,TestAllFormatsGeneration,TestFormatValidation
+    TestAllFormatsGeneration: test_format_generates_output(2),test_format_contains_class_info(2),test_format_contains_function_info(2)  # Test that all formats generate valid...
+    TestFormatValidation: test_yaml_validation_valid(1),test_yaml_validation_invalid(0),test_json_validation_valid(1),test_json_validation_invalid(0),test_logicml_validation_valid(1)  # Test format validation where applicable.
+    TestFormatEfficiency: test_format_sizes(1),test_logicml_compression(1)  # Test format size efficiency.
+    TestDetailLevels: test_detail_levels_ordering(2)  # Test different detail levels.
+    TestYAMLSpecifics: test_yaml_parseable(1),test_yaml_includes_imports(1)  # YAML-specific tests.
+    sample_code()->None
+    sample_project(tmp_path;sample_code)->None
+    samples_project()->None
+    get_generator(fmt:str)->None
+    generate_output(generator;project;detail='standard')->None
+  tests/test_e2e_projects.py:
+    i: shutil,code2logic.analyze_project,code2logic.generators.YAMLGenerator,logic2code.generator.{Logic2CodeGenerator,Logic2CodeGeneratorConfig},logic2test.generator.{Logic2TestGenerator,Logic2TestGeneratorConfig},pathlib.Path
+    e: test_e2e_pipeline_code2logic_logic2test_logic2code,test_e2e_logic2test_on_examples_input,test_e2e_logic2code_on_examples_input
+    _repo_root()->Path
+    _copy_example_sample_project(tmp_path:Path)->Path
+    _write_code2logic_compact_yaml(project_dir:Path;out_file:Path)->None
+    test_e2e_pipeline_code2logic_logic2test_logic2code(tmp_path:Path)->None
+    test_e2e_logic2test_on_examples_input(tmp_path:Path)->None
+    test_e2e_logic2code_on_examples_input(tmp_path:Path)->None
+  tests/test_error_handling.py:
+    i: pytest,tempfile,os,stat,code2logic.errors.{ErrorHandler,ErrorSeverity,ErrorType},pathlib.Path,unittest.mock.{MagicMock,patch}
+    e: error_handler,strict_handler,temp_project,TestFilesystemErrors,TestParsingErrors,TestGenerationErrors,TestErrorHandlerModes,TestIntegration
+    TestFilesystemErrors: test_file_not_found(1),test_permission_denied(2),test_file_too_large(1),test_binary_file_detection(2),test_encoding_fallback(2)  # Tests for filesystem-related errors.
+    TestParsingErrors: test_syntax_error_in_python(2),test_deeply_nested_code(1),test_unsupported_language(1)  # Tests for parsing-related errors.
+    TestGenerationErrors: test_yaml_with_special_characters(1),test_json_with_unicode(1),test_write_to_readonly_location(2),test_write_creates_directories(2)  # Tests for output generation errors.
+    TestErrorHandlerModes: test_lenient_mode_continues(1),test_strict_mode_stops(1),test_silent_mode_no_logging(2),test_critical_error_stops_all_modes(0)  # Tests for different error handler modes.
+    TestIntegration: test_mixed_valid_invalid_files(1),test_nested_folders_with_errors(1),test_large_project_resilience(1)  # Integration tests for error handling...
+    error_handler()->None
+    strict_handler()->None
+    temp_project(tmp_path)->None
+  tests/test_shared_utils.py:
+    i: pytest,code2logic.shared_utils
+    e: TestCompactImports,TestDeduplicateImports,TestAbbreviateType,TestExpandType,TestBuildSignature,TestRemoveSelfFromParams,TestCategorizeFunction,TestExtractDomain
+    TestCompactImports: test_groups_submodules(0),test_preserves_standalone(0),test_limits_output(0),test_handles_empty(0),test_skips_module_module_duplicates(0)  # Tests for compact_imports function.
+    TestDeduplicateImports: test_removes_base_when_specific_exists(0),test_handles_empty(0)  # Tests for deduplicate_imports function.
+    TestAbbreviateType: test_simple_types(0),test_complex_types(0),test_optional_type(0),test_preserves_unknown(0),test_handles_empty(0)  # Tests for abbreviate_type function.
+    TestExpandType: test_expands_abbreviated(0),test_handles_empty(0)  # Tests for expand_type function.
+    TestBuildSignature: test_removes_self_by_default(0),test_includes_self_when_requested(0),test_removes_cls(0),test_abbreviates_types(0),test_truncates_params(0)  # Tests for build_signature function.
+  tests/test_llm_priority.py:
+    i: json,os,pytest,code2logic.llm_clients.{OllamaLocalClient,OpenRouterClient,get_client},pathlib.Path
+    e: test_get_client_auto_prefers_override_provider_on_tie,test_get_client_auto_model_first_uses_model_priority
+    _write_user_llm_config(tmp_path:Path;data:dict)->Path
+    test_get_client_auto_prefers_override_provider_on_tie(tmp_path:Path;monkeypatch:Any)->None
+    test_get_client_auto_model_first_uses_model_priority(tmp_path:Path;monkeypatch:Any)->None
+  tests/test_llm_profiler.py:
+    i: json,tempfile,os,pytest,code2logic.llm_profiler.{AdaptiveChunker,LLMProfile,LLMProfiler},pathlib.Path,unittest.mock.{Mock,patch}
+    e: TestLLMProfile,TestDefaultProfiles,TestProfileStorage,TestAdaptiveChunker,TestLLMProfiler,TestProfileTestCases,TestConvenienceFunctions
+    TestLLMProfile: test_profile_creation(0),test_profile_id_consistency(0),test_profile_defaults(0),test_profile_custom_values(0)  # Tests for LLMProfile dataclass.
+    TestDefaultProfiles: test_gpt4_profile(0),test_gpt4_turbo_profile(0),test_claude_profile(0),test_qwen_coder_profile(0),test_deepseek_profile(0)  # Tests for default profile creation.
+    TestProfileStorage: test_save_and_load_profile(1),test_load_empty_profiles(1),test_get_profile(1),test_get_nonexistent_profile(1),test_get_or_create_profile_existing(1)  # Tests for profile storage (save/load).
+    TestAdaptiveChunker: test_chunker_creation(0),test_chunker_default_profile(0),test_chunk_small_spec(0),test_chunk_large_spec(0),test_chunk_format_adjustment(0)  # Tests for AdaptiveChunker.
+    TestLLMProfiler: test_profiler_creation(0),test_profiler_with_unknown_client(0),test_code_to_spec(0),test_extract_code_with_block(0),test_extract_code_without_block(0)  # Tests for LLMProfiler class.
+  tests/test_generators.py:
+    i: json,pytest,code2logic
+    e: sample_project,TestMarkdownGenerator,TestCompactGenerator,TestJSONGenerator
+    TestMarkdownGenerator: test_generate_basic(1),test_generate_includes_modules(1),test_generate_includes_classes(1),test_generate_includes_functions(1),test_generate_includes_entrypoints(1)  # Tests for MarkdownGenerator.
+    TestCompactGenerator: test_generate_basic(1),test_generate_includes_hubs(1),test_compact_is_smaller(1)  # Tests for CompactGenerator.
+    TestJSONGenerator: test_generate_valid_json(1),test_generate_structure(1),test_generate_modules(1),test_generate_functions(1),test_generate_classes(1)  # Tests for JSONGenerator.
+    sample_project()->None
+  tests/test_reproduction.py:
+    i: pytest,sys,code2logic.{ReproductionMetrics,analyze_project},code2logic.generators.YAMLGenerator,code2logic.gherkin.GherkinGenerator,code2logic.logicml.{LogicMLGenerator,generate_logicml},code2logic.markdown_format.MarkdownHybridGenerator,pathlib.Path
+    e: TestYAMLGenerator,TestGherkinGenerator,TestMarkdownGenerator,TestReproductionMetrics,TestChunkedReproduction,TestProjectAnalysis,TestLogicMLGenerator,TestFormatComparison
+    TestYAMLGenerator: test_yaml_basic(0),test_yaml_includes_classes(0),test_yaml_includes_functions(0)  # Tests for YAML format generation.
+    TestGherkinGenerator: test_gherkin_basic(0),test_gherkin_has_scenarios(0)  # Tests for Gherkin format generation.
+    TestMarkdownGenerator: test_markdown_basic(0),test_markdown_has_yaml_section(0)  # Tests for Markdown hybrid format gene...
+    TestReproductionMetrics: test_metrics_basic(0),test_metrics_identical_code(0),test_metrics_different_code(0)  # Tests for reproduction metrics calcul...
+    TestChunkedReproduction: test_estimate_tokens(0),test_get_llm_limit(0),test_chunk_yaml_spec(0),test_chunk_gherkin_spec(0)  # Tests for chunked reproduction functi...
+  tests/test_intent.py:
+    i: pytest,code2logic.intent.{Intent,IntentAnalyzer,IntentType},code2logic.models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo},unittest.mock.{Mock,patch}
+    e: make_function,make_class,make_module,make_project,TestIntentAnalyzer
+    TestIntentAnalyzer: test_init(0),test_extract_keywords(0),test_calculate_intent_confidence(0),test_identify_target_module(1),test_identify_target_function(1)  # Test cases for IntentAnalyzer.
+    make_function(name;params=None;complexity=1;lines=5;docstring=None)->None
+    make_class(name;methods=None;bases=None)->None
+    make_module(name;path;functions=None;classes=None;imports=None;lines_total=10)->None
+    make_project(name;modules)->None
+  tests/test_analyzer.py:
+    i: pytest,code2logic.analyzer.{ProjectAnalyzer,analyze_project,get_library_status},code2logic.models.{ModuleInfo,ProjectInfo},pathlib.Path,unittest.mock.{Mock,patch}
+    e: TestProjectAnalyzer,TestAnalyzeProjectFunction,TestGetLibraryStatus
+    TestProjectAnalyzer: test_init(1),test_init_with_verbose(2),test_analyze_returns_project_info(1),test_analyze_finds_source_files(1),test_ignores_non_source_files(1)  # Test cases for ProjectAnalyzer.
+    TestAnalyzeProjectFunction: test_analyze_project(1)  # Test the analyze_project convenience...
+    TestGetLibraryStatus: test_get_library_status(0)  # Test the get_library_status function.
+  logic2test/cli.py:
+    i: argparse,sys,generator.{GenerationResult,GeneratorConfig,TestGenerator},pathlib.Path
+    e: main
+    main()->None
+  logic2test/parsers.py:
+    i: re,dataclasses.{dataclass,field},pathlib.Path,typing.{Any,Dict,List,Optional,Union}
+    e: FunctionSpec,ClassSpec,ModuleSpec,ProjectSpec,LogicParser
+    FunctionSpec:   # Specification of a function/method ex...
+    ClassSpec:   # Specification of a class extracted fr...
+    ModuleSpec:   # Specification of a module extracted f...
+    ProjectSpec:   # Full project specification from logic...
+    LogicParser: __init__(1),parse(0),_detect_and_parse_format(0),_parse_yaml(0),_parse_yaml_simple(0)  # Parser for Code2Logic output formats.
+  logic2test/generator.py:
+    i: re,dataclasses.{dataclass,field},parsers.{LogicParser,ProjectSpec},pathlib.Path,typing.{Dict,List,Optional,Union}
+    e: GeneratorConfig,GenerationResult,TestGenerator
+    GeneratorConfig:   # Configuration for test generation.
+    GenerationResult:   # Result of test generation.
+    TestGenerator: __init__(2),project(0),generate_unit_tests(2),_generate_module_tests(1),_generate_class_tests(1)  # Main test generator class.
+  logic2test/templates.py:
+    i: dataclasses.dataclass,typing.{List,Optional}
+    e: TestTemplate
+    TestTemplate: render_test_file_header(2),render_function_test(6),render_class_test(5),render_dataclass_test(2)  # Template for generating test code.
+  scripts/configure_llm.py:
+    i: sys,os,json,time,datetime,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: CONFIG_DIR,CONFIG_FILE,log,check_ollama,check_litellm,check_env_keys,categorize_models,get_recommended_models
+    log(msg:str;level:str='info')->None
+    check_ollama()->Dict[str, Any]
+    check_litellm()->Dict[str, Any]
+    check_env_keys()->Dict[str, bool]
+    categorize_models(models:List[Dict])->Dict[str, List[Dict]]
+    get_recommended_models(models:List[Dict])->Dict[str, str]
+    test_model(model:str;timeout:int=30)->Dict[str, Any]
+    save_config(config:Dict[str;Any])->None
+  lolm/config.py:
+    i: json,os,yaml,dataclasses.{dataclass,field},pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: RECOMMENDED_MODELS,DEFAULT_MODELS,DEFAULT_PROVIDER_PRIORITIES,LLMConfig,get_config_dir,get_config_path,load_config,save_config
+    LLMConfig: to_dict(0),from_dict(1)  # LLM configuration container.
+    get_config_dir()->Path
+    get_config_path()->Path
+    load_config()->LLMConfig
+    save_config(config:LLMConfig)->None
+    load_env_file(search_paths:Optional[List[Path]]=None)->None
+    load_litellm_config(search_paths:Optional[List[Path]]=None)->Dict[str, Any]
+    save_litellm_config(config:Dict[str;Any];path:Optional[Path]=None)->None
+    get_provider_model(provider:str)->str
+  lolm/cli.py:
+    i: argparse,os,sys,config,pathlib.Path
+    e: cmd_status,cmd_set_provider,cmd_set_model,cmd_key_set,cmd_key_show,cmd_models,cmd_test,cmd_config_show
+    cmd_status(args)->int
+    cmd_set_provider(args)->int
+    cmd_set_model(args)->int
+    cmd_key_set(args)->int
+    cmd_key_show(args)->int
+    cmd_models(args)->int
+    cmd_test(args)->int
+    cmd_config_show(args)->int
+  lolm/manager.py:
+    i: os,config,typing.{Dict,List,Optional}
+    e: ProviderInfo,LLMManager,get_client,list_available_providers
+    ProviderInfo: __init__(5)  # Information about a configured provider.
+    LLMManager: __init__(1),is_available(0),is_ready(0),primary_provider(0),providers(0)  # LLM Manager with multi-provider support.
+    get_client(provider:str=None;model:str=None)->BaseLLMClient
+    list_available_providers()->List[str]
+  lolm/provider.py:
+    i: abc.{ABC,abstractmethod},dataclasses.{dataclass,field},enum.Enum,typing.{Any,Dict,List,Literal,Optional}
+    e: LLMProviderStatus,GenerateOptions,LLMResponse,LLMModelInfo,BaseLLMClient,LLMProvider
+    LLMProviderStatus:   # Provider availability status.
+    GenerateOptions: to_messages(0)  # Options for LLM generation.
+    LLMResponse:   # Response from LLM generation.
+    LLMModelInfo:   # Information about an available model.
+    BaseLLMClient: generate(3),is_available(0),chat(2)  # Abstract base class for synchronous L...
+  lolm/clients.py:
+    i: os,time,config.{DEFAULT_MODELS,RECOMMENDED_MODELS,get_provider_model,load_env_file},provider.{BaseLLMClient,LLMModelInfo},typing.{List,Optional}
+    e: OpenRouterClient,OllamaClient,LiteLLMClient,GroqClient,TogetherClient
+    OpenRouterClient: __init__(2),generate(3),is_available(0),list_recommended_models(0)  # OpenRouter API client for cloud LLM a...
+    OllamaClient: __init__(2),generate(3),is_available(0),list_models(0),list_recommended_models(0)  # Ollama client for local LLM inference.
+    LiteLLMClient: __init__(1),generate(3),is_available(0)  # LiteLLM client for universal LLM access.
+    GroqClient: __init__(2),generate(3),is_available(0)  # Groq API client for fast inference.
+    TogetherClient: __init__(2),generate(3),is_available(0)  # Together AI client.
+  generated_code_full/llm_profiler.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: PROFILE_TEST_CASES,LLMProfile,ProfileTestResult,LLMProfiler,AdaptiveChunker,load_profiles,save_profile,get_profile
+    LLMProfile: __post_init__(0)  # Profile of LLM capabilities for code...
+    ProfileTestResult:   # Result of a single profile test.
+    LLMProfiler: __init__(2),run_profile(1),_test_reproduction(2),_code_to_spec(1),_extract_code(1)  # Profile LLM capabilities for code rep...
+    AdaptiveChunker: __init__(1),get_optimal_settings(0),chunk_spec(2),recommend_format(1),estimate_chunks_needed(1)  # Adaptive chunking based on LLM profile.
+    _get_profiles_path()->Path
+    load_profiles()->Dict[str, LLMProfile]
+    save_profile(profile:LLMProfile;profile:Any)->None
+    get_profile(provider:str;model:str)->Optional[LLMProfile]
+    get_or_create_profile(provider:str;model:str)->LLMProfile
+    _create_default_profile(provider:str;model:str)->LLMProfile
+    profile_llm(client;quick:bool=False)->LLMProfile
+    get_adaptive_chunker(provider:str;model:str)->AdaptiveChunker
+  generated_code_full/file_formats.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: generate_file_csv,generate_file_json,generate_file_yaml
+    generate_file_csv(file_path:Path;file_path:Any)->str
+    generate_file_json(file_path:Path;file_path:Any)->str
+    generate_file_yaml(file_path:Path;file_path:Any)->str
+    _parse_file_elements(content:str;content:Any)->Dict[str, Any]
+  generated_code_full/project_reproducer.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: SUPPORTED_EXTENSIONS,FileResult,ProjectResult,ProjectReproducer,reproduce_project
+    FileResult:   # Result for a single file reproduction.
+    ProjectResult:   # Result for project reproduction.
+    ProjectReproducer: __init__(4),_get_client(0),find_source_files(3),reproduce_file(2),reproduce_project(3)  # Multi-file project reproduction system.
+    reproduce_project(project_path:str;output_dir:str=None;target_lang:str=None;parallel:bool=False;use_llm:bool=True)->ProjectResult
+  generated_code_full/base.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: VerboseMixin,BaseParser,BaseGenerator
+    VerboseMixin: __init__(1),log(2),debug(1),info(1),warn(1)  # Mixin providing verbose logging funct...
+    BaseParser: __init__(1),parse(2),parse_file(1)  # Base class for code parsers.
+    BaseGenerator: __init__(1),generate(2)  # Base class for output generators.
+  generated_code_full/cli.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: Colors,Logger,ensure_dependencies
+    Colors:   # Class Colors.
+    Logger: __init__(2),_elapsed(0),info(1),success(1),warning(1)  # Enhanced logger for CLI output.
+    ensure_dependencies()->None
+    _get_env_file_path()->str
+    _read_text_file(path:str;path:Any)->str
+    _write_text_file(path:str;content:str)->None
+    _set_env_var(var_name:str;value:str)->str
+    _unset_env_var(var_name:str;var_name:Any)->str
+    _get_litellm_config_path()->str
+    _get_user_llm_config_path()->str
+  generated_code_full/llm.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: LLMConfig,OllamaClient,LiteLLMClient,CodeAnalyzer,get_available_backends
+    LLMConfig:   # Configuration for LLM backend.
+    OllamaClient: __init__(1),generate(2),chat(1),is_available(0),list_models(0)  # Direct Ollama API client.
+    LiteLLMClient: __init__(1),generate(2),chat(1),is_available(0)  # LiteLLM client for unified API access.
+    CodeAnalyzer: __init__(4),is_available(0),suggest_refactoring(1),find_semantic_duplicates(1),generate_code(3)  # LLM-powered code analysis for Code2Lo...
+    get_available_backends()->Dict[str, bool]
+  generated_code_full/errors.py:
+    i: dataclasses.{dataclass,field},enum.{Enum,auto},typing.{Any,Dict,List,Optional}
+    e: ErrorSeverity,ErrorType,AnalysisError,AnalysisResult,ErrorHandler,create_error_handler
+    ErrorSeverity:   # Error severity levels.
+    ErrorType:   # Types of errors that can occur during...
+    AnalysisError: to_dict(0)  # Represents an error during analysis.
+    AnalysisResult: add_error(1),has_errors(0),summary(0)  # Result of analysis with errors tracked.
+    ErrorHandler: __init__(4),reset(0),handle_error(5),_default_severity(1),_log_error(1)  # Handles errors during analysis with c...
+    create_error_handler(mode:str='lenient';max_file_size_mb:float=10.0)->ErrorHandler
+  generated_code_full/code_review.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: SECURITY_PATTERNS,PERFORMANCE_PATTERNS,COMPLEXITY_HIGH,COMPLEXITY_MEDIUM,LINES_MAX,FILE_LINES_MAX,CodeReviewer,analyze_code_quality
+    CodeReviewer: __init__(1),review(2),generate_report(2)  # Automated code review with optional L...
+    analyze_code_quality(project;project:Any)->Dict[str, List[Dict]]
+    check_security_issues(project;project:Any)->Dict[str, List[Dict]]
+    check_performance_issues(project;project:Any)->Dict[str, List[Dict]]
+  generated_code_full/analyzer.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: ProjectAnalyzer,analyze_project,get_library_status
+    ProjectAnalyzer: __init__(4),_print_status(0),analyze(0),_scan_files(0),_detect_entrypoints(0)  # Main class for analyzing software pro...
+    analyze_project(path:str;use_treesitter:bool=True;verbose:bool=False)->ProjectInfo
+    get_library_status()->Dict[str, bool]
+  generated_code_full/quality.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: QualityIssue,QualityReport,QualityAnalyzer,analyze_quality,get_quality_summary
+    QualityIssue:   # Represents a code quality issue.
+    QualityReport: to_dict(0)  # Complete quality analysis report.
+    QualityAnalyzer: __init__(1),analyze(1),analyze_modules(1),_analyze_module(2),_check_function(3)  # Analyzes code quality and generates r...
+    analyze_quality(project:ProjectInfo;thresholds:Dict[str;int]=None)->QualityReport
+    get_quality_summary(report:QualityReport;report:Any)->str
+  generated_code_full/parsers.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: TREE_SITTER_AVAILABLE,TreeSitterParser,UniversalParser,is_tree_sitter_available
+    _PyFunctionBodyAnalyzer: __init__(0),_add_call(1),_add_raise(1),visit_Call(1),visit_Raise(1)  # Class _PyFunctionBodyAnalyzer.
+    TreeSitterParser: __init__(0),_init_parsers(0),is_available(1),get_supported_languages(0),parse(3)  # Parser using Tree-sitter for high-acc...
+    UniversalParser: __init__(0),parse(3),_parse_python(2),_extract_ast_enum(1),_extract_ast_function(1)  # Fallback parser using Python AST and...
+    _normalize_import_path(import_path:str;import_path:Any)->str
+    _clean_imports(imports:List[str];imports:Any)->List[str]
+    _combine_import_name(module_name:str;identifier:str)->str
+    _truncate_constant_value(value_text:str;limit:int=400)->str
+    _py_expr_to_dotted_name(expr;expr:Any)->str
+    _analyze_python_function_node(func_node;func_node:Any)->None
+    is_tree_sitter_available()->bool
+  generated_code_full/intent.py:
+    i: dataclasses.{dataclass,field},enum.{Enum,auto},typing.{Any,Dict,List,Optional}
+    e: IntentType,Intent,EnhancedIntentGenerator,IntentAnalyzer
+    IntentType:   # Types of user intents for code analysis.
+    Intent:   # Represents a detected user intent.
+    EnhancedIntentGenerator: __init__(1),generate(2),_extract_from_docstring(1),_split_name(1),get_available_features(0)  # Generator intencji z NLP - lemmatyzac...
+    IntentAnalyzer: __init__(0),_extract_keywords(1),_calculate_intent_confidence(2),_identify_target(2),_generate_description(2)  # Analyzes user queries to detect inten...
+  generated_code_full/adaptive.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: LLM_CAPABILITIES,ChunkInfo,AdaptiveResult,AdaptiveReproducer,get_llm_capabilities
+    ChunkInfo:   # Information about a code chunk.
+    AdaptiveResult:   # Result of adaptive reproduction.
+    AdaptiveReproducer: __init__(2),_get_capabilities(0),select_format(2),should_chunk(1),chunk_content(2)  # Adaptive code reproduction with LLM c...
+    get_llm_capabilities(model:str;model:Any)->Dict[str, Any]
+  generated_code_full/reproducer.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: SUPPORTED_EXTENSIONS,FileResult,ProjectResult,ProjectReproducer,reproduce_project
+    FileResult:   # Result for a single file reproduction.
+    ProjectResult:   # Result for project reproduction.
+    ProjectReproducer: __init__(4),_get_client(0),find_source_files(3),reproduce_file(2),reproduce_project(3)  # Multi-file project reproduction system.
+    reproduce_project(project_path:str;output_dir:str=None;target_lang:str=None;parallel:bool=False;use_llm:bool=True)->ProjectResult
+  generated_code_full/llm_clients.py:
+    i: abc.{ABC,abstractmethod},typing.{Any,Dict,List,Optional}
+    e: RECOMMENDED_MODELS,DEFAULT_MODELS,DEFAULT_PROVIDER_PRIORITIES,BaseLLMClient,OpenRouterClient,OllamaLocalClient,LiteLLMClient,get_priority_mode
+    BaseLLMClient: generate(3),is_available(0),chat(2)  # Abstract base class for LLM clients.
+    OpenRouterClient: __init__(2),generate(3),is_available(0),list_recommended_models(0)  # OpenRouter API client for cloud LLM a...
+    OllamaLocalClient: __init__(2),generate(3),is_available(0),list_models(0),list_recommended_models(0)  # Ollama client for local LLM inference.
+    LiteLLMClient: __init__(1),generate(3),is_available(0)  # LiteLLM client for universal LLM access.
+    _get_user_llm_config_path()->str
+    _load_user_llm_config()->Dict[str, Any]
+    _get_priority_mode()->str
+    get_priority_mode()->str
+    _get_provider_priority_overrides()->Dict[str, int]
+    _get_model_priority_rules()->Dict[str, Dict[str, int]]
+    _get_model_priority(model_string:str;model_string:Any)->Optional[int]
+    _get_provider_model_string(provider:str;provider:Any)->str
+  generated_code_full/prompts.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: FORMAT_HINTS,get_reproduction_prompt,get_review_prompt,get_fix_prompt
+    get_reproduction_prompt(spec:str;fmt:str;file_name:str;language:str='python';max_spec_length:int=5000)->str
+    get_review_prompt(code:str;spec:str;fmt:str)->str
+    get_fix_prompt(code:str;issues:list;spec:str)->str
+  generated_code_full/chunked_reproduction.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: LLM_CONTEXT_LIMITS,Chunk,ChunkedSpec,ChunkedResult,ChunkedReproducer,get_llm_limit,chunk_yaml_spec,chunk_gherkin_spec
+    Chunk:   # A chunk of specification for reproduc...
+    ChunkedSpec:   # Chunked specification.
+    ChunkedResult:   # Result of chunked reproduction.
+    ChunkedReproducer: __init__(2),reproduce(3),_extract_code(1)  # Reproduce code from chunked specifica...
+    get_llm_limit(model_name:str;model_name:Any)->int
+    chunk_yaml_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_gherkin_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_markdown_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_spec(spec:str;fmt:str;max_tokens:int=2000)->ChunkedSpec
+    get_chunk_prompt(chunk:Chunk;fmt:str;file_name:str;chunk_num:int;total_chunks:int)->str
+    merge_chunk_codes(codes:List[str];file_name:str)->str
+    auto_chunk_reproduce(spec:str;fmt:str;file_name:str;client;model_name:str='default')->ChunkedResult
+  generated_code_full/metrics.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: TextMetrics,StructuralMetrics,SemanticMetrics,FormatMetrics,ReproductionResult,ReproductionMetrics,analyze_reproduction,compare_formats
+    TextMetrics:   # Text-level similarity metrics.
+    StructuralMetrics:   # Structural code metrics.
+    SemanticMetrics:   # Semantic preservation metrics.
+    FormatMetrics:   # Format-specific efficiency metrics.
+    ReproductionResult: to_dict(0),to_report(0)  # Complete reproduction analysis result.
+    analyze_reproduction(original:str;generated:str;spec:str='';format_name:str='';verbose:bool=False)->ReproductionResult
+    compare_formats(original:str;results:Dict[str;Tuple[str;str]];verbose:bool=False)->Dict[str, Any]
+  generated_code_full/refactor.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: DuplicateGroup,RefactoringSuggestion,RefactoringReport,find_duplicates,analyze_quality,suggest_refactoring,compare_codebases,quick_analyze
+    DuplicateGroup:   # Group of duplicate functions.
+    RefactoringSuggestion:   # Single refactoring suggestion.
+    RefactoringReport: to_dict(0),to_markdown(0)  # Complete refactoring analysis report.
+    find_duplicates(project_path:str;threshold:float=0.8)->List[DuplicateGroup]
+    analyze_quality(project_path:str;include_security:bool=True;include_performance:bool=True)->RefactoringReport
+    suggest_refactoring(project_path:str;use_llm:bool=False;client:BaseLLMClient=None)->RefactoringReport
+    compare_codebases(project1:str;project2:str)->Dict[str, Any]
+    quick_analyze(project_path:str;project_path:Any)->Dict[str, Any]
+  generated_code_full/function_logic.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: FunctionLogicGenerator
+    FunctionLogicGenerator: __init__(1),generate(2),generate_json(2),generate_yaml(2),generate_toon(2)  # Class FunctionLogicGenerator.
+  generated_code_full/generators.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: MarkdownGenerator,CompactGenerator,JSONGenerator,YAMLGenerator,CSVGenerator,bytes_to_kb
+    MarkdownGenerator: generate(2),_gen_tree(2),_print_tree(4),_gen_module(4),_gen_class(3)  # Generates Markdown output for project...
+    CompactGenerator: generate(1)  # Generates ultra-compact output for to...
+    JSONGenerator: generate(3),generate_from_module(2),_generate_nested(2),_field_to_dict(1),_generate_flat(2)  # Generates JSON output for machine pro...
+    YAMLGenerator: generate(4),generate_schema(1),_generate_compact_schema(0),_generate_full_schema(0),_generate_hybrid_schema(0)  # Generates YAML output for human-reada...
+    CSVGenerator: generate(2),_build_row(5),_build_function_row(5),_build_signature(1),_categorize(1)  # Generates CSV output optimized for LL...
+    bytes_to_kb(bytes_value:int;bytes_value:Any)->float
+  generated_code_full/markdown_format.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: MarkdownSpec,MarkdownHybridGenerator,generate_markdown_hybrid,generate_file_markdown
+    MarkdownSpec:   # Markdown specification for a project.
+    MarkdownHybridGenerator: __init__(1),generate(2),_generate_header(1),_generate_tree(1),_generate_imports(1)  # Generates optimized Markdown hybrid f...
+    generate_markdown_hybrid(project:ProjectInfo;detail:str='full')->str
+    generate_file_markdown(file_path:str;file_path:Any)->str
+  generated_code_full/models.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: FunctionInfo,ClassInfo,TypeInfo,ModuleInfo,DependencyNode,ProjectInfo,ConstantInfo,FieldInfo
+    FunctionInfo:   # Information about a function or method.
+    ClassInfo:   # Information about a class or interface.
+    TypeInfo:   # Information about a type alias, inter...
+    ModuleInfo:   # Information about a source file/module.
+    DependencyNode:   # Node in the dependency graph with met...
+  generated_code_full/similarity.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: RAPIDFUZZ_AVAILABLE,SimilarityDetector,is_rapidfuzz_available,get_refactoring_suggestions
+    SimilarityDetector: __init__(1),find_similar_functions(1),find_duplicate_signatures(1),_build_signature(3)  # Detects similar functions using fuzzy...
+    is_rapidfuzz_available()->bool
+    get_refactoring_suggestions(similar_functions:Dict[str;List[str]];similar_functions:Any)->List[Dict[str, any]]
+  generated_code_full/universal.py:
+    i: dataclasses.{dataclass,field},enum.{Enum,auto},typing.{Any,Dict,List,Optional}
+    e: ElementType,Language,Parameter,CodeElement,CodeLogic,UniversalParser,CodeGenerator,UniversalReproducer
+    ElementType:   # Types of code elements.
+    Language:   # Supported languages.
+    Parameter:   # Function/method parameter.
+    CodeElement:   # Universal representation of a code el...
+    CodeLogic: to_dict(0),_element_to_dict(1),to_compact(0),_element_to_compact(2)  # Universal code logic representation f...
+    reproduce_file(source_path:str;target_lang:str=None;output_dir:str=None;use_llm:bool=True)->Dict[str, Any]
+  generated_code_full/benchmark.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: FORMAT_PROMPTS,FormatResult,BenchmarkResult,ReproductionBenchmark,run_benchmark
+    FormatResult:   # Result for a single format test.
+    BenchmarkResult:   # Complete benchmark result.
+    ReproductionBenchmark: __init__(1),generate_spec(3),reproduce_with_format(3),run_single(2),run_all(2)  # Benchmark reproduction quality across...
+    run_benchmark(files:List[str];output_dir:str='benchmark_results';provider:str=None;model:str=None)->Dict[str, Any]
+  generated_code_full/toon_format.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: TOONGenerator,TOONParser,generate_toon,parse_toon
+    TOONGenerator: __init__(2),generate(2),_generate_modules(2),_generate_types(2),_generate_classes(3)  # Generates TOON format output from Pro...
+    TOONParser: __init__(0),parse(1),_parse_value(1)  # Parse TOON format back to Python dict.
+    generate_toon(project:ProjectInfo;detail:str='standard';use_tabs:bool=False)->str
+    parse_toon(content:str;content:Any)->Dict[str, Any]
+  generated_code_full/dependency.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: NETWORKX_AVAILABLE,DependencyAnalyzer,is_networkx_available
+    DependencyAnalyzer: __init__(0),build_graph(1),analyze_metrics(0),get_entrypoints(0),get_hubs(0)  # Analyzes dependency graphs using Netw...
+    is_networkx_available()->bool
+  generated_code_full/mcp_server.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: handle_request,call_tool,run_server
+    handle_request(request:dict;request:Any)->dict
+    call_tool(tool_name:str;arguments:dict)->str
+    run_server()->None
+  generated_code_full/reproduction.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: LLM_CONTEXT_LIMITS,Chunk,ChunkedSpec,ChunkedResult,ChunkedReproducer,get_llm_limit,chunk_yaml_spec,chunk_gherkin_spec
+    Chunk:   # A chunk of specification for reproduc...
+    ChunkedSpec:   # Chunked specification.
+    ChunkedResult:   # Result of chunked reproduction.
+    ChunkedReproducer: __init__(2),reproduce(3),_extract_code(1)  # Reproduce code from chunked specifica...
+    get_llm_limit(model_name:str;model_name:Any)->int
+    chunk_yaml_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_gherkin_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_markdown_spec(spec:str;max_tokens:int=2000)->List[Chunk]
+    chunk_spec(spec:str;fmt:str;max_tokens:int=2000)->ChunkedSpec
+    get_chunk_prompt(chunk:Chunk;fmt:str;file_name:str;chunk_num:int;total_chunks:int)->str
+    merge_chunk_codes(codes:List[str];file_name:str)->str
+    auto_chunk_reproduce(spec:str;fmt:str;file_name:str;client;model_name:str='default')->ChunkedResult
+  generated_code_full/gherkin.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: GherkinScenario,GherkinFeature,StepDefinition,GherkinGenerator,StepDefinitionGenerator,CucumberYAMLGenerator,csv_to_gherkin,gherkin_to_test_data
+    GherkinScenario:   # Represents a single Gherkin scenario.
+    GherkinFeature:   # Represents a Gherkin feature file.
+    StepDefinition:   # Represents a step definition.
+    GherkinGenerator: __init__(1),generate(3),generate_test_scenarios(2),get_step_definitions(0),_extract_features(2)  # Generates Gherkin feature files from...
+    StepDefinitionGenerator: generate_pytest_bdd(1),generate_behave(1),generate_cucumber_js(1),_step_to_func_name(1)  # Generates step definition stubs from...
+    csv_to_gherkin(csv_content:str;language:str='en')->str
+    gherkin_to_test_data(gherkin_content:str;gherkin_content:Any)->Dict[str, Any]
+  logic2code/cli.py:
+    i: argparse,sys,generator.{CodeGenerator,GenerationResult,GeneratorConfig},pathlib.Path
+    e: main
+    main()->None
+  logic2code/generator.py:
+    i: re,sys,dataclasses.{dataclass,field},logic2test.parsers.LogicParser,pathlib.Path,typing.{Dict,List,Optional,Union}
+    e: GeneratorConfig,GenerationResult,CodeGenerator
+    GeneratorConfig:   # Configuration for code generation.
+    GenerationResult:   # Result of code generation.
+    CodeGenerator: __init__(2),project(0),generate(2),generate_module(1),generate_class(2)  # Main code generator class.
+  logic2code/renderers.py:
+    i: re,abc.{ABC,abstractmethod},dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Set}
+    e: RenderConfig,BaseRenderer,PythonRenderer
+    RenderConfig:   # Configuration for code rendering.
+    BaseRenderer: __init__(1),render_module(1),render_class(1),render_function(1)  # Abstract base class for language-spec...
+    PythonRenderer: render_module(1),_collect_imports(1),_render_constant(1),render_class(1),_render_field(1)  # Python code renderer.
+  generated_tests/test_project_reproducer.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestFileResult,TestFileResultDataclass,TestProjectResult,TestProjectResultDataclass,TestProjectReproducer,test_init_dunder,test_projectreproducer_find_source_files,test_projectreproducer_reproduce_file
+    TestFileResult: test_fileresult_instantiation(0)  # Test suite for FileResult.
+    TestFileResultDataclass: test_fileresult_fields(0),test_fileresult_equality(0)  # Dataclass-specific tests for FileResult.
+    TestProjectResult: test_projectresult_instantiation(0)  # Test suite for ProjectResult.
+    TestProjectResultDataclass: test_projectresult_fields(0),test_projectresult_equality(0)  # Dataclass-specific tests for ProjectR...
+    TestProjectReproducer: test_projectreproducer_instantiation(0)  # Test suite for ProjectReproducer.
+    test_init_dunder()->None
+    test_projectreproducer_find_source_files()->None
+    test_projectreproducer_reproduce_file()->None
+    test_projectreproducer_reproduce_project()->None
+    test_reproduce_project()->None
+  generated_tests/test_llm_clients.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestBaseLLMClient,test_basellmclient_generate,test_basellmclient_is_available,test_basellmclient_chat,TestOpenRouterClient,test_init_dunder,test_openrouterclient_generate,test_openrouterclient_is_available
+    TestBaseLLMClient: test_basellmclient_instantiation(0),test_basellmclient_inheritance(0)  # Test suite for BaseLLMClient.
+    TestOpenRouterClient: test_openrouterclient_instantiation(0),test_openrouterclient_inheritance(0)  # Test suite for OpenRouterClient.
+    TestOllamaLocalClient: test_ollamalocalclient_instantiation(0),test_ollamalocalclient_inheritance(0)  # Test suite for OllamaLocalClient.
+    TestLiteLLMClient: test_litellmclient_instantiation(0),test_litellmclient_inheritance(0)  # Test suite for LiteLLMClient.
+    test_basellmclient_generate()->None
+    test_basellmclient_is_available()->None
+    test_basellmclient_chat()->None
+    test_init_dunder()->None
+    test_openrouterclient_generate()->None
+    test_openrouterclient_is_available()->None
+    test_openrouterclient_list_recommended_models()->None
+    test_init_dunder()->None
+  generated_tests/test_reproducer.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestReproductionStatus,TestFileValidation,TestFileValidationDataclass,test_filevalidation_score,test_filevalidation_to_dict,TestReproductionResult,TestReproductionResultDataclass,test_reproductionresult_success_rate
+    TestReproductionStatus: test_reproductionstatus_instantiation(0),test_reproductionstatus_inheritance(0)  # Test suite for ReproductionStatus.
+    TestFileValidation: test_filevalidation_instantiation(0)  # Test suite for FileValidation.
+    TestFileValidationDataclass: test_filevalidation_fields(0),test_filevalidation_equality(0)  # Dataclass-specific tests for FileVali...
+    TestReproductionResult: test_reproductionresult_instantiation(0)  # Test suite for ReproductionResult.
+    TestReproductionResultDataclass: test_reproductionresult_fields(0),test_reproductionresult_equality(0)  # Dataclass-specific tests for Reproduc...
+    test_filevalidation_score()->None
+    test_filevalidation_to_dict()->None
+    test_reproductionresult_success_rate()->None
+    test_reproductionresult_average_score()->None
+    test_reproductionresult_summary()->None
+    test_init_dunder()->None
+    test_specreproducer_reproduce_from_yaml()->None
+    test_specreproducer_reproduce_from_json()->None
+  generated_tests/test_file_formats.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_generate_file_csv,test_generate_file_json,test_generate_file_yaml
+    test_generate_file_csv()->None
+    test_generate_file_json()->None
+    test_generate_file_yaml()->None
+  generated_tests/test_logicml_schema.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestLogicMLMethod,TestLogicMLMethodDataclass,TestLogicMLClass,TestLogicMLClassDataclass,TestLogicMLModule,TestLogicMLModuleDataclass,TestLogicMLSchema,TestLogicMLSchemaDataclass
+    TestLogicMLMethod: test_logicmlmethod_instantiation(0)  # Test suite for LogicMLMethod.
+    TestLogicMLMethodDataclass: test_logicmlmethod_fields(0),test_logicmlmethod_equality(0)  # Dataclass-specific tests for LogicMLM...
+    TestLogicMLClass: test_logicmlclass_instantiation(0)  # Test suite for LogicMLClass.
+    TestLogicMLClassDataclass: test_logicmlclass_fields(0),test_logicmlclass_equality(0)  # Dataclass-specific tests for LogicMLC...
+    TestLogicMLModule: test_logicmlmodule_instantiation(0)  # Test suite for LogicMLModule.
+    test_validate_logicml()->None
+    test_parse_logicml_header()->None
+    test_extract_logicml_signature()->None
+  generated_tests/test_errors.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestErrorSeverity,TestErrorType,TestAnalysisError,TestAnalysisErrorDataclass,test_analysiserror_to_dict,TestAnalysisResult,TestAnalysisResultDataclass,test_analysisresult_add_error
+    TestErrorSeverity: test_errorseverity_instantiation(0),test_errorseverity_inheritance(0)  # Test suite for ErrorSeverity.
+    TestErrorType: test_errortype_instantiation(0),test_errortype_inheritance(0)  # Test suite for ErrorType.
+    TestAnalysisError: test_analysiserror_instantiation(0)  # Test suite for AnalysisError.
+    TestAnalysisErrorDataclass: test_analysiserror_fields(0),test_analysiserror_equality(0)  # Dataclass-specific tests for Analysis...
+    TestAnalysisResult: test_analysisresult_instantiation(0)  # Test suite for AnalysisResult.
+    test_analysiserror_to_dict()->None
+    test_analysisresult_add_error()->None
+    test_analysisresult_has_errors()->None
+    test_analysisresult_summary()->None
+    test_init_dunder()->None
+    test_errorhandler_reset()->None
+    test_errorhandler_handle_error()->None
+    test_errorhandler_safe_read_file()->None
+  generated_tests/test_llm.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestLLMConfig,TestLLMConfigDataclass,TestOllamaClient,test_init_dunder,test_ollamaclient_generate,test_ollamaclient_chat,test_ollamaclient_is_available,test_ollamaclient_list_models
+    TestLLMConfig: test_llmconfig_instantiation(0)  # Test suite for LLMConfig.
+    TestLLMConfigDataclass: test_llmconfig_fields(0),test_llmconfig_equality(0)  # Dataclass-specific tests for LLMConfig.
+    TestOllamaClient: test_ollamaclient_instantiation(0)  # Test suite for OllamaClient.
+    TestLiteLLMClient: test_litellmclient_instantiation(0)  # Test suite for LiteLLMClient.
+    TestCodeAnalyzer: test_codeanalyzer_instantiation(0)  # Test suite for CodeAnalyzer.
+    test_init_dunder()->None
+    test_ollamaclient_generate()->None
+    test_ollamaclient_chat()->None
+    test_ollamaclient_is_available()->None
+    test_ollamaclient_list_models()->None
+    test_init_dunder()->None
+    test_litellmclient_generate()->None
+    test_litellmclient_chat()->None
+  generated_tests/test_code_review.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestCodeReviewer,test_init_dunder,test_codereviewer_review,test_codereviewer_generate_report,test_analyze_code_quality,test_check_security_issues,test_check_performance_issues
+    TestCodeReviewer: test_codereviewer_instantiation(0)  # Test suite for CodeReviewer.
+    test_init_dunder()->None
+    test_codereviewer_review()->None
+    test_codereviewer_generate_report()->None
+    test_analyze_code_quality()->None
+    test_check_security_issues()->None
+    test_check_performance_issues()->None
+  generated_tests/test_yaml_schema.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestMethodSchema,TestMethodSchemaDataclass,TestClassSchema,TestClassSchemaDataclass,TestFunctionSchema,TestFunctionSchemaDataclass,TestModuleSchema,TestModuleSchemaDataclass
+    TestMethodSchema: test_methodschema_instantiation(0)  # Test suite for MethodSchema.
+    TestMethodSchemaDataclass: test_methodschema_fields(0),test_methodschema_equality(0)  # Dataclass-specific tests for MethodSc...
+    TestClassSchema: test_classschema_instantiation(0)  # Test suite for ClassSchema.
+    TestClassSchemaDataclass: test_classschema_fields(0),test_classschema_equality(0)  # Dataclass-specific tests for ClassSch...
+    TestFunctionSchema: test_functionschema_instantiation(0)  # Test suite for FunctionSchema.
+    test_validate_yaml()->None
+  generated_tests/test_shared_utils.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_compact_imports,test_deduplicate_imports,test_abbreviate_type,test_expand_type,test_build_signature,test_remove_self_from_params,test_categorize_function,test_extract_domain
+    test_compact_imports()->None
+    test_deduplicate_imports()->None
+    test_abbreviate_type()->None
+    test_expand_type()->None
+    test_build_signature()->None
+    test_remove_self_from_params()->None
+    test_categorize_function()->None
+    test_extract_domain()->None
+  generated_tests/test_config.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestConfig,test_init_dunder,test_config_get_api_key,test_config_get_model,test_config_get_ollama_host,test_config_get_default_provider,test_config_is_verbose,test_config_get_cache_dir
+    TestConfig: test_config_instantiation(0)  # Test suite for Config.
+    test_init_dunder()->None
+    test_config_get_api_key()->None
+    test_config_get_model()->None
+    test_config_get_ollama_host()->None
+    test_config_get_default_provider()->None
+    test_config_is_verbose()->None
+    test_config_get_cache_dir()->None
+    test_config_list_configured_providers()->None
+  generated_tests/test_markdown_schema.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestMarkdownMethod,TestMarkdownMethodDataclass,TestMarkdownClass,TestMarkdownClassDataclass,TestMarkdownModule,TestMarkdownModuleDataclass,TestMarkdownSchema,TestMarkdownSchemaDataclass
+    TestMarkdownMethod: test_markdownmethod_instantiation(0)  # Test suite for MarkdownMethod.
+    TestMarkdownMethodDataclass: test_markdownmethod_fields(0),test_markdownmethod_equality(0)  # Dataclass-specific tests for Markdown...
+    TestMarkdownClass: test_markdownclass_instantiation(0)  # Test suite for MarkdownClass.
+    TestMarkdownClassDataclass: test_markdownclass_fields(0),test_markdownclass_equality(0)  # Dataclass-specific tests for Markdown...
+    TestMarkdownModule: test_markdownmodule_instantiation(0)  # Test suite for MarkdownModule.
+    test_validate_markdown()->None
+    test_extract_markdown_sections()->None
+  generated_tests/test_logicml.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestLogicMLSpec,TestLogicMLSpecDataclass,TestLogicMLGenerator,test_init_dunder,test_logicmlgenerator_generate,test_generate_logicml
+    TestLogicMLSpec: test_logicmlspec_instantiation(0)  # Test suite for LogicMLSpec.
+    TestLogicMLSpecDataclass: test_logicmlspec_fields(0),test_logicmlspec_equality(0)  # Dataclass-specific tests for LogicMLS...
+    TestLogicMLGenerator: test_logicmlgenerator_instantiation(0)  # Test suite for LogicMLGenerator.
+    test_init_dunder()->None
+    test_logicmlgenerator_generate()->None
+    test_generate_logicml()->None
+  generated_tests/test_universal.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestElementType,TestLanguage,TestParameter,TestParameterDataclass,TestCodeElement,TestCodeElementDataclass,TestCodeLogic,TestCodeLogicDataclass
+    TestElementType: test_elementtype_instantiation(0),test_elementtype_inheritance(0)  # Test suite for ElementType.
+    TestLanguage: test_language_instantiation(0),test_language_inheritance(0)  # Test suite for Language.
+    TestParameter: test_parameter_instantiation(0)  # Test suite for Parameter.
+    TestParameterDataclass: test_parameter_fields(0),test_parameter_equality(0)  # Dataclass-specific tests for Parameter.
+    TestCodeElement: test_codeelement_instantiation(0)  # Test suite for CodeElement.
+    test_codelogic_to_dict()->None
+    test_codelogic_to_compact()->None
+    test_universalparser_detect_language()->None
+    test_universalparser_parse()->None
+    test_codegenerator_generate()->None
+    test_init_dunder()->None
+    test_universalreproducer_extract_logic()->None
+    test_universalreproducer_reproduce()->None
+  generated_tests/test_base.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestBaseParser,test_init_dunder,test_baseparser_parse,test_baseparser_parse_file,TestBaseGenerator,test_init_dunder,test_basegenerator_generate
+    TestBaseParser: test_baseparser_instantiation(0),test_baseparser_inheritance(0)  # Test suite for BaseParser.
+    TestBaseGenerator: test_basegenerator_instantiation(0),test_basegenerator_inheritance(0)  # Test suite for BaseGenerator.
+    test_init_dunder()->None
+    test_baseparser_parse()->None
+    test_baseparser_parse_file()->None
+    test_init_dunder()->None
+    test_basegenerator_generate()->None
+  generated_tests/test_prompts.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_get_reproduction_prompt,test_get_review_prompt,test_get_fix_prompt
+    test_get_reproduction_prompt()->None
+    test_get_review_prompt()->None
+    test_get_fix_prompt()->None
+  generated_tests/test_metrics.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestTextMetrics,TestTextMetricsDataclass,TestStructuralMetrics,TestStructuralMetricsDataclass,TestSemanticMetrics,TestSemanticMetricsDataclass,TestFormatMetrics,TestFormatMetricsDataclass
+    TestTextMetrics: test_textmetrics_instantiation(0)  # Test suite for TextMetrics.
+    TestTextMetricsDataclass: test_textmetrics_fields(0),test_textmetrics_equality(0)  # Dataclass-specific tests for TextMetr...
+    TestStructuralMetrics: test_structuralmetrics_instantiation(0)  # Test suite for StructuralMetrics.
+    TestStructuralMetricsDataclass: test_structuralmetrics_fields(0),test_structuralmetrics_equality(0)  # Dataclass-specific tests for Structur...
+    TestSemanticMetrics: test_semanticmetrics_instantiation(0)  # Test suite for SemanticMetrics.
+    test_reproductionresult_to_dict()->None
+    test_reproductionresult_to_report()->None
+    test_init_dunder()->None
+    test_reproductionmetrics_analyze()->None
+    test_analyze_reproduction()->None
+    test_compare_formats()->None
+  generated_tests/test_adaptive.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestChunkInfo,TestChunkInfoDataclass,TestAdaptiveResult,TestAdaptiveResultDataclass,TestAdaptiveReproducer,test_init_dunder,test_adaptivereproducer_select_format,test_adaptivereproducer_should_chunk
+    TestChunkInfo: test_chunkinfo_instantiation(0)  # Test suite for ChunkInfo.
+    TestChunkInfoDataclass: test_chunkinfo_fields(0),test_chunkinfo_equality(0)  # Dataclass-specific tests for ChunkInfo.
+    TestAdaptiveResult: test_adaptiveresult_instantiation(0)  # Test suite for AdaptiveResult.
+    TestAdaptiveResultDataclass: test_adaptiveresult_fields(0),test_adaptiveresult_equality(0)  # Dataclass-specific tests for Adaptive...
+    TestAdaptiveReproducer: test_adaptivereproducer_instantiation(0)  # Test suite for AdaptiveReproducer.
+    test_init_dunder()->None
+    test_adaptivereproducer_select_format()->None
+    test_adaptivereproducer_should_chunk()->None
+    test_adaptivereproducer_chunk_content()->None
+    test_adaptivereproducer_generate_chunk_spec()->None
+    test_adaptivereproducer_reproduce()->None
+    test_get_llm_capabilities()->None
+  generated_tests/test_chunked_reproduction.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestChunk,TestChunkDataclass,TestChunkedSpec,TestChunkedSpecDataclass,TestChunkedResult,TestChunkedResultDataclass,TestChunkedReproducer,test_init_dunder
+    TestChunk: test_chunk_instantiation(0)  # Test suite for Chunk.
+    TestChunkDataclass: test_chunk_fields(0),test_chunk_equality(0)  # Dataclass-specific tests for Chunk.
+    TestChunkedSpec: test_chunkedspec_instantiation(0)  # Test suite for ChunkedSpec.
+    TestChunkedSpecDataclass: test_chunkedspec_fields(0),test_chunkedspec_equality(0)  # Dataclass-specific tests for ChunkedS...
+    TestChunkedResult: test_chunkedresult_instantiation(0)  # Test suite for ChunkedResult.
+    test_init_dunder()->None
+    test_chunkedreproducer_reproduce()->None
+    test_get_llm_limit()->None
+    test_chunk_yaml_spec()->None
+    test_chunk_gherkin_spec()->None
+    test_chunk_markdown_spec()->None
+    test_chunk_spec()->None
+    test_get_chunk_prompt()->None
+  generated_tests/test_similarity.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestSimilarityDetector,test_init_dunder,test_similaritydetector_find_similar_functions,test_similaritydetector_find_duplicate_signatures,test_is_rapidfuzz_available,test_get_refactoring_suggestions
+    TestSimilarityDetector: test_similaritydetector_instantiation(0)  # Test suite for SimilarityDetector.
+    test_init_dunder()->None
+    test_similaritydetector_find_similar_functions()->None
+    test_similaritydetector_find_duplicate_signatures()->None
+    test_is_rapidfuzz_available()->None
+    test_get_refactoring_suggestions()->None
+  generated_tests/test_llm_profiler.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestLLMProfile,TestLLMProfileDataclass,TestProfileTestResult,TestProfileTestResultDataclass,TestLLMProfiler,test_init_dunder,test_llmprofiler_run_profile,TestAdaptiveChunker
+    TestLLMProfile: test_llmprofile_instantiation(0)  # Test suite for LLMProfile.
+    TestLLMProfileDataclass: test_llmprofile_fields(0),test_llmprofile_equality(0)  # Dataclass-specific tests for LLMProfile.
+    TestProfileTestResult: test_profiletestresult_instantiation(0)  # Test suite for ProfileTestResult.
+    TestProfileTestResultDataclass: test_profiletestresult_fields(0),test_profiletestresult_equality(0)  # Dataclass-specific tests for ProfileT...
+    TestLLMProfiler: test_llmprofiler_instantiation(0)  # Test suite for LLMProfiler.
+    test_init_dunder()->None
+    test_llmprofiler_run_profile()->None
+    test_init_dunder()->None
+    test_adaptivechunker_get_optimal_settings()->None
+    test_adaptivechunker_chunk_spec()->None
+    test_adaptivechunker_recommend_format()->None
+    test_adaptivechunker_estimate_chunks_needed()->None
+    test_load_profiles()->None
+  generated_tests/test_results.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestFormatResult,TestFormatResultDataclass,test_formatresult_to_dict,TestFileResult,TestFileResultDataclass,test_fileresult_to_dict,TestFunctionResult,TestFunctionResultDataclass
+    TestFormatResult: test_formatresult_instantiation(0)  # Test suite for FormatResult.
+    TestFormatResultDataclass: test_formatresult_fields(0),test_formatresult_equality(0)  # Dataclass-specific tests for FormatRe...
+    TestFileResult: test_fileresult_instantiation(0)  # Test suite for FileResult.
+    TestFileResultDataclass: test_fileresult_fields(0),test_fileresult_equality(0)  # Dataclass-specific tests for FileResult.
+    TestFunctionResult: test_functionresult_instantiation(0)  # Test suite for FunctionResult.
+    test_formatresult_to_dict()->None
+    test_fileresult_to_dict()->None
+    test_functionresult_to_dict()->None
+    test_benchmarkresult_calculate_aggregates()->None
+    test_benchmarkresult_to_dict()->None
+    test_benchmarkresult_to_json()->None
+    test_benchmarkresult_save()->None
+    test_benchmarkresult_load()->None
+  generated_tests/test_mcp_server.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_handle_request,test_call_tool,test_run_server
+    test_handle_request()->None
+    test_call_tool()->None
+    test_run_server()->None
+  generated_tests/test_benchmark.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestFormatResult,TestFormatResultDataclass,TestBenchmarkResult,TestBenchmarkResultDataclass,TestReproductionBenchmark,test_init_dunder,test_reproductionbenchmark_generate_spec,test_reproductionbenchmark_reproduce_with_format
+    TestFormatResult: test_formatresult_instantiation(0)  # Test suite for FormatResult.
+    TestFormatResultDataclass: test_formatresult_fields(0),test_formatresult_equality(0)  # Dataclass-specific tests for FormatRe...
+    TestBenchmarkResult: test_benchmarkresult_instantiation(0)  # Test suite for BenchmarkResult.
+    TestBenchmarkResultDataclass: test_benchmarkresult_fields(0),test_benchmarkresult_equality(0)  # Dataclass-specific tests for Benchmar...
+    TestReproductionBenchmark: test_reproductionbenchmark_instantiation(0)  # Test suite for ReproductionBenchmark.
+    test_init_dunder()->None
+    test_reproductionbenchmark_generate_spec()->None
+    test_reproductionbenchmark_reproduce_with_format()->None
+    test_reproductionbenchmark_run_single()->None
+    test_reproductionbenchmark_run_all()->None
+    test_run_benchmark()->None
+  generated_tests/test_generators.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestMarkdownGenerator,test_markdowngenerator_generate,TestCompactGenerator,test_compactgenerator_generate,TestJSONGenerator,test_jsongenerator_generate,test_jsongenerator_generate_from_module,TestYAMLGenerator
+    TestMarkdownGenerator: test_markdowngenerator_instantiation(0)  # Test suite for MarkdownGenerator.
+    TestCompactGenerator: test_compactgenerator_instantiation(0)  # Test suite for CompactGenerator.
+    TestJSONGenerator: test_jsongenerator_instantiation(0)  # Test suite for JSONGenerator.
+    TestYAMLGenerator: test_yamlgenerator_instantiation(0)  # Test suite for YAMLGenerator.
+    TestCSVGenerator: test_csvgenerator_instantiation(0)  # Test suite for CSVGenerator.
+    test_markdowngenerator_generate()->None
+    test_compactgenerator_generate()->None
+    test_jsongenerator_generate()->None
+    test_jsongenerator_generate_from_module()->None
+    test_yamlgenerator_generate()->None
+    test_yamlgenerator_generate_schema()->None
+    test_yamlgenerator_generate_hybrid()->None
+    test_yamlgenerator_generate_from_module()->None
+  generated_tests/test_common.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_create_single_project,test_generate_spec,test_generate_spec_token,test_get_async_reproduction_prompt,test_get_token_reproduction_prompt,test_get_simple_reproduction_prompt
+    test_create_single_project()->None
+    test_generate_spec()->None
+    test_generate_spec_token()->None
+    test_get_async_reproduction_prompt()->None
+    test_get_token_reproduction_prompt()->None
+    test_get_simple_reproduction_prompt()->None
+  generated_tests/test_toon_format.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestTOONGenerator,test_init_dunder,test_toongenerator_generate,test_toongenerator_generate_compact,test_toongenerator_generate_full,test_toongenerator_generate_schema,TestTOONParser,test_init_dunder
+    TestTOONGenerator: test_toongenerator_instantiation(0)  # Test suite for TOONGenerator.
+    TestTOONParser: test_toonparser_instantiation(0)  # Test suite for TOONParser.
+    test_init_dunder()->None
+    test_toongenerator_generate()->None
+    test_toongenerator_generate_compact()->None
+    test_toongenerator_generate_full()->None
+    test_toongenerator_generate_schema()->None
+    test_init_dunder()->None
+    test_toonparser_parse()->None
+    test_generate_toon()->None
+  generated_tests/test_reproduction.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestCodeReproducer,test_init_dunder,test_codereproducer_reproduce_file,test_codereproducer_generate_from_gherkin,test_generate_file_gherkin,test_compare_code,test_extract_code_block
+    TestCodeReproducer: test_codereproducer_instantiation(0)  # Test suite for CodeReproducer.
+    test_init_dunder()->None
+    test_codereproducer_reproduce_file()->None
+    test_codereproducer_generate_from_gherkin()->None
+    test_generate_file_gherkin()->None
+    test_compare_code()->None
+    test_extract_code_block()->None
+  generated_tests/test_quality.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestQualityIssue,TestQualityIssueDataclass,TestQualityReport,TestQualityReportDataclass,test_qualityreport_to_dict,TestQualityAnalyzer,test_init_dunder,test_qualityanalyzer_analyze
+    TestQualityIssue: test_qualityissue_instantiation(0)  # Test suite for QualityIssue.
+    TestQualityIssueDataclass: test_qualityissue_fields(0),test_qualityissue_equality(0)  # Dataclass-specific tests for QualityI...
+    TestQualityReport: test_qualityreport_instantiation(0)  # Test suite for QualityReport.
+    TestQualityReportDataclass: test_qualityreport_fields(0),test_qualityreport_equality(0)  # Dataclass-specific tests for QualityR...
+    TestQualityAnalyzer: test_qualityanalyzer_instantiation(0)  # Test suite for QualityAnalyzer.
+    test_qualityreport_to_dict()->None
+    test_init_dunder()->None
+    test_qualityanalyzer_analyze()->None
+    test_qualityanalyzer_analyze_modules()->None
+    test_analyze_quality()->None
+    test_get_quality_summary()->None
+  generated_tests/test_models.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestFunctionInfo,TestFunctionInfoDataclass,TestClassInfo,TestClassInfoDataclass,TestTypeInfo,TestTypeInfoDataclass,TestModuleInfo,TestModuleInfoDataclass
+    TestFunctionInfo: test_functioninfo_instantiation(0)  # Test suite for FunctionInfo.
+    TestFunctionInfoDataclass: test_functioninfo_fields(0),test_functioninfo_equality(0)  # Dataclass-specific tests for Function...
+    TestClassInfo: test_classinfo_instantiation(0)  # Test suite for ClassInfo.
+    TestClassInfoDataclass: test_classinfo_fields(0),test_classinfo_equality(0)  # Dataclass-specific tests for ClassInfo.
+    TestTypeInfo: test_typeinfo_instantiation(0)  # Test suite for TypeInfo.
+  generated_tests/test_terminal.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestShellRenderer,test_init_dunder,test_shellrenderer_enable_log,test_shellrenderer_get_log,test_shellrenderer_clear_log,test_shellrenderer_heading,test_shellrenderer_codeblock,test_shellrenderer_render_markdown
+    TestShellRenderer: test_shellrenderer_instantiation(0)  # Test suite for ShellRenderer.
+    TestRenderAPI: test_renderapi_instantiation(0)  # Test suite for RenderAPI.
+    test_init_dunder()->None
+    test_shellrenderer_enable_log()->None
+    test_shellrenderer_get_log()->None
+    test_shellrenderer_clear_log()->None
+    test_shellrenderer_heading()->None
+    test_shellrenderer_codeblock()->None
+    test_shellrenderer_render_markdown()->None
+    test_shellrenderer_success()->None
+  generated_tests/test_runner.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestBenchmarkRunner,test_init_dunder,test_benchmarkrunner_run_format_benchmark,test_benchmarkrunner_run_file_benchmark,test_benchmarkrunner_run_function_benchmark,test_benchmarkrunner_run_project_benchmark,test_run_benchmark
+    TestBenchmarkRunner: test_benchmarkrunner_instantiation(0)  # Test suite for BenchmarkRunner.
+    test_init_dunder()->None
+    test_benchmarkrunner_run_format_benchmark()->None
+    test_benchmarkrunner_run_file_benchmark()->None
+    test_benchmarkrunner_run_function_benchmark()->None
+    test_benchmarkrunner_run_project_benchmark()->None
+    test_run_benchmark()->None
+  generated_tests/test_refactor.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestDuplicateGroup,TestDuplicateGroupDataclass,TestRefactoringSuggestion,TestRefactoringSuggestionDataclass,TestRefactoringReport,TestRefactoringReportDataclass,test_refactoringreport_to_dict,test_refactoringreport_to_markdown
+    TestDuplicateGroup: test_duplicategroup_instantiation(0)  # Test suite for DuplicateGroup.
+    TestDuplicateGroupDataclass: test_duplicategroup_fields(0),test_duplicategroup_equality(0)  # Dataclass-specific tests for Duplicat...
+    TestRefactoringSuggestion: test_refactoringsuggestion_instantiation(0)  # Test suite for RefactoringSuggestion.
+    TestRefactoringSuggestionDataclass: test_refactoringsuggestion_fields(0),test_refactoringsuggestion_equality(0)  # Dataclass-specific tests for Refactor...
+    TestRefactoringReport: test_refactoringreport_instantiation(0)  # Test suite for RefactoringReport.
+    test_refactoringreport_to_dict()->None
+    test_refactoringreport_to_markdown()->None
+    test_find_duplicates()->None
+    test_analyze_quality()->None
+    test_suggest_refactoring()->None
+    test_compare_codebases()->None
+    test_quick_analyze()->None
+  generated_tests/test_gherkin.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestGherkinScenario,TestGherkinScenarioDataclass,TestGherkinFeature,TestGherkinFeatureDataclass,TestStepDefinition,TestStepDefinitionDataclass,TestGherkinGenerator,test_init_dunder
+    TestGherkinScenario: test_gherkinscenario_instantiation(0)  # Test suite for GherkinScenario.
+    TestGherkinScenarioDataclass: test_gherkinscenario_fields(0),test_gherkinscenario_equality(0)  # Dataclass-specific tests for GherkinS...
+    TestGherkinFeature: test_gherkinfeature_instantiation(0)  # Test suite for GherkinFeature.
+    TestGherkinFeatureDataclass: test_gherkinfeature_fields(0),test_gherkinfeature_equality(0)  # Dataclass-specific tests for GherkinF...
+    TestStepDefinition: test_stepdefinition_instantiation(0)  # Test suite for StepDefinition.
+    test_init_dunder()->None
+    test_gherkingenerator_generate()->None
+    test_gherkingenerator_generate_test_scenarios()->None
+    test_gherkingenerator_get_step_definitions()->None
+    test_stepdefinitiongenerator_generate_pytest_bdd()->None
+    test_stepdefinitiongenerator_generate_behave()->None
+    test_stepdefinitiongenerator_generate_cucumber_js()->None
+    test_cucumberyamlgenerator_generate()->None
+  generated_tests/test_json_schema.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestJSONMethodSchema,TestJSONMethodSchemaDataclass,TestJSONClassSchema,TestJSONClassSchemaDataclass,TestJSONFunctionSchema,TestJSONFunctionSchemaDataclass,TestJSONModuleSchema,TestJSONModuleSchemaDataclass
+    TestJSONMethodSchema: test_jsonmethodschema_instantiation(0)  # Test suite for JSONMethodSchema.
+    TestJSONMethodSchemaDataclass: test_jsonmethodschema_fields(0),test_jsonmethodschema_equality(0)  # Dataclass-specific tests for JSONMeth...
+    TestJSONClassSchema: test_jsonclassschema_instantiation(0)  # Test suite for JSONClassSchema.
+    TestJSONClassSchemaDataclass: test_jsonclassschema_fields(0),test_jsonclassschema_equality(0)  # Dataclass-specific tests for JSONClas...
+    TestJSONFunctionSchema: test_jsonfunctionschema_instantiation(0)  # Test suite for JSONFunctionSchema.
+    test_validate_json()->None
+    test_parse_json_spec()->None
+  generated_tests/test_markdown_format.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestMarkdownSpec,TestMarkdownSpecDataclass,TestMarkdownHybridGenerator,test_init_dunder,test_markdownhybridgenerator_generate,test_generate_markdown_hybrid,test_generate_file_markdown
+    TestMarkdownSpec: test_markdownspec_instantiation(0)  # Test suite for MarkdownSpec.
+    TestMarkdownSpecDataclass: test_markdownspec_fields(0),test_markdownspec_equality(0)  # Dataclass-specific tests for Markdown...
+    TestMarkdownHybridGenerator: test_markdownhybridgenerator_instantiation(0)  # Test suite for MarkdownHybridGenerator.
+    test_init_dunder()->None
+    test_markdownhybridgenerator_generate()->None
+    test_generate_markdown_hybrid()->None
+    test_generate_file_markdown()->None
+  generated_tests/test_dependency.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestDependencyAnalyzer,test_init_dunder,test_dependencyanalyzer_build_graph,test_dependencyanalyzer_analyze_metrics,test_dependencyanalyzer_get_entrypoints,test_dependencyanalyzer_get_hubs,test_dependencyanalyzer_detect_cycles,test_dependencyanalyzer_get_strongly_connected_components
+    TestDependencyAnalyzer: test_dependencyanalyzer_instantiation(0)  # Test suite for DependencyAnalyzer.
+    test_init_dunder()->None
+    test_dependencyanalyzer_build_graph()->None
+    test_dependencyanalyzer_analyze_metrics()->None
+    test_dependencyanalyzer_get_entrypoints()->None
+    test_dependencyanalyzer_get_hubs()->None
+    test_dependencyanalyzer_detect_cycles()->None
+    test_dependencyanalyzer_get_strongly_connected_components()->None
+    test_dependencyanalyzer_get_dependency_depth()->None
+  generated_tests/test_function_logic.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestFunctionLogicGenerator,test_init_dunder,test_functionlogicgenerator_generate,test_functionlogicgenerator_generate_json,test_functionlogicgenerator_generate_yaml,test_functionlogicgenerator_generate_toon
+    TestFunctionLogicGenerator: test_functionlogicgenerator_instantiation(0)  # Test suite for FunctionLogicGenerator.
+    test_init_dunder()->None
+    test_functionlogicgenerator_generate()->None
+    test_functionlogicgenerator_generate_json()->None
+    test_functionlogicgenerator_generate_yaml()->None
+    test_functionlogicgenerator_generate_toon()->None
+  generated_tests/test_intent.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestIntentType,TestIntent,TestIntentDataclass,TestEnhancedIntentGenerator,test_init_dunder,test_enhancedintentgenerator_generate,test_enhancedintentgenerator_get_available_features,TestIntentAnalyzer
+    TestIntentType: test_intenttype_instantiation(0),test_intenttype_inheritance(0)  # Test suite for IntentType.
+    TestIntent: test_intent_instantiation(0)  # Test suite for Intent.
+    TestIntentDataclass: test_intent_fields(0),test_intent_equality(0)  # Dataclass-specific tests for Intent.
+    TestEnhancedIntentGenerator: test_enhancedintentgenerator_instantiation(0)  # Test suite for EnhancedIntentGenerator.
+    TestIntentAnalyzer: test_intentanalyzer_instantiation(0)  # Test suite for IntentAnalyzer.
+    test_init_dunder()->None
+    test_enhancedintentgenerator_generate()->None
+    test_enhancedintentgenerator_get_available_features()->None
+    test_init_dunder()->None
+    test_intentanalyzer_analyze_intent()->None
+    test_intentanalyzer_detect_code_smells()->None
+    test_intentanalyzer_suggest_refactoring()->None
+  generated_tests/test_cli.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestColors,TestLogger,test_init_dunder,test_logger_info,test_logger_success,test_logger_warning,test_logger_error,test_logger_step
+    TestColors: test_colors_instantiation(0)  # Test suite for Colors.
+    TestLogger: test_logger_instantiation(0)  # Test suite for Logger.
+    test_init_dunder()->None
+    test_logger_info()->None
+    test_logger_success()->None
+    test_logger_warning()->None
+    test_logger_error()->None
+    test_logger_step()->None
+    test_logger_detail()->None
+    test_logger_debug_msg()->None
+  generated_tests/test_utils.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_estimate_tokens,test_write_text_atomic,test_cleanup_generated_root
+    test_estimate_tokens()->None
+    test_write_text_atomic()->None
+    test_cleanup_generated_root()->None
+  generated_tests/test_parsers.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestTreeSitterParser,test_init_dunder,test_treesitterparser_is_available,test_treesitterparser_get_supported_languages,test_treesitterparser_parse,TestUniversalParser,test_init_dunder,test_universalparser_parse
+    TestTreeSitterParser: test_treesitterparser_instantiation(0)  # Test suite for TreeSitterParser.
+    TestUniversalParser: test_universalparser_instantiation(0)  # Test suite for UniversalParser.
+    test_init_dunder()->None
+    test_treesitterparser_is_available()->None
+    test_treesitterparser_get_supported_languages()->None
+    test_treesitterparser_parse()->None
+    test_init_dunder()->None
+    test_universalparser_parse()->None
+    test_is_tree_sitter_available()->None
+  generated_tests/test_analyzer.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestProjectAnalyzer,test_init_dunder,test_projectanalyzer_analyze,test_projectanalyzer_get_statistics,test_analyze_project,test_get_library_status
+    TestProjectAnalyzer: test_projectanalyzer_instantiation(0)  # Test suite for ProjectAnalyzer.
+    test_init_dunder()->None
+    test_projectanalyzer_analyze()->None
+    test_projectanalyzer_get_statistics()->None
+    test_analyze_project()->None
+    test_get_library_status()->None
+  generated_tests_hybrid/property/test_properties.py:
+    i: pytest,hypothesis.{given,st}
+    e: TestProperties
+    TestProperties: test_llmprofile_roundtrip(0),test_profiletestresult_roundtrip(0),test_fileresult_roundtrip(0),test_projectresult_roundtrip(0),test_llmconfig_roundtrip(0)  # Property-based tests for data structu...
+  generated_tests_hybrid/unit/test_project_reproducer.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestFileResult,TestFileResultDataclass,TestProjectResult,TestProjectResultDataclass,TestProjectReproducer,test_init_dunder,test_projectreproducer_find_source_files,test_projectreproducer_reproduce_file
+    TestFileResult: test_fileresult_instantiation(0)  # Test suite for FileResult.
+    TestFileResultDataclass: test_fileresult_fields(0),test_fileresult_equality(0)  # Dataclass-specific tests for FileResult.
+    TestProjectResult: test_projectresult_instantiation(0)  # Test suite for ProjectResult.
+    TestProjectResultDataclass: test_projectresult_fields(0),test_projectresult_equality(0)  # Dataclass-specific tests for ProjectR...
+    TestProjectReproducer: test_projectreproducer_instantiation(0)  # Test suite for ProjectReproducer.
+    test_init_dunder()->None
+    test_projectreproducer_find_source_files()->None
+    test_projectreproducer_reproduce_file()->None
+    test_projectreproducer_reproduce_project()->None
+    test_reproduce_project()->None
+  generated_tests_hybrid/unit/test_llm_clients.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestBaseLLMClient,test_basellmclient_generate,test_basellmclient_is_available,test_basellmclient_chat,TestOpenRouterClient,test_init_dunder,test_openrouterclient_generate,test_openrouterclient_is_available
+    TestBaseLLMClient: test_basellmclient_instantiation(0),test_basellmclient_inheritance(0)  # Test suite for BaseLLMClient.
+    TestOpenRouterClient: test_openrouterclient_instantiation(0),test_openrouterclient_inheritance(0)  # Test suite for OpenRouterClient.
+    TestOllamaLocalClient: test_ollamalocalclient_instantiation(0),test_ollamalocalclient_inheritance(0)  # Test suite for OllamaLocalClient.
+    TestLiteLLMClient: test_litellmclient_instantiation(0),test_litellmclient_inheritance(0)  # Test suite for LiteLLMClient.
+    test_basellmclient_generate()->None
+    test_basellmclient_is_available()->None
+    test_basellmclient_chat()->None
+    test_init_dunder()->None
+    test_openrouterclient_generate()->None
+    test_openrouterclient_is_available()->None
+    test_openrouterclient_list_recommended_models()->None
+    test_init_dunder()->None
+  generated_tests_hybrid/unit/test_reproducer.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestReproductionStatus,TestFileValidation,TestFileValidationDataclass,test_filevalidation_score,test_filevalidation_to_dict,TestReproductionResult,TestReproductionResultDataclass,test_reproductionresult_success_rate
+    TestReproductionStatus: test_reproductionstatus_instantiation(0),test_reproductionstatus_inheritance(0)  # Test suite for ReproductionStatus.
+    TestFileValidation: test_filevalidation_instantiation(0)  # Test suite for FileValidation.
+    TestFileValidationDataclass: test_filevalidation_fields(0),test_filevalidation_equality(0)  # Dataclass-specific tests for FileVali...
+    TestReproductionResult: test_reproductionresult_instantiation(0)  # Test suite for ReproductionResult.
+    TestReproductionResultDataclass: test_reproductionresult_fields(0),test_reproductionresult_equality(0)  # Dataclass-specific tests for Reproduc...
+    test_filevalidation_score()->None
+    test_filevalidation_to_dict()->None
+    test_reproductionresult_success_rate()->None
+    test_reproductionresult_average_score()->None
+    test_reproductionresult_summary()->None
+    test_init_dunder()->None
+    test_specreproducer_reproduce_from_yaml()->None
+    test_specreproducer_reproduce_from_json()->None
+  generated_tests_hybrid/unit/test_file_formats.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_generate_file_csv,test_generate_file_json,test_generate_file_yaml
+    test_generate_file_csv()->None
+    test_generate_file_json()->None
+    test_generate_file_yaml()->None
+  generated_tests_hybrid/unit/test_logicml_schema.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestLogicMLMethod,TestLogicMLMethodDataclass,TestLogicMLClass,TestLogicMLClassDataclass,TestLogicMLModule,TestLogicMLModuleDataclass,TestLogicMLSchema,TestLogicMLSchemaDataclass
+    TestLogicMLMethod: test_logicmlmethod_instantiation(0)  # Test suite for LogicMLMethod.
+    TestLogicMLMethodDataclass: test_logicmlmethod_fields(0),test_logicmlmethod_equality(0)  # Dataclass-specific tests for LogicMLM...
+    TestLogicMLClass: test_logicmlclass_instantiation(0)  # Test suite for LogicMLClass.
+    TestLogicMLClassDataclass: test_logicmlclass_fields(0),test_logicmlclass_equality(0)  # Dataclass-specific tests for LogicMLC...
+    TestLogicMLModule: test_logicmlmodule_instantiation(0)  # Test suite for LogicMLModule.
+    test_validate_logicml()->None
+    test_parse_logicml_header()->None
+    test_extract_logicml_signature()->None
+  generated_tests_hybrid/unit/test_errors.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestErrorSeverity,TestErrorType,TestAnalysisError,TestAnalysisErrorDataclass,test_analysiserror_to_dict,TestAnalysisResult,TestAnalysisResultDataclass,test_analysisresult_add_error
+    TestErrorSeverity: test_errorseverity_instantiation(0),test_errorseverity_inheritance(0)  # Test suite for ErrorSeverity.
+    TestErrorType: test_errortype_instantiation(0),test_errortype_inheritance(0)  # Test suite for ErrorType.
+    TestAnalysisError: test_analysiserror_instantiation(0)  # Test suite for AnalysisError.
+    TestAnalysisErrorDataclass: test_analysiserror_fields(0),test_analysiserror_equality(0)  # Dataclass-specific tests for Analysis...
+    TestAnalysisResult: test_analysisresult_instantiation(0)  # Test suite for AnalysisResult.
+    test_analysiserror_to_dict()->None
+    test_analysisresult_add_error()->None
+    test_analysisresult_has_errors()->None
+    test_analysisresult_summary()->None
+    test_init_dunder()->None
+    test_errorhandler_reset()->None
+    test_errorhandler_handle_error()->None
+    test_errorhandler_safe_read_file()->None
+  generated_tests_hybrid/unit/test_llm.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestLLMConfig,TestLLMConfigDataclass,TestOllamaClient,test_init_dunder,test_ollamaclient_generate,test_ollamaclient_chat,test_ollamaclient_is_available,test_ollamaclient_list_models
+    TestLLMConfig: test_llmconfig_instantiation(0)  # Test suite for LLMConfig.
+    TestLLMConfigDataclass: test_llmconfig_fields(0),test_llmconfig_equality(0)  # Dataclass-specific tests for LLMConfig.
+    TestOllamaClient: test_ollamaclient_instantiation(0)  # Test suite for OllamaClient.
+    TestLiteLLMClient: test_litellmclient_instantiation(0)  # Test suite for LiteLLMClient.
+    TestCodeAnalyzer: test_codeanalyzer_instantiation(0)  # Test suite for CodeAnalyzer.
+    test_init_dunder()->None
+    test_ollamaclient_generate()->None
+    test_ollamaclient_chat()->None
+    test_ollamaclient_is_available()->None
+    test_ollamaclient_list_models()->None
+    test_init_dunder()->None
+    test_litellmclient_generate()->None
+    test_litellmclient_chat()->None
+  generated_tests_hybrid/unit/test_code_review.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestCodeReviewer,test_init_dunder,test_codereviewer_review,test_codereviewer_generate_report,test_analyze_code_quality,test_check_security_issues,test_check_performance_issues
+    TestCodeReviewer: test_codereviewer_instantiation(0)  # Test suite for CodeReviewer.
+    test_init_dunder()->None
+    test_codereviewer_review()->None
+    test_codereviewer_generate_report()->None
+    test_analyze_code_quality()->None
+    test_check_security_issues()->None
+    test_check_performance_issues()->None
+  generated_tests_hybrid/unit/test_yaml_schema.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestMethodSchema,TestMethodSchemaDataclass,TestClassSchema,TestClassSchemaDataclass,TestFunctionSchema,TestFunctionSchemaDataclass,TestModuleSchema,TestModuleSchemaDataclass
+    TestMethodSchema: test_methodschema_instantiation(0)  # Test suite for MethodSchema.
+    TestMethodSchemaDataclass: test_methodschema_fields(0),test_methodschema_equality(0)  # Dataclass-specific tests for MethodSc...
+    TestClassSchema: test_classschema_instantiation(0)  # Test suite for ClassSchema.
+    TestClassSchemaDataclass: test_classschema_fields(0),test_classschema_equality(0)  # Dataclass-specific tests for ClassSch...
+    TestFunctionSchema: test_functionschema_instantiation(0)  # Test suite for FunctionSchema.
+    test_validate_yaml()->None
+  generated_tests_hybrid/unit/test_shared_utils.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_compact_imports,test_deduplicate_imports,test_abbreviate_type,test_expand_type,test_build_signature,test_remove_self_from_params,test_categorize_function,test_extract_domain
+    test_compact_imports()->None
+    test_deduplicate_imports()->None
+    test_abbreviate_type()->None
+    test_expand_type()->None
+    test_build_signature()->None
+    test_remove_self_from_params()->None
+    test_categorize_function()->None
+    test_extract_domain()->None
+  generated_tests_hybrid/unit/test_config.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestConfig,test_init_dunder,test_config_get_api_key,test_config_get_model,test_config_get_ollama_host,test_config_get_default_provider,test_config_is_verbose,test_config_get_cache_dir
+    TestConfig: test_config_instantiation(0)  # Test suite for Config.
+    test_init_dunder()->None
+    test_config_get_api_key()->None
+    test_config_get_model()->None
+    test_config_get_ollama_host()->None
+    test_config_get_default_provider()->None
+    test_config_is_verbose()->None
+    test_config_get_cache_dir()->None
+    test_load_env()->None
+  generated_tests_hybrid/unit/test_markdown_schema.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestMarkdownMethod,TestMarkdownMethodDataclass,TestMarkdownClass,TestMarkdownClassDataclass,TestMarkdownModule,TestMarkdownModuleDataclass,TestMarkdownSchema,TestMarkdownSchemaDataclass
+    TestMarkdownMethod: test_markdownmethod_instantiation(0)  # Test suite for MarkdownMethod.
+    TestMarkdownMethodDataclass: test_markdownmethod_fields(0),test_markdownmethod_equality(0)  # Dataclass-specific tests for Markdown...
+    TestMarkdownClass: test_markdownclass_instantiation(0)  # Test suite for MarkdownClass.
+    TestMarkdownClassDataclass: test_markdownclass_fields(0),test_markdownclass_equality(0)  # Dataclass-specific tests for Markdown...
+    TestMarkdownModule: test_markdownmodule_instantiation(0)  # Test suite for MarkdownModule.
+    test_validate_markdown()->None
+    test_extract_markdown_sections()->None
+  generated_tests_hybrid/unit/test_logicml.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestLogicMLSpec,TestLogicMLSpecDataclass,TestLogicMLGenerator,test_init_dunder,test_logicmlgenerator_generate,test_generate_logicml
+    TestLogicMLSpec: test_logicmlspec_instantiation(0)  # Test suite for LogicMLSpec.
+    TestLogicMLSpecDataclass: test_logicmlspec_fields(0),test_logicmlspec_equality(0)  # Dataclass-specific tests for LogicMLS...
+    TestLogicMLGenerator: test_logicmlgenerator_instantiation(0)  # Test suite for LogicMLGenerator.
+    test_init_dunder()->None
+    test_logicmlgenerator_generate()->None
+    test_generate_logicml()->None
+  generated_tests_hybrid/unit/test_universal.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestElementType,TestLanguage,TestParameter,TestParameterDataclass,TestCodeElement,TestCodeElementDataclass,TestCodeLogic,TestCodeLogicDataclass
+    TestElementType: test_elementtype_instantiation(0),test_elementtype_inheritance(0)  # Test suite for ElementType.
+    TestLanguage: test_language_instantiation(0),test_language_inheritance(0)  # Test suite for Language.
+    TestParameter: test_parameter_instantiation(0)  # Test suite for Parameter.
+    TestParameterDataclass: test_parameter_fields(0),test_parameter_equality(0)  # Dataclass-specific tests for Parameter.
+    TestCodeElement: test_codeelement_instantiation(0)  # Test suite for CodeElement.
+    test_codelogic_to_dict()->None
+    test_codelogic_to_compact()->None
+    test_universalparser_detect_language()->None
+    test_universalparser_parse()->None
+    test_codegenerator_generate()->None
+    test_init_dunder()->None
+    test_universalreproducer_extract_logic()->None
+    test_universalreproducer_reproduce()->None
+  generated_tests_hybrid/unit/test_base.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestBaseParser,test_init_dunder,test_baseparser_parse,test_baseparser_parse_file,TestBaseGenerator,test_init_dunder,test_basegenerator_generate
+    TestBaseParser: test_baseparser_instantiation(0),test_baseparser_inheritance(0)  # Test suite for BaseParser.
+    TestBaseGenerator: test_basegenerator_instantiation(0),test_basegenerator_inheritance(0)  # Test suite for BaseGenerator.
+    test_init_dunder()->None
+    test_baseparser_parse()->None
+    test_baseparser_parse_file()->None
+    test_init_dunder()->None
+    test_basegenerator_generate()->None
+  generated_tests_hybrid/unit/test_prompts.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_get_reproduction_prompt,test_get_review_prompt,test_get_fix_prompt
+    test_get_reproduction_prompt()->None
+    test_get_review_prompt()->None
+    test_get_fix_prompt()->None
+  generated_tests_hybrid/unit/test_metrics.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestTextMetrics,TestTextMetricsDataclass,TestStructuralMetrics,TestStructuralMetricsDataclass,TestSemanticMetrics,TestSemanticMetricsDataclass,TestFormatMetrics,TestFormatMetricsDataclass
+    TestTextMetrics: test_textmetrics_instantiation(0)  # Test suite for TextMetrics.
+    TestTextMetricsDataclass: test_textmetrics_fields(0),test_textmetrics_equality(0)  # Dataclass-specific tests for TextMetr...
+    TestStructuralMetrics: test_structuralmetrics_instantiation(0)  # Test suite for StructuralMetrics.
+    TestStructuralMetricsDataclass: test_structuralmetrics_fields(0),test_structuralmetrics_equality(0)  # Dataclass-specific tests for Structur...
+    TestSemanticMetrics: test_semanticmetrics_instantiation(0)  # Test suite for SemanticMetrics.
+    test_reproductionresult_to_dict()->None
+    test_reproductionresult_to_report()->None
+    test_init_dunder()->None
+    test_reproductionmetrics_analyze()->None
+    test_analyze_reproduction()->None
+    test_compare_formats()->None
+  generated_tests_hybrid/unit/test_adaptive.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestChunkInfo,TestChunkInfoDataclass,TestAdaptiveResult,TestAdaptiveResultDataclass,TestAdaptiveReproducer,test_init_dunder,test_adaptivereproducer_select_format,test_adaptivereproducer_should_chunk
+    TestChunkInfo: test_chunkinfo_instantiation(0)  # Test suite for ChunkInfo.
+    TestChunkInfoDataclass: test_chunkinfo_fields(0),test_chunkinfo_equality(0)  # Dataclass-specific tests for ChunkInfo.
+    TestAdaptiveResult: test_adaptiveresult_instantiation(0)  # Test suite for AdaptiveResult.
+    TestAdaptiveResultDataclass: test_adaptiveresult_fields(0),test_adaptiveresult_equality(0)  # Dataclass-specific tests for Adaptive...
+    TestAdaptiveReproducer: test_adaptivereproducer_instantiation(0)  # Test suite for AdaptiveReproducer.
+    test_init_dunder()->None
+    test_adaptivereproducer_select_format()->None
+    test_adaptivereproducer_should_chunk()->None
+    test_adaptivereproducer_chunk_content()->None
+    test_adaptivereproducer_generate_chunk_spec()->None
+    test_adaptivereproducer_reproduce()->None
+    test_get_llm_capabilities()->None
+  generated_tests_hybrid/unit/test_chunked_reproduction.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestChunk,TestChunkDataclass,TestChunkedSpec,TestChunkedSpecDataclass,TestChunkedResult,TestChunkedResultDataclass,TestChunkedReproducer,test_init_dunder
+    TestChunk: test_chunk_instantiation(0)  # Test suite for Chunk.
+    TestChunkDataclass: test_chunk_fields(0),test_chunk_equality(0)  # Dataclass-specific tests for Chunk.
+    TestChunkedSpec: test_chunkedspec_instantiation(0)  # Test suite for ChunkedSpec.
+    TestChunkedSpecDataclass: test_chunkedspec_fields(0),test_chunkedspec_equality(0)  # Dataclass-specific tests for ChunkedS...
+    TestChunkedResult: test_chunkedresult_instantiation(0)  # Test suite for ChunkedResult.
+    test_init_dunder()->None
+    test_chunkedreproducer_reproduce()->None
+    test_get_llm_limit()->None
+    test_chunk_yaml_spec()->None
+    test_chunk_gherkin_spec()->None
+    test_chunk_markdown_spec()->None
+    test_chunk_spec()->None
+    test_get_chunk_prompt()->None
+  generated_tests_hybrid/unit/test_similarity.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestSimilarityDetector,test_init_dunder,test_similaritydetector_find_similar_functions,test_similaritydetector_find_duplicate_signatures,test_is_rapidfuzz_available,test_get_refactoring_suggestions
+    TestSimilarityDetector: test_similaritydetector_instantiation(0)  # Test suite for SimilarityDetector.
+    test_init_dunder()->None
+    test_similaritydetector_find_similar_functions()->None
+    test_similaritydetector_find_duplicate_signatures()->None
+    test_is_rapidfuzz_available()->None
+    test_get_refactoring_suggestions()->None
+  generated_tests_hybrid/unit/test_llm_profiler.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestLLMProfile,TestLLMProfileDataclass,TestProfileTestResult,TestProfileTestResultDataclass,TestLLMProfiler,test_init_dunder,test_llmprofiler_run_profile,TestAdaptiveChunker
+    TestLLMProfile: test_llmprofile_instantiation(0)  # Test suite for LLMProfile.
+    TestLLMProfileDataclass: test_llmprofile_fields(0),test_llmprofile_equality(0)  # Dataclass-specific tests for LLMProfile.
+    TestProfileTestResult: test_profiletestresult_instantiation(0)  # Test suite for ProfileTestResult.
+    TestProfileTestResultDataclass: test_profiletestresult_fields(0),test_profiletestresult_equality(0)  # Dataclass-specific tests for ProfileT...
+    TestLLMProfiler: test_llmprofiler_instantiation(0)  # Test suite for LLMProfiler.
+    test_init_dunder()->None
+    test_llmprofiler_run_profile()->None
+    test_init_dunder()->None
+    test_adaptivechunker_get_optimal_settings()->None
+    test_adaptivechunker_chunk_spec()->None
+    test_adaptivechunker_recommend_format()->None
+    test_adaptivechunker_estimate_chunks_needed()->None
+    test_load_profiles()->None
+  generated_tests_hybrid/unit/test_results.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestFormatResult,TestFormatResultDataclass,test_formatresult_to_dict,TestFileResult,TestFileResultDataclass,test_fileresult_to_dict,TestFunctionResult,TestFunctionResultDataclass
+    TestFormatResult: test_formatresult_instantiation(0)  # Test suite for FormatResult.
+    TestFormatResultDataclass: test_formatresult_fields(0),test_formatresult_equality(0)  # Dataclass-specific tests for FormatRe...
+    TestFileResult: test_fileresult_instantiation(0)  # Test suite for FileResult.
+    TestFileResultDataclass: test_fileresult_fields(0),test_fileresult_equality(0)  # Dataclass-specific tests for FileResult.
+    TestFunctionResult: test_functionresult_instantiation(0)  # Test suite for FunctionResult.
+    test_formatresult_to_dict()->None
+    test_fileresult_to_dict()->None
+    test_functionresult_to_dict()->None
+    test_benchmarkresult_calculate_aggregates()->None
+    test_benchmarkresult_to_dict()->None
+    test_benchmarkresult_to_json()->None
+    test_benchmarkresult_save()->None
+    test_benchmarkresult_load()->None
+  generated_tests_hybrid/unit/test_mcp_server.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_handle_request,test_call_tool,test_run_server
+    test_handle_request()->None
+    test_call_tool()->None
+    test_run_server()->None
+  generated_tests_hybrid/unit/test_benchmark.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestFormatResult,TestFormatResultDataclass,TestBenchmarkResult,TestBenchmarkResultDataclass,TestReproductionBenchmark,test_init_dunder,test_reproductionbenchmark_generate_spec,test_reproductionbenchmark_reproduce_with_format
+    TestFormatResult: test_formatresult_instantiation(0)  # Test suite for FormatResult.
+    TestFormatResultDataclass: test_formatresult_fields(0),test_formatresult_equality(0)  # Dataclass-specific tests for FormatRe...
+    TestBenchmarkResult: test_benchmarkresult_instantiation(0)  # Test suite for BenchmarkResult.
+    TestBenchmarkResultDataclass: test_benchmarkresult_fields(0),test_benchmarkresult_equality(0)  # Dataclass-specific tests for Benchmar...
+    TestReproductionBenchmark: test_reproductionbenchmark_instantiation(0)  # Test suite for ReproductionBenchmark.
+    test_init_dunder()->None
+    test_reproductionbenchmark_generate_spec()->None
+    test_reproductionbenchmark_reproduce_with_format()->None
+    test_reproductionbenchmark_run_single()->None
+    test_reproductionbenchmark_run_all()->None
+    test_run_benchmark()->None
+  generated_tests_hybrid/unit/test_generators.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestMarkdownGenerator,test_markdowngenerator_generate,TestCompactGenerator,test_compactgenerator_generate,TestJSONGenerator,test_jsongenerator_generate,test_jsongenerator_generate_from_module,TestYAMLGenerator
+    TestMarkdownGenerator: test_markdowngenerator_instantiation(0)  # Test suite for MarkdownGenerator.
+    TestCompactGenerator: test_compactgenerator_instantiation(0)  # Test suite for CompactGenerator.
+    TestJSONGenerator: test_jsongenerator_instantiation(0)  # Test suite for JSONGenerator.
+    TestYAMLGenerator: test_yamlgenerator_instantiation(0)  # Test suite for YAMLGenerator.
+    TestCSVGenerator: test_csvgenerator_instantiation(0)  # Test suite for CSVGenerator.
+    test_markdowngenerator_generate()->None
+    test_compactgenerator_generate()->None
+    test_jsongenerator_generate()->None
+    test_jsongenerator_generate_from_module()->None
+    test_yamlgenerator_generate()->None
+    test_yamlgenerator_generate_schema()->None
+    test_yamlgenerator_generate_hybrid()->None
+    test_csvgenerator_generate()->None
+  generated_tests_hybrid/unit/test_common.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_create_single_project,test_generate_spec,test_generate_spec_token,test_get_async_reproduction_prompt,test_get_token_reproduction_prompt,test_get_simple_reproduction_prompt
+    test_create_single_project()->None
+    test_generate_spec()->None
+    test_generate_spec_token()->None
+    test_get_async_reproduction_prompt()->None
+    test_get_token_reproduction_prompt()->None
+    test_get_simple_reproduction_prompt()->None
+  generated_tests_hybrid/unit/test_toon_format.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestTOONGenerator,test_init_dunder,test_toongenerator_generate,test_toongenerator_generate_compact,TestTOONParser,test_init_dunder,test_toonparser_parse,test_generate_toon
+    TestTOONGenerator: test_toongenerator_instantiation(0)  # Test suite for TOONGenerator.
+    TestTOONParser: test_toonparser_instantiation(0)  # Test suite for TOONParser.
+    test_init_dunder()->None
+    test_toongenerator_generate()->None
+    test_toongenerator_generate_compact()->None
+    test_init_dunder()->None
+    test_toonparser_parse()->None
+    test_generate_toon()->None
+    test_parse_toon()->None
+  generated_tests_hybrid/unit/test_reproduction.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestCodeReproducer,test_init_dunder,test_codereproducer_reproduce_file,test_codereproducer_generate_from_gherkin,test_generate_file_gherkin,test_compare_code,test_extract_code_block
+    TestCodeReproducer: test_codereproducer_instantiation(0)  # Test suite for CodeReproducer.
+    test_init_dunder()->None
+    test_codereproducer_reproduce_file()->None
+    test_codereproducer_generate_from_gherkin()->None
+    test_generate_file_gherkin()->None
+    test_compare_code()->None
+    test_extract_code_block()->None
+  generated_tests_hybrid/unit/test_quality.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestQualityIssue,TestQualityIssueDataclass,TestQualityReport,TestQualityReportDataclass,test_qualityreport_to_dict,TestQualityAnalyzer,test_init_dunder,test_qualityanalyzer_analyze
+    TestQualityIssue: test_qualityissue_instantiation(0)  # Test suite for QualityIssue.
+    TestQualityIssueDataclass: test_qualityissue_fields(0),test_qualityissue_equality(0)  # Dataclass-specific tests for QualityI...
+    TestQualityReport: test_qualityreport_instantiation(0)  # Test suite for QualityReport.
+    TestQualityReportDataclass: test_qualityreport_fields(0),test_qualityreport_equality(0)  # Dataclass-specific tests for QualityR...
+    TestQualityAnalyzer: test_qualityanalyzer_instantiation(0)  # Test suite for QualityAnalyzer.
+    test_qualityreport_to_dict()->None
+    test_init_dunder()->None
+    test_qualityanalyzer_analyze()->None
+    test_qualityanalyzer_analyze_modules()->None
+    test_analyze_quality()->None
+    test_get_quality_summary()->None
+  generated_tests_hybrid/unit/test_models.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestFunctionInfo,TestFunctionInfoDataclass,TestClassInfo,TestClassInfoDataclass,TestTypeInfo,TestTypeInfoDataclass,TestModuleInfo,TestModuleInfoDataclass
+    TestFunctionInfo: test_functioninfo_instantiation(0)  # Test suite for FunctionInfo.
+    TestFunctionInfoDataclass: test_functioninfo_fields(0),test_functioninfo_equality(0)  # Dataclass-specific tests for Function...
+    TestClassInfo: test_classinfo_instantiation(0)  # Test suite for ClassInfo.
+    TestClassInfoDataclass: test_classinfo_fields(0),test_classinfo_equality(0)  # Dataclass-specific tests for ClassInfo.
+    TestTypeInfo: test_typeinfo_instantiation(0)  # Test suite for TypeInfo.
+  generated_tests_hybrid/unit/test_terminal.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestShellRenderer,test_init_dunder,test_shellrenderer_enable_log,test_shellrenderer_get_log,test_shellrenderer_clear_log,test_shellrenderer_heading,test_shellrenderer_codeblock,test_shellrenderer_render_markdown
+    TestShellRenderer: test_shellrenderer_instantiation(0)  # Test suite for ShellRenderer.
+    TestRenderAPI: test_renderapi_instantiation(0)  # Test suite for RenderAPI.
+    test_init_dunder()->None
+    test_shellrenderer_enable_log()->None
+    test_shellrenderer_get_log()->None
+    test_shellrenderer_clear_log()->None
+    test_shellrenderer_heading()->None
+    test_shellrenderer_codeblock()->None
+    test_shellrenderer_render_markdown()->None
+    test_renderapi_heading()->None
+  generated_tests_hybrid/unit/test_runner.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestBenchmarkRunner,test_init_dunder,test_benchmarkrunner_run_format_benchmark,test_benchmarkrunner_run_file_benchmark,test_benchmarkrunner_run_function_benchmark,test_benchmarkrunner_run_project_benchmark,test_run_benchmark
+    TestBenchmarkRunner: test_benchmarkrunner_instantiation(0)  # Test suite for BenchmarkRunner.
+    test_init_dunder()->None
+    test_benchmarkrunner_run_format_benchmark()->None
+    test_benchmarkrunner_run_file_benchmark()->None
+    test_benchmarkrunner_run_function_benchmark()->None
+    test_benchmarkrunner_run_project_benchmark()->None
+    test_run_benchmark()->None
+  generated_tests_hybrid/unit/test_refactor.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestDuplicateGroup,TestDuplicateGroupDataclass,TestRefactoringSuggestion,TestRefactoringSuggestionDataclass,TestRefactoringReport,TestRefactoringReportDataclass,test_refactoringreport_to_dict,test_refactoringreport_to_markdown
+    TestDuplicateGroup: test_duplicategroup_instantiation(0)  # Test suite for DuplicateGroup.
+    TestDuplicateGroupDataclass: test_duplicategroup_fields(0),test_duplicategroup_equality(0)  # Dataclass-specific tests for Duplicat...
+    TestRefactoringSuggestion: test_refactoringsuggestion_instantiation(0)  # Test suite for RefactoringSuggestion.
+    TestRefactoringSuggestionDataclass: test_refactoringsuggestion_fields(0),test_refactoringsuggestion_equality(0)  # Dataclass-specific tests for Refactor...
+    TestRefactoringReport: test_refactoringreport_instantiation(0)  # Test suite for RefactoringReport.
+    test_refactoringreport_to_dict()->None
+    test_refactoringreport_to_markdown()->None
+    test_find_duplicates()->None
+    test_analyze_quality()->None
+    test_suggest_refactoring()->None
+    test_compare_codebases()->None
+    test_quick_analyze()->None
+  generated_tests_hybrid/unit/test_gherkin.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestGherkinScenario,TestGherkinScenarioDataclass,TestGherkinFeature,TestGherkinFeatureDataclass,TestStepDefinition,TestStepDefinitionDataclass,TestGherkinGenerator,test_init_dunder
+    TestGherkinScenario: test_gherkinscenario_instantiation(0)  # Test suite for GherkinScenario.
+    TestGherkinScenarioDataclass: test_gherkinscenario_fields(0),test_gherkinscenario_equality(0)  # Dataclass-specific tests for GherkinS...
+    TestGherkinFeature: test_gherkinfeature_instantiation(0)  # Test suite for GherkinFeature.
+    TestGherkinFeatureDataclass: test_gherkinfeature_fields(0),test_gherkinfeature_equality(0)  # Dataclass-specific tests for GherkinF...
+    TestStepDefinition: test_stepdefinition_instantiation(0)  # Test suite for StepDefinition.
+    test_init_dunder()->None
+    test_gherkingenerator_generate()->None
+    test_gherkingenerator_generate_test_scenarios()->None
+    test_gherkingenerator_get_step_definitions()->None
+    test_stepdefinitiongenerator_generate_pytest_bdd()->None
+    test_stepdefinitiongenerator_generate_behave()->None
+    test_stepdefinitiongenerator_generate_cucumber_js()->None
+    test_cucumberyamlgenerator_generate()->None
+  generated_tests_hybrid/unit/test_json_schema.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestJSONMethodSchema,TestJSONMethodSchemaDataclass,TestJSONClassSchema,TestJSONClassSchemaDataclass,TestJSONFunctionSchema,TestJSONFunctionSchemaDataclass,TestJSONModuleSchema,TestJSONModuleSchemaDataclass
+    TestJSONMethodSchema: test_jsonmethodschema_instantiation(0)  # Test suite for JSONMethodSchema.
+    TestJSONMethodSchemaDataclass: test_jsonmethodschema_fields(0),test_jsonmethodschema_equality(0)  # Dataclass-specific tests for JSONMeth...
+    TestJSONClassSchema: test_jsonclassschema_instantiation(0)  # Test suite for JSONClassSchema.
+    TestJSONClassSchemaDataclass: test_jsonclassschema_fields(0),test_jsonclassschema_equality(0)  # Dataclass-specific tests for JSONClas...
+    TestJSONFunctionSchema: test_jsonfunctionschema_instantiation(0)  # Test suite for JSONFunctionSchema.
+    test_validate_json()->None
+    test_parse_json_spec()->None
+  generated_tests_hybrid/unit/test_markdown_format.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestMarkdownSpec,TestMarkdownSpecDataclass,TestMarkdownHybridGenerator,test_init_dunder,test_markdownhybridgenerator_generate,test_generate_markdown_hybrid,test_generate_file_markdown
+    TestMarkdownSpec: test_markdownspec_instantiation(0)  # Test suite for MarkdownSpec.
+    TestMarkdownSpecDataclass: test_markdownspec_fields(0),test_markdownspec_equality(0)  # Dataclass-specific tests for Markdown...
+    TestMarkdownHybridGenerator: test_markdownhybridgenerator_instantiation(0)  # Test suite for MarkdownHybridGenerator.
+    test_init_dunder()->None
+    test_markdownhybridgenerator_generate()->None
+    test_generate_markdown_hybrid()->None
+    test_generate_file_markdown()->None
+  generated_tests_hybrid/unit/test_dependency.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestDependencyAnalyzer,test_init_dunder,test_dependencyanalyzer_build_graph,test_dependencyanalyzer_analyze_metrics,test_dependencyanalyzer_get_entrypoints,test_dependencyanalyzer_get_hubs,test_dependencyanalyzer_detect_cycles,test_dependencyanalyzer_get_strongly_connected_components
+    TestDependencyAnalyzer: test_dependencyanalyzer_instantiation(0)  # Test suite for DependencyAnalyzer.
+    test_init_dunder()->None
+    test_dependencyanalyzer_build_graph()->None
+    test_dependencyanalyzer_analyze_metrics()->None
+    test_dependencyanalyzer_get_entrypoints()->None
+    test_dependencyanalyzer_get_hubs()->None
+    test_dependencyanalyzer_detect_cycles()->None
+    test_dependencyanalyzer_get_strongly_connected_components()->None
+    test_dependencyanalyzer_get_dependency_depth()->None
+  generated_tests_hybrid/unit/test_function_logic.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestFunctionLogicGenerator,test_init_dunder,test_functionlogicgenerator_generate,test_functionlogicgenerator_generate_json,test_functionlogicgenerator_generate_yaml,test_functionlogicgenerator_generate_toon
+    TestFunctionLogicGenerator: test_functionlogicgenerator_instantiation(0)  # Test suite for FunctionLogicGenerator.
+    test_init_dunder()->None
+    test_functionlogicgenerator_generate()->None
+    test_functionlogicgenerator_generate_json()->None
+    test_functionlogicgenerator_generate_yaml()->None
+    test_functionlogicgenerator_generate_toon()->None
+  generated_tests_hybrid/unit/test_intent.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestIntentType,TestIntent,TestIntentDataclass,TestEnhancedIntentGenerator,test_init_dunder,test_enhancedintentgenerator_generate,test_enhancedintentgenerator_get_available_features,TestIntentAnalyzer
+    TestIntentType: test_intenttype_instantiation(0),test_intenttype_inheritance(0)  # Test suite for IntentType.
+    TestIntent: test_intent_instantiation(0)  # Test suite for Intent.
+    TestIntentDataclass: test_intent_fields(0),test_intent_equality(0)  # Dataclass-specific tests for Intent.
+    TestEnhancedIntentGenerator: test_enhancedintentgenerator_instantiation(0)  # Test suite for EnhancedIntentGenerator.
+    TestIntentAnalyzer: test_intentanalyzer_instantiation(0)  # Test suite for IntentAnalyzer.
+    test_init_dunder()->None
+    test_enhancedintentgenerator_generate()->None
+    test_enhancedintentgenerator_get_available_features()->None
+    test_init_dunder()->None
+    test_intentanalyzer_analyze_intent()->None
+    test_intentanalyzer_detect_code_smells()->None
+    test_intentanalyzer_suggest_refactoring()->None
+  generated_tests_hybrid/unit/test_cli.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestColors,TestLogger,test_init_dunder,test_logger_info,test_logger_success,test_logger_warning,test_logger_error,test_logger_step
+    TestColors: test_colors_instantiation(0)  # Test suite for Colors.
+    TestLogger: test_logger_instantiation(0)  # Test suite for Logger.
+    test_init_dunder()->None
+    test_logger_info()->None
+    test_logger_success()->None
+    test_logger_warning()->None
+    test_logger_error()->None
+    test_logger_step()->None
+    test_logger_detail()->None
+    test_logger_debug_msg()->None
+  generated_tests_hybrid/unit/test_utils.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: test_estimate_tokens,test_write_text_atomic,test_cleanup_generated_root
+    test_estimate_tokens()->None
+    test_write_text_atomic()->None
+    test_cleanup_generated_root()->None
+  generated_tests_hybrid/unit/test_parsers.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestTreeSitterParser,test_init_dunder,test_treesitterparser_is_available,test_treesitterparser_get_supported_languages,test_treesitterparser_parse,TestUniversalParser,test_init_dunder,test_universalparser_parse
+    TestTreeSitterParser: test_treesitterparser_instantiation(0)  # Test suite for TreeSitterParser.
+    TestUniversalParser: test_universalparser_instantiation(0)  # Test suite for UniversalParser.
+    test_init_dunder()->None
+    test_treesitterparser_is_available()->None
+    test_treesitterparser_get_supported_languages()->None
+    test_treesitterparser_parse()->None
+    test_init_dunder()->None
+    test_universalparser_parse()->None
+    test_is_tree_sitter_available()->None
+  generated_tests_hybrid/unit/test_analyzer.py:
+    i: pytest,unittest.mock.{MagicMock,Mock,patch}
+    e: TestProjectAnalyzer,test_init_dunder,test_projectanalyzer_analyze,test_projectanalyzer_get_statistics,test_analyze_project,test_get_library_status
+    TestProjectAnalyzer: test_projectanalyzer_instantiation(0)  # Test suite for ProjectAnalyzer.
+    test_init_dunder()->None
+    test_projectanalyzer_analyze()->None
+    test_projectanalyzer_get_statistics()->None
+    test_analyze_project()->None
+    test_get_library_status()->None
+  generated_tests_hybrid/integration/test_integration.py:
+    i: pytest,unittest.mock.{Mock,patch}
+    e: TestIntegration
+    TestIntegration: test_llmprofile_integration(0),test_profiletestresult_integration(0),test_llmprofiler_integration(0),test_adaptivechunker_integration(0),test_config_integration(0)  # Integration tests for cross-module fu...
+  logic2code/examples/02_llm_enhanced.py:
+    i: sys,logic2code.{CodeGenerator,GeneratorConfig},pathlib.Path
+    e: example_llm_generation,example_hybrid_generation,example_compare_outputs
+    example_llm_generation()->None
+    example_hybrid_generation()->None
+    example_compare_outputs()->None
+  logic2code/examples/01_quickstart.py:
+    i: sys,logic2code.{CodeGenerator,GeneratorConfig},pathlib.Path
+    e: example_basic_generation,example_with_config,example_stubs_only,example_single_module
+    example_basic_generation()->None
+    example_with_config()->None
+    example_stubs_only()->None
+    example_single_module()->None
+  logic2code/tests/test_basic.py:
+    i: pytest
+    e: test_import_logic2code,test_import_generator,test_config_defaults,test_generator_config_custom,test_generator_config_llm
+    test_import_logic2code()->None
+    test_import_generator()->None
+    test_config_defaults()->None
+    test_generator_config_custom()->None
+    test_generator_config_llm()->None
+  generated_code_full/schemas/logicml_schema.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: LogicMLMethod,LogicMLClass,LogicMLModule,LogicMLSchema,validate_logicml,parse_logicml_header,extract_logicml_signature
+    LogicMLMethod:   # Schema for LogicML method.
+    LogicMLClass:   # Schema for LogicML class.
+    LogicMLModule:   # Schema for LogicML module.
+    LogicMLSchema:   # Complete LogicML specification schema.
+    validate_logicml(spec:str;spec:Any)->Tuple[bool, List[str]]
+    parse_logicml_header(line:str;line:Any)->Optional[Dict[str, Any]]
+    extract_logicml_signature(sig_line:str;sig_line:Any)->Dict[str, Any]
+  generated_code_full/schemas/yaml_schema.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: MethodSchema,ClassSchema,FunctionSchema,ModuleSchema,YAMLSchema,validate_yaml
+    MethodSchema:   # Schema for method definition.
+    ClassSchema:   # Schema for class definition.
+    FunctionSchema:   # Schema for function definition.
+    ModuleSchema:   # Schema for module definition.
+    YAMLSchema:   # Complete YAML specification schema.
+    validate_yaml(spec:str;spec:Any)->Tuple[bool, List[str]]
+    _validate_module(module:Dict;index:int)->List[str]
+    _validate_class(cls:Dict;prefix:str)->List[str]
+  generated_code_full/schemas/json_schema.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: JSONMethodSchema,JSONClassSchema,JSONFunctionSchema,JSONModuleSchema,JSONSchema,validate_json,parse_json_spec
+    JSONMethodSchema:   # Schema for JSON method definition.
+    JSONClassSchema:   # Schema for JSON class definition.
+    JSONFunctionSchema:   # Schema for JSON function definition.
+    JSONModuleSchema:   # Schema for JSON module definition.
+    JSONSchema:   # Complete JSON specification schema.
+    validate_json(spec:str;spec:Any)->Tuple[bool, List[str]]
+    _validate_json_module(module:Dict;index:int)->List[str]
+    _validate_json_class(cls:Dict;prefix:str)->List[str]
+    parse_json_spec(spec:str;spec:Any)->Optional[JSONSchema]
+  generated_code_full/schemas/markdown_schema.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: MarkdownMethod,MarkdownClass,MarkdownModule,MarkdownSchema,validate_markdown,extract_markdown_sections
+    MarkdownMethod:   # Schema for Markdown method.
+    MarkdownClass:   # Schema for Markdown class.
+    MarkdownModule:   # Schema for Markdown module.
+    MarkdownSchema:   # Complete Markdown specification schema.
+    validate_markdown(spec:str;spec:Any)->Tuple[bool, List[str]]
+    extract_markdown_sections(spec:str;spec:Any)->Dict[str, Any]
+  generated_code_full/benchmarks/common.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: create_single_project,generate_spec,generate_spec_token,get_async_reproduction_prompt,get_token_reproduction_prompt,get_simple_reproduction_prompt
+    create_single_project(module_info;file_path:Path)->ProjectInfo
+    generate_spec(project:ProjectInfo;fmt:str)->str
+    _generate_token_json(project:ProjectInfo;project:Any)->str
+    _generate_token_json_compact(project:ProjectInfo;project:Any)->str
+    generate_spec_token(project:ProjectInfo;fmt:str)->str
+    get_async_reproduction_prompt(spec:str;fmt:str;file_name:str;with_tests:bool=False)->str
+    get_token_reproduction_prompt(spec:str;fmt:str;file_name:str)->str
+    get_simple_reproduction_prompt(spec:str;fmt:str;file_name:str)->str
+  generated_code_full/benchmarks/runner.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: BenchmarkRunner,run_benchmark
+    BenchmarkRunner: __init__(2),_should_use_llm(0),_get_client(0),_template_generate_code(3),run_format_benchmark(4)  # Unified benchmark runner for code2logic.
+    _test_python_syntax(code:str;code:Any)->bool
+    _test_python_runs(code:str;timeout:int=5)->bool
+    _extract_code(response:str;response:Any)->str
+    run_benchmark(source:str;formats:List[str]=None;limit:Optional[int]=None;output:Optional[str]=None;verbose:bool=False)->BenchmarkResult
+  generated_code_full/benchmarks/results.py:
+    i: dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: FormatResult,FileResult,FunctionResult,BenchmarkResult,BenchmarkConfig
+    FormatResult: to_dict(0)  # Result for a single format test.
+    FileResult: to_dict(0)  # Result for single file reproduction.
+    FunctionResult: to_dict(0)  # Result for single function reproduction.
+    BenchmarkResult: __post_init__(0),calculate_aggregates(0),to_dict(0),to_json(1),save(1)  # Complete benchmark result.
+    BenchmarkConfig: to_dict(0)  # Configuration for benchmark runs.
+  lolm/examples/03_code_generation.py:
+    i: lolm.{LLMManager,get_client}
+    e: SYSTEM_PROMPT,generate_function,generate_class,explain_code,review_code
+    generate_function(description:str)->str
+    generate_class(description:str)->str
+    explain_code(code:str)->str
+    review_code(code:str)->str
+  lolm/examples/01_quickstart.py:
+    i: lolm.{LLMManager,get_client}
+    e: example_simple_client,example_specific_provider,example_manager,example_fallback
+    example_simple_client()->None
+    example_specific_provider()->None
+    example_manager()->None
+    example_fallback()->None
+  lolm/examples/02_configuration.py:
+    i: os,lolm,pathlib.Path
+    e: show_defaults,show_recommended_models,show_current_config,example_modify_config,show_environment_config
+    show_defaults()->None
+    show_recommended_models()->None
+    show_current_config()->None
+    example_modify_config()->None
+    show_environment_config()->None
+  lolm/tests/test_basic.py:
+    i: pytest
+    e: test_import_lolm,test_import_config,test_import_clients,test_config_defaults,test_manager_init,test_recommended_models
+    test_import_lolm()->None
+    test_import_config()->None
+    test_import_clients()->None
+    test_config_defaults()->None
+    test_manager_init()->None
+    test_recommended_models()->None
+  logic2test/examples/01_quickstart.py:
+    i: sys,logic2test.{GeneratorConfig,TestGenerator},pathlib.Path
+    e: example_basic_generation,example_with_config,example_generate_all_types
+    example_basic_generation()->None
+    example_with_config()->None
+    example_generate_all_types()->None
+  logic2test/examples/02_custom_templates.py:
+    i: sys,logic2test.parsers.{ClassSpec,FunctionSpec},logic2test.templates.TestTemplate,pathlib.Path
+    e: example_function_test,example_class_test,example_dataclass_test,example_async_function_test
+    example_function_test()->None
+    example_class_test()->None
+    example_dataclass_test()->None
+    example_async_function_test()->None
+  logic2test/tests/test_basic.py:
+    i: pytest
+    e: test_import_logic2test,test_import_generator,test_config_defaults,test_generator_config_custom
+    test_import_logic2test()->None
+    test_import_generator()->None
+    test_config_defaults()->None
+    test_generator_config_custom()->None
+  tests/samples/sample_dataclasses.py:
+    i: datetime,dataclasses.{dataclass,field},typing.{Dict,List,Optional}
+    e: User,Product,Order,Address
+    User:   # Represents a user in the system.
+    Product:   # Represents a product in the catalog.
+    Order:   # Represents a customer order.
+    Address:   # Represents a shipping address.
+  tests/samples/sample_async.py:
+    i: asyncio,datetime,contextlib.asynccontextmanager,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,TypeVar}
+    e: T,Task,TaskResult,AsyncTaskQueue,AsyncCache,async_timer,fetch_with_retry,parallel_map
+    Task:   # Async task with status tracking.
+    TaskResult:   # Result of task execution.
+    AsyncTaskQueue: __init__(1),add_task(1),get_task(1),process_task(2),process_all(1)  # Async task queue with concurrency con...
+    AsyncCache: __init__(1),get(1),set(2),delete(1),clear(0)  # Simple async cache with TTL.
+    async_timer(name:str='operation')->None
+    fetch_with_retry(url:str;max_retries:int=3;delay:float=1.0)->Dict[str, Any]
+    parallel_map(items:List[T];handler;max_concurrent:int=5)->List[Any]
+    race()->Any
+    timeout_wrapper(coro;timeout_seconds:float;default=None)->None
+  tests/samples/sample_class.py:
+    i: typing.{Any,Dict,List,Optional}
+    e: Calculator
+    Calculator: __init__(1),add(2),subtract(2),multiply(2),divide(2)  # Simple calculator with history.
+  tests/samples/sample_pydantic.py:
+    i: datetime,enum.Enum,pydantic.{BaseModel,Field,field_validator},typing.{List,Optional}
+    e: TaskStatus,Task,TaskQueue,Project
+    TaskStatus:   # Task status enumeration.
+    Task: name_not_empty(1)  # Task model with Pydantic features.
+    TaskQueue: add_task(1),get_pending(0),get_by_status(1)  # Task queue container.
+    Project: total_tasks(0)  # Project model with nested models.
+  tests/samples/sample_javascript.js:
+    e: Product,deepClone,debounce,calculateTotal,User,filterBy,fetchData
+    User: constructor(3),getDisplayName(0),deactivate(0)
+    Product: constructor(3),addTags(0),isInStock(0),formatPrice(0)
+    calculateTotal(items)->None
+    filterBy(arr;predicate)->None
+    fetchData(url)->None
+    debounce(func;wait)->None
+    deepClone(obj)->None
+  tests/samples/sample_sql_dsl.py:
+    i: dataclasses.{dataclass,field},enum.Enum,typing.{Any,Dict,List,Optional,Union}
+    e: SQLOperator,JoinType,Condition,Join,QueryBuilder,InsertBuilder,UpdateBuilder,select
+    SQLOperator:   # SQL comparison operators.
+    JoinType:   # SQL join types.
+    Condition: to_sql(0)  # SQL WHERE condition.
+    Join: to_sql(0)  # SQL JOIN clause.
+    QueryBuilder: __init__(1),select(0),where(3),join(4),order_by(0)  # Fluent SQL query builder.
+    select(table:str)->QueryBuilder
+    insert(table:str)->InsertBuilder
+    update(table:str)->UpdateBuilder
+  tests/samples/sample_typescript.ts:
+    e: groupBy,Product,fetchUser,Nullable,Result,User,filterByStatus,calculateOrderTotal
+    Repository: add(1),get(1),getAll(0),delete(1),count(0)
+    createUser(id: number;name: string;email: string)->User
+    calculateOrderTotal(items: OrderItem[])->number
+    filterByStatus(items: T[];status: string)->T[]
+    groupBy(items: T[];key: K)->Map<T[K], T[]>
+    fetchUser(id: number)->Promise<Result<User>>
+    processOrder(order: Order)->Promise<Result<Order>>
+  tests/samples/sample_enum.py:
+    i: enum.{Enum,IntEnum,auto},typing.List
+    e: Status,Priority,Color,HttpStatus,TaskType
+    Status:   # Status enumeration with auto values.
+    Priority:   # Priority levels as integers.
+    Color: from_hex(1)  # Color enumeration with string values.
+    HttpStatus: is_success(0),is_error(0)  # HTTP status codes.
+    TaskType: get_timeout(0),get_allowed_statuses(0)  # Task type enumeration.
+  tests/samples/sample_algorithms.py:
+    i: functools.lru_cache,typing.{Generator,List,Optional,Tuple,TypeVar}
+    e: T,binary_search,quicksort,merge_sort,fibonacci,fibonacci_generator,is_prime,sieve_of_eratosthenes
+    binary_search(arr:List[int];target:int)->int
+    quicksort(arr:List[int])->List[int]
+    merge_sort(arr:List[int])->List[int]
+    _merge(left:List[int];right:List[int])->List[int]
+    fibonacci(n:int)->int
+    fibonacci_generator(limit:int)->Generator[int, None, None]
+    is_prime(n:int)->bool
+    sieve_of_eratosthenes(limit:int)->List[int]
+  tests/samples/sample_api.py:
+    i: datetime,json,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional}
+    e: APIResponse,User,APIError,UserAPI,fetch_user_async,create_user_async,handle_api_error
+    APIResponse:   # Standard API response structure.
+    User:   # User model for API.
+    APIError: __init__(2)  # Custom API error.
+    UserAPI: __init__(0),create_user(3),get_user(1),update_user(1),delete_user(1)  # User management API.
+    fetch_user_async(api:UserAPI;user_id:int)->APIResponse
+    create_user_async(api:UserAPI;username:str;email:str)->APIResponse
+    handle_api_error(func)->None
+  tests/samples/sample_functions.py:
+    i: json,os,typing.{Any,Dict,List,Optional}
+    e: calculate_total,filter_by_status,merge_configs,validate_email,load_json_file,get_env_or_default,chunk_list,format_currency
+    calculate_total(items:List[int];tax_rate:float=0.1)->float
+    filter_by_status(records:List[Dict];status:str)->List[Dict]
+    merge_configs(base:Dict[str;Any];override:Dict[str;Any])->Dict[str, Any]
+    validate_email(email:str)->bool
+    load_json_file(path:str)->Optional[Dict]
+    get_env_or_default(key:str;default:str='')->str
+    chunk_list(items:List[Any];chunk_size:int)->List[List[Any]]
+    format_currency(amount:int;currency:str='USD')->str
+  tests/samples/sample_reexport/exceptions.py:
+    e: ValidationError,ProcessingError
+    ValidationError:   # Validation error.
+    ProcessingError:   # Processing error.
+  tests/samples/sample_reexport/utils.py:
+    i: typing.{Any,Dict}
+    e: process_data,validate_input
+    process_data(data:Dict[str;Any])->Dict[str, Any]
+    validate_input(data:Dict[str;Any])->bool
+  tests/samples/sample_reexport/models.py:
+    i: dataclasses.dataclass,typing.{List,Optional}
+    e: User,Order,Product
+    User:   # User model.
+    Order:   # Order model.
+    Product:   # Product model.
+  examples/code2logic/sample_project/calculator.py:
+    e: Calculator,factorial
+    Calculator: add(2),divide(2)  # A tiny calculator used for Code2Logic...
+    factorial(n:int)->int
+  examples/code2logic/sample_project/models/user.py:
+    i: dataclasses.dataclass
+    e: User
+    User:   # Simple user model.
+  examples/code2logic/sample_project/api/client.py:
+    i: dataclasses.dataclass
+    e: Response,APIClient
+    Response:   # Very small HTTP-like response placeho...
+    APIClient: get(1),post(2)  # Example client with async methods.
+  code2logic/schemas/logicml_schema.py:
+    i: re,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
+    e: LogicMLMethod,LogicMLClass,LogicMLModule,LogicMLSchema,validate_logicml,parse_logicml_header,extract_logicml_signature
+    LogicMLMethod:   # Schema for LogicML method.
+    LogicMLClass:   # Schema for LogicML class.
+    LogicMLModule:   # Schema for LogicML module.
+    LogicMLSchema:   # Complete LogicML specification schema.
+    validate_logicml(spec:str)->Tuple[bool, List[str]]
+    parse_logicml_header(line:str)->Optional[Dict[str, Any]]
+    extract_logicml_signature(sig_line:str)->Dict[str, Any]
+  code2logic/schemas/yaml_schema.py:
+    i: yaml,dataclasses.{dataclass,field},typing.{Any,Dict,List,Tuple}
+    e: MethodSchema,ClassSchema,FunctionSchema,ModuleSchema,YAMLSchema,validate_yaml
+    MethodSchema:   # Schema for method definition.
+    ClassSchema:   # Schema for class definition.
+    FunctionSchema:   # Schema for function definition.
+    ModuleSchema:   # Schema for module definition.
+    YAMLSchema:   # Complete YAML specification schema.
+    validate_yaml(spec:str)->Tuple[bool, List[str]]
+    _validate_module(module:Dict;index:int)->List[str]
+    _validate_class(cls:Dict;prefix:str)->List[str]
+  code2logic/schemas/json_schema.py:
+    i: json,dataclasses.{dataclass,field},typing.{Any,Dict,List,Optional,Tuple}
+    e: JSONMethodSchema,JSONClassSchema,JSONFunctionSchema,JSONModuleSchema,JSONSchema,validate_json,parse_json_spec
+    JSONMethodSchema:   # Schema for JSON method definition.
+    JSONClassSchema:   # Schema for JSON class definition.
+    JSONFunctionSchema:   # Schema for JSON function definition.
+    JSONModuleSchema:   # Schema for JSON module definition.
+    JSONSchema:   # Complete JSON specification schema.
+    validate_json(spec:str)->Tuple[bool, List[str]]
+    _validate_json_module(module:Dict;index:int)->List[str]
+    _validate_json_class(cls:Dict;prefix:str)->List[str]
+    parse_json_spec(spec:str)->Optional[JSONSchema]
+  code2logic/schemas/markdown_schema.py:
+    i: re,dataclasses.{dataclass,field},typing.{Any,Dict,List,Tuple}
+    e: MarkdownMethod,MarkdownClass,MarkdownModule,MarkdownSchema,validate_markdown,extract_markdown_sections
+    MarkdownMethod:   # Schema for Markdown method.
+    MarkdownClass:   # Schema for Markdown class.
+    MarkdownModule:   # Schema for Markdown module.
+    MarkdownSchema:   # Complete Markdown specification schema.
+    validate_markdown(spec:str)->Tuple[bool, List[str]]
+    extract_markdown_sections(spec:str)->Dict[str, Any]
+  code2logic/benchmarks/common.py:
+    i: json,datetime,generators.{JSONGenerator,YAMLGenerator},gherkin.GherkinGenerator,logicml.LogicMLGenerator,markdown_format.MarkdownHybridGenerator,models.ProjectInfo,pathlib.Path,toon_format.TOONGenerator
+    e: create_single_project,generate_spec,generate_spec_token,get_async_reproduction_prompt,get_token_reproduction_prompt,get_simple_reproduction_prompt
+    create_single_project(module_info;file_path:Path)->ProjectInfo
+    generate_spec(project:ProjectInfo;fmt:str)->str
+    _generate_token_json(project:ProjectInfo)->str
+    _generate_token_json_compact(project:ProjectInfo)->str
+    generate_spec_token(project:ProjectInfo;fmt:str)->str
+    get_async_reproduction_prompt(spec:str;fmt:str;file_name:str;with_tests:bool=False)->str
+    get_token_reproduction_prompt(spec:str;fmt:str;file_name:str)->str
+    get_simple_reproduction_prompt(spec:str;fmt:str;file_name:str)->str
+  code2logic/benchmarks/runner.py:
+    i: sys,time,analyzer.analyze_project,llm_clients.{BaseLLMClient,get_client},metrics.ReproductionMetrics,pathlib.Path,terminal.render,typing.{List,Optional}
+    e: BenchmarkRunner,run_benchmark
+    BenchmarkRunner: __init__(2),_should_use_llm(0),_get_client(0),_template_generate_code(3),run_format_benchmark(4)  # Unified benchmark runner for code2logic.
+    _test_python_syntax(code:str)->bool
+    _test_python_runs(code:str;timeout:int=5)->bool
+    _extract_code(response:str)->str
+    run_benchmark(source:str;benchmark_type:str='format';formats:List[str]=None;limit:Optional[int]=None;output:Optional[str]=None;verbose:bool=False)->BenchmarkResult
+  code2logic/benchmarks/results.py:
+    i: json,datetime,dataclasses.{asdict,dataclass,field},pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: FormatResult,FileResult,FunctionResult,BenchmarkResult,BenchmarkConfig
+    FormatResult: to_dict(0)  # Result for a single format test.
+    FileResult: to_dict(0)  # Result for single file reproduction.
+    FunctionResult: to_dict(0)  # Result for single function reproduction.
+    BenchmarkResult: __post_init__(0),calculate_aggregates(0),to_dict(0),to_json(1),save(1)  # Complete benchmark result.
+    BenchmarkConfig: to_dict(0)  # Configuration for benchmark runs.

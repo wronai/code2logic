@@ -47,7 +47,11 @@ pip install code2logic[nlp]         # Enhanced intents
 ```
 
 ## 📖 Quick Start
-
+```bash
+code2logic ./ -f yaml --compact --function-logic --with-schema -o project.yaml
+code2logic ./ -f toon --compact --function-logic --with-schema -o project.toon
+```
+    
 ### Command Line
 
 ```bash
@@ -59,6 +63,7 @@ code2logic /path/to/project -f yaml --compact -o analysis-compact.yaml
 
 # Ultra-compact TOON (71% smaller, single-letter keys)
 code2logic /path/to/project -f toon --ultra-compact -o analysis-ultra.toon
+
 
 # Generate schema alongside output
 code2logic /path/to/project -f yaml --compact --with-schema
