@@ -18,16 +18,16 @@ pip install code2logic
 
 ```bash
 # Show what can be generated
-python -m logic2code project.c2l.yaml --summary
+python -m logic2code out/code2logic/project.c2l.yaml --summary
 
 # Generate Python code
-python -m logic2code project.c2l.yaml -o generated_src/
+python -m logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated_code/
 
 # Generate with stubs only (no implementations)
-python -m logic2code project.c2l.yaml -o generated_src/ --stubs-only
+python -m logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated_code/ --stubs-only
 
 # Generate specific modules
-python -m logic2code project.c2l.yaml -o generated_src/ --modules "analyzer.py,parsers.py"
+python -m logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated_code/ --modules "analyzer.py,parsers.py"
 ```
 
 ### Python API
@@ -36,7 +36,7 @@ python -m logic2code project.c2l.yaml -o generated_src/ --modules "analyzer.py,p
 from logic2code import CodeGenerator, GeneratorConfig
 
 # Create generator
-generator = CodeGenerator('project.c2l.yaml')
+generator = CodeGenerator('out/code2logic/project.c2l.yaml')
 
 # Get summary
 summary = generator.summary()
@@ -144,16 +144,16 @@ optional arguments:
 
 ```bash
 # 1. Analyze original code
-code2logic src/ -f yaml -o project.c2l.yaml
+code2logic src/ -f yaml -o out/code2logic/project.c2l.yaml
 
 # 2. Modify logic file (add new functions, change signatures)
-# Edit project.c2l.yaml
+# Edit out/code2logic/project.c2l.yaml
 
 # 3. Generate new code from modified logic
-python -m logic2code project.c2l.yaml -o new_src/
+python -m logic2code out/code2logic/project.c2l.yaml -o out/logic2code/new_src/
 
 # 4. Compare and merge
-diff -r src/ new_src/
+diff -r src/ out/logic2code/new_src/
 ```
 
 ### Refactoring Workflow

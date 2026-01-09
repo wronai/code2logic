@@ -76,23 +76,24 @@ clean:
 	rm -rf .mypy_cache/
 	rm -rf .ruff_cache/
 	rm -rf htmlcov/
-	rm -rf generated_code/
+	rm -rf ../out/logic2code/generated_code/
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 
 # Development helpers
 demo:
-	@if [ -f ../project.c2l.yaml ]; then \
-		$(PYTHON) -m $(PACKAGE_NAME) ../project.c2l.yaml -o generated_code/ -v; \
+	@if [ -f ../out/code2logic/project.c2l.yaml ]; then \
+		mkdir -p ../out/logic2code/generated_code/; \
+		$(PYTHON) -m $(PACKAGE_NAME) ../out/code2logic/project.c2l.yaml -o ../out/logic2code/generated_code/ -v; \
 	else \
-		echo "No project.c2l.yaml found. Run 'code2logic .' first."; \
+		echo "No out/code2logic/project.c2l.yaml found. Run ./project.sh first."; \
 	fi
 
 summary:
-	@if [ -f ../project.c2l.yaml ]; then \
-		$(PYTHON) -m $(PACKAGE_NAME) ../project.c2l.yaml --summary; \
+	@if [ -f ../out/code2logic/project.c2l.yaml ]; then \
+		$(PYTHON) -m $(PACKAGE_NAME) ../out/code2logic/project.c2l.yaml --summary; \
 	else \
-		echo "No project.c2l.yaml found. Run 'code2logic .' first."; \
+		echo "No out/code2logic/project.c2l.yaml found. Run ./project.sh first."; \
 	fi
 
 # Version

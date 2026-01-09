@@ -18,16 +18,16 @@ pip install code2logic
 
 ```bash
 # Show what can be generated
-python -m logic2test project.c2l.yaml --summary
+python -m logic2test out/code2logic/project.c2l.yaml --summary
 
 # Generate unit tests
-python -m logic2test project.c2l.yaml -o tests/
+python -m logic2test out/code2logic/project.c2l.yaml -o out/logic2test/tests/
 
 # Generate all test types
-python -m logic2test project.c2l.hybrid.yaml -o tests/ --type all
+python -m logic2test out/code2logic/project.c2l.hybrid.yaml -o out/logic2test/tests/ --type all
 
 # Include private methods
-python -m logic2test project.c2l.yaml -o tests/ --include-private
+python -m logic2test out/code2logic/project.c2l.yaml -o out/logic2test/tests/ --include-private
 ```
 
 ### Python API
@@ -36,7 +36,7 @@ python -m logic2test project.c2l.yaml -o tests/ --include-private
 from logic2test import TestGenerator, GeneratorConfig
 
 # Create generator
-generator = TestGenerator('project.c2l.yaml')
+generator = TestGenerator('out/code2logic/project.c2l.yaml')
 
 # Get summary
 summary = generator.summary()
@@ -44,7 +44,7 @@ print(f"Classes: {summary['testable_classes']}")
 print(f"Functions: {summary['testable_functions']}")
 
 # Generate unit tests
-result = generator.generate_unit_tests('tests/')
+result = generator.generate_unit_tests('out/logic2test/tests/')
 print(f"Generated {result.tests_generated} tests")
 
 # Generate integration tests
@@ -112,7 +112,7 @@ config = GeneratorConfig(
     generate_dataclass_tests=True,
 )
 
-generator = TestGenerator('project.c2l.yaml', config)
+generator = TestGenerator('out/code2logic/project.c2l.yaml', config)
 ```
 
 ## CLI Reference

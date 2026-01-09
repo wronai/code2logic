@@ -419,19 +419,19 @@ Generate test scaffolds from Code2Logic output:
 
 ```bash
 # Show what can be generated
-python -m logic2test project.c2l.yaml --summary
+python -m logic2test out/code2logic/project.c2l.yaml --summary
 
 # Generate unit tests
-python -m logic2test project.c2l.yaml -o tests/
+python -m logic2test out/code2logic/project.c2l.yaml -o out/logic2test/tests/
 
 # Generate all test types (unit, integration, property)
-python -m logic2test project.c2l.yaml -o tests/ --type all
+python -m logic2test out/code2logic/project.c2l.yaml -o out/logic2test/tests/ --type all
 ```
 
 ```python
 from logic2test import TestGenerator
 
-generator = TestGenerator('project.c2l.yaml')
+generator = TestGenerator('out/code2logic/project.c2l.yaml')
 result = generator.generate_unit_tests('tests/')
 print(f"Generated {result.tests_generated} tests")
 ```
@@ -442,19 +442,19 @@ Generate source code from Code2Logic output:
 
 ```bash
 # Show what can be generated
-python -m logic2code project.c2l.yaml --summary
+python -m logic2code out/code2logic/project.c2l.yaml --summary
 
 # Generate Python code
-python -m logic2code project.c2l.yaml -o generated_src/
+python -m logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated_code/
 
 # Generate stubs only
-python -m logic2code project.c2l.yaml -o src/ --stubs-only
+python -m logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated_code/ --stubs-only
 ```
 
 ```python
 from logic2code import CodeGenerator
 
-generator = CodeGenerator('project.c2l.yaml')
+generator = CodeGenerator('out/code2logic/project.c2l.yaml')
 result = generator.generate('output/')
 print(f"Generated {result.files_generated} files")
 ```
@@ -463,13 +463,13 @@ print(f"Generated {result.files_generated} files")
 
 ```bash
 # 1. Analyze existing codebase
-code2logic src/ -f yaml -o project.c2l.yaml
+code2logic src/ -f yaml -o out/code2logic/project.c2l.yaml
 
 # 2. Generate tests for the codebase
-python -m logic2test project.c2l.yaml -o tests/ --type all
+python -m logic2test out/code2logic/project.c2l.yaml -o out/logic2test/tests/ --type all
 
 # 3. Generate code scaffolds (for refactoring)
-python -m logic2code project.c2l.yaml -o new_src/ --stubs-only
+python -m logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated_code/ --stubs-only
 ```
 
 ## 📚 Documentation
