@@ -3,6 +3,13 @@ examples/reproduction/*
 examples/output/*
 bdd_output/*
 generated*/
+artifacts/
+out/
+project.c2l.*
+project.func.*
+project.functions.*
+ollama_benchmark_results.csv
+*_benchmark_results.csv
 .idea
 # Byte-compiled / optimized / DLL files
 __pycache__/

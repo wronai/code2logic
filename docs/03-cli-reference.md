@@ -37,11 +37,12 @@ If `CODE2LOGIC_DEFAULT_PROVIDER=auto`, Code2Logic tries providers in priority or
 
 | Option | Short | Description |
 |--------|-------|-------------|
-| `--format` | `-f` | Output format (markdown, compact, json, yaml, csv, gherkin, toon, logicml) |
+| `--format` | `-f` | Output format (markdown, compact, json, yaml, hybrid, csv, gherkin, toon, logicml) |
 | `--output` | `-o` | Output file path |
 | `--detail` | `-d` | Detail level (minimal, standard, full) |
-| `--flat` | | Flat JSON structure (for json format) |
+| `--flat` | | Flat structure (for json/yaml formats) |
 | `--compact` | | Use compact YAML format (14% smaller, meta.legend transparency) |
+| `--hybrid` | | Use hybrid YAML output (or use `-f hybrid`) |
 | `--ultra-compact` | | Use ultra-compact TOON format (71% smaller) |
 | `--with-schema` | | Generate JSON schema alongside output |
 | `--verbose` | `-v` | Verbose output with timing |
@@ -102,6 +103,13 @@ code2logic /path/to/project -f yaml --compact --with-schema
 ```
 
 Human-readable structured format with compact variant using short keys and `meta.legend` for LLM transparency.
+
+### Hybrid YAML
+
+```bash
+# Hybrid YAML (recommended for code regeneration / best fidelity)
+code2logic /path/to/project -f hybrid -o analysis.hybrid.yaml
+```
 
 ### TOON
 
@@ -208,6 +216,9 @@ cat context.feature | ollama run qwen2.5-coder:7b "Generate tests for this"
 ```bash
 # Skip dependency installation
 CODE2LOGIC_NO_INSTALL=1 code2logic /path/to/project
+
+# Same, when running from source without install
+CODE2LOGIC_NO_INSTALL=1 python -m code2logic /path/to/project
 
 # Enable verbose mode
 CODE2LOGIC_VERBOSE=true code2logic /path/to/project

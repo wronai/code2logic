@@ -49,7 +49,7 @@ pip install code2logic[nlp]         # Enhanced intents
 ## 📖 Quick Start
 ```bash
 code2logic ./ -f yaml --compact --function-logic --with-schema -o project.yaml
-code2logic ./ -f toon --compact --function-logic --with-schema -o project.toon
+code2logic ./ -f toon --ultra-compact --function-logic --with-schema -o project.toon
 ```
     
 ### Command Line
@@ -57,6 +57,9 @@ code2logic ./ -f toon --compact --function-logic --with-schema -o project.toon
 ```bash
 # Standard Markdown output
 code2logic /path/to/project
+
+# If the `code2logic` entrypoint is not available (e.g. running from source without install):
+python -m code2logic /path/to/project
 
 # Compact YAML (14% smaller, meta.legend transparency)
 code2logic /path/to/project -f yaml --compact -o analysis-compact.yaml
@@ -101,19 +104,22 @@ print(f"Key modules: {hubs}")
 
 ```python
 # Core analysis
-from code2logic.core import ProjectInfo, ProjectAnalyzer, analyze_project
+from code2logic import ProjectInfo, ProjectAnalyzer, analyze_project
 
 # Format generators
-from code2logic.formats import (
-    YAMLGenerator, JSONGenerator, TOONGenerator,
-    LogicMLGenerator, GherkinGenerator
+from code2logic import (
+    YAMLGenerator,
+    JSONGenerator,
+    TOONGenerator,
+    LogicMLGenerator,
+    GherkinGenerator,
 )
 
 # LLM clients
-from code2logic.llm import get_client, BaseLLMClient
+from code2logic import get_client, BaseLLMClient
 
 # Development tools
-from code2logic.tools import run_benchmark, CodeReviewer
+from code2logic import run_benchmark, CodeReviewer
 ```
 
 ## 📋 Output Formats
@@ -488,6 +494,14 @@ python -m logic2code project.c2l.yaml -o new_src/ --stubs-only
 - [17 - LOLM](docs/17-lolm.md) - LLM provider management
 - [18 - Reproduction Testing](docs/18-reproduction-testing.md) - Format validation and code regeneration
 - [19 - Monorepo Workflow](docs/19-monorepo-workflow.md) - Managing all packages from repo root
+
+## 🧩 Examples
+
+- [examples/](examples/) - All runnable examples
+- [examples/run_examples.sh](examples/run_examples.sh) - Example runner script (multi-command workflows)
+- [examples/code2logic/](examples/code2logic/) - Minimal project + docker example for code2logic
+- [examples/logic2test/](examples/logic2test/) - Minimal project + docker example for logic2test
+- [examples/logic2code/](examples/logic2code/) - Minimal project + docker example for logic2code
 
 ## 🔗 Links
 

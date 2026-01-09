@@ -10,6 +10,7 @@
 |--------|--------|----------|----------|
 | **TOON** | ~2K | 70% | Token efficiency (6x smaller than JSON) |
 | **Gherkin** | ~3K | 95% | LLM code generation |
+| **Hybrid YAML** | ~6K | 90% | Code regeneration (best fidelity) |
 | **YAML** | ~6K | 90% | Human + LLM |
 | **LogicML** | ~5K | 65% | Compression + async code |
 | **Compact** | ~200 | 50% | Quick overview |
@@ -133,6 +134,14 @@ from code2logic.generators import YAMLGenerator
 
 gen = YAMLGenerator()
 schema = gen.generate_schema('compact')  # or 'full'
+```
+
+## Hybrid YAML
+
+Hybrid YAML is optimized for code regeneration workflows (best balance of fidelity and size).
+
+```bash
+code2logic /path/to/project -f hybrid -o analysis.hybrid.yaml
 ```
 
 ## Compact

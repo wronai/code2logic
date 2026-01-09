@@ -89,7 +89,7 @@ Best for local, private, and free LLM usage.
 
 ```bash
 # Install Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
+curl -fsSL https://ollama.com/install.sh | sh
 
 # Pull code-optimized model
 ollama pull qwen2.5-coder:14b

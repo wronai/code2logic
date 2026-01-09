@@ -525,7 +525,7 @@ def main():
         epilog='''
 Examples:
   code2logic /path/to/project                    # Standard Markdown
-  code2logic /path/to/project -f csv             # CSV (best for LLM, ~50%% smaller)
+  code2logic /path/to/project -f csv             # CSV (best for LLM, ~50% smaller)
   code2logic /path/to/project -f yaml            # YAML (human-readable)
   code2logic /path/to/project -f json --flat     # Flat JSON (for comparisons)
   code2logic /path/to/project -f compact         # Ultra-compact text
@@ -591,7 +591,7 @@ code2logic [path] [options]
     )
     parser.add_argument(
         '-f', '--format',
-        choices=['markdown', 'compact', 'json', 'yaml', 'csv', 'gherkin', 'toon', 'logicml'],
+        choices=['markdown', 'compact', 'json', 'yaml', 'hybrid', 'csv', 'gherkin', 'toon', 'logicml'],
         default='markdown',
         help='Output format (default: markdown)'
     )
@@ -620,17 +620,17 @@ code2logic [path] [options]
     parser.add_argument(
         '--compact',
         action='store_true',
-        help='Use compact YAML format (14% smaller, meta.legend transparency)'
+        help='Use compact YAML format (14%% smaller, meta.legend transparency)'
     )
     parser.add_argument(
         '--ultra-compact',
         action='store_true',
-        help='Use ultra-compact TOON format (71% smaller, single-letter keys)'
+        help='Use ultra-compact TOON format (71%% smaller, single-letter keys)'
     )
     parser.add_argument(
         '--hybrid',
         action='store_true',
-        help='Use hybrid format (70% of YAML size, 90% of info, best LLM quality)'
+        help='Use hybrid format (70%% of YAML size, 90%% of info, best LLM quality)'
     )
     parser.add_argument(
         '--with-schema',
@@ -695,6 +695,12 @@ code2logic [path] [options]
 
     args = parser.parse_args()
 
+    if not args.no_install and os.environ.get("CODE2LOGIC_NO_INSTALL") in ("1", "true", "True", "yes", "YES"):
+        args.no_install = True
+
+    if not args.verbose and not args.quiet and os.environ.get("CODE2LOGIC_VERBOSE") in ("1", "true", "True", "yes", "YES"):
+        args.verbose = True
+
     if args.detail == 'detailed':
         args.detail = 'full'
 
@@ -717,7 +723,13 @@ code2logic [path] [options]
     # Import after potential installation
     from .analyzer import ProjectAnalyzer, get_library_status
     from .function_logic import FunctionLogicGenerator
-    from .generators import CompactGenerator, JSONGenerator, MarkdownGenerator, YAMLGenerator
+    from .generators import (
+        CSVGenerator,
+        CompactGenerator,
+        JSONGenerator,
+        MarkdownGenerator,
+        YAMLGenerator,
+    )
     from .logicml import LogicMLGenerator
     from .toon_format import TOONGenerator
 
@@ -841,13 +853,21 @@ code2logic [path] [options]
     elif args.format == 'compact':
         generator = CompactGenerator()
         output = generator.generate(project)
+    elif args.format == 'csv':
+        generator = CSVGenerator()
+        output = generator.generate(project, detail=args.detail)
+    elif args.format == 'gherkin':
+        from .gherkin import GherkinGenerator
+
+        generator = GherkinGenerator()
+        output = generator.generate(project, detail=args.detail)
     elif args.format == 'json':
         generator = JSONGenerator()
         output = generator.generate(project, flat=args.flat, detail=args.detail)
-    elif args.format == 'yaml':
+    elif args.format in ('yaml', 'hybrid'):
         generator = YAMLGenerator()
         compact = args.compact if hasattr(args, 'compact') else False
-        hybrid = args.hybrid if hasattr(args, 'hybrid') else False
+        hybrid = (args.format == 'hybrid') or (args.hybrid if hasattr(args, 'hybrid') else False)
 
         if hybrid:
             output = generator.generate_hybrid(project, detail=args.detail)
@@ -901,6 +921,9 @@ code2logic [path] [options]
         generator = LogicMLGenerator()
         spec = generator.generate(project, detail=args.detail)
         output = spec.content
+    else:
+        log.error(f"Unsupported format: {args.format}")
+        sys.exit(1)
 
     # Optional: write detailed function logic to a separate file
     if args.function_logic:

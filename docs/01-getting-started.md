@@ -81,6 +81,7 @@ for module in project.modules:
 | CSV | `-f csv` | Data analysis |
 | JSON | `-f json` | RAG/Embeddings |
 | YAML | `-f yaml` | Human + LLM |
+| Hybrid | `-f hybrid` | Code regeneration (best fidelity) |
 | TOON | `-f toon` | Token-efficient specs |
 | Gherkin | `-f gherkin` | LLM code gen (95%) |
 | Compact | `-f compact` | Quick overview |
@@ -91,7 +92,7 @@ for module in project.modules:
 
 ```bash
 # Install Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
+curl -fsSL https://ollama.com/install.sh | sh
 
 # Pull a model
 ollama pull qwen2.5-coder:7b

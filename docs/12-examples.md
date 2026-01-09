@@ -8,6 +8,11 @@
 
 All examples are in the `examples/` folder:
 
+- [examples/run_examples.sh](../examples/run_examples.sh) - Example runner script (multi-command workflows)
+- [examples/code2logic/](../examples/code2logic/) - Minimal project + Docker example for code2logic
+- [examples/logic2test/](../examples/logic2test/) - Minimal project + Docker example for logic2test
+- [examples/logic2code/](../examples/logic2code/) - Minimal project + Docker example for logic2code
+
 | Example | Description |
 | --- | --- |
 | [01_quick_start.py](../examples/01_quick_start.py) | Basic usage guide |
