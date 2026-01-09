@@ -116,13 +116,13 @@ Set these repository secrets:
 
 ```bash
 # 1. Analyze source project into a logic file
-code2logic src/ -f hybrid -o project.c2l.hybrid.yaml
+code2logic src/ -f hybrid -o out/code2logic/project.c2l.hybrid.yaml
 
 # 2. Generate tests
-python -m logic2test project.c2l.hybrid.yaml -o tests/ --type all
+python -m logic2test out/code2logic/project.c2l.hybrid.yaml -o out/logic2test/tests/ --type all
 
 # 3. Generate code scaffolds (or regenerate)
-python -m logic2code project.c2l.hybrid.yaml -o out/
+python -m logic2code out/code2logic/project.c2l.hybrid.yaml -o out/logic2code/generated_code/
 
 # 4. Run all tests across monorepo
 make test-all

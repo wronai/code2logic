@@ -147,6 +147,9 @@ def _read_text_file(path: str) -> str:
 
 
 def _write_text_file(path: str, content: str) -> None:
+    parent_dir = os.path.dirname(path)
+    if parent_dir:
+        os.makedirs(parent_dir, exist_ok=True)
     with open(path, 'w', encoding='utf-8') as f:
         f.write(content)
 
@@ -882,6 +885,9 @@ code2logic [path] [options]
                 schema = generator.generate_schema('compact' if compact else 'full')
             base_name = os.path.splitext(args.output)[0] if args.output else 'output'
             schema_path = f"{base_name}.yaml-schema.json"
+            parent_dir = os.path.dirname(schema_path)
+            if parent_dir:
+                os.makedirs(parent_dir, exist_ok=True)
             with open(schema_path, 'w', encoding='utf-8') as f:
                 f.write(schema)
             if args.verbose:
@@ -912,6 +918,9 @@ code2logic [path] [options]
             schema = generator.generate_schema(schema_type)
             base_name = os.path.splitext(args.output)[0] if args.output else 'output'
             schema_path = f"{base_name}.toon-schema.json"
+            parent_dir = os.path.dirname(schema_path)
+            if parent_dir:
+                os.makedirs(parent_dir, exist_ok=True)
             with open(schema_path, 'w', encoding='utf-8') as f:
                 f.write(schema)
             if args.verbose:
@@ -955,6 +964,10 @@ code2logic [path] [options]
             logic_out = logic_gen.generate_toon(project, detail=args.detail)
         else:
             logic_out = logic_gen.generate(project, detail=args.detail)
+
+        parent_dir = os.path.dirname(logic_path)
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
         with open(logic_path, 'w', encoding='utf-8') as f:
             f.write(logic_out)
         if args.verbose:
@@ -971,6 +984,9 @@ code2logic [path] [options]
 
     # Write output
     if args.output:
+        parent_dir = os.path.dirname(args.output)
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
         with open(args.output, 'w', encoding='utf-8') as f:
             f.write(output)
         if args.verbose:

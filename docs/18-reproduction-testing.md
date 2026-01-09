@@ -101,9 +101,9 @@ Each format captures different levels of detail:
 bash project.sh
 
 # Or run individual format tests
-code2logic . -f yaml -o project.c2l.yaml
-code2logic . -f hybrid -o project.c2l.hybrid.yaml
-code2logic . -f toon -o project.c2l.toon
+code2logic . -f yaml -o out/code2logic/project.c2l.yaml
+code2logic . -f hybrid -o out/code2logic/project.c2l.hybrid.yaml
+code2logic . -f toon -o out/code2logic/project.c2l.toon
 ```
 
 ## Integration with logic2code
@@ -112,10 +112,10 @@ The reproduction test results directly impact how well `logic2code` can regenera
 
 ```bash
 # Generate code from logic file
-logic2code project.c2l.yaml -o regenerated/
+logic2code out/code2logic/project.c2l.yaml -o out/logic2code/regenerated/
 
 # Compare original vs regenerated
-diff -r src/ regenerated/
+diff -r src/ out/logic2code/regenerated/
 ```
 
 ## Best Format Selection

@@ -188,8 +188,8 @@ config = GeneratorConfig(
     llm_provider='openrouter'
 )
 
-generator = CodeGenerator('project.c2l.yaml', config)
-result = generator.generate('output/')
+generator = CodeGenerator('out/code2logic/project.c2l.yaml', config)
+result = generator.generate('out/logic2code/generated_code/')
 ```
 
 ## Example Output

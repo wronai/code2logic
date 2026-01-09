@@ -35,16 +35,16 @@ pip install logic2code[llm]  # With lolm for LLM generation
 
 ```bash
 # Show what can be generated
-logic2code project.c2l.yaml --summary
+logic2code out/code2logic/project.c2l.yaml --summary
 
 # Generate Python code
-logic2code project.c2l.yaml -o generated_src/
+logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated_code/
 
 # Generate stubs only
-logic2code project.c2l.yaml -o src/ --stubs-only
+logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated_code/ --stubs-only
 
 # Generate specific modules
-logic2code project.c2l.yaml -o src/ --modules "analyzer.py,parsers.py"
+logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated_code/ --modules "analyzer.py,parsers.py"
 ```
 
 ### Python API
@@ -53,7 +53,7 @@ logic2code project.c2l.yaml -o src/ --modules "analyzer.py,parsers.py"
 from logic2code import CodeGenerator
 
 # Create generator
-generator = CodeGenerator('project.c2l.yaml')
+generator = CodeGenerator('out/code2logic/project.c2l.yaml')
 
 # Get summary
 summary = generator.summary()
@@ -61,7 +61,7 @@ print(f"Modules: {summary['total_modules']}")
 print(f"Classes: {summary['total_classes']}")
 
 # Generate code
-result = generator.generate('output/')
+result = generator.generate('out/logic2code/generated_code/')
 print(f"Generated {result.files_generated} files")
 
 # Generate single module
@@ -100,8 +100,8 @@ config = GeneratorConfig(
     llm_provider='openrouter'
 )
 
-generator = CodeGenerator('project.c2l.yaml', config)
-result = generator.generate('output/')
+generator = CodeGenerator('out/code2logic/project.c2l.yaml', config)
+result = generator.generate('out/logic2code/generated_code/')
 ```
 
 ## 🖥️ CLI Reference
@@ -142,16 +142,16 @@ generator = CodeGenerator('project.c2l.yaml', config)
 
 ```bash
 # 1. Analyze original code
-code2logic src/ -f yaml -o project.c2l.yaml
+code2logic src/ -f yaml -o out/code2logic/project.c2l.yaml
 
 # 2. Modify logic file (add/change functions)
-# Edit project.c2l.yaml
+# Edit out/code2logic/project.c2l.yaml
 
 # 3. Generate new code
-logic2code project.c2l.yaml -o new_src/
+logic2code out/code2logic/project.c2l.yaml -o out/logic2code/new_src/
 
 # 4. Compare and merge
-diff -r src/ new_src/
+diff -r src/ out/logic2code/new_src/
 ```
 
 ## 🧰 Monorepo (code2logic) workflow

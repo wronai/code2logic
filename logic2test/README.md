@@ -35,16 +35,16 @@ pip install logic2test[hypothesis]  # Property testing support
 
 ```bash
 # Show what can be generated
-logic2test project.c2l.yaml --summary
+logic2test out/code2logic/project.c2l.yaml --summary
 
 # Generate unit tests
-logic2test project.c2l.yaml -o tests/
+logic2test out/code2logic/project.c2l.yaml -o out/logic2test/tests/
 
 # Generate all test types
-logic2test project.c2l.yaml -o tests/ --type all
+logic2test out/code2logic/project.c2l.yaml -o out/logic2test/tests/ --type all
 
 # Include private methods
-logic2test project.c2l.yaml -o tests/ --include-private
+logic2test out/code2logic/project.c2l.yaml -o out/logic2test/tests/ --include-private
 ```
 
 ### Python API
@@ -53,7 +53,7 @@ logic2test project.c2l.yaml -o tests/ --include-private
 from logic2test import TestGenerator
 
 # Create generator
-generator = TestGenerator('project.c2l.yaml')
+generator = TestGenerator('out/code2logic/project.c2l.yaml')
 
 # Get summary
 summary = generator.summary()
@@ -61,11 +61,11 @@ print(f"Classes: {summary['testable_classes']}")
 print(f"Functions: {summary['testable_functions']}")
 
 # Generate unit tests
-result = generator.generate_unit_tests('tests/')
+result = generator.generate_unit_tests('out/logic2test/tests/')
 print(f"Generated {result.tests_generated} tests")
 
 # Generate all test types
-result = generator.generate_all('tests/')
+result = generator.generate_all('out/logic2test/tests/')
 ```
 
 ## 📋 Generated Test Structure
