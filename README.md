@@ -432,7 +432,7 @@ python -m logic2test out/code2logic/project.c2l.yaml -o out/logic2test/tests/ --
 from logic2test import TestGenerator
 
 generator = TestGenerator('out/code2logic/project.c2l.yaml')
-result = generator.generate_unit_tests('tests/')
+result = generator.generate_unit_tests('out/logic2test/tests/')
 print(f"Generated {result.tests_generated} tests")
 ```
 
@@ -455,7 +455,7 @@ python -m logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated
 from logic2code import CodeGenerator
 
 generator = CodeGenerator('out/code2logic/project.c2l.yaml')
-result = generator.generate('output/')
+result = generator.generate('out/logic2code/generated_code/')
 print(f"Generated {result.files_generated} files")
 ```
 
