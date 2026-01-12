@@ -15,7 +15,14 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import yaml
+
+def _safe_load_yaml_file(path: str) -> Any:
+    try:
+        import yaml
+    except ImportError as e:
+        raise RuntimeError('pyyaml is required for YAML specs. Install: pip install pyyaml') from e
+    with open(path, encoding='utf-8') as f:
+        return yaml.safe_load(f)
 
 
 class ReproductionStatus(Enum):
@@ -136,8 +143,7 @@ class SpecReproducer:
             output_dir: Directory to write generated files
             filter_paths: Optional list of paths to reproduce (selective)
         """
-        with open(spec_path, encoding='utf-8') as f:
-            spec = yaml.safe_load(f)
+        spec = _safe_load_yaml_file(spec_path)
 
         return self._reproduce(spec, output_dir, filter_paths)
 
@@ -548,8 +554,7 @@ class SpecValidator:
             with open(spec_path) as f:
                 spec = json.load(f)
         else:
-            with open(spec_path) as f:
-                spec = yaml.safe_load(f)
+            spec = _safe_load_yaml_file(spec_path)
 
         results = []
         generated_path = Path(generated_dir)

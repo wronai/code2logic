@@ -7,8 +7,6 @@ Defines the structure and validation for YAML specifications.
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Tuple
 
-import yaml
-
 
 @dataclass
 class MethodSchema:
@@ -105,8 +103,13 @@ def validate_yaml(spec: str) -> Tuple[bool, List[str]]:
     errors: List[str] = []
 
     try:
+        import yaml
+    except ImportError:
+        return False, ['pyyaml is required for YAML validation. Install: pip install pyyaml']
+
+    try:
         data = yaml.safe_load(spec)
-    except yaml.YAMLError as e:
+    except Exception as e:
         return False, [f"YAML parse error: {e}"]
 
     if not isinstance(data, dict):

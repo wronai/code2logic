@@ -64,7 +64,7 @@ from .manager import (
     list_available_providers,
 )
 
-__version__ = '0.1.4'
+__version__ = '0.1.6'
 __all__ = [
     # Config
     'LLMConfig',
