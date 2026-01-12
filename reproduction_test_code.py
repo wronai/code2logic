@@ -6,9 +6,13 @@ Ten plik pokazuje CO MOŻNA wygenerować z każdego formatu,
 z komentarzami co jest poprawne a co brakuje.
 """
 
+import gzip
+import hashlib
 import re
+import csv
 from dataclasses import dataclass
-from typing import List, Tuple
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 
 @dataclass
@@ -73,6 +77,280 @@ def print_quality_report() -> None:
     for result in evaluate_formats():
         print(f"  - {format_quality_summary(result)}")
     print()
+
+
+@dataclass
+class FormatStats:
+    format_name: str
+    bytes: int
+    lines: int
+    gzip_bytes: int
+    tokens_est: int
+    signatures: int
+    signatures_with_types: int
+    signatures_with_defaults: int
+    constants: int
+    constants_with_types: int
+    constants_with_values: int
+    constants_with_keys: int
+    dataclass_fields: int
+
+    @property
+    def gzip_ratio(self) -> float:
+        if self.bytes <= 0:
+            return 0.0
+        return self.gzip_bytes / self.bytes
+
+
+def _read_text(path: Path) -> str:
+    return path.read_text(encoding='utf-8', errors='replace')
+
+
+def _basic_text_stats(format_name: str, content: str) -> FormatStats:
+    b = len(content.encode('utf-8', errors='replace'))
+    gz = len(gzip.compress(content.encode('utf-8', errors='replace')))
+    lines = content.count('\n') + (1 if content else 0)
+    tokens_est = max(1, int(len(content) / 4)) if content else 0
+    return FormatStats(
+        format_name=format_name,
+        bytes=b,
+        lines=lines,
+        gzip_bytes=gz,
+        tokens_est=tokens_est,
+        signatures=0,
+        signatures_with_types=0,
+        signatures_with_defaults=0,
+        constants=0,
+        constants_with_types=0,
+        constants_with_values=0,
+        constants_with_keys=0,
+        dataclass_fields=0,
+    )
+
+
+def _extract_yaml_modules(data: Any) -> List[Dict[str, Any]]:
+    if isinstance(data, dict):
+        modules = data.get('modules')
+        if isinstance(modules, list):
+            return [m for m in modules if isinstance(m, dict)]
+    return []
+
+
+def _extract_yaml_signatures_from_module(module: Dict[str, Any]) -> List[str]:
+    sigs: List[str] = []
+
+    funcs = module.get('f') or module.get('functions')
+    if isinstance(funcs, list):
+        for f in funcs:
+            if isinstance(f, dict):
+                s = f.get('sig') or f.get('signature')
+                if isinstance(s, str) and s.strip():
+                    sigs.append(s)
+
+    classes = module.get('c') or module.get('classes')
+    if isinstance(classes, list):
+        for c in classes:
+            if not isinstance(c, dict):
+                continue
+            methods = c.get('m') or c.get('methods')
+            if isinstance(methods, list):
+                for m in methods:
+                    if isinstance(m, dict):
+                        s = m.get('sig') or m.get('signature')
+                        if isinstance(s, str) and s.strip():
+                            sigs.append(s)
+
+    return sigs
+
+
+def _extract_yaml_constants_from_module(module: Dict[str, Any]) -> List[Dict[str, Any]]:
+    consts = module.get('const') or module.get('constants')
+    if isinstance(consts, list):
+        return [c for c in consts if isinstance(c, dict)]
+    return []
+
+
+def _count_yaml_dataclass_fields(module: Dict[str, Any]) -> int:
+    total = 0
+
+    dcs = module.get('dataclasses')
+    if isinstance(dcs, list):
+        for dc in dcs:
+            if isinstance(dc, dict):
+                fields = dc.get('fields')
+                if isinstance(fields, list):
+                    total += len(fields)
+
+    classes = module.get('c') or module.get('classes')
+    if isinstance(classes, list):
+        for c in classes:
+            if isinstance(c, dict):
+                fields = c.get('fields')
+                if isinstance(fields, list):
+                    total += len(fields)
+
+    return total
+
+
+def analyze_yaml_like(format_name: str, content: str) -> FormatStats:
+    stats = _basic_text_stats(format_name, content)
+
+    try:
+        import yaml  # type: ignore
+        data = yaml.safe_load(content)
+    except Exception:
+        sigs = re.findall(r"\bsig:\s*([^\n]+)", content)
+        stats.signatures = len(sigs)
+        stats.signatures_with_types = sum(1 for s in sigs if ':' in s)
+        stats.signatures_with_defaults = sum(1 for s in sigs if '=' in s)
+        return stats
+
+    modules = _extract_yaml_modules(data)
+
+    sigs: List[str] = []
+    consts: List[Dict[str, Any]] = []
+    dataclass_fields = 0
+    for m in modules:
+        sigs.extend(_extract_yaml_signatures_from_module(m))
+        consts.extend(_extract_yaml_constants_from_module(m))
+        dataclass_fields += _count_yaml_dataclass_fields(m)
+
+    stats.signatures = len(sigs)
+    stats.signatures_with_types = sum(1 for s in sigs if ':' in s)
+    stats.signatures_with_defaults = sum(1 for s in sigs if '=' in s)
+
+    stats.constants = len(consts)
+    for c in consts:
+        t = c.get('t') or c.get('type')
+        v = c.get('v') or c.get('value')
+        keys = c.get('keys')
+
+        if isinstance(t, str) and t.strip() and t.strip() != '-':
+            stats.constants_with_types += 1
+        if isinstance(v, str) and v.strip() and v.strip() != '-':
+            stats.constants_with_values += 1
+        if isinstance(keys, list) and len(keys) > 0:
+            stats.constants_with_keys += 1
+        elif isinstance(keys, str) and keys.strip() and keys.strip() != '-':
+            stats.constants_with_keys += 1
+
+    stats.dataclass_fields = dataclass_fields
+    return stats
+
+
+def analyze_toon(format_name: str, content: str) -> FormatStats:
+    stats = _basic_text_stats(format_name, content)
+
+    lines = content.splitlines()
+    delimiter = '\t' if any('\t' in ln for ln in lines) else ','
+
+    def parse_row(line: str) -> List[str]:
+        return next(csv.reader([line], delimiter=delimiter, quotechar='"', escapechar='\\'))
+
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        i += 1
+
+        if not line.strip() or line.lstrip().startswith('#'):
+            continue
+
+        m = re.search(r"\b(functions|methods|const|fields)\[(\d+)\]\{([^}]*)\}:\s*$", line)
+        if not m:
+            continue
+
+        section = m.group(1)
+        count = int(m.group(2))
+        fields = [f.strip() for f in m.group(3).split(',') if f.strip()]
+        field_to_idx = {name: idx for idx, name in enumerate(fields)}
+
+        for _ in range(count):
+            if i >= len(lines):
+                break
+            row_line = lines[i].strip()
+            i += 1
+            if not row_line:
+                continue
+            cells = parse_row(row_line)
+
+            if section in ('functions', 'methods'):
+                sig_idx = field_to_idx.get('sig')
+                if sig_idx is not None and sig_idx < len(cells):
+                    sig = cells[sig_idx]
+                    if sig:
+                        stats.signatures += 1
+                        if ':' in sig:
+                            stats.signatures_with_types += 1
+                        if '=' in sig:
+                            stats.signatures_with_defaults += 1
+
+            if section == 'const':
+                stats.constants += 1
+                t_idx = field_to_idx.get('t')
+                v_idx = field_to_idx.get('v')
+                keys_idx = field_to_idx.get('keys')
+
+                if t_idx is not None and t_idx < len(cells):
+                    t = cells[t_idx]
+                    if t and t != '-':
+                        stats.constants_with_types += 1
+                if v_idx is not None and v_idx < len(cells):
+                    v = cells[v_idx]
+                    if v and v != '-':
+                        stats.constants_with_values += 1
+                if keys_idx is not None and keys_idx < len(cells):
+                    keys = cells[keys_idx]
+                    if keys and keys != '-':
+                        stats.constants_with_keys += 1
+
+            if section == 'fields':
+                stats.dataclass_fields += 1
+
+    return stats
+
+
+def _pct(part: int, whole: int) -> float:
+    if whole <= 0:
+        return 0.0
+    return (part / whole) * 100
+
+
+def print_detailed_format_comparison() -> None:
+    base = Path('out/code2logic')
+    yaml_path = base / 'project.c2l.yaml'
+    hybrid_path = base / 'project.c2l.hybrid.yaml'
+    toon_path = base / 'project.c2l.toon'
+
+    if not (yaml_path.exists() or hybrid_path.exists() or toon_path.exists()):
+        return
+
+    print("=== PORÓWNANIE FORMATÓW (AUTO, z realnych plików) ===")
+    print("Uwaga: oceny heurystyczne poniżej są demonstracyjne; ten blok liczy metryki z aktualnych plików w out/.")
+    print()
+
+    reports: List[FormatStats] = []
+    if yaml_path.exists():
+        reports.append(analyze_yaml_like('YAML', _read_text(yaml_path)))
+    if hybrid_path.exists():
+        reports.append(analyze_yaml_like('HYBRID', _read_text(hybrid_path)))
+    if toon_path.exists():
+        reports.append(analyze_toon('TOON', _read_text(toon_path)))
+
+    for r in reports:
+        print(f"{r.format_name}:")
+        print(f"  size_bytes: {r.bytes:,}")
+        print(f"  size_gzip_bytes: {r.gzip_bytes:,} (ratio {r.gzip_ratio:.2f})")
+        print(f"  lines: {r.lines:,}")
+        print(f"  tokens_est: {r.tokens_est:,}  (≈ chars/4)")
+        print(f"  signatures: {r.signatures:,}")
+        print(f"    with_types: {r.signatures_with_types:,} ({_pct(r.signatures_with_types, r.signatures):.1f}%)")
+        print(f"    with_defaults: {r.signatures_with_defaults:,} ({_pct(r.signatures_with_defaults, r.signatures):.1f}%)")
+        print(f"  constants: {r.constants:,}")
+        print(f"    with_types: {r.constants_with_types:,} ({_pct(r.constants_with_types, r.constants):.1f}%)")
+        print(f"    with_values: {r.constants_with_values:,} ({_pct(r.constants_with_values, r.constants):.1f}%)")
+        print(f"    with_keys: {r.constants_with_keys:,} ({_pct(r.constants_with_keys, r.constants):.1f}%)")
+        print(f"  dataclass_fields: {r.dataclass_fields:,}")
+        print()
 
 # =============================================================================
 # REPRODUKCJA Z TOON (shared_utils.py) - PO NAPRAWIE
@@ -612,6 +890,7 @@ def clean_identifier(name: str) -> str:
 if __name__ == "__main__":
     print("=== TEST REPRODUKOWALNOŚCI ===")
     print()
+    print_detailed_format_comparison()
     print_quality_report()
     print("TOON:   ~55% (parametry + typy, brak wartości stałych)")
     print("YAML:   ~75% (pełne sygnatury, brak wartości stałych)")

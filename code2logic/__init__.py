@@ -92,13 +92,38 @@ from .gherkin import (
     gherkin_to_test_data,
 )
 from .intent import EnhancedIntentGenerator
-from .llm_clients import (
-    BaseLLMClient,
-    LiteLLMClient,
-    OllamaLocalClient,
-    OpenRouterClient,
-    get_client,
-)
+try:
+    from .llm_clients import (
+        BaseLLMClient,
+        LiteLLMClient,
+        OllamaLocalClient,
+        OpenRouterClient,
+        get_client,
+    )
+except ImportError:
+    from typing import Optional as _Optional
+
+    class BaseLLMClient:  # type: ignore[no-redef]
+        def generate(self, prompt: str, system: _Optional[str] = None, max_tokens: int = 4000) -> str:
+            raise ImportError('lolm is required for LLM features')
+
+        def is_available(self) -> bool:
+            return False
+
+    class OpenRouterClient(BaseLLMClient):  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError('lolm is required for LLM features')
+
+    class OllamaLocalClient(BaseLLMClient):  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError('lolm is required for LLM features')
+
+    class LiteLLMClient(BaseLLMClient):  # type: ignore[no-redef]
+        def __init__(self, *args, **kwargs):
+            raise ImportError('lolm is required for LLM features')
+
+    def get_client(*args, **kwargs):  # type: ignore[no-redef]
+        raise ImportError('lolm is required for LLM features')
 from .llm_profiler import (
     AdaptiveChunker,
     LLMProfile,

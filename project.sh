@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+cd "$SCRIPT_DIR"
+
 OUT_DIR="out/code2logic"
 mkdir -p "$OUT_DIR"
 
-poetry run code2logic code2logic -f yaml -o "$OUT_DIR/project.c2l.yaml" --compact --with-schema
-poetry run code2logic code2logic -f hybrid -o "$OUT_DIR/project.c2l.hybrid.yaml" --with-schema
-poetry run code2logic code2logic -f toon -o "$OUT_DIR/project.c2l.toon" --with-schema
+poetry run python -m code2logic code2logic -f yaml -o "$OUT_DIR/project.c2l.yaml" --compact --with-schema
+poetry run python -m code2logic code2logic -f hybrid -o "$OUT_DIR/project.c2l.hybrid.yaml" --with-schema
+poetry run python -m code2logic code2logic -f toon -o "$OUT_DIR/project.c2l.toon" --with-schema
 
 echo
 echo "=== ROZMIARY WYGENEROWANYCH PLIKÓW (kB) ==="
@@ -38,8 +41,8 @@ poetry run python multilang_reproduction_tester.py --yaml "$OUT_DIR/project.c2l.
 poetry run python universal_validator.py --yaml "$OUT_DIR/project.c2l.yaml" --hybrid "$OUT_DIR/project.c2l.hybrid.yaml" --toon "$OUT_DIR/project.c2l.toon" --language python --verbose
 
 
-poetry run code2logic code2logic -f compact --function-logic -o "$OUT_DIR/project.func.logicml"
-poetry run code2logic code2logic -f compact --function-logic -o "$OUT_DIR/project.func.json"
-poetry run code2logic code2logic -f toon --function-logic -o "$OUT_DIR/project.func.yaml"
-poetry run code2logic code2logic -f json --function-logic -o "$OUT_DIR/project.func.toon"
-poetry run code2logic code2logic -f compact -q --function-logic "$OUT_DIR/project.func.logicml"
+poetry run python -m code2logic code2logic -f compact --function-logic -o "$OUT_DIR/project.func.logicml"
+poetry run python -m code2logic code2logic -f compact --function-logic -o "$OUT_DIR/project.func.json"
+poetry run python -m code2logic code2logic -f toon --function-logic -o "$OUT_DIR/project.func.yaml"
+poetry run python -m code2logic code2logic -f json --function-logic -o "$OUT_DIR/project.func.toon"
+poetry run python -m code2logic code2logic -f compact -q --function-logic "$OUT_DIR/project.func.logicml"
