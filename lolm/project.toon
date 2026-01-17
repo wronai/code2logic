@@ -1,0 +1,93 @@
+# lolm | 12f 1990L | python:12
+# Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
+M[12]:
+  config.py,240
+  cli.py,231
+  manager.py,322
+  __init__.py,81
+  __main__.py,10
+  provider.py,121
+  clients.py,228
+  examples/03_code_generation.py,86
+  examples/01_quickstart.py,60
+  examples/02_configuration.py,88
+  tests/__init__.py,1
+  tests/test_basic.py,51
+D:
+  config.py:
+    i: json,os,yaml,dataclasses.{dataclass,field},pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: RECOMMENDED_MODELS,DEFAULT_MODELS,DEFAULT_PROVIDER_PRIORITIES,LLMConfig,get_config_dir,get_config_path,load_config,save_config
+    LLMConfig: to_dict(0),from_dict(1)  # LLM configuration container.
+    get_config_dir()->Path
+    get_config_path()->Path
+    load_config()->LLMConfig
+    save_config(config:LLMConfig)->None
+    load_env_file(search_paths:Optional[List[Path]]=None)->None
+    load_litellm_config(search_paths:Optional[List[Path]]=None)->Dict[str, Any]
+    save_litellm_config(config:Dict[str;Any];path:Optional[Path]=None)->None
+    get_provider_model(provider:str)->str
+  cli.py:
+    i: argparse,os,sys,config,pathlib.Path
+    e: cmd_status,cmd_set_provider,cmd_set_model,cmd_key_set,cmd_key_show,cmd_models,cmd_test,cmd_config_show
+    cmd_status(args)->int
+    cmd_set_provider(args)->int
+    cmd_set_model(args)->int
+    cmd_key_set(args)->int
+    cmd_key_show(args)->int
+    cmd_models(args)->int
+    cmd_test(args)->int
+    cmd_config_show(args)->int
+  manager.py:
+    i: os,config,typing.{Dict,List,Optional}
+    e: ProviderInfo,LLMManager,get_client,list_available_providers
+    ProviderInfo: __init__(5)  # Information about a configured provider.
+    LLMManager: __init__(1),is_available(0),is_ready(0),primary_provider(0),providers(0)  # LLM Manager with multi-provider support.
+    get_client(provider:str=None;model:str=None)->BaseLLMClient
+    list_available_providers()->List[str]
+  provider.py:
+    i: abc.{ABC,abstractmethod},dataclasses.{dataclass,field},enum.Enum,typing.{Any,Dict,List,Literal,Optional}
+    e: LLMProviderStatus,GenerateOptions,LLMResponse,LLMModelInfo,BaseLLMClient,LLMProvider
+    LLMProviderStatus:   # Provider availability status.
+    GenerateOptions: to_messages(0)  # Options for LLM generation.
+    LLMResponse:   # Response from LLM generation.
+    LLMModelInfo:   # Information about an available model.
+    BaseLLMClient: generate(3),is_available(0),chat(2)  # Abstract base class for synchronous L...
+  clients.py:
+    i: os,time,config.{DEFAULT_MODELS,RECOMMENDED_MODELS,get_provider_model,load_env_file},provider.{BaseLLMClient,LLMModelInfo},typing.{List,Optional}
+    e: OpenRouterClient,OllamaClient,LiteLLMClient,GroqClient,TogetherClient
+    OpenRouterClient: __init__(2),generate(3),is_available(0),list_recommended_models(0)  # OpenRouter API client for cloud LLM a...
+    OllamaClient: __init__(2),generate(3),is_available(0),list_models(0),list_recommended_models(0)  # Ollama client for local LLM inference.
+    LiteLLMClient: __init__(1),generate(3),is_available(0)  # LiteLLM client for universal LLM access.
+    GroqClient: __init__(2),generate(3),is_available(0)  # Groq API client for fast inference.
+    TogetherClient: __init__(2),generate(3),is_available(0)  # Together AI client.
+  examples/03_code_generation.py:
+    i: lolm.{LLMManager,get_client}
+    e: SYSTEM_PROMPT,generate_function,generate_class,explain_code,review_code
+    generate_function(description:str)->str
+    generate_class(description:str)->str
+    explain_code(code:str)->str
+    review_code(code:str)->str
+  examples/01_quickstart.py:
+    i: lolm.{LLMManager,get_client}
+    e: example_simple_client,example_specific_provider,example_manager,example_fallback
+    example_simple_client()->None
+    example_specific_provider()->None
+    example_manager()->None
+    example_fallback()->None
+  examples/02_configuration.py:
+    i: os,lolm,pathlib.Path
+    e: show_defaults,show_recommended_models,show_current_config,example_modify_config,show_environment_config
+    show_defaults()->None
+    show_recommended_models()->None
+    show_current_config()->None
+    example_modify_config()->None
+    show_environment_config()->None
+  tests/test_basic.py:
+    i: pytest
+    e: test_import_lolm,test_import_config,test_import_clients,test_config_defaults,test_manager_init,test_recommended_models
+    test_import_lolm()->None
+    test_import_config()->None
+    test_import_clients()->None
+    test_config_defaults()->None
+    test_manager_init()->None
+    test_recommended_models()->None
