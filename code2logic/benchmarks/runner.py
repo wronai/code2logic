@@ -18,6 +18,7 @@ Usage:
 import sys
 import time
 import difflib
+import re
 from pathlib import Path
 from typing import List, Optional
 
@@ -373,7 +374,7 @@ class {cls}:
 
         if verbose:
             render.heading(2, "Format Benchmark")
-            render.codeblock("yaml", f"folder: {folder}\nfiles: {len(py_files)}\nformats: [{', '.join(formats)}]")
+            render.codeblock("yaml", f"folder: {folder}\nfiles: {len(modules)}\nformats: [{', '.join(formats)}]")
 
         start_time = time.time()
 

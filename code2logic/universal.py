@@ -156,6 +156,78 @@ class CodeLogic:
 
         return '\n'.join(lines)
 
+    def _generate_rust(self, logic: CodeLogic) -> str:
+        """Generate Rust code."""
+        lines: List[str] = []
+        for imp in logic.imports:
+            if imp.strip():
+                lines.append(imp)
+        if lines:
+            lines.append("")
+
+        for elem in logic.elements:
+            if elem.type == ElementType.STRUCT:
+                lines.append(f"pub struct {elem.name} {{")
+                lines.append("}")
+                lines.append("")
+            elif elem.type == ElementType.ENUM:
+                lines.append(f"pub enum {elem.name} {{")
+                lines.append("}")
+                lines.append("")
+            elif elem.type in (ElementType.FUNCTION, ElementType.METHOD):
+                lines.append(f"pub fn {elem.name}() {{")
+                lines.append("}")
+                lines.append("")
+        return '\n'.join(lines).rstrip() + "\n"
+
+    def _generate_java(self, logic: CodeLogic) -> str:
+        """Generate Java code."""
+        lines: List[str] = []
+        for imp in logic.imports:
+            if imp.strip():
+                lines.append(imp)
+        if lines:
+            lines.append("")
+
+        main_class = None
+        for elem in logic.elements:
+            if elem.type == ElementType.CLASS:
+                main_class = elem.name
+                break
+        if not main_class:
+            main_class = "Generated"
+
+        lines.append(f"public class {main_class} {{")
+        for elem in logic.elements:
+            if elem.type == ElementType.FUNCTION:
+                lines.append(f"    public static void {elem.name}() {{ }}")
+        lines.append("}")
+        return '\n'.join(lines).rstrip() + "\n"
+
+    def _generate_csharp(self, logic: CodeLogic) -> str:
+        """Generate C# code."""
+        lines: List[str] = []
+        for imp in logic.imports:
+            if imp.strip():
+                lines.append(imp)
+        if lines:
+            lines.append("")
+
+        main_class = None
+        for elem in logic.elements:
+            if elem.type == ElementType.CLASS:
+                main_class = elem.name
+                break
+        if not main_class:
+            main_class = "Generated"
+
+        lines.append(f"public class {main_class} {{")
+        for elem in logic.elements:
+            if elem.type == ElementType.FUNCTION:
+                lines.append(f"    public static void {elem.name}() {{ }}")
+        lines.append("}")
+        return '\n'.join(lines).rstrip() + "\n"
+
     def _element_to_compact(self, elem: CodeElement, indent: int) -> List[str]:
         """Convert element to compact lines."""
         prefix = "  " * indent
@@ -276,8 +348,85 @@ class UniversalParser:
             return self._parse_go(path, content, source_hash)
         elif language == Language.SQL:
             return self._parse_sql(path, content, source_hash)
+        elif language == Language.RUST:
+            return self._parse_rust(path, content, source_hash)
+        elif language == Language.JAVA:
+            return self._parse_java(path, content, source_hash)
+        elif language == Language.CSHARP:
+            return self._parse_csharp(path, content, source_hash)
         else:
             return self._parse_generic(path, content, source_hash, language)
+
+    def _parse_rust(self, path: Path, content: str, hash_: str) -> CodeLogic:
+        """Parse Rust file."""
+        logic = CodeLogic(
+            source_file=str(path),
+            source_language=Language.RUST,
+            source_hash=hash_,
+        )
+
+        for line in content.split('\n'):
+            stripped = line.strip()
+            if stripped.startswith('use ') and stripped.endswith(';'):
+                logic.imports.append(stripped)
+
+        for m in re.finditer(r'^(?:pub\s+)?struct\s+(\w+)', content, re.MULTILINE):
+            logic.elements.append(CodeElement(type=ElementType.STRUCT, name=m.group(1)))
+
+        for m in re.finditer(r'^(?:pub\s+)?enum\s+(\w+)', content, re.MULTILINE):
+            logic.elements.append(CodeElement(type=ElementType.ENUM, name=m.group(1)))
+
+        for m in re.finditer(r'^(?:pub\s+)?trait\s+(\w+)', content, re.MULTILINE):
+            logic.elements.append(CodeElement(type=ElementType.INTERFACE, name=m.group(1)))
+
+        for m in re.finditer(r'^(?:pub\s+)?fn\s+(\w+)\s*\(([^)]*)\)', content, re.MULTILINE):
+            logic.elements.append(CodeElement(type=ElementType.FUNCTION, name=m.group(1)))
+
+        return logic
+
+    def _parse_java(self, path: Path, content: str, hash_: str) -> CodeLogic:
+        """Parse Java file."""
+        logic = CodeLogic(
+            source_file=str(path),
+            source_language=Language.JAVA,
+            source_hash=hash_,
+        )
+
+        for m in re.finditer(r'^import\s+([^;]+);', content, re.MULTILINE):
+            logic.imports.append(f"import {m.group(1).strip()};")
+
+        for m in re.finditer(r'^(?:public\s+)?(?:abstract\s+)?class\s+(\w+)', content, re.MULTILINE):
+            logic.elements.append(CodeElement(type=ElementType.CLASS, name=m.group(1)))
+
+        for m in re.finditer(r'^(?:public\s+)?interface\s+(\w+)', content, re.MULTILINE):
+            logic.elements.append(CodeElement(type=ElementType.INTERFACE, name=m.group(1)))
+
+        for m in re.finditer(r'^(?:public\s+)?enum\s+(\w+)', content, re.MULTILINE):
+            logic.elements.append(CodeElement(type=ElementType.ENUM, name=m.group(1)))
+
+        return logic
+
+    def _parse_csharp(self, path: Path, content: str, hash_: str) -> CodeLogic:
+        """Parse C# file."""
+        logic = CodeLogic(
+            source_file=str(path),
+            source_language=Language.CSHARP,
+            source_hash=hash_,
+        )
+
+        for m in re.finditer(r'^using\s+([^;]+);', content, re.MULTILINE):
+            logic.imports.append(f"using {m.group(1).strip()};")
+
+        for m in re.finditer(r'^(?:public\s+)?interface\s+(I\w+)', content, re.MULTILINE):
+            logic.elements.append(CodeElement(type=ElementType.INTERFACE, name=m.group(1)))
+
+        for m in re.finditer(r'^(?:public\s+)?(?:abstract\s+)?class\s+(\w+)', content, re.MULTILINE):
+            logic.elements.append(CodeElement(type=ElementType.CLASS, name=m.group(1)))
+
+        for m in re.finditer(r'^(?:public\s+)?record\s+(\w+)', content, re.MULTILINE):
+            logic.elements.append(CodeElement(type=ElementType.CLASS, name=m.group(1)))
+
+        return logic
 
     def _parse_python(self, path: Path, content: str, hash_: str) -> CodeLogic:
         """Parse Python file."""
@@ -717,6 +866,12 @@ class CodeGenerator:
             return self._generate_go(logic)
         elif target_lang == Language.SQL:
             return self._generate_sql(logic)
+        elif target_lang == Language.RUST:
+            return self._generate_rust(logic)
+        elif target_lang == Language.JAVA:
+            return self._generate_java(logic)
+        elif target_lang == Language.CSHARP:
+            return self._generate_csharp(logic)
         else:
             return self._generate_generic(logic, target_lang)
 
