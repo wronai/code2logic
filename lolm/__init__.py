@@ -63,8 +63,20 @@ from .manager import (
     get_client,
     list_available_providers,
 )
+from .rotation import (
+    RotationQueue,
+    ProviderHealth,
+    ProviderState,
+    RateLimitInfo,
+    RateLimitType,
+    LLMRotationManager,
+    parse_rate_limit_headers,
+    is_rate_limit_error,
+    create_rotation_manager,
+)
+from .clients import LLMRateLimitError
 
-__version__ = '0.1.6'
+__version__ = '0.1.8'
 __all__ = [
     # Config
     'LLMConfig',
@@ -92,4 +104,15 @@ __all__ = [
     'ProviderInfo',
     'get_client',
     'list_available_providers',
+    # Rotation
+    'RotationQueue',
+    'ProviderHealth',
+    'ProviderState',
+    'RateLimitInfo',
+    'RateLimitType',
+    'LLMRotationManager',
+    'LLMRateLimitError',
+    'parse_rate_limit_headers',
+    'is_rate_limit_error',
+    'create_rotation_manager',
 ]

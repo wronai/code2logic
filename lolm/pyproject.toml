@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lolm"
-version = "0.1.6"
+version = "0.1.8"
 description = "Lightweight Orchestrated LLM Manager - Multi-provider LLM configuration and management"
 readme = "README.md"
 license = {text = "Apache-2.0"}

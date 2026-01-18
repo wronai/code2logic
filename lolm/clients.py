@@ -11,6 +11,26 @@ from typing import List, Optional
 from .config import DEFAULT_MODELS, RECOMMENDED_MODELS, get_provider_model, load_env_file
 from .provider import BaseLLMClient, LLMModelInfo
 
+
+class LLMRateLimitError(Exception):
+    """Exception raised when a rate limit is hit."""
+    
+    def __init__(self, message: str, provider: str = "",
+                 status_code: int = 429, headers: dict = None,
+                 retry_after: float = None):
+        super().__init__(message)
+        self.provider = provider
+        self.status_code = status_code
+        self.headers = headers or {}
+        self.retry_after = retry_after
+    
+    def __str__(self):
+        base = super().__str__()
+        if self.retry_after:
+            return f"{base} (retry after {self.retry_after}s)"
+        return base
+
+
 # Load .env on import
 load_env_file()
 
@@ -77,6 +97,15 @@ class OpenRouterClient(BaseLLMClient):
             data = response.json()
             return data['choices'][0]['message']['content']
         except httpx.HTTPStatusError as e:
+            if e.response.status_code == 429:
+                retry_after = e.response.headers.get('retry-after')
+                raise LLMRateLimitError(
+                    f"OpenRouter rate limit exceeded",
+                    provider="openrouter",
+                    status_code=429,
+                    headers=dict(e.response.headers),
+                    retry_after=float(retry_after) if retry_after else None
+                )
             error_detail = e.response.text if hasattr(e, 'response') else str(e)
             raise RuntimeError(f"OpenRouter API error: {error_detail}")
         except Exception as e:
@@ -237,6 +266,17 @@ class GroqClient(BaseLLMClient):
             response.raise_for_status()
             data = response.json()
             return data['choices'][0]['message']['content']
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 429:
+                retry_after = e.response.headers.get('retry-after')
+                raise LLMRateLimitError(
+                    f"Groq rate limit exceeded",
+                    provider="groq",
+                    status_code=429,
+                    headers=dict(e.response.headers),
+                    retry_after=float(retry_after) if retry_after else None
+                )
+            raise RuntimeError(f"Groq error: {e}")
         except Exception as e:
             raise RuntimeError(f"Groq error: {e}")
     
@@ -283,6 +323,17 @@ class TogetherClient(BaseLLMClient):
             response.raise_for_status()
             data = response.json()
             return data['choices'][0]['message']['content']
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 429:
+                retry_after = e.response.headers.get('retry-after')
+                raise LLMRateLimitError(
+                    f"Together rate limit exceeded",
+                    provider="together",
+                    status_code=429,
+                    headers=dict(e.response.headers),
+                    retry_after=float(retry_after) if retry_after else None
+                )
+            raise RuntimeError(f"Together error: {e}")
         except Exception as e:
             raise RuntimeError(f"Together error: {e}")
     

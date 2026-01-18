@@ -23,6 +23,16 @@ from .clients import (
     LiteLLMClient,
     GroqClient,
     TogetherClient,
+    LLMRateLimitError,
+)
+from .rotation import (
+    RotationQueue,
+    ProviderHealth,
+    ProviderState,
+    RateLimitInfo,
+    RateLimitType,
+    parse_rate_limit_headers,
+    is_rate_limit_error,
 )
 
 
@@ -50,6 +60,7 @@ class LLMManager:
     LLM Manager with multi-provider support.
     
     Manages multiple LLM providers and provides fallback logic.
+    Now includes rotation queue with rate limit detection and automatic failover.
     
     Example:
         manager = LLMManager()
@@ -58,14 +69,22 @@ class LLMManager:
         if manager.is_available:
             response = manager.generate("Explain this code")
             print(response)
+        
+        # With rotation (automatic failover on rate limits):
+        response = manager.generate_with_rotation("Explain this code")
     """
     
-    def __init__(self, verbose: bool = False):
+    def __init__(self, verbose: bool = False, enable_rotation: bool = True):
         self._providers: Dict[str, ProviderInfo] = {}
         self._primary_provider: Optional[str] = None
         self._initialized = False
         self._verbose = verbose
         self._config = load_config()
+        self._enable_rotation = enable_rotation
+        self._rotation_queue: Optional[RotationQueue] = None
+        
+        if enable_rotation:
+            self._rotation_queue = RotationQueue()
     
     @property
     def is_available(self) -> bool:
@@ -122,6 +141,12 @@ class LLMManager:
                 if info and info.status == LLMProviderStatus.AVAILABLE:
                     self._primary_provider = name
                     break
+        
+        # Add available providers to rotation queue
+        if self._rotation_queue:
+            for name, info in self._providers.items():
+                if info.status == LLMProviderStatus.AVAILABLE:
+                    self._rotation_queue.add_provider(name, info.priority)
         
         self._initialized = True
     
@@ -331,12 +356,99 @@ class LLMManager:
                 continue
             
             try:
-                return info.client.generate(prompt, system=system, max_tokens=max_tokens)
+                result = info.client.generate(prompt, system=system, max_tokens=max_tokens)
+                # Record success in rotation queue
+                if self._rotation_queue:
+                    self._rotation_queue.record_success(name)
+                return result
+            except LLMRateLimitError as e:
+                # Record rate limit in rotation queue
+                if self._rotation_queue:
+                    rate_info = RateLimitInfo(
+                        limit_type=RateLimitType.UNKNOWN,
+                        retry_after_seconds=e.retry_after,
+                        raw_headers=e.headers
+                    )
+                    self._rotation_queue.record_failure(
+                        name, str(e), is_rate_limit=True, rate_limit_info=rate_info
+                    )
+                if self._verbose:
+                    print(f"[LLMManager] {name} rate limited: {e}")
+                last_error = e
+                continue
             except Exception as e:
+                # Record failure in rotation queue
+                if self._rotation_queue:
+                    self._rotation_queue.record_failure(name, str(e))
                 last_error = e
                 continue
         
         raise RuntimeError(f"All providers failed. Last error: {last_error}")
+    
+    def generate_with_rotation(
+        self,
+        prompt: str,
+        system: str = None,
+        max_tokens: int = 4000,
+        max_retries: int = 3
+    ) -> str:
+        """
+        Generate with intelligent rotation based on provider health.
+        
+        Uses the rotation queue to select providers based on their
+        current health, avoiding rate-limited or unavailable providers.
+        
+        Args:
+            prompt: User prompt
+            system: System prompt
+            max_tokens: Maximum tokens
+            max_retries: Maximum number of providers to try
+            
+        Returns:
+            Generated text
+        """
+        if not self._initialized:
+            self.initialize()
+        
+        if not self._rotation_queue:
+            return self.generate_with_fallback(prompt, system, max_tokens)
+        
+        # Get providers ordered by rotation queue (respects health/cooldowns)
+        available = self._rotation_queue.get_available()
+        
+        if not available:
+            # Fall back to priority order if no providers available in queue
+            available = self._get_priority_order()
+        
+        return self.generate_with_fallback(
+            prompt, system, max_tokens, 
+            providers=available[:max_retries]
+        )
+    
+    def get_rotation_queue(self) -> Optional[RotationQueue]:
+        """Get the rotation queue for advanced control."""
+        return self._rotation_queue
+    
+    def get_provider_health(self, name: str = None) -> Dict:
+        """Get health info for providers."""
+        if not self._rotation_queue:
+            return {}
+        if name:
+            health = self._rotation_queue.get_health(name)
+            return health.to_dict() if health else {}
+        return self._rotation_queue.get_all_health()
+    
+    def reset_provider(self, name: str) -> bool:
+        """Reset a provider's health metrics."""
+        if self._rotation_queue:
+            return self._rotation_queue.reset_provider(name)
+        return False
+    
+    def set_provider_priority(self, name: str, priority: int) -> bool:
+        """Set priority for a provider in the rotation queue."""
+        if self._rotation_queue:
+            return self._rotation_queue.set_priority(name, priority)
+        return False
     
     def get_status(self) -> Dict[str, Dict]:
         """Get status of all providers."""
