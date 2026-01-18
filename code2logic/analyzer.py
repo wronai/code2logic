@@ -52,6 +52,7 @@ class ProjectAnalyzer:
         '.java': 'java',
         '.go': 'go',
         '.rs': 'rust',
+        '.cs': 'csharp',
         '.c': 'cpp',
         '.cpp': 'cpp',
         '.cc': 'cpp',

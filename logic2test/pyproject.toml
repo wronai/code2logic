@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "logic2test"
-version = "0.1.8"
+version = "0.1.10"
 description = "Generate test scaffolds from Code2Logic output files"
 readme = "README.md"
 license = {text = "Apache-2.0"}

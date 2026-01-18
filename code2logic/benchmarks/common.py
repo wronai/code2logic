@@ -174,19 +174,16 @@ Name the test class Test<ClassName> or TestFunctions."""
     return prompt
 
 
-def get_token_reproduction_prompt(spec: str, fmt: str, file_name: str) -> str:
+def get_token_reproduction_prompt(spec: str, fmt: str, file_name: str, language: str = "python") -> str:
     format_hints = {
         "json": "Parse the JSON structure and implement all classes and functions.",
         "json_compact": "Parse the compact JSON and implement all elements.",
         "yaml": "Parse the YAML structure and implement all classes and functions with exact signatures.",
-        "gherkin": "Implement scenarios as SIMPLE, MINIMAL Python code. NO extra error classes, NO over-engineering. Keep code short and direct.",
+        "gherkin": "Implement scenarios as SIMPLE, MINIMAL code. NO over-engineering. Keep code short and direct.",
         "markdown": "Parse embedded Gherkin (behaviors) and YAML (structures).",
-        "logicml": """Parse LogicML and generate VALID Python code:
-- 'sig: (params) -> Type' = def func(params) -> Type
-- 'sig: async (params)' = async def func(params)
-- 'sig: @property (self)' = @property decorator
-- 'bases: [BaseModel]' = class X(BaseModel) with Field()
-- 'type: re-export' = from .module import X
+        "logicml": """Parse LogicML and generate VALID code:
+- 'sig:' lines describe function signatures (translate to the target language)
+- 'type: re-export' means this module primarily re-exports symbols
 CRITICAL: Ensure valid syntax - balanced brackets, proper indentation, no undefined variables.""",
         "toon": """Parse TOON (Token-Oriented Object Notation) format carefully:
 
@@ -211,17 +208,30 @@ CRITICAL: Use imports[], function_docs, and exact signatures to reproduce code a
     max_spec = 5000
     spec_truncated = spec[:max_spec] if len(spec) > max_spec else spec
 
-    prompt = f"""Generate Python code from this {fmt.upper()} specification.
+    language_norm = (language or "python").strip().lower()
+    lang_label_map = {
+        "python": "Python",
+        "javascript": "JavaScript",
+        "typescript": "TypeScript",
+        "go": "Go",
+        "rust": "Rust",
+        "java": "Java",
+        "csharp": "C#",
+        "sql": "SQL",
+    }
+    lang_label = lang_label_map.get(language_norm, language_norm)
+
+    prompt = f"""Generate {lang_label} code from this {fmt.upper()} specification.
 {format_hints.get(fmt, '')}
 
 {spec_truncated}
 
 Requirements:
-- Complete, working Python code for {file_name}
+- Complete, working {lang_label} code for {file_name}
 - Include imports and type hints
 - Implement all functions with actual logic
 
-```python
+```{language_norm}
 """
     return prompt
 

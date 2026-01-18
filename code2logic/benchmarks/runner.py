@@ -17,6 +17,7 @@ Usage:
 
 import sys
 import time
+import difflib
 from pathlib import Path
 from typing import List, Optional
 
@@ -54,6 +55,98 @@ def _test_python_runs(code: str, timeout: int = 5) -> bool:
             return result.returncode == 0
     except Exception:
         return True  # Timeout might mean waiting for input
+
+
+def _basic_syntax_ok(code: str, language: str) -> bool:
+    """Heuristic syntax check for non-Python languages."""
+    s = (code or "").strip()
+    if not s:
+        return False
+    if language in ("javascript", "typescript"):
+        # Basic bracket/brace balance to catch the most common truncations
+        pairs = {')': '(', ']': '[', '}': '{'}
+        stack: List[str] = []
+        for ch in s:
+            if ch in "([{":
+                stack.append(ch)
+            elif ch in ")]}":
+                if not stack or stack[-1] != pairs.get(ch):
+                    return False
+                stack.pop()
+        return not stack
+    if language == "go":
+        return "package" in s and "func" in s
+    if language == "rust":
+        return "fn" in s or "struct" in s or "enum" in s
+    if language == "java":
+        return "class" in s or "interface" in s
+    if language == "csharp":
+        return "class" in s or "interface" in s or "record" in s
+    if language == "sql":
+        upper = s.upper()
+        return "CREATE" in upper or "SELECT" in upper or "INSERT" in upper
+    return len(s) > 10
+
+
+def _count_structural_elements(code: str, language: str) -> dict:
+    s = code or ""
+    if language == "python":
+        return {
+            'classes': len(re.findall(r'^class\s+\w+', s, re.MULTILINE)),
+            'functions': len(re.findall(r'^def\s+\w+', s, re.MULTILINE)),
+            'imports': len(re.findall(r'^(?:from|import)\s+', s, re.MULTILINE)),
+        }
+    if language in ("javascript", "typescript"):
+        return {
+            'classes': len(re.findall(r'\bclass\s+\w+', s)),
+            'functions': len(re.findall(r'\bfunction\s+\w+\s*\(', s)) + len(re.findall(r'\bconst\s+\w+\s*=\s*(?:async\s*)?\([^)]*\)\s*=>', s)),
+            'types': len(re.findall(r'\binterface\s+\w+', s)) + len(re.findall(r'\btype\s+\w+\s*=', s)) + len(re.findall(r'\benum\s+\w+', s)),
+            'imports': len(re.findall(r'^import\s+', s, re.MULTILINE)) + len(re.findall(r'\brequire\(', s)),
+        }
+    if language == "go":
+        return {
+            'types': len(re.findall(r'^type\s+\w+\s+(?:struct|interface)\b', s, re.MULTILINE)),
+            'functions': len(re.findall(r'^func\s+(?:\([^)]*\)\s*)?\w+\s*\(', s, re.MULTILINE)),
+            'imports': len(re.findall(r'^import\b', s, re.MULTILINE)),
+        }
+    if language == "rust":
+        return {
+            'types': len(re.findall(r'\bstruct\s+\w+', s)) + len(re.findall(r'\benum\s+\w+', s)) + len(re.findall(r'\btrait\s+\w+', s)),
+            'functions': len(re.findall(r'\bfn\s+\w+\s*\(', s)),
+            'imports': len(re.findall(r'^use\s+', s, re.MULTILINE)),
+        }
+    if language == "java":
+        return {
+            'types': len(re.findall(r'\bclass\s+\w+', s)) + len(re.findall(r'\binterface\s+\w+', s)) + len(re.findall(r'\benum\s+\w+', s)) + len(re.findall(r'\brecord\s+\w+', s)),
+            'functions': len(re.findall(r'\b\w+\s+\w+\s*\([^)]*\)\s*\{', s)),
+            'imports': len(re.findall(r'^import\s+', s, re.MULTILINE)),
+        }
+    if language == "csharp":
+        return {
+            'types': len(re.findall(r'\bclass\s+\w+', s)) + len(re.findall(r'\binterface\s+\w+', s)) + len(re.findall(r'\brecord\s+\w+', s)),
+            'functions': len(re.findall(r'\b\w+\s+\w+\s*\([^)]*\)\s*\{', s)),
+            'imports': len(re.findall(r'^using\s+', s, re.MULTILINE)),
+        }
+    if language == "sql":
+        upper = s.upper()
+        return {
+            'types': len(re.findall(r'\bCREATE\s+TABLE\s+\w+', upper)) + len(re.findall(r'\bCREATE\s+(?:OR\s+REPLACE\s+)?VIEW\s+\w+', upper)),
+            'functions': len(re.findall(r'\bCREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+\w+', upper)),
+        }
+    return {}
+
+
+def _structural_score(original: str, generated: str, language: str) -> float:
+    o = _count_structural_elements(original, language)
+    g = _count_structural_elements(generated, language)
+    if not o:
+        return 0.0
+    keys = list(o.keys())
+    matches = 0
+    for k in keys:
+        if o.get(k, 0) == g.get(k, 0):
+            matches += 1
+    return matches / max(len(keys), 1) * 100
 
 
 def _extract_code(response: str) -> str:
@@ -111,8 +204,8 @@ class BenchmarkRunner:
             self.client = get_client()
         return self.client
 
-    def _template_generate_code(self, spec: str, fmt: str, file_name: str) -> str:
-        """Generate minimal Python code without an LLM (fallback mode)."""
+    def _template_generate_code(self, spec: str, fmt: str, file_name: str, language: str = "python") -> str:
+        """Generate minimal code without an LLM (fallback mode)."""
         import re
 
         # Try to infer class/function names from spec
@@ -139,11 +232,35 @@ class BenchmarkRunner:
         classes = [c for c in uniq(classes) if c.isidentifier()][:5]
         functions = [f for f in uniq(functions) if f.isidentifier() and f not in classes][:10]
 
-        code = """from __future__ import annotations
+        language_norm = (language or "python").strip().lower()
+        if language_norm == "python":
+            code = """from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any, Optional, List, Dict
 
+"""
+        elif language_norm in ("javascript", "typescript"):
+            code = """// Auto-generated placeholder
+"""
+        elif language_norm == "go":
+            code = """package main
+
+"""
+        elif language_norm == "rust":
+            code = """// Auto-generated placeholder
+"""
+        elif language_norm == "java":
+            code = """// Auto-generated placeholder
+"""
+        elif language_norm == "csharp":
+            code = """// Auto-generated placeholder
+"""
+        elif language_norm == "sql":
+            code = """-- Auto-generated placeholder
+"""
+        else:
+            code = """// Auto-generated placeholder
 """
 
         if not classes and not functions:
@@ -153,20 +270,56 @@ from typing import Any, Optional, List, Dict
             classes = ["GeneratedClass"]
             functions = ["generated_function"]
 
-        for cls in classes:
-            code += f"""@dataclass
+        if language_norm == "python":
+            for cls in classes:
+                code += f"""@dataclass
 class {cls}:
     \"\"\"Generated placeholder for {file_name} ({fmt}).\"\"\"
     value: Any = None
 
 """
 
-        for fn in functions:
-            code += f"""def {fn}(*args: Any, **kwargs: Any) -> Any:
+            for fn in functions:
+                code += f"""def {fn}(*args: Any, **kwargs: Any) -> Any:
     \"\"\"Generated placeholder for {file_name} ({fmt}).\"\"\"
     return None
 
 """
+        elif language_norm in ("javascript", "typescript"):
+            for fn in functions:
+                export_kw = "export " if language_norm == "typescript" else ""
+                code += f"{export_kw}function {fn}(...args) {{\n  return null;\n}}\n\n"
+            for cls in classes:
+                export_kw = "export " if language_norm == "typescript" else ""
+                code += f"{export_kw}class {cls} {{\n  constructor() {{}}\n}}\n\n"
+        elif language_norm == "go":
+            for fn in functions:
+                code += f"func {fn}() {{\n}}\n\n"
+            for cls in classes:
+                code += f"type {cls} struct {{\n}}\n\n"
+        elif language_norm == "rust":
+            for fn in functions:
+                code += f"pub fn {fn}() {{\n}}\n\n"
+            for cls in classes:
+                code += f"pub struct {cls} {{\n}}\n\n"
+        elif language_norm == "java":
+            safe_class = classes[0] if classes else "Generated"
+            code += f"public class {safe_class} {{\n"
+            for fn in functions:
+                code += f"    public static void {fn}() {{ }}\n"
+            code += "}\n"
+        elif language_norm == "csharp":
+            safe_class = classes[0] if classes else "Generated"
+            code += f"public class {safe_class} {{\n"
+            for fn in functions:
+                code += f"    public static void {fn}() {{ }}\n"
+            code += "}\n"
+        elif language_norm == "sql":
+            for cls in classes:
+                code += f"CREATE TABLE {cls} (id INT);\n"
+        else:
+            for fn in functions:
+                code += f"function {fn}() {{}}\n"
 
         return code
 
@@ -213,45 +366,35 @@ class {cls}:
 
         # Analyze project
         path = Path(folder)
-        py_files = list(path.glob('*.py'))
-        if limit:
-            py_files = py_files[:limit]
+        project = analyze_project(str(path), use_treesitter=False)
+        modules = project.modules[:limit] if limit else project.modules
 
-        result.total_files = len(py_files)
+        result.total_files = len(modules)
 
         if verbose:
             render.heading(2, "Format Benchmark")
             render.codeblock("yaml", f"folder: {folder}\nfiles: {len(py_files)}\nformats: [{', '.join(formats)}]")
 
-        project = analyze_project(str(path), use_treesitter=False)
-
         start_time = time.time()
 
         # Process each file with each format
-        for py_file in py_files:
-            original = py_file.read_text()
-
-            # Find module info
-            module_info = None
-            for m in project.modules:
-                if Path(m.path).name == py_file.name:
-                    module_info = m
-                    break
-
-            if not module_info:
+        for module_info in modules:
+            abs_file = path / module_info.path
+            if not abs_file.exists():
                 continue
+            original = abs_file.read_text(encoding='utf-8', errors='ignore')
 
-            single_project = create_single_project(module_info, py_file)
+            single_project = create_single_project(module_info, abs_file)
 
             file_result = FileResult(
-                file_path=str(py_file),
-                language='python',
+                file_path=str(abs_file),
+                language=module_info.language,
                 original_size=len(original),
             )
 
             for fmt in formats:
                 fmt_result = self._test_format(
-                    single_project, original, fmt, py_file.name, client, verbose
+                    single_project, original, fmt, abs_file.name, client, verbose, language=module_info.language
                 )
                 file_result.format_results[fmt] = fmt_result
 
@@ -288,6 +431,7 @@ class {cls}:
         file_name: str,
         client: Optional[BaseLLMClient],
         verbose: bool = False,
+        language: str = "python",
     ) -> FormatResult:
         """Test a single format."""
         result = FormatResult(format_name=fmt)
@@ -299,12 +443,12 @@ class {cls}:
             result.spec_tokens = estimate_tokens(spec)
 
             # Generate prompt
-            prompt = get_token_reproduction_prompt(spec, fmt, file_name)
+            prompt = get_token_reproduction_prompt(spec, fmt, file_name, language=language)
 
             # Reproduce
             start = time.time()
             if client is None:
-                generated = self._template_generate_code(spec, fmt, file_name)
+                generated = self._template_generate_code(spec, fmt, file_name, language=language)
                 result.gen_time = 0.0
             else:
                 response = client.generate(prompt, max_tokens=self.config.max_tokens)
@@ -313,15 +457,26 @@ class {cls}:
             result.generated_size = len(generated)
 
             # Test quality
-            result.syntax_ok = _test_python_syntax(generated)
-            if result.syntax_ok:
-                result.runs_ok = _test_python_runs(generated)
+            language_norm = (language or "python").strip().lower()
+            if language_norm == 'python':
+                result.syntax_ok = _test_python_syntax(generated)
+                if result.syntax_ok:
+                    result.runs_ok = _test_python_runs(generated)
+            else:
+                result.syntax_ok = _basic_syntax_ok(generated, language_norm)
+                result.runs_ok = False
 
             # Calculate metrics
             if original and generated:
-                analysis = self._metrics.analyze(original, generated, spec, format_name=fmt)
-                result.score = analysis.overall_score
-                result.similarity = analysis.overall_score
+                if language_norm == 'python':
+                    analysis = self._metrics.analyze(original, generated, spec, format_name=fmt)
+                    result.score = analysis.overall_score
+                    result.similarity = analysis.text.char_similarity
+                else:
+                    sim = difflib.SequenceMatcher(None, ' '.join(original.split()), ' '.join(generated.split())).ratio() * 100
+                    struct = _structural_score(original, generated, language_norm)
+                    result.similarity = sim
+                    result.score = (sim * 0.7) + (struct * 0.3)
 
             # Efficiency
             if result.spec_size and len(original) > 0:
@@ -753,7 +908,7 @@ Requirements:
 
             # Test format
             fmt_result = self._test_format(
-                single_project, original, fmt, abs_path.name, client, verbose=False
+                single_project, original, fmt, abs_path.name, client, verbose=False, language=module_info.language
             )
 
             file_result.format_results[fmt] = fmt_result

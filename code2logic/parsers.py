@@ -1424,8 +1424,18 @@ class UniversalParser:
 
         if language == 'python':
             return self._parse_python(filepath, content)
-        elif language in ('javascript', 'typescript'):
+        if language in ('javascript', 'typescript'):
             return self._parse_js_ts(filepath, content, language)
+        if language == 'go':
+            return self._parse_go(filepath, content)
+        if language == 'rust':
+            return self._parse_rust(filepath, content)
+        if language == 'java':
+            return self._parse_java(filepath, content)
+        if language == 'csharp':
+            return self._parse_csharp(filepath, content)
+        if language == 'sql':
+            return self._parse_sql(filepath, content)
         return None
 
     def _parse_python(self, filepath: str, content: str) -> Optional[ModuleInfo]:
@@ -1946,6 +1956,359 @@ class UniversalParser:
             docstring=None,
             lines_total=len(lines),
             lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('//')])
+        )
+
+    def _parse_go(self, filepath: str, content: str) -> ModuleInfo:
+        """Parse Go using regex patterns."""
+        imports: List[str] = []
+        classes: List[ClassInfo] = []
+        functions: List[FunctionInfo] = []
+        types: List[TypeInfo] = []
+        constants: List[str] = []
+        exports: List[str] = []
+
+        for m in re.finditer(r'^package\s+(\w+)', content, re.MULTILINE):
+            _ = m.group(1)
+
+        for m in re.finditer(r'^import\s+\(?\s*"([^"]+)"', content, re.MULTILINE):
+            imports.append(m.group(1))
+
+        for m in re.finditer(r'^type\s+(\w+)\s+struct\b', content, re.MULTILINE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name))
+            exports.append(name)
+            types.append(TypeInfo(name=name, kind='struct', definition=''))
+
+        for m in re.finditer(r'^type\s+(\w+)\s+interface\b', content, re.MULTILINE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name, is_interface=True))
+            exports.append(name)
+            types.append(TypeInfo(name=name, kind='interface', definition=''))
+
+        for m in re.finditer(r'^func\s+(?:\([^)]*\)\s*)?(\w+)\s*\(([^)]*)\)\s*(\([^)]*\)|\w+)?', content, re.MULTILINE):
+            name = m.group(1)
+            params = [p.strip() for p in (m.group(2) or '').split(',') if p.strip()][:8]
+            ret = (m.group(3) or '').strip()
+            functions.append(FunctionInfo(
+                name=name,
+                params=params,
+                return_type=ret,
+                docstring=None,
+                docstring_full=None,
+                calls=[],
+                raises=[],
+                decorators=[],
+                complexity=1,
+                lines=1,
+                is_async=False,
+                is_static=False,
+                is_classmethod=False,
+                is_property=False,
+                intent=self.intent_gen.generate(name),
+                start_line=0,
+                end_line=0,
+                is_private=False,
+            ))
+            exports.append(name)
+
+        for m in re.finditer(r'^const\s+([A-Z][A-Za-z0-9_]*)\b', content, re.MULTILINE):
+            constants.append(m.group(1))
+
+        lines = content.split('\n')
+        return ModuleInfo(
+            path=filepath,
+            language='go',
+            imports=imports[:20],
+            exports=list(dict.fromkeys(exports))[:50],
+            classes=classes,
+            functions=functions,
+            types=types,
+            constants=constants[:10],
+            docstring=None,
+            lines_total=len(lines),
+            lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('//')])
+        )
+
+    def _parse_rust(self, filepath: str, content: str) -> ModuleInfo:
+        """Parse Rust using regex patterns."""
+        imports: List[str] = []
+        classes: List[ClassInfo] = []
+        functions: List[FunctionInfo] = []
+        types: List[TypeInfo] = []
+        constants: List[str] = []
+        exports: List[str] = []
+
+        for m in re.finditer(r'^use\s+([^;]+);', content, re.MULTILINE):
+            imports.append(m.group(1).strip())
+
+        for m in re.finditer(r'^(?:pub\s+)?struct\s+(\w+)', content, re.MULTILINE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name))
+            types.append(TypeInfo(name=name, kind='struct', definition=''))
+            exports.append(name)
+
+        for m in re.finditer(r'^(?:pub\s+)?enum\s+(\w+)', content, re.MULTILINE):
+            name = m.group(1)
+            types.append(TypeInfo(name=name, kind='enum', definition=''))
+            exports.append(name)
+
+        for m in re.finditer(r'^(?:pub\s+)?trait\s+(\w+)', content, re.MULTILINE):
+            name = m.group(1)
+            types.append(TypeInfo(name=name, kind='trait', definition=''))
+            exports.append(name)
+
+        for m in re.finditer(r'^(?:pub\s+)?fn\s+(\w+)\s*\(([^)]*)\)\s*(?:->\s*([^\s{]+))?', content, re.MULTILINE):
+            name = m.group(1)
+            params = [p.strip() for p in (m.group(2) or '').split(',') if p.strip()][:8]
+            ret = (m.group(3) or '').strip()
+            functions.append(FunctionInfo(
+                name=name,
+                params=params,
+                return_type=ret,
+                docstring=None,
+                docstring_full=None,
+                calls=[],
+                raises=[],
+                decorators=[],
+                complexity=1,
+                lines=1,
+                is_async='async' in m.group(0),
+                is_static=False,
+                is_classmethod=False,
+                is_property=False,
+                intent=self.intent_gen.generate(name),
+                start_line=0,
+                end_line=0,
+                is_private=False,
+            ))
+            exports.append(name)
+
+        for m in re.finditer(r'^(?:pub\s+)?const\s+([A-Z][A-Z0-9_]*)\b', content, re.MULTILINE):
+            constants.append(m.group(1))
+
+        lines = content.split('\n')
+        return ModuleInfo(
+            path=filepath,
+            language='rust',
+            imports=imports[:20],
+            exports=list(dict.fromkeys(exports))[:50],
+            classes=classes,
+            functions=functions,
+            types=types,
+            constants=constants[:10],
+            docstring=None,
+            lines_total=len(lines),
+            lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('//')])
+        )
+
+    def _parse_java(self, filepath: str, content: str) -> ModuleInfo:
+        """Parse Java using regex patterns."""
+        imports: List[str] = []
+        classes: List[ClassInfo] = []
+        functions: List[FunctionInfo] = []
+        types: List[TypeInfo] = []
+        constants: List[str] = []
+        exports: List[str] = []
+
+        for m in re.finditer(r'^import\s+([^;]+);', content, re.MULTILINE):
+            imports.append(m.group(1).strip())
+
+        for m in re.finditer(r'^(?:public\s+)?(?:abstract\s+)?class\s+(\w+)', content, re.MULTILINE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name, is_abstract='abstract' in m.group(0)))
+            exports.append(name)
+
+        for m in re.finditer(r'^(?:public\s+)?interface\s+(\w+)', content, re.MULTILINE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name, is_interface=True))
+            exports.append(name)
+            types.append(TypeInfo(name=name, kind='interface', definition=''))
+
+        for m in re.finditer(r'^(?:public\s+)?enum\s+(\w+)', content, re.MULTILINE):
+            name = m.group(1)
+            types.append(TypeInfo(name=name, kind='enum', definition=''))
+            exports.append(name)
+
+        for m in re.finditer(r'^(?:public\s+)?record\s+(\w+)\s*\(', content, re.MULTILINE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name))
+            types.append(TypeInfo(name=name, kind='record', definition=''))
+            exports.append(name)
+
+        # Very rough method detection (only top-level class members are not tracked here)
+        for m in re.finditer(r'^(?:public|protected|private)\s+(?:static\s+)?([\w<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*\{', content, re.MULTILINE):
+            ret_type = m.group(1)
+            name = m.group(2)
+            params = [p.strip() for p in (m.group(3) or '').split(',') if p.strip()][:8]
+            functions.append(FunctionInfo(
+                name=name,
+                params=params,
+                return_type=ret_type,
+                docstring=None,
+                docstring_full=None,
+                calls=[],
+                raises=[],
+                decorators=[],
+                complexity=1,
+                lines=1,
+                is_async=False,
+                is_static='static' in m.group(0),
+                is_classmethod=False,
+                is_property=False,
+                intent=self.intent_gen.generate(name),
+                start_line=0,
+                end_line=0,
+                is_private=False,
+            ))
+
+        for m in re.finditer(r'^(?:public\s+)?static\s+final\s+[\w<>\[\]]+\s+([A-Z][A-Z0-9_]*)\b', content, re.MULTILINE):
+            constants.append(m.group(1))
+
+        lines = content.split('\n')
+        return ModuleInfo(
+            path=filepath,
+            language='java',
+            imports=imports[:20],
+            exports=list(dict.fromkeys(exports))[:50],
+            classes=classes,
+            functions=functions,
+            types=types,
+            constants=constants[:10],
+            docstring=None,
+            lines_total=len(lines),
+            lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('//')])
+        )
+
+    def _parse_csharp(self, filepath: str, content: str) -> ModuleInfo:
+        """Parse C# using regex patterns."""
+        imports: List[str] = []
+        classes: List[ClassInfo] = []
+        functions: List[FunctionInfo] = []
+        types: List[TypeInfo] = []
+        constants: List[str] = []
+        exports: List[str] = []
+
+        for m in re.finditer(r'^using\s+([^;]+);', content, re.MULTILINE):
+            imports.append(m.group(1).strip())
+
+        for m in re.finditer(r'^(?:public\s+)?interface\s+(I\w+)', content, re.MULTILINE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name, is_interface=True))
+            exports.append(name)
+            types.append(TypeInfo(name=name, kind='interface', definition=''))
+
+        for m in re.finditer(r'^(?:public\s+)?(?:abstract\s+)?class\s+(\w+)', content, re.MULTILINE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name, is_abstract='abstract' in m.group(0)))
+            exports.append(name)
+
+        for m in re.finditer(r'^(?:public\s+)?record\s+(\w+)', content, re.MULTILINE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name))
+            exports.append(name)
+            types.append(TypeInfo(name=name, kind='record', definition=''))
+
+        for m in re.finditer(r'^(?:public|private|protected|internal)\s+(?:static\s+)?([\w<>\[\]?]+)\s+(\w+)\s*\(([^)]*)\)\s*\{', content, re.MULTILINE):
+            ret_type = m.group(1)
+            name = m.group(2)
+            params = [p.strip() for p in (m.group(3) or '').split(',') if p.strip()][:8]
+            functions.append(FunctionInfo(
+                name=name,
+                params=params,
+                return_type=ret_type,
+                docstring=None,
+                docstring_full=None,
+                calls=[],
+                raises=[],
+                decorators=[],
+                complexity=1,
+                lines=1,
+                is_async='async' in m.group(0),
+                is_static='static' in m.group(0),
+                is_classmethod=False,
+                is_property=False,
+                intent=self.intent_gen.generate(name),
+                start_line=0,
+                end_line=0,
+                is_private=False,
+            ))
+
+        for m in re.finditer(r'^(?:public\s+)?const\s+[\w<>\[\]]+\s+([A-Z][A-Z0-9_]*)\b', content, re.MULTILINE):
+            constants.append(m.group(1))
+
+        lines = content.split('\n')
+        return ModuleInfo(
+            path=filepath,
+            language='csharp',
+            imports=imports[:20],
+            exports=list(dict.fromkeys(exports))[:50],
+            classes=classes,
+            functions=functions,
+            types=types,
+            constants=constants[:10],
+            docstring=None,
+            lines_total=len(lines),
+            lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('//')])
+        )
+
+    def _parse_sql(self, filepath: str, content: str) -> ModuleInfo:
+        """Parse SQL using regex patterns."""
+        imports: List[str] = []
+        classes: List[ClassInfo] = []
+        functions: List[FunctionInfo] = []
+        types: List[TypeInfo] = []
+        constants: List[str] = []
+        exports: List[str] = []
+
+        for m in re.finditer(r'CREATE\s+TABLE\s+(\w+)', content, re.IGNORECASE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name))
+            exports.append(name)
+            types.append(TypeInfo(name=name, kind='table', definition=''))
+
+        for m in re.finditer(r'CREATE\s+(?:OR\s+REPLACE\s+)?VIEW\s+(\w+)', content, re.IGNORECASE):
+            name = m.group(1)
+            classes.append(ClassInfo(name=name))
+            exports.append(name)
+            types.append(TypeInfo(name=name, kind='view', definition=''))
+
+        for m in re.finditer(r'CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+(\w+)', content, re.IGNORECASE):
+            name = m.group(1)
+            functions.append(FunctionInfo(
+                name=name,
+                params=[],
+                return_type='',
+                docstring=None,
+                docstring_full=None,
+                calls=[],
+                raises=[],
+                decorators=[],
+                complexity=1,
+                lines=1,
+                is_async=False,
+                is_static=False,
+                is_classmethod=False,
+                is_property=False,
+                intent=self.intent_gen.generate(name),
+                start_line=0,
+                end_line=0,
+                is_private=False,
+            ))
+            exports.append(name)
+
+        lines = content.split('\n')
+        return ModuleInfo(
+            path=filepath,
+            language='sql',
+            imports=imports,
+            exports=list(dict.fromkeys(exports))[:50],
+            classes=classes,
+            functions=functions,
+            types=types,
+            constants=constants,
+            docstring=None,
+            lines_total=len(lines),
+            lines_code=len([l for l in lines if l.strip() and not l.strip().startswith('--')])
         )
 
 

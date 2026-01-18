@@ -129,12 +129,16 @@ class LogicMLGenerator:
             lines.append("# Re-export module")
             lines.append("type: re-export")
             lines.append("exports:")
-            for imp in module.imports[:20]:
-                # Extract export name from import
-                if '.' in imp:
-                    export_name = imp.split('.')[-1]
-                else:
-                    export_name = imp
+            export_items: List[str] = []
+            if getattr(module, "exports", None):
+                export_items = [e for e in (module.exports or []) if e]
+            else:
+                export_items = [i for i in (module.imports or []) if i]
+
+            for item in export_items[:20]:
+                export_name = item.strip()
+                if export_name.endswith(".*"):
+                    export_name = "*"
                 lines.append(f"  - {export_name}")
             return '\n'.join(lines)
 
