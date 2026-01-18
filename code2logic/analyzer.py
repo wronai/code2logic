@@ -48,6 +48,7 @@ class ProjectAnalyzer:
         '.jsx': 'javascript',
         '.ts': 'typescript',
         '.tsx': 'typescript',
+        '.sql': 'sql',
         '.java': 'java',
         '.go': 'go',
         '.rs': 'rust',

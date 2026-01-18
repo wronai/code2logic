@@ -1449,6 +1449,8 @@ class UniversalParser:
                 module = node.module or ''
                 for alias in node.names:
                     if alias.name == '*':
+                        if module:
+                            imports.append(f"{module}.*")
                         continue
                     imports.append(_combine_import_name(module, alias.name))
             elif isinstance(node, ast.ClassDef):
@@ -1813,6 +1815,50 @@ class UniversalParser:
         # Import patterns
         for m in re.finditer(r"import\s+.*?from\s+['\"]([^'\"]+)['\"]", content):
             imports.append(m.group(1))
+
+        # Re-export patterns (export * / export {...} from)
+        for m in re.finditer(r"export\s+\*\s+from\s+['\"]([^'\"]+)['\"]", content):
+            mod = m.group(1)
+            imports.append(mod)
+            exports.append(f"* from {mod}")
+
+        for m in re.finditer(r"export\s+\*\s+as\s+(\w+)\s+from\s+['\"]([^'\"]+)['\"]", content):
+            name = m.group(1)
+            mod = m.group(2)
+            imports.append(mod)
+            exports.append(f"* as {name} from {mod}")
+            exports.append(name)
+
+        for m in re.finditer(r"export\s+\{([^}]+)\}\s+from\s+['\"]([^'\"]+)['\"]", content):
+            items = m.group(1)
+            mod = m.group(2)
+            imports.append(mod)
+            for raw in (items or '').split(','):
+                part = raw.strip()
+                if not part:
+                    continue
+                if ' as ' in part:
+                    exported = part.split(' as ', 1)[1].strip()
+                else:
+                    exported = part
+                if exported:
+                    exports.append(exported)
+
+        # Local export list (export { A, B as C };)
+        for m in re.finditer(r"export\s+\{([^}]+)\}\s*;", content):
+            if 'from' in m.group(0):
+                continue
+            items = m.group(1)
+            for raw in (items or '').split(','):
+                part = raw.strip()
+                if not part:
+                    continue
+                if ' as ' in part:
+                    exported = part.split(' as ', 1)[1].strip()
+                else:
+                    exported = part
+                if exported:
+                    exports.append(exported)
 
         # Class patterns
         for m in re.finditer(

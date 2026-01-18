@@ -16,7 +16,7 @@ def create_single_project(module_info, file_path: Path) -> ProjectInfo:
     return ProjectInfo(
         name=file_path.name,
         root_path=str(file_path.parent),
-        languages={"python": 1},
+        languages={getattr(module_info, "language", "python") or "python": 1},
         modules=[module_info],
         dependency_graph={},
         dependency_metrics={},

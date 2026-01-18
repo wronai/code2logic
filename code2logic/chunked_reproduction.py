@@ -13,7 +13,7 @@ Features:
 
 import re
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 from .utils import estimate_tokens
 
@@ -348,10 +348,13 @@ def merge_chunk_codes(codes: List[str], file_name: str) -> str:
 class ChunkedReproducer:
     """Reproduce code from chunked specifications."""
 
-    def __init__(self, client, model_name: str = 'default'):
+    def __init__(self, client, model_name: str = 'default', max_tokens: Optional[int] = None):
         self.client = client
         self.model_name = model_name
-        self.max_tokens = get_llm_limit(model_name) // 2  # Leave room for response
+        if max_tokens is None:
+            self.max_tokens = get_llm_limit(model_name) // 2  # Leave room for response
+        else:
+            self.max_tokens = int(max_tokens)
 
     def reproduce(self, spec: str, fmt: str, file_name: str) -> ChunkedResult:
         """Reproduce code from specification, chunking if needed."""
