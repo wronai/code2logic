@@ -156,78 +156,6 @@ class CodeLogic:
 
         return '\n'.join(lines)
 
-    def _generate_rust(self, logic: CodeLogic) -> str:
-        """Generate Rust code."""
-        lines: List[str] = []
-        for imp in logic.imports:
-            if imp.strip():
-                lines.append(imp)
-        if lines:
-            lines.append("")
-
-        for elem in logic.elements:
-            if elem.type == ElementType.STRUCT:
-                lines.append(f"pub struct {elem.name} {{")
-                lines.append("}")
-                lines.append("")
-            elif elem.type == ElementType.ENUM:
-                lines.append(f"pub enum {elem.name} {{")
-                lines.append("}")
-                lines.append("")
-            elif elem.type in (ElementType.FUNCTION, ElementType.METHOD):
-                lines.append(f"pub fn {elem.name}() {{")
-                lines.append("}")
-                lines.append("")
-        return '\n'.join(lines).rstrip() + "\n"
-
-    def _generate_java(self, logic: CodeLogic) -> str:
-        """Generate Java code."""
-        lines: List[str] = []
-        for imp in logic.imports:
-            if imp.strip():
-                lines.append(imp)
-        if lines:
-            lines.append("")
-
-        main_class = None
-        for elem in logic.elements:
-            if elem.type == ElementType.CLASS:
-                main_class = elem.name
-                break
-        if not main_class:
-            main_class = "Generated"
-
-        lines.append(f"public class {main_class} {{")
-        for elem in logic.elements:
-            if elem.type == ElementType.FUNCTION:
-                lines.append(f"    public static void {elem.name}() {{ }}")
-        lines.append("}")
-        return '\n'.join(lines).rstrip() + "\n"
-
-    def _generate_csharp(self, logic: CodeLogic) -> str:
-        """Generate C# code."""
-        lines: List[str] = []
-        for imp in logic.imports:
-            if imp.strip():
-                lines.append(imp)
-        if lines:
-            lines.append("")
-
-        main_class = None
-        for elem in logic.elements:
-            if elem.type == ElementType.CLASS:
-                main_class = elem.name
-                break
-        if not main_class:
-            main_class = "Generated"
-
-        lines.append(f"public class {main_class} {{")
-        for elem in logic.elements:
-            if elem.type == ElementType.FUNCTION:
-                lines.append(f"    public static void {elem.name}() {{ }}")
-        lines.append("}")
-        return '\n'.join(lines).rstrip() + "\n"
-
     def _element_to_compact(self, elem: CodeElement, indent: int) -> List[str]:
         """Convert element to compact lines."""
         prefix = "  " * indent
@@ -1041,10 +969,88 @@ class CodeGenerator:
                 for attr in elem.attributes:
                     cols.append(f"    {attr['name']} {attr.get('type', 'TEXT')}")
                 lines.append(',\n'.join(cols))
-                lines.append(");")
+                lines.append(";")
                 lines.append("")
 
         return '\n'.join(lines)
+
+    def _generate_rust(self, logic: CodeLogic) -> str:
+        """Generate Rust code."""
+        lines: List[str] = []
+
+        for imp in logic.imports:
+            if (imp or "").strip():
+                lines.append(imp)
+        if lines:
+            lines.append("")
+
+        for elem in logic.elements:
+            if elem.type == ElementType.STRUCT:
+                lines.append(f"pub struct {elem.name} {{")
+                lines.append("}")
+                lines.append("")
+            elif elem.type == ElementType.ENUM:
+                lines.append(f"pub enum {elem.name} {{")
+                lines.append("}")
+                lines.append("")
+            elif elem.type in (ElementType.FUNCTION, ElementType.METHOD):
+                lines.append(f"pub fn {elem.name}() {{")
+                lines.append("}")
+                lines.append("")
+
+        return "\n".join(lines).rstrip() + "\n"
+
+    def _generate_java(self, logic: CodeLogic) -> str:
+        """Generate Java code."""
+        lines: List[str] = []
+
+        for imp in logic.imports:
+            if (imp or "").strip():
+                lines.append(imp)
+        if lines:
+            lines.append("")
+
+        main_class = None
+        for elem in logic.elements:
+            if elem.type == ElementType.CLASS:
+                main_class = elem.name
+                break
+        if not main_class:
+            main_class = "Generated"
+
+        lines.append(f"public class {main_class} {{")
+        for elem in logic.elements:
+            if elem.type == ElementType.FUNCTION:
+                lines.append(f"    public static void {elem.name}() {{ }}")
+        lines.append("}")
+
+        return "\n".join(lines).rstrip() + "\n"
+
+    def _generate_csharp(self, logic: CodeLogic) -> str:
+        """Generate C# code."""
+        lines: List[str] = []
+
+        for imp in logic.imports:
+            if (imp or "").strip():
+                lines.append(imp)
+        if lines:
+            lines.append("")
+
+        main_class = None
+        for elem in logic.elements:
+            if elem.type == ElementType.CLASS:
+                main_class = elem.name
+                break
+        if not main_class:
+            main_class = "Generated"
+
+        lines.append(f"public class {main_class} {{")
+        for elem in logic.elements:
+            if elem.type == ElementType.FUNCTION:
+                lines.append(f"    public static void {elem.name}() {{ }}")
+        lines.append("}")
+
+        return "\n".join(lines).rstrip() + "\n"
 
     def _generate_generic(self, logic: CodeLogic, target: Language) -> str:
         """Generate generic code."""
