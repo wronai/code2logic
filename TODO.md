@@ -1,5 +1,37 @@
 # Code2Logic - Refactoring Plan
 
+## Active Task List (Execution Order)
+
+- [x] Add `toon` support to CLI (`code2logic ... -f toon`)
+- [x] Fix TOON tabular headers (`{path,lang,lines}`) and delimiter/quoting in TOON parser
+- [x] Fix public API collisions in `code2logic/__init__.py` (`analyze_quality`, `reproduce_project`, `ReproductionResult`)
+- [x] Update CLI docs to include TOON and clarify `python -m code2logic` vs `code2logic` entrypoint
+- [x] **Fix critical parser bug**: TreeSitterParser._text() byte vs char offset mismatch
+- [x] **Fix truncated identifiers**: Function/class names now extracted correctly
+- [x] **Fix corrupted signatures**: Parameter parsing uses proper byte slicing
+- [x] **Fix import deduplication**: Remove `module.module` duplicates
+- [x] **Add docstring truncation**: First sentence or 80 chars for efficiency
+- [x] **Add parser integrity tests**: 15 new test cases in `tests/test_parser_integrity.py`
+- [x] **YAML compact format**: Short keys (p, l, i, e, c, f, n, d, m) with header legend
+- [x] **YAML self removal**: Method signatures no longer include 'self' parameter
+- [x] **YAML import dedup**: `typing.Dict, typing.List` → `typing.{Dict,List}`
+- [x] **YAML schema update**: Validation supports both full and compact keys
+- [x] **Add YAML compact tests**: 9 new test cases in `tests/test_yaml_compact.py`
+- [x] **Create shared_utils.py**: Common utility functions (compact_imports, abbreviate_type, build_signature, truncate_docstring)
+- [x] **Add shared_utils tests**: 47 test cases in `tests/test_shared_utils.py`
+- [x] **TOON remove self**: Method signatures no longer include 'self' parameter
+- [x] **TOON ultra-compact**: New `generate_ultra_compact()` method - 71% size reduction (78KB → 22KB)
+- [x] **LogicML optimization**: Truncated docstrings, grouped imports, removed self from signatures
+- [ ] Add a TOON round-trip sanity check (generate TOON -> parse -> validate key structure)
+- [ ] Review TOON reproduction prompt quality (benchmark `toon` vs `yaml/json` after spec fixes)
+- [x] Run full smoke-test (279 tests pass):
+  - [x] `python -m code2logic code2logic/ -f toon`
+  - [x] `python examples/02_refactoring.py`
+  - [x] `python examples/04_project.py tests/samples/ --no-llm`
+  - [x] `python -m pytest`
+
+---
+
 ## Overview
 
 This document outlines the refactoring tasks identified during code analysis. Tasks are prioritized by impact and effort.
@@ -223,8 +255,16 @@ Classes with >20 methods:
 - [x] Add refactoring utilities (refactor.py)
 - [x] Add universal reproduction (universal.py)
 - [x] Add project reproduction (project_reproducer.py)
+- [x] Add format benchmarks (08_format_benchmark.py)
+- [x] Add async multi-provider LLM (09_async_benchmark.py)
+- [x] Add function-level reproduction (10_function_reproduction.py)
+- [x] Add token-aware benchmarking (11_token_benchmark.py)
+- [x] Add JSON generator for format comparison
+- [x] Fix dataclass detection in parser
+- [x] Add class properties to YAML output
 - [ ] Fix remaining test failures
-- [ ] Update CHANGELOG
+- [x] Implement `code2logic llm` management commands (provider/model/key/priority)
+- [x] Update CHANGELOG
 
 ### Short-term (Week 2-3)
 - [ ] Split `generators.py` into subpackage
@@ -242,14 +282,46 @@ Classes with >20 methods:
 
 ## 📊 Metrics to Track
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| Test Coverage | 31% | 80% |
-| Duplicate Groups | 17 | 5 |
-| Long Files (>500) | 3 | 0 |
-| Long Functions (>50) | 21 | 5 |
-| Large Classes (>20 methods) | 2 | 0 |
-| mypy Errors | ? | 0 |
+| Metric | Current | Target | Status |
+|--------|---------|--------|--------|
+| Test Coverage | 31% | 80% | 🟡 |
+| Duplicate Groups | 17 → 18 | 5 | 🟡 |
+| Long Files (>500) | 3 | 0 | 🟡 |
+| Long Functions (>50) | 21 → 19 | 5 | 🟡 |
+| Large Classes (>20 methods) | 2 | 0 | 🟡 |
+| Example Files | 19 → 11 | 6 | 🟡 |
+| New Modules Added | 0 → 12 | - | ✅ |
+| Reproduction Score (YAML) | 74.5% | 80% | 🟡 |
+| Reproduction Score (LogicML) | 65.9% | 80% | 🟡 |
+| Token Efficiency (Markdown) | 43.9 | 50 | 🟡 |
+| LogicML Compression | 0.42x | - | ✅ |
+| LogicML Repeatability | 56.9% | 70% | 🟡 |
+| YAML Repeatability | 41.0% | 70% | 🟡 |
+| YAML vs JSON Token Savings | 44.1% | - | ✅ |
+| Syntax OK (YAML/LogicML) | 100% | 100% | ✅ |
+| Total Tests | 40 | 50 | 🟡 |
+| LogicML Success Rate | 100% | 100% | ✅ |
+
+### New Modules Added
+- `llm_clients.py` - Unified LLM client interface
+- `reproduction.py` - Code reproduction utilities
+- `code_review.py` - Code review functions
+- `benchmark.py` - Reproduction benchmarking
+- `metrics.py` - Advanced quality metrics
+- `refactor.py` - Refactoring utilities
+- `logicml.py` - ⭐ LogicML format generator (best compression 0.42x)
+- `prompts.py` - Optimized prompt templates for reproduction
+- `universal.py` - Universal code representation
+- `project_reproducer.py` - Multi-file reproduction
+- `adaptive.py` - Adaptive format selection
+- `file_formats.py` - File-specific format generators
+- `markdown_format.py` - Hybrid Markdown generator
+
+### New Example Scripts
+- `08_format_benchmark.py` - Format comparison benchmark
+- `09_async_benchmark.py` - Async multi-provider benchmark
+- `10_function_reproduction.py` - Function-level reproduction
+- `11_token_benchmark.py` - Token-aware benchmarking
 
 ---
 
