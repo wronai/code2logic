@@ -332,7 +332,7 @@ class TreeSitterParser:
 
             # Classes
             elif node_type == 'class_definition':
-                cls = self._extract_py_class(child, content)
+                cls = self._extract_py_class(child, content, filepath=filepath)
                 if cls:
                     classes.append(cls)
                     if not cls.name.startswith('_'):
@@ -343,7 +343,7 @@ class TreeSitterParser:
                         types.append(enum_type)
             # Top-level functions (regular or decorated)
             elif node_type == 'function_definition':
-                func = self._extract_py_function(child, content)
+                func = self._extract_py_function(child, content, filepath=filepath)
                 if func:
                     functions.append(func)
                     if not func.name.startswith('_'):
@@ -352,7 +352,7 @@ class TreeSitterParser:
                 # Handle decorated functions
                 inner_func = self._find_child(child, 'function_definition')
                 if inner_func:
-                    func = self._extract_py_function(inner_func, content, child)
+                    func = self._extract_py_function(inner_func, content, child, filepath=filepath)
                     if func:
                         functions.append(func)
                         if not func.name.startswith('_'):
@@ -361,7 +361,7 @@ class TreeSitterParser:
                 # Handle decorated classes (e.g., @dataclass)
                 inner_class = self._find_child(child, 'class_definition')
                 if inner_class:
-                    cls = self._extract_py_class(inner_class, content, decorated_node=child)
+                    cls = self._extract_py_class(inner_class, content, decorated_node=child, filepath=filepath)
                     if cls:
                         classes.append(cls)
                         if not cls.name.startswith('_'):
@@ -528,7 +528,7 @@ class TreeSitterParser:
         return aliases
 
     def _extract_py_function(self, node, content: str,
-                              decorated_node=None) -> Optional[FunctionInfo]:
+                              decorated_node=None, filepath: Optional[str] = None) -> Optional[FunctionInfo]:
         """Extract Python function from AST node."""
         name_node = self._find_child(node, 'identifier')
         if not name_node:
@@ -549,7 +549,8 @@ class TreeSitterParser:
         try:
             func_src = textwrap.dedent(self._text(node, content))
             is_async = func_src.lstrip().startswith('async def')
-            parsed = ast.parse(func_src)
+            padded_src = ('\n' * max(0, start_line - 1)) + func_src
+            parsed = ast.parse(padded_src, filename=filepath or '<unknown>')
             if parsed.body and isinstance(parsed.body[0], (ast.FunctionDef, ast.AsyncFunctionDef)):
                 is_async = isinstance(parsed.body[0], ast.AsyncFunctionDef)
                 func_node_for_ast = parsed.body[0]
@@ -672,7 +673,7 @@ class TreeSitterParser:
         except Exception:
             return None
 
-    def _extract_py_class(self, node, content: str, decorated_node=None) -> Optional[ClassInfo]:
+    def _extract_py_class(self, node, content: str, decorated_node=None, filepath: Optional[str] = None) -> Optional[ClassInfo]:
         """Extract Python class from AST node."""
         name_node = self._find_child(node, 'identifier')
         if not name_node:
@@ -715,7 +716,7 @@ class TreeSitterParser:
                         docstring = self._extract_string(expr, content)
 
                 if child.type == 'function_definition':
-                    m = self._extract_py_function(child, content)
+                    m = self._extract_py_function(child, content, filepath=filepath)
                     if m:
                         methods.append(m)
                         # Extract self.x = ... from __init__ method
@@ -725,7 +726,7 @@ class TreeSitterParser:
                 elif child.type == 'decorated_definition':
                     inner = self._find_child(child, 'function_definition')
                     if inner:
-                        m = self._extract_py_function(inner, content, child)
+                        m = self._extract_py_function(inner, content, child, filepath=filepath)
                         if m:
                             methods.append(m)
 
@@ -1441,7 +1442,7 @@ class UniversalParser:
     def _parse_python(self, filepath: str, content: str) -> Optional[ModuleInfo]:
         """Parse Python using built-in AST."""
         try:
-            tree = ast.parse(content)
+            tree = ast.parse(content, filename=filepath or '<unknown>')
         except SyntaxError:
             lines = content.split('\n')
             return ModuleInfo(
