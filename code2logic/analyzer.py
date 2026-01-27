@@ -8,7 +8,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from .dependency import NETWORKX_AVAILABLE, DependencyAnalyzer
 from .intent import NLTK_AVAILABLE, SPACY_AVAILABLE
@@ -45,9 +45,13 @@ class ProjectAnalyzer:
     LANGUAGE_EXTENSIONS: Dict[str, str] = {
         '.py': 'python',
         '.js': 'javascript',
+        '.mjs': 'javascript',
+        '.cjs': 'javascript',
         '.jsx': 'javascript',
         '.ts': 'typescript',
         '.tsx': 'typescript',
+        '.mts': 'typescript',
+        '.cts': 'typescript',
         '.sql': 'sql',
         '.java': 'java',
         '.go': 'go',
@@ -81,6 +85,17 @@ class ProjectAnalyzer:
         'Pipfile.lock', 'poetry.lock',
         'Cargo.lock', 'pnpm-lock.yaml',
     }
+
+    @staticmethod
+    def _language_from_shebang(first_line: str) -> Optional[str]:
+        s = (first_line or '').strip().lower()
+        if not s.startswith('#!'):
+            return None
+        if 'python' in s:
+            return 'python'
+        if 'node' in s:
+            return 'javascript'
+        return None
 
     def __init__(
         self,
@@ -177,12 +192,18 @@ class ProjectAnalyzer:
             if fp.name in self.IGNORE_FILES:
                 continue
 
-            # Check extension
             ext = fp.suffix.lower()
-            if ext not in self.LANGUAGE_EXTENSIONS:
+            language = self.LANGUAGE_EXTENSIONS.get(ext)
+            if language is None and ext == '':
+                try:
+                    with fp.open('r', encoding='utf-8', errors='ignore') as f:
+                        language = self._language_from_shebang(f.readline())
+                except Exception:
+                    language = None
+
+            if language is None:
                 continue
 
-            language = self.LANGUAGE_EXTENSIONS[ext]
             self.languages[language] += 1
 
             # Read file
