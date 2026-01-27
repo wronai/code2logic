@@ -39,6 +39,8 @@ from code2logic import (
     validate_markdown,
 )
 
+from code2logic.function_logic import FunctionLogicGenerator
+
 
 # =============================================================================
 # FIXTURES
@@ -409,6 +411,19 @@ class TestTOONSpecifics:
         output = gen.generate(sample_project)
         
         assert '\t' in output
+
+
+def test_function_logic_toon_js_does_not_default_return_type_to_none(tmp_path):
+    (tmp_path / "app.js").write_text(
+        """
+function foo(a, b) {
+  return a + b;
+}
+""".lstrip()
+    )
+    project = analyze_project(str(tmp_path), use_treesitter=False)
+    out = FunctionLogicGenerator().generate_toon(project, detail='standard')
+    assert '-> None' not in out
 
 
 class TestCSVSpecifics:

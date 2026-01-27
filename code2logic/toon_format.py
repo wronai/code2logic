@@ -323,9 +323,13 @@ class TOONGenerator:
 
         param_str = ';'.join(params)
 
-        # Include return type
-        ret = f.return_type if f.return_type else 'None'
-        return f"({param_str})->{ret}"
+        ret = getattr(f, 'return_type', None)
+        if isinstance(ret, str):
+            ret = ret.strip()
+
+        if ret:
+            return f"({param_str})->{ret}"
+        return f"({param_str})"
 
     def _quote(self, value: Any) -> str:
         """Quote a value if necessary for TOON format."""

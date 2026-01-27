@@ -35,7 +35,7 @@ class FunctionLogicGenerator:
             lines.append("functions:")
 
             for kind, qname, func in items:
-                lines.extend(self._format_function(kind, qname, func, detail, indent=2))
+                lines.extend(self._format_function(kind, qname, func, detail, indent=2, module_language=module.language))
 
             lines.append("")
 
@@ -96,7 +96,7 @@ class FunctionLogicGenerator:
             lines.append(f"    functions[{len(items)}]{{{header}}}:")
 
             for kind, qname, func in items:
-                sig = self._build_sig(func, include_async_prefix=False)
+                sig = self._build_sig(func, include_async_prefix=False, language=m.language)
                 loc = self._build_loc(func)
                 is_async = 'true' if getattr(func, 'is_async', False) else 'false'
                 row = [
@@ -134,7 +134,7 @@ class FunctionLogicGenerator:
             modules_data.append({
                 'path': m.path,
                 'language': m.language,
-                'functions': [self._item_to_dict(kind, qname, func, detail) for kind, qname, func in items]
+                'functions': [self._item_to_dict(kind, qname, func, detail, module_language=m.language) for kind, qname, func in items]
             })
 
         data = {
@@ -156,11 +156,19 @@ class FunctionLogicGenerator:
 
         return items
 
-    def _build_sig(self, func: FunctionInfo, include_async_prefix: bool = True) -> str:
+    def _build_sig(self, func: FunctionInfo, include_async_prefix: bool = True, language: str = '') -> str:
         clean_params = remove_self_from_params((func.params or [])[:10])
         params_str = ', '.join(clean_params)
-        ret = func.return_type or 'None'
-        sig = f"({params_str}) -> {ret}" if params_str else f"() -> {ret}"
+        ret = getattr(func, 'return_type', None)
+        if isinstance(ret, str):
+            ret = ret.strip()
+
+        if language in ('javascript', 'typescript') and ret == 'None':
+            ret = None
+
+        sig = f"({params_str})" if params_str else "()"
+        if ret:
+            sig = f"{sig} -> {ret}"
         if include_async_prefix and getattr(func, 'is_async', False):
             sig = f"async {sig}"
         return sig
@@ -178,11 +186,11 @@ class FunctionLogicGenerator:
         does = does.replace('\n', ' ').replace('"', "'").strip()
         return does or '-'
 
-    def _item_to_dict(self, kind: str, qualified_name: str, func: FunctionInfo, detail: str) -> dict:
+    def _item_to_dict(self, kind: str, qualified_name: str, func: FunctionInfo, detail: str, module_language: str = '') -> dict:
         data = {
             'name': qualified_name,
             'kind': kind,
-            'sig': self._build_sig(func, include_async_prefix=True),
+            'sig': self._build_sig(func, include_async_prefix=True, language=module_language),
         }
 
         start_line = getattr(func, 'start_line', 0) or 0
@@ -224,6 +232,7 @@ class FunctionLogicGenerator:
         func: FunctionInfo,
         detail: str,
         indent: int,
+        module_language: str = '',
     ) -> List[str]:
         prefix = ' ' * indent
         sub = ' ' * (indent + 2)
@@ -232,7 +241,7 @@ class FunctionLogicGenerator:
 
         lines.append(f"{sub}kind: {kind}")
 
-        sig = self._build_sig(func, include_async_prefix=True)
+        sig = self._build_sig(func, include_async_prefix=True, language=module_language)
         lines.append(f"{sub}sig: {sig}")
 
         loc = self._build_loc(func)
