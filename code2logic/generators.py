@@ -329,6 +329,18 @@ class CompactGenerator:
             if hubs:
                 lines.append(f"HUBS: {' '.join(hubs[:5])}")
 
+        # Dependency edges (compact call flow for LLM)
+        deps = {k: v for k, v in project.dependency_graph.items() if v}
+        if deps:
+            lines.append("")
+            lines.append("DEPS:")
+            for src, targets in sorted(deps.items())[:20]:
+                short_src = Path(src).stem
+                short_targets = ','.join(Path(t).stem for t in targets[:5])
+                if len(targets) > 5:
+                    short_targets += f"+{len(targets)-5}"
+                lines.append(f"  {short_src}->{short_targets}")
+
         lines.append("")
 
         curr_dir = None
@@ -349,6 +361,17 @@ class CompactGenerator:
                 parts.append(f"C:{cls_s}")
             if fn_s:
                 parts.append(f"F:{fn_s}")
+
+            # Add method signatures with return types for classes
+            for c in m.classes[:3]:
+                pub_methods = [mt for mt in c.methods if not mt.is_private or mt.name == '__init__']
+                if pub_methods:
+                    sigs = []
+                    for mt in pub_methods[:6]:
+                        p = ','.join(remove_self_from_params(mt.params or [])[:3])
+                        ret = f"->{mt.return_type}" if mt.return_type else ""
+                        sigs.append(f"{mt.name}({p}){ret}")
+                    parts.append(f"{c.name}:{{{';'.join(sigs)}}}")
 
             content = ' | '.join(parts) if parts else '-'
             lines.append(f"  {fn} ({m.lines_code}L) {content}")

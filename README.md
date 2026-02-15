@@ -6,7 +6,7 @@
  
 [![PyPI version](https://badge.fury.io/py/code2logic.svg)](https://badge.fury.io/py/code2logic)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
  
 **Convert source code to logical representation for LLM analysis.**
@@ -509,3 +509,11 @@ python -m logic2code out/code2logic/project.c2l.yaml -o out/logic2code/generated
 - [PyPI](https://pypi.org/project/code2logic/)
 - [GitHub](https://github.com/wronai/code2logic)
 - [Issues](https://github.com/wronai/code2logic/issues)
+
+## License
+
+Apache License 2.0 - see [LICENSE](LICENSE) for details.
+
+## Author
+
+Created by **Tom Sapletta** - [tom@sapletta.com](mailto:tom@sapletta.com)

@@ -1,3 +1,18 @@
+## [1.0.31] - 2026-02-15
+
+### Summary
+
+feat(goal): deep code analysis engine with 7 supporting modules
+
+### Config
+
+- config: update goal.yaml
+
+### Other
+
+- update code2logic/generators.py
+
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
