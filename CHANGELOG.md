@@ -1,3 +1,14 @@
+## [1.0.32] - 2026-02-15
+
+### Summary
+
+chore(goal): code quality metrics with 2 supporting modules
+
+### Config
+
+- config: update goal.yaml
+
+
 ## [1.0.31] - 2026-02-15
 
 ### Summary

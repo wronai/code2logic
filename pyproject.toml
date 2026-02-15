@@ -4,12 +4,13 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "code2logic"
-version = "1.0.31"
+version = "1.0.32"
 description = "Convert source code to logical representation for LLM analysis"
 readme = "README.md"
 license = "Apache-2.0"
 authors = [
-    "Softreck <info@softreck.dev>"
+    "Softreck <info@softreck.dev>",
+    "Tom Sapletta <tom@sapletta.com>",
 ]
 maintainers = ["Softreck <info@softreck.dev>"]
 keywords = [
