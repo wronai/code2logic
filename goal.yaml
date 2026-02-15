@@ -263,7 +263,7 @@ advanced:
     timeout_test: 300
 quality:
   commit_summary:
-    min_value_words: 2
+    min_value_words: 3
     max_generic_terms: 0
     required_metrics: 2
     relation_threshold: 0.7
