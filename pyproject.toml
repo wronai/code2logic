@@ -9,8 +9,7 @@ description = "Convert source code to logical representation for LLM analysis"
 readme = "README.md"
 license = "Apache-2.0"
 authors = [
-    "Softreck <info@softreck.dev>",
-    {name = "Tom Sapletta", email = "tom@sapletta.com"},
+    "Softreck <info@softreck.dev>"
 ]
 maintainers = ["Softreck <info@softreck.dev>"]
 keywords = [
