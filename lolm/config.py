@@ -15,6 +15,12 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 try:
+    from getv import EnvStore
+    _HAS_GETV = True
+except ImportError:
+    _HAS_GETV = False
+
+try:
     import yaml
     YAML_AVAILABLE = True
 except ImportError:
@@ -131,7 +137,10 @@ def save_config(config: LLMConfig) -> None:
 
 
 def load_env_file(search_paths: Optional[List[Path]] = None) -> None:
-    """Load environment variables from .env file."""
+    """Load environment variables from .env file.
+
+    Delegates to getv.EnvStore when available.
+    """
     if search_paths is None:
         search_paths = [
             Path.cwd() / '.env',
@@ -143,20 +152,22 @@ def load_env_file(search_paths: Optional[List[Path]] = None) -> None:
         try:
             if not path.exists():
                 continue
-            
+            if _HAS_GETV:
+                store = EnvStore(path, auto_create=False)
+                for key, value in store.items():
+                    if key and value and not os.environ.get(key):
+                        os.environ[key] = value
+                return
             for line in path.read_text().splitlines():
                 line = line.strip()
                 if not line or line.startswith('#') or '=' not in line:
                     continue
-                
                 key, value = line.split('=', 1)
                 key = key.strip()
                 value = value.strip().strip('"').strip("'")
-                
                 if key and value and not os.environ.get(key):
                     os.environ[key] = value
-            
-            return  # Stop after first successful load
+            return
         except Exception:
             continue
 
@@ -250,7 +261,10 @@ def get_api_key(provider: str) -> Optional[str]:
 
 
 def set_api_key(provider: str, key: str, env_path: Optional[Path] = None) -> None:
-    """Set API key for a provider in .env file."""
+    """Set API key for a provider in .env file.
+
+    Delegates to getv.EnvStore when available.
+    """
     env_var_map = {
         'openrouter': 'OPENROUTER_API_KEY',
         'openai': 'OPENAI_API_KEY',
@@ -266,28 +280,26 @@ def set_api_key(provider: str, key: str, env_path: Optional[Path] = None) -> Non
     if env_path is None:
         env_path = Path.cwd() / '.env'
     
-    # Read existing content
-    existing_lines = []
-    if env_path.exists():
-        existing_lines = env_path.read_text().splitlines()
-    
-    # Update or add the key
-    found = False
-    new_lines = []
-    for line in existing_lines:
-        if line.strip().startswith(f'{env_var}='):
+    if _HAS_GETV:
+        store = EnvStore(env_path)
+        store.set(env_var, key)
+        store.save()
+    else:
+        existing_lines = []
+        if env_path.exists():
+            existing_lines = env_path.read_text().splitlines()
+        found = False
+        new_lines = []
+        for line in existing_lines:
+            if line.strip().startswith(f'{env_var}='):
+                new_lines.append(f'{env_var}={key}')
+                found = True
+            else:
+                new_lines.append(line)
+        if not found:
             new_lines.append(f'{env_var}={key}')
-            found = True
-        else:
-            new_lines.append(line)
+        env_path.write_text('\n'.join(new_lines) + '\n')
     
-    if not found:
-        new_lines.append(f'{env_var}={key}')
-    
-    # Write back
-    env_path.write_text('\n'.join(new_lines) + '\n')
-    
-    # Also set in environment
     os.environ[env_var] = key
 
 
