@@ -140,7 +140,20 @@ def load_env_file(search_paths: Optional[List[Path]] = None) -> None:
     """Load environment variables from .env file.
 
     Delegates to getv.EnvStore when available.
+    Also loads getv app defaults (``getv use code2logic llm PROFILE``).
     """
+    # Load getv app defaults first (if configured)
+    if _HAS_GETV:
+        try:
+            from getv import AppDefaults
+            from getv.integrations.pydantic_env import load_profile_into_env
+            defaults = AppDefaults("code2logic")
+            llm_profile = defaults.get("llm")
+            if llm_profile:
+                load_profile_into_env("llm", llm_profile)
+        except Exception:
+            pass
+
     if search_paths is None:
         search_paths = [
             Path.cwd() / '.env',
