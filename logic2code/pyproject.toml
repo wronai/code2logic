@@ -7,7 +7,7 @@ name = "logic2code"
 version = "0.1.9"
 description = "Generate source code from Code2Logic output files"
 readme = "README.md"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 requires-python = ">=3.9"
 authors = [
     {name = "WronAI", email = "contact@wronai.com"}
@@ -23,7 +23,6 @@ keywords = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",

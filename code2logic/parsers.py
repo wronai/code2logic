@@ -2039,12 +2039,81 @@ class UniversalParser:
         constants: List[str] = []
         exports: List[str] = []
 
+        def _get_or_create_class(name: str) -> ClassInfo:
+            for c in classes:
+                if c.name == name:
+                    return c
+            c = ClassInfo(name=name)
+            classes.append(c)
+            return c
+
+        def _find_matching_brace(src: str, start_idx: int) -> int:
+            depth = 0
+            in_str = False
+            str_ch = ''
+            i = start_idx
+            while i < len(src):
+                ch = src[i]
+                if in_str:
+                    if ch == '\\' and i + 1 < len(src):
+                        i += 2
+                        continue
+                    if ch == str_ch:
+                        in_str = False
+                        str_ch = ''
+                    i += 1
+                    continue
+                if ch in ('\"', "'"):
+                    in_str = True
+                    str_ch = ch
+                    i += 1
+                    continue
+                if ch == '{':
+                    depth += 1
+                elif ch == '}':
+                    depth -= 1
+                    if depth == 0:
+                        return i
+                i += 1
+            return -1
+
+        def _parse_rust_fn(match: re.Match, *, is_method: bool) -> FunctionInfo:
+            name = match.group('name')
+            params_raw = (match.group('params') or '').strip()
+            ret = (match.group('ret') or '').strip()
+            sig = (match.group(0) or '')
+
+            params = [p.strip() for p in params_raw.split(',') if p.strip()]
+            params = params[:8]
+
+            is_pub = bool(re.search(r'\bpub\b', sig))
+            return FunctionInfo(
+                name=name,
+                params=params,
+                return_type=ret,
+                docstring=None,
+                docstring_full=None,
+                calls=[],
+                raises=[],
+                decorators=[],
+                complexity=1,
+                lines=1,
+                is_async=False,
+                is_static=False,
+                is_classmethod=False,
+                is_property=False,
+                intent=self.intent_gen.generate(name),
+                start_line=0,
+                end_line=0,
+                is_private=not is_pub,
+            )
+
         for m in re.finditer(r'^use\s+([^;]+);', content, re.MULTILINE):
             imports.append(m.group(1).strip())
 
         for m in re.finditer(r'^(?:pub\s+)?struct\s+(\w+)', content, re.MULTILINE):
             name = m.group(1)
-            classes.append(ClassInfo(name=name))
+            _get_or_create_class(name)
             types.append(TypeInfo(name=name, kind='struct', definition=''))
             exports.append(name)
 
@@ -2058,33 +2127,62 @@ class UniversalParser:
             types.append(TypeInfo(name=name, kind='trait', definition=''))
             exports.append(name)
 
-        for m in re.finditer(r'^(?:pub\s+)?fn\s+(\w+)\s*\(([^)]*)\)\s*(?:->\s*([^\s{]+))?', content, re.MULTILINE):
+        for m in re.finditer(r'^(?:pub\s+)?type\s+(\w+)\s*=', content, re.MULTILINE):
             name = m.group(1)
-            params = [p.strip() for p in (m.group(2) or '').split(',') if p.strip()][:8]
-            ret = (m.group(3) or '').strip()
-            functions.append(FunctionInfo(
-                name=name,
-                params=params,
-                return_type=ret,
-                docstring=None,
-                docstring_full=None,
-                calls=[],
-                raises=[],
-                decorators=[],
-                complexity=1,
-                lines=1,
-                is_async='async' in m.group(0),
-                is_static=False,
-                is_classmethod=False,
-                is_property=False,
-                intent=self.intent_gen.generate(name),
-                start_line=0,
-                end_line=0,
-                is_private=False,
-            ))
+            types.append(TypeInfo(name=name, kind='type', definition=''))
             exports.append(name)
 
+        for m in re.finditer(r'^(?:pub\s+)?mod\s+(\w+)\s*;', content, re.MULTILINE):
+            name = m.group(1)
+            types.append(TypeInfo(name=name, kind='module', definition=''))
+            exports.append(name)
+
+        fn_pat = re.compile(
+            r'^\s*(?P<sig>(?:pub(?:\([^)]*\))?\s+)?fn)\s+(?P<name>\w+)\s*\((?P<params>[^)]*)\)\s*(?:->\s*(?P<ret>[^\s{]+))?',
+            re.MULTILINE,
+        )
+
+        for m in fn_pat.finditer(content):
+            functions.append(_parse_rust_fn(m, is_method=False))
+            exports.append(m.group('name'))
+
+        impl_pat = re.compile(
+            r'^impl\b[^\{]*\{',
+            re.MULTILINE,
+        )
+
+        for m in impl_pat.finditer(content):
+            hdr = content[m.start():m.end()]
+            type_name = ''
+            m_for = re.search(r'\bfor\s+(\w+)\b', hdr)
+            if m_for:
+                type_name = m_for.group(1)
+            else:
+                m_type = re.search(r'^impl\b[^\{]*?\b(\w+)\b\s*\{', hdr)
+                if m_type:
+                    type_name = m_type.group(1)
+
+            if not type_name:
+                continue
+
+            open_idx = content.find('{', m.start(), m.end())
+            if open_idx < 0:
+                continue
+            close_idx = _find_matching_brace(content, open_idx)
+            if close_idx < 0:
+                continue
+
+            body = content[open_idx + 1:close_idx]
+            cls = _get_or_create_class(type_name)
+            for fm in fn_pat.finditer(body):
+                cls.methods.append(_parse_rust_fn(fm, is_method=True))
+
+            exports.append(type_name)
+
         for m in re.finditer(r'^(?:pub\s+)?const\s+([A-Z][A-Z0-9_]*)\b', content, re.MULTILINE):
+            constants.append(m.group(1))
+
+        for m in re.finditer(r'^(?:pub\s+)?static\s+(?:mut\s+)?([A-Z][A-Z0-9_]*)\b', content, re.MULTILINE):
             constants.append(m.group(1))
 
         lines = content.split('\n')

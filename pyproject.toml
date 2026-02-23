@@ -4,15 +4,15 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "code2logic"
-version = "1.0.32"
-description = "Convert source code to logical representation for LLM analysis"
+version = "1.0.33"
+description = "Code2Logic - Source code to logical representation converter for LLM analysis, featuring Tree-sitter parsing, dependency graph analysis, and multi-language support."
 readme = "README.md"
 license = "Apache-2.0"
 authors = [
-    "Softreck <info@softreck.dev>",
+    "Softreck <tom@sapletta.com>",
     "Tom Sapletta <tom@sapletta.com>",
 ]
-maintainers = ["Softreck <info@softreck.dev>"]
+maintainers = ["Softreck <tom@sapletta.com>"]
 keywords = [
     "code-analysis",
     "llm",
@@ -25,21 +25,8 @@ keywords = [
     "nlp",
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Environment :: Console",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Topic :: Software Development :: Documentation",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Software Development :: Quality Assurance",
-    "Topic :: Text Processing :: Linguistic",
-    "Typing :: Typed",
 ]
 packages = [{ include = "code2logic" }]
 

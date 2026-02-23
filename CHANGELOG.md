@@ -1,3 +1,25 @@
+## [1.0.33] - 2026-02-23
+
+### Summary
+
+feat(config): deep code analysis engine with 6 supporting modules
+
+### Test
+
+- update tests/test_formats.py
+
+### Build
+
+- update pyproject.toml
+
+### Other
+
+- update code2logic/parsers.py
+- update logic2code/pyproject.toml
+- update logic2test/pyproject.toml
+- update lolm/pyproject.toml
+
+
 ## [1.0.32] - 2026-02-15
 
 ### Summary

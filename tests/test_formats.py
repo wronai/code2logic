@@ -111,6 +111,34 @@ def samples_project():
     return analyze_project('tests/samples/', use_treesitter=False)
 
 
+@pytest.fixture
+def rust_sample_project(tmp_path):
+    (tmp_path / "lib.rs").write_text(
+        '''
+use std::fmt;
+
+pub struct Greeter {
+    pub name: String,
+}
+
+impl Greeter {
+    pub fn new(name: String) -> Self {
+        Self { name }
+    }
+
+    pub fn greet(&self) -> String {
+        format!("hi {}", self.name)
+    }
+}
+
+pub fn top_level(a: i32) -> i32 {
+    a + 1
+}
+'''
+    )
+    return analyze_project(str(tmp_path), use_treesitter=False)
+
+
 # =============================================================================
 # ALL FORMATS LIST
 # =============================================================================
@@ -186,6 +214,35 @@ class TestAllFormatsGeneration:
         # Should mention functions
         has_func = any(x in output.lower() for x in ['helper', 'add', 'format', 'function', 'def'])
         assert has_func, f"{fmt} missing function info"
+
+
+class TestRustSupport:
+    def test_rust_parsing_finds_top_level_and_impl_methods(self, rust_sample_project):
+        project = rust_sample_project
+        assert project.modules
+        m = project.modules[0]
+        assert m.language == 'rust'
+
+        top = [f.name for f in (m.functions or [])]
+        assert 'top_level' in top
+
+        cls_names = [c.name for c in (m.classes or [])]
+        assert 'Greeter' in cls_names
+
+        greeter = next(c for c in m.classes if c.name == 'Greeter')
+        method_names = [x.name for x in (greeter.methods or [])]
+        assert 'new' in method_names
+        assert 'greet' in method_names
+
+    def test_rust_shows_up_in_toon_and_function_logic(self, rust_sample_project):
+        project = rust_sample_project
+        toon = TOONGenerator().generate(project, detail='full')
+        assert 'Greeter' in toon
+        assert 'top_level' in toon
+
+        logic = FunctionLogicGenerator().generate(project, detail='full')
+        assert 'Greeter.new' in logic or 'Greeter.greet' in logic
+        assert 'top_level' in logic
 
 
 class TestFormatValidation:
