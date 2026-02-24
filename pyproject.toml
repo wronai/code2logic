@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "code2logic"
-version = "1.0.34"
+version = "1.0.35"
 description = "Code2Logic - Source code to logical representation converter for LLM analysis, featuring Tree-sitter parsing, dependency graph analysis, and multi-language support."
 readme = "README.md"
 license = "Apache-2.0"

@@ -1,3 +1,24 @@
+## [1.0.35] - 2026-02-24
+
+### Summary
+
+refactor(None): configuration management system
+
+### Other
+
+- config: update project.c2l.hybrid.yaml
+- update project.c2l.hybrid.yaml-schema.json
+- update project.c2l.toon
+- update project.c2l.toon-schema.json
+- config: update project.c2l.yaml
+- update project.c2l.yaml-schema.json
+- update project.func.json
+- update project.func.logicml
+- update project.func.toon
+- config: update project.func.yaml
+- ... and 3 more
+
+
 ## [1.0.34] - 2026-02-24
 
 ### Summary
