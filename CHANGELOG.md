@@ -1,3 +1,16 @@
+## [1.0.34] - 2026-02-24
+
+### Summary
+
+feat(examples): CLI interface improvements
+
+### Other
+
+- update .env.example
+- update code2logic/cli.py
+- update code2logic/config.py
+
+
 ## [1.0.33] - 2026-02-23
 
 ### Summary

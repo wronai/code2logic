@@ -153,6 +153,14 @@ class Config:
         """Check if verbose mode is enabled."""
         return os.environ.get('CODE2LOGIC_VERBOSE', '').lower() in ('true', '1', 'yes')
 
+    def get_project_name(self) -> str:
+        """Get default project name for output files.
+
+        Returns:
+            Project name (default: 'project')
+        """
+        return os.environ.get('CODE2LOGIC_PROJECT_NAME', 'project')
+
     def get_cache_dir(self) -> Path:
         """Get cache directory path."""
         cache_dir = os.environ.get('CODE2LOGIC_CACHE_DIR', '~/.code2logic/cache')

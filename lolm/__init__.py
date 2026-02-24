@@ -76,7 +76,7 @@ from .rotation import (
 )
 from .clients import LLMRateLimitError
 
-__version__ = '1.0.33'
+__version__ = '1.0.34'
 __all__ = [
     # Config
     'LLMConfig',

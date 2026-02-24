@@ -609,6 +609,11 @@ code2logic [path] [options]
         help='Output file path (default: stdout)'
     )
     parser.add_argument(
+        '--name',
+        dest='project_name',
+        help='Project name for output files (default: from CODE2LOGIC_PROJECT_NAME env or "project"). Used for auto-generating output, schema, and function-logic file names.'
+    )
+    parser.add_argument(
         '--function-logic',
         nargs='?',
         const='auto',
@@ -725,6 +730,7 @@ code2logic [path] [options]
 
     # Import after potential installation
     from .analyzer import ProjectAnalyzer, get_library_status
+    from .config import Config
     from .function_logic import FunctionLogicGenerator
     from .generators import (
         CSVGenerator,
@@ -735,6 +741,9 @@ code2logic [path] [options]
     )
     from .logicml import LogicMLGenerator
     from .toon_format import TOONGenerator
+
+    # Load config to get project name
+    config = Config()
 
     # Status check
     if args.status:
@@ -844,6 +853,27 @@ code2logic [path] [options]
 
         log.separator()
 
+    # Get default project name from config
+    project_name = config.get_project_name()
+
+    # Determine default output path when using --function-logic or --with-schema without -o
+    default_output = None
+    if (args.function_logic or args.with_schema) and not args.output:
+        # Use project name from config with appropriate extension
+        ext_map = {
+            'markdown': 'md',
+            'compact': 'txt',
+            'json': 'json',
+            'yaml': 'yaml',
+            'hybrid': 'yaml',
+            'csv': 'csv',
+            'gherkin': 'feature',
+            'toon': 'toon',
+            'logicml': 'logicml',
+        }
+        ext = ext_map.get(args.format, args.format)
+        default_output = f"{project_name}.{ext}"
+
     # Generate output
     if args.verbose:
         log.step(f"Generating {args.format} output (detail: {args.detail})")
@@ -883,7 +913,8 @@ code2logic [path] [options]
                 schema = generator.generate_schema('hybrid')
             else:
                 schema = generator.generate_schema('compact' if compact else 'full')
-            base_name = os.path.splitext(args.output)[0] if args.output else 'output'
+            effective_output = args.output or default_output
+            base_name = os.path.splitext(effective_output)[0] if effective_output else project_name
             schema_path = f"{base_name}.yaml-schema.json"
             parent_dir = os.path.dirname(schema_path)
             if parent_dir:
@@ -916,7 +947,8 @@ code2logic [path] [options]
         if args.with_schema:
             schema_type = 'ultra_compact' if use_ultra_compact else 'standard'
             schema = generator.generate_schema(schema_type)
-            base_name = os.path.splitext(args.output)[0] if args.output else 'output'
+            effective_output = args.output or default_output
+            base_name = os.path.splitext(effective_output)[0] if effective_output else project_name
             schema_path = f"{base_name}.toon-schema.json"
             parent_dir = os.path.dirname(schema_path)
             if parent_dir:
@@ -940,18 +972,19 @@ code2logic [path] [options]
 
         # Auto-generate path if 'auto' was specified (--function-logic without argument)
         if args.function_logic == 'auto':
-            if args.output:
+            effective_output = args.output or default_output
+            if effective_output:
                 # Derive from output file: project.c2l.yaml -> project.functions.yaml
-                base = args.output.rsplit('.', 1)[0]
+                base = effective_output.rsplit('.', 1)[0]
                 if base.endswith('.c2l'):
                     base = base[:-4]
-                ext = args.output.rsplit('.', 1)[-1] if '.' in args.output else 'logicml'
+                ext = effective_output.rsplit('.', 1)[-1] if '.' in effective_output else 'logicml'
                 logic_path = f"{base}.functions.{ext}"
             else:
-                # Default path based on format
+                # Default path based on format using project name from config
                 ext_map = {'json': 'json', 'yaml': 'yaml', 'toon': 'toon'}
                 ext = ext_map.get(args.format, 'logicml')
-                logic_path = f"project.functions.{ext}"
+                logic_path = f"{project_name}.functions.{ext}"
         else:
             logic_path = str(args.function_logic)
 
