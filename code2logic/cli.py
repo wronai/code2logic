@@ -605,8 +605,9 @@ code2logic [path] [options]
         help='Detail level - columns to include (default: standard)'
     )
     parser.add_argument(
-        '-o', '--output',
-        help='Output file path (default: stdout)'
+        '-o', '--output-dir',
+        dest='output_dir',
+        help='Output directory for all generated files. If specified, files are saved instead of stdout. File names are derived from --name and format flags: {name}.{format}, {name}.functions.{ext}, {name}.{format}-schema.json'
     )
     parser.add_argument(
         '--name',
@@ -643,7 +644,12 @@ code2logic [path] [options]
     parser.add_argument(
         '--with-schema',
         action='store_true',
-        help='Generate JSON schema alongside output'
+        help='Generate JSON schema file alongside output (uses project name for filename)'
+    )
+    parser.add_argument(
+        '--stdout',
+        action='store_true',
+        help='Write all output to stdout instead of files (including schema and function-logic). Useful for piping.'
     )
     parser.add_argument(
         '--no-install',
@@ -853,26 +859,37 @@ code2logic [path] [options]
 
         log.separator()
 
-    # Get default project name from config
-    project_name = config.get_project_name()
+    # Get project name: CLI arg > env var > default
+    project_name = args.project_name if args.project_name else config.get_project_name()
 
-    # Determine default output path when using --function-logic or --with-schema without -o
-    default_output = None
-    if (args.function_logic or args.with_schema) and not args.output:
-        # Use project name from config with appropriate extension
-        ext_map = {
-            'markdown': 'md',
-            'compact': 'txt',
-            'json': 'json',
-            'yaml': 'yaml',
-            'hybrid': 'yaml',
-            'csv': 'csv',
-            'gherkin': 'feature',
-            'toon': 'toon',
-            'logicml': 'logicml',
-        }
-        ext = ext_map.get(args.format, args.format)
-        default_output = f"{project_name}.{ext}"
+    # Determine output mode:
+    # - --stdout: all requested output to stdout (with section markers)
+    # - -o ./dir with --function-logic or --with-schema: only generate flagged files
+    # - -o ./dir without aux flags: generate main file only
+    # - no -o: main to stdout (auxiliary files require explicit path)
+    use_stdout = args.stdout
+    output_dir = args.output_dir
+
+    # When using output_dir with aux flags, only generate those files (not main)
+    has_aux_flags = args.function_logic or args.with_schema
+    generate_main = not has_aux_flags or use_stdout
+
+    # Build output paths based on output_dir
+    ext_map = {
+        'markdown': 'md',
+        'compact': 'txt',
+        'json': 'json',
+        'yaml': 'yaml',
+        'hybrid': 'yaml',
+        'csv': 'csv',
+        'gherkin': 'feature',
+        'toon': 'toon',
+        'logicml': 'logicml',
+    }
+    ext = ext_map.get(args.format, args.format)
+    main_output_path = None
+    if output_dir and generate_main:
+        main_output_path = os.path.join(output_dir, f"{project_name}.{ext}")
 
     # Generate output
     if args.verbose:
@@ -913,16 +930,19 @@ code2logic [path] [options]
                 schema = generator.generate_schema('hybrid')
             else:
                 schema = generator.generate_schema('compact' if compact else 'full')
-            effective_output = args.output or default_output
-            base_name = os.path.splitext(effective_output)[0] if effective_output else project_name
-            schema_path = f"{base_name}.yaml-schema.json"
-            parent_dir = os.path.dirname(schema_path)
-            if parent_dir:
-                os.makedirs(parent_dir, exist_ok=True)
-            with open(schema_path, 'w', encoding='utf-8') as f:
-                f.write(schema)
-            if args.verbose:
-                log.success(f"Schema written to: {schema_path}")
+
+            if use_stdout:
+                # Write to stdout with section marker
+                print(f"\n=== SCHEMA ===")
+                print(schema)
+            elif output_dir:
+                # Write to file in output directory
+                schema_path = os.path.join(output_dir, f"{project_name}.yaml-schema.json")
+                os.makedirs(output_dir, exist_ok=True)
+                with open(schema_path, 'w', encoding='utf-8') as f:
+                    f.write(schema)
+                if args.verbose:
+                    log.success(f"Schema written to: {schema_path}")
 
     elif args.format == 'toon':
         generator = TOONGenerator()
@@ -947,16 +967,19 @@ code2logic [path] [options]
         if args.with_schema:
             schema_type = 'ultra_compact' if use_ultra_compact else 'standard'
             schema = generator.generate_schema(schema_type)
-            effective_output = args.output or default_output
-            base_name = os.path.splitext(effective_output)[0] if effective_output else project_name
-            schema_path = f"{base_name}.toon-schema.json"
-            parent_dir = os.path.dirname(schema_path)
-            if parent_dir:
-                os.makedirs(parent_dir, exist_ok=True)
-            with open(schema_path, 'w', encoding='utf-8') as f:
-                f.write(schema)
-            if args.verbose:
-                log.success(f"Schema written to: {schema_path}")
+
+            if use_stdout:
+                # Write to stdout with section marker
+                print(f"\n=== SCHEMA ===")
+                print(schema)
+            elif output_dir:
+                # Write to file in output directory
+                schema_path = os.path.join(output_dir, f"{project_name}.toon-schema.json")
+                os.makedirs(output_dir, exist_ok=True)
+                with open(schema_path, 'w', encoding='utf-8') as f:
+                    f.write(schema)
+                if args.verbose:
+                    log.success(f"Schema written to: {schema_path}")
 
     elif args.format == 'logicml':
         generator = LogicMLGenerator()
@@ -970,21 +993,16 @@ code2logic [path] [options]
     if args.function_logic:
         logic_gen = FunctionLogicGenerator()
 
-        # Auto-generate path if 'auto' was specified (--function-logic without argument)
+        # Determine path for function logic file
         if args.function_logic == 'auto':
-            effective_output = args.output or default_output
-            if effective_output:
-                # Derive from output file: project.c2l.yaml -> project.functions.yaml
-                base = effective_output.rsplit('.', 1)[0]
-                if base.endswith('.c2l'):
-                    base = base[:-4]
-                ext = effective_output.rsplit('.', 1)[-1] if '.' in effective_output else 'logicml'
-                logic_path = f"{base}.functions.{ext}"
+            if output_dir:
+                # Use output directory with project name
+                logic_ext = ext_map.get(args.format, 'logicml')
+                logic_path = os.path.join(output_dir, f"{project_name}.functions.{logic_ext}")
             else:
-                # Default path based on format using project name from config
-                ext_map = {'json': 'json', 'yaml': 'yaml', 'toon': 'toon'}
-                ext = ext_map.get(args.format, 'logicml')
-                logic_path = f"{project_name}.functions.{ext}"
+                # No output dir - use project name in current directory
+                logic_ext = ext_map.get(args.format, 'logicml')
+                logic_path = f"{project_name}.functions.{logic_ext}"
         else:
             logic_path = str(args.function_logic)
 
@@ -998,13 +1016,17 @@ code2logic [path] [options]
         else:
             logic_out = logic_gen.generate(project, detail=args.detail)
 
-        parent_dir = os.path.dirname(logic_path)
-        if parent_dir:
-            os.makedirs(parent_dir, exist_ok=True)
-        with open(logic_path, 'w', encoding='utf-8') as f:
-            f.write(logic_out)
-        if args.verbose:
-            log.success(f"Function logic written to: {logic_path}")
+        if use_stdout:
+            # Write to stdout with section marker
+            print(f"\n=== FUNCTION_LOGIC ===")
+            print(logic_out)
+        elif output_dir:
+            # Write to file in output directory
+            os.makedirs(output_dir, exist_ok=True)
+            with open(logic_path, 'w', encoding='utf-8') as f:
+                f.write(logic_out)
+            if args.verbose:
+                log.success(f"Function logic written to: {logic_path}")
 
     gen_time = time.time() - gen_start
 
@@ -1015,25 +1037,26 @@ code2logic [path] [options]
         log.stats("Size", f"{output_size:,} chars (~{tokens_approx:,} tokens)")
         log.stats("Lines", output.count('\n') + 1)
 
-    # Write output
-    if args.output:
-        parent_dir = os.path.dirname(args.output)
-        if parent_dir:
-            os.makedirs(parent_dir, exist_ok=True)
-        with open(args.output, 'w', encoding='utf-8') as f:
-            f.write(output)
-        if args.verbose:
-            log.success(f"Output written to: {args.output}")
-    else:
-        if not args.quiet:
-            try:
-                print(output, flush=True)
-            except BrokenPipeError:
+    # Write main output (only if generate_main is True)
+    if generate_main:
+        if output_dir:
+            # Write to file in output directory
+            os.makedirs(output_dir, exist_ok=True)
+            with open(main_output_path, 'w', encoding='utf-8') as f:
+                f.write(output)
+            if args.verbose:
+                log.success(f"Output written to: {main_output_path}")
+        else:
+            # Write to stdout
+            if not args.quiet:
                 try:
-                    sys.stdout.close()
-                except Exception:
-                    pass
-                os._exit(0)
+                    print(output, flush=True)
+                except BrokenPipeError:
+                    try:
+                        sys.stdout.close()
+                    except Exception:
+                        pass
+                    os._exit(0)
 
     # Final summary
     if args.verbose:
