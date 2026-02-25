@@ -46,6 +46,7 @@ If `CODE2LOGIC_DEFAULT_PROVIDER=auto`, Code2Logic tries providers in priority or
 | `--ultra-compact` | | Use ultra-compact TOON format (71% smaller) |
 | `--no-repeat-module` | | Reduce repeated directory prefixes in TOON `modules[...]` tables by using `./file` for consecutive entries in the same folder |
 | `--no-repeat-details` | | Reduce repeated directory prefixes in function-logic TOON `function_details` section by using `./file` for consecutive entries in the same folder |
+| `--does` | | Include the `does` (intent/purpose) column in function-logic TOON output. Omitted by default to save tokens |
 | `--with-schema` | | Generate JSON schema alongside output |
 | `--verbose` | `-v` | Verbose output with timing |
 | `--debug` | | Debug output (very verbose) |
@@ -130,6 +131,12 @@ code2logic /path/to/project -f toon --ultra-compact --with-schema
 
 # Generate function-logic as TOON + compress function_details module keys
 code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-repeat-details
+
+# Generate function-logic TOON with intent descriptions (does column)
+code2logic /path/to/project -f toon --function-logic --does --name project -o ./
+
+# Generate function-logic TOON + schema (project.functions.toon + project.functions-schema.json)
+code2logic /path/to/project -f toon --function-logic --with-schema --name project -o ./
 ```
 
 Token-oriented object notation - most efficient format for LLM consumption.

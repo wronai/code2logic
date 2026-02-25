@@ -168,21 +168,80 @@ modules[4]{path,lang,lines,kb}:
 **Example (function-logic TOON, function_details):**
 
 ```bash
-code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-repeat-details
+code2logic /path/to/project -f toon --function-logic --with-schema --name project -o ./ --no-repeat-details
 ```
 
 Output fragment:
 
 ```toon
+# myproject function-logic | 3 modules
+# Convention: name with . = method, ~name = async, cc:N shown only when >1
+project: myproject
+generated: "2026-02-25T09:00:00"
+modules[3]{path,lang,items}:
+  firmware/main.py,py,4
+  ./test_main.py,py,15
+  db/config.py,py,5
+
 function_details:
   firmware/main.py:
-    functions[2]{line,name,kind,sig,async,cc,does}:
-      77,index_page,function,(),true,2,Serve the firmware UI
-      85,health_check,function,(),true,1,Health check endpoint
+    functions[4]{line,name,sig}:
+      77,~index_page cc:2,()
+      85,~health_check,()
+      90,~status,()
+      96,"~websocket_endpoint cc:5","(websocket:WebSocket)"
   ./test_main.py:
-    functions[1]{line,name,kind,sig,async,cc,does}:
-      14,TestFirmwareSimulator.test_health_check,method,(),false,1,Test basic health endpoint
+    functions[15]{line,name,sig}:
+      14,TestFirmwareSimulator.test_health_check,()
+      20,TestFirmwareSimulator.test_scenarios_fetch,()
 ```
+
+If you also want the intent/purpose column, add `--does`:
+
+```bash
+code2logic /path/to/project -f toon --function-logic --does --name project -o ./ --no-repeat-details
+```
+
+### Format Conventions (function-logic TOON)
+
+| Convention | Meaning | Example |
+|---|---|---|
+| Name with `.` | Method | `Config.get_api_key` |
+| Name without `.` | Top-level function | `main` |
+| `~` prefix | Async | `~index_page` |
+| `cc:N` suffix | Cyclomatic complexity > 1 | `~index_page cc:2` |
+| `./file` | Same directory as previous entry | `./test_main.py` |
+
+Only modules with at least one function/method are listed. Empty modules (`__init__.py`, `models.py` with 0 items) are omitted.
+
+### The `--does` flag
+
+By default, the `does` (intent/purpose) column is **omitted** from function-logic TOON to save tokens. Use `--does` to include it:
+
+```bash
+# Without --does (default, compact):
+#   functions[2]{line,name,sig}:
+#     77,~index_page cc:2,()
+
+# With --does (adds intent column):
+#   functions[2]{line,name,sig,does}:
+#     77,~index_page cc:2,(),Serve the firmware UI
+
+code2logic /path/to/project -f toon --function-logic --does --name project -o ./
+```
+
+Use `--does` when you need the LLM to understand **what each function does**, not just its signature. Omit it when you only need structure/navigation.
+
+### Schema Generation
+
+When `--with-schema` is used with `--function-logic` and TOON format, a JSON schema is written alongside:
+
+```bash
+code2logic /path/to/project -f toon --function-logic --with-schema --name project -o ./
+# Produces: project.functions.toon + project.functions-schema.json
+```
+
+If using `--stdout`, the function-logic schema is printed under the `=== FUNCTION_LOGIC_SCHEMA ===` section marker.
 
 Notes:
 

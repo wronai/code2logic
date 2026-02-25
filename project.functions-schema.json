@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Code2Logic Function-Logic TOON Schema",
+  "description": "Schema for project.functions.toon — compact function/method index. Conventions: name containing '.' = method (Class.method), ~prefix = async, 'cc:N' suffix = cyclomatic complexity (only when >1).",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "Project name"
+    },
+    "generated": {
+      "type": "string",
+      "description": "ISO timestamp"
+    },
+    "modules": {
+      "type": "array",
+      "description": "Modules with at least one function/method. Rows: path,lang,items. Use ./file for same-dir compression (--no-repeat-module).",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path or ./basename if same dir as previous"
+          },
+          "lang": {
+            "type": "string",
+            "description": "Short language code (py, js, ts, ...)"
+          },
+          "items": {
+            "type": "integer",
+            "description": "Number of functions+methods in module"
+          }
+        }
+      }
+    },
+    "function_details": {
+      "type": "object",
+      "description": "Per-module function tables. Keys are module paths (or ./basename with --no-repeat-details).",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "properties": {
+            "functions": {
+              "type": "array",
+              "description": "Tabular rows: line,name,sig[,does][,decorators,calls,raises]",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "line": {
+                    "type": "integer",
+                    "description": "Start line number"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Function or method name. Contains '.' if method (e.g. Class.method). Prefixed with ~ if async. Suffixed with ' cc:N' if cyclomatic complexity > 1."
+                  },
+                  "sig": {
+                    "type": "string",
+                    "description": "Signature: (params) [-> return_type]"
+                  },
+                  "does": {
+                    "type": "string",
+                    "description": "Intent/purpose (standard+full detail)"
+                  },
+                  "decorators": {
+                    "type": "string",
+                    "description": "Pipe-separated decorators (full detail)"
+                  },
+                  "calls": {
+                    "type": "string",
+                    "description": "Pipe-separated function calls (full detail)"
+                  },
+                  "raises": {
+                    "type": "string",
+                    "description": "Pipe-separated exceptions (full detail)"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

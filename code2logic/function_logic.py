@@ -65,6 +65,7 @@ class FunctionLogicGenerator:
         detail: str = 'full',
         no_repeat_name: bool = False,
         no_repeat_details: bool = False,
+        include_does: bool = False,
     ) -> str:
         if detail == 'detailed':
             detail = 'full'
@@ -110,7 +111,7 @@ class FunctionLogicGenerator:
             lines.append(f"  {toon._quote(details_key)}:")
 
             header = f"line{dm}name{dm}sig"
-            if detail in ('standard', 'full'):
+            if include_does and detail in ('standard', 'full'):
                 header += f"{dm}does"
             if detail == 'full':
                 header += f"{dm}decorators{dm}calls{dm}raises"
@@ -135,7 +136,7 @@ class FunctionLogicGenerator:
                     toon._quote(sig),
                 ]
 
-                if detail in ('standard', 'full'):
+                if include_does and detail in ('standard', 'full'):
                     does = self._build_does(func)
                     row.append(toon._quote(does))
 

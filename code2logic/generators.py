@@ -209,7 +209,8 @@ class MarkdownGenerator:
             lines.append(f"imports: [{imps}]")
 
         if m.constants:
-            lines.append(f"constants: [{', '.join(m.constants[:5])}]")
+            cnames = [c.name if hasattr(c, 'name') else str(c) for c in m.constants[:5]]
+            lines.append(f"constants: [{', '.join(cnames)}]")
         lines.append("```")
         lines.append("")
 

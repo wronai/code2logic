@@ -669,6 +669,11 @@ code2logic [path] [options]
         help='Reduce repeated directory prefixes in function-logic TOON section function_details by using ./file for consecutive entries in the same folder.'
     )
     parser.add_argument(
+        '--does',
+        action='store_true',
+        help='Include the does/intent column in function-logic TOON output. Without this flag, the does column is omitted to save tokens.'
+    )
+    parser.add_argument(
         '--no-install',
         action='store_true',
         help='Skip auto-installation of dependencies'
@@ -1038,6 +1043,7 @@ code2logic [path] [options]
                 detail=args.detail,
                 no_repeat_name=args.no_repeat_module,
                 no_repeat_details=args.no_repeat_details,
+                include_does=args.does,
             )
         else:
             logic_out = logic_gen.generate(project, detail=args.detail)

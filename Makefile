@@ -1,4 +1,5 @@
 .PHONY: help install install-dev install-full clean build test lint format typecheck publish publish-test docs docker
+.PHONY: benchmark benchmark-format benchmark-function benchmark-project benchmark-token benchmark-compare benchmark-toon examples
 
 POETRY := $(shell command -v poetry 2>/dev/null)
 ifeq ($(POETRY),)
@@ -297,6 +298,149 @@ run-compare: ## Compare sizes of all formats
 
 status: ## Show library status
 	code2logic --status
+
+# ============================================================================
+# Benchmarks
+# ============================================================================
+
+BENCH_SAMPLES := tests/samples
+BENCH_OUTPUT  := examples/output
+BENCH_LIMIT   := 20
+BENCH_FORMATS := yaml toon logicml json
+
+benchmark: benchmark-format benchmark-function benchmark-token benchmark-project benchmark-toon benchmark-compare ## Run all benchmarks (no LLM)
+	@echo ""
+	@echo "$(GREEN)All benchmarks completed!$(NC)"
+	@echo "Results in $(BENCH_OUTPUT)/"
+	@ls -lhS $(BENCH_OUTPUT)/*.json 2>/dev/null
+
+benchmark-format: ## Benchmark format reproduction (yaml/toon/logicml/json)
+	@echo "$(BLUE)━━━ Format Benchmark ━━━$(NC)"
+	$(PYTHON) examples/15_unified_benchmark.py \
+		--no-llm --type format \
+		--folder $(BENCH_SAMPLES)/ \
+		--formats $(BENCH_FORMATS) \
+		--limit $(BENCH_LIMIT) --verbose \
+		--output $(BENCH_OUTPUT)/benchmark_format.json
+
+benchmark-function: ## Benchmark function-level reproduction
+	@echo "$(BLUE)━━━ Function Benchmark ━━━$(NC)"
+	$(PYTHON) examples/15_unified_benchmark.py \
+		--no-llm --type function \
+		--file $(BENCH_SAMPLES)/sample_functions.py \
+		--limit 10 --verbose \
+		--output $(BENCH_OUTPUT)/benchmark_function.json
+
+benchmark-token: ## Benchmark token efficiency across formats
+	@echo "$(BLUE)━━━ Token Efficiency Benchmark ━━━$(NC)"
+	$(PYTHON) examples/11_token_benchmark.py \
+		--no-llm \
+		--folder $(BENCH_SAMPLES)/ \
+		--formats $(BENCH_FORMATS) \
+		--limit $(BENCH_LIMIT) --verbose \
+		--output $(BENCH_OUTPUT)/benchmark_token.json
+
+benchmark-project: ## Benchmark project-level reproduction
+	@echo "$(BLUE)━━━ Project Benchmark ━━━$(NC)"
+	$(PYTHON) examples/15_unified_benchmark.py \
+		--no-llm --type project \
+		--folder $(BENCH_SAMPLES)/ \
+		--formats $(BENCH_FORMATS) \
+		--limit $(BENCH_LIMIT) --verbose \
+		--output $(BENCH_OUTPUT)/benchmark_project.json
+
+benchmark-toon: ## Generate TOON + function-logic for self-analysis
+	@echo "$(BLUE)━━━ TOON Self-Analysis ━━━$(NC)"
+	@mkdir -p $(BENCH_OUTPUT)
+	$(PYTHON) -m code2logic ./ -f toon --compact --name project -o ./
+	$(PYTHON) -m code2logic ./ -f toon --compact --no-repeat-module --function-logic --with-schema --name project -o ./
+	$(PYTHON) -m code2logic ./ -f yaml --compact --name project -o $(BENCH_OUTPUT)/
+	$(PYTHON) -m code2logic ./ -f json --name project -o $(BENCH_OUTPUT)/
+	$(PYTHON) -m code2logic ./ -f markdown --name project -o $(BENCH_OUTPUT)/
+	$(PYTHON) -m code2logic ./ -f compact --name project -o $(BENCH_OUTPUT)/
+	$(PYTHON) -m code2logic ./ -f csv -d standard --name project -o $(BENCH_OUTPUT)/
+	@echo ""
+	@echo "$(BLUE)Format size comparison (self-analysis):$(NC)"
+	@printf "  %-25s %10s %10s\n" "Format" "Size" "~Tokens"
+	@printf "  %-25s %10s %10s\n" "-------------------------" "----------" "----------"
+	@for f in project.toon project.functions.toon $(BENCH_OUTPUT)/project.yaml $(BENCH_OUTPUT)/project.json $(BENCH_OUTPUT)/project.md $(BENCH_OUTPUT)/project.txt $(BENCH_OUTPUT)/project.csv; do \
+		if [ -f "$$f" ]; then \
+			sz=$$(wc -c < "$$f"); \
+			tok=$$((sz / 4)); \
+			printf "  %-25s %8s B %8s\n" "$$(basename $$f)" "$$sz" "$$tok"; \
+		fi; \
+	done
+	@echo ""
+	@echo "$(GREEN)TOON files:$(NC)"
+	@ls -lh project.toon project.functions.toon project.toon-schema.json project.functions-schema.json 2>/dev/null
+
+benchmark-compare: ## Show summary comparison of all benchmark results
+	@echo ""
+	@echo "$(BLUE)━━━ Benchmark Summary ━━━$(NC)"
+	@$(PYTHON) examples/benchmark_summary.py $(BENCH_OUTPUT)
+
+# ============================================================================
+# Examples (step by step)
+# ============================================================================
+
+examples: ## Run all examples step by step (no LLM required)
+	@mkdir -p $(BENCH_OUTPUT)
+	@echo "$(BLUE)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(NC)"
+	@echo "$(BLUE)  Running all code2logic examples (--no-llm where needed)$(NC)"
+	@echo "$(BLUE)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(NC)"
+	@echo ""
+	@echo "$(YELLOW)[1/16] Quick Start — basic analysis$(NC)"
+	$(PYTHON) examples/01_quick_start.py
+	@echo ""
+	@echo "$(YELLOW)[2/16] Refactoring — suggest improvements$(NC)"
+	$(PYTHON) examples/02_refactoring.py
+	@echo ""
+	@echo "$(YELLOW)[3/16] Reproduction — code ↔ spec round-trip$(NC)"
+	$(PYTHON) examples/03_reproduction.py --no-llm
+	@echo ""
+	@echo "$(YELLOW)[4/16] Project Analysis — multi-file$(NC)"
+	$(PYTHON) examples/04_project.py --no-llm
+	@echo ""
+	@echo "$(YELLOW)[5/16] LLM Integration — provider detection$(NC)"
+	$(PYTHON) examples/05_llm_integration.py --no-llm
+	@echo ""
+	@echo "$(YELLOW)[6/16] Metrics — reproduction quality$(NC)"
+	$(PYTHON) examples/06_metrics.py --no-llm
+	@echo ""
+	@echo "$(YELLOW)[7/16] Format Benchmark — compare formats$(NC)"
+	$(PYTHON) examples/08_format_benchmark.py --no-llm
+	@echo ""
+	@echo "$(YELLOW)[8/16] Async Benchmark — async code analysis$(NC)"
+	$(PYTHON) examples/09_async_benchmark.py --no-llm
+	@echo ""
+	@echo "$(YELLOW)[9/16] Function Reproduction — per-function$(NC)"
+	$(PYTHON) examples/10_function_reproduction.py --no-llm
+	@echo ""
+	@echo "$(YELLOW)[10/16] Token Benchmark — token efficiency$(NC)"
+	$(PYTHON) examples/11_token_benchmark.py --no-llm
+	@echo ""
+	@echo "$(YELLOW)[11/16] Comprehensive Analysis — full pipeline$(NC)"
+	$(PYTHON) examples/12_comprehensive_analysis.py --no-llm --limit 3
+	@echo ""
+	@echo "$(YELLOW)[12/16] Project Benchmark — project-level scores$(NC)"
+	$(PYTHON) examples/13_project_benchmark.py --no-llm
+	@echo ""
+	@echo "$(YELLOW)[13/16] Repeatability Test — determinism check$(NC)"
+	$(PYTHON) examples/14_repeatability_test.py --no-llm --file tests/samples/sample_functions.py --runs 2
+	@echo ""
+	@echo "$(YELLOW)[14/16] Unified Benchmark — all-in-one$(NC)"
+	$(PYTHON) examples/15_unified_benchmark.py --no-llm --verbose
+	@echo ""
+	@echo "$(YELLOW)[15/16] Terminal Demo — rich output$(NC)"
+	$(PYTHON) examples/16_terminal_demo.py
+	@echo ""
+	@echo "$(YELLOW)[16/16] Duplicate Detection$(NC)"
+	$(PYTHON) examples/duplicate_detection.py
+	@echo ""
+	@echo "$(GREEN)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(NC)"
+	@echo "$(GREEN)  All 16 examples completed successfully!$(NC)"
+	@echo "$(GREEN)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(NC)"
+	@echo "  Output: $(BENCH_OUTPUT)/"
 
 # ============================================================================
 # LLM Integration
