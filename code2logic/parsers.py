@@ -2212,30 +2212,30 @@ class UniversalParser:
         for m in re.finditer(r'^import\s+([^;]+);', content, re.MULTILINE):
             imports.append(m.group(1).strip())
 
-        for m in re.finditer(r'^(?:public\s+)?(?:abstract\s+)?class\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(r'^\s*(?:public\s+)?(?:abstract\s+)?class\s+(\w+)', content, re.MULTILINE):
             name = m.group(1)
             classes.append(ClassInfo(name=name, is_abstract='abstract' in m.group(0)))
             exports.append(name)
 
-        for m in re.finditer(r'^(?:public\s+)?interface\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(r'^\s*(?:public\s+)?interface\s+(\w+)', content, re.MULTILINE):
             name = m.group(1)
             classes.append(ClassInfo(name=name, is_interface=True))
             exports.append(name)
             types.append(TypeInfo(name=name, kind='interface', definition=''))
 
-        for m in re.finditer(r'^(?:public\s+)?enum\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(r'^\s*(?:public\s+)?enum\s+(\w+)', content, re.MULTILINE):
             name = m.group(1)
             types.append(TypeInfo(name=name, kind='enum', definition=''))
             exports.append(name)
 
-        for m in re.finditer(r'^(?:public\s+)?record\s+(\w+)\s*\(', content, re.MULTILINE):
+        for m in re.finditer(r'^\s*(?:public\s+)?record\s+(\w+)\s*\(', content, re.MULTILINE):
             name = m.group(1)
             classes.append(ClassInfo(name=name))
             types.append(TypeInfo(name=name, kind='record', definition=''))
             exports.append(name)
 
-        # Very rough method detection (only top-level class members are not tracked here)
-        for m in re.finditer(r'^(?:public|protected|private)\s+(?:static\s+)?([\w<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*\{', content, re.MULTILINE):
+        # Method detection – allow indented declarations inside classes
+        for m in re.finditer(r'^\s*(?:@\w+\s+)*(?:public|protected|private)\s+(?:static\s+)?(?:final\s+)?(?:synchronized\s+)?([\w<>\[\],\s]+?)\s+(\w+)\s*\(([^)]*)\)\s*(?:throws\s+[\w,\s]+)?\s*\{', content, re.MULTILINE):
             ret_type = m.group(1)
             name = m.group(2)
             params = [p.strip() for p in (m.group(3) or '').split(',') if p.strip()][:8]
@@ -2260,7 +2260,7 @@ class UniversalParser:
                 is_private=False,
             ))
 
-        for m in re.finditer(r'^(?:public\s+)?static\s+final\s+[\w<>\[\]]+\s+([A-Z][A-Z0-9_]*)\b', content, re.MULTILINE):
+        for m in re.finditer(r'^\s*(?:public\s+)?static\s+final\s+[\w<>\[\]]+\s+([A-Z][A-Z0-9_]*)\b', content, re.MULTILINE):
             constants.append(m.group(1))
 
         lines = content.split('\n')
@@ -2290,24 +2290,24 @@ class UniversalParser:
         for m in re.finditer(r'^using\s+([^;]+);', content, re.MULTILINE):
             imports.append(m.group(1).strip())
 
-        for m in re.finditer(r'^(?:public\s+)?interface\s+(I\w+)', content, re.MULTILINE):
+        for m in re.finditer(r'^\s*(?:public\s+)?interface\s+(I\w+)', content, re.MULTILINE):
             name = m.group(1)
             classes.append(ClassInfo(name=name, is_interface=True))
             exports.append(name)
             types.append(TypeInfo(name=name, kind='interface', definition=''))
 
-        for m in re.finditer(r'^(?:public\s+)?(?:abstract\s+)?class\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(r'^\s*(?:public\s+)?(?:abstract\s+)?class\s+(\w+)', content, re.MULTILINE):
             name = m.group(1)
             classes.append(ClassInfo(name=name, is_abstract='abstract' in m.group(0)))
             exports.append(name)
 
-        for m in re.finditer(r'^(?:public\s+)?record\s+(\w+)', content, re.MULTILINE):
+        for m in re.finditer(r'^\s*(?:public\s+)?record\s+(\w+)', content, re.MULTILINE):
             name = m.group(1)
             classes.append(ClassInfo(name=name))
             exports.append(name)
             types.append(TypeInfo(name=name, kind='record', definition=''))
 
-        for m in re.finditer(r'^(?:public|private|protected|internal)\s+(?:static\s+)?([\w<>\[\]?]+)\s+(\w+)\s*\(([^)]*)\)\s*\{', content, re.MULTILINE):
+        for m in re.finditer(r'^\s*(?:public|private|protected|internal)\s+(?:static\s+)?(?:async\s+)?(?:override\s+)?(?:virtual\s+)?([\w<>\[\]?]+)\s+(\w+)\s*\(([^)]*)\)\s*\{', content, re.MULTILINE):
             ret_type = m.group(1)
             name = m.group(2)
             params = [p.strip() for p in (m.group(3) or '').split(',') if p.strip()][:8]
@@ -2332,7 +2332,7 @@ class UniversalParser:
                 is_private=False,
             ))
 
-        for m in re.finditer(r'^(?:public\s+)?const\s+[\w<>\[\]]+\s+([A-Z][A-Z0-9_]*)\b', content, re.MULTILINE):
+        for m in re.finditer(r'^\s*(?:public\s+)?const\s+[\w<>\[\]]+\s+([A-Z][A-Z0-9_]*)\b', content, re.MULTILINE):
             constants.append(m.group(1))
 
         lines = content.split('\n')

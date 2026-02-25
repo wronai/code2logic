@@ -217,12 +217,37 @@ class BenchmarkRunner:
         classes: List[str] = []
         functions: List[str] = []
 
-        # Common patterns
+        # Common patterns across formats
         classes.extend(re.findall(r"\bclass\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
-        classes.extend(re.findall(r"^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*$", spec, re.MULTILINE))
+        classes.extend(re.findall(r'"name":\s*"([A-Z][A-Za-z0-9_]*)"', spec))
         functions.extend(re.findall(r"\bdef\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", spec))
         functions.extend(re.findall(r"\bFunction:\s*([A-Za-z_][A-Za-z0-9_]*)", spec))
         functions.extend(re.findall(r"\bScenario:\s*([A-Za-z_][A-Za-z0-9_]*)", spec))
+        # TOON format: function lines like "  42,func_name,(params)"
+        functions.extend(re.findall(r'^\s+\d+,([A-Za-z_][A-Za-z0-9_]*),', spec, re.MULTILINE))
+        # TOON class.method: "  42,ClassName.method_name,"
+        for cm in re.findall(r'^\s+\d+,([A-Z][A-Za-z0-9_]*)\.([a-z_][A-Za-z0-9_]*),', spec, re.MULTILINE):
+            classes.append(cm[0])
+            functions.append(cm[1])
+        # YAML/JSON: "n: ClassName" or name patterns
+        classes.extend(re.findall(r'(?:^|\s)n:\s*([A-Z][A-Za-z0-9_]*)', spec, re.MULTILINE))
+        # CSV format: path,type,name columns
+        for row_m in re.findall(r',class,([A-Z][A-Za-z0-9_]*),', spec):
+            classes.append(row_m)
+        for row_m in re.findall(r',(?:function|method),([a-z_][A-Za-z0-9_]*),', spec):
+            functions.append(row_m)
+        # Gherkin: Feature/Scenario names
+        functions.extend(re.findall(r'Scenario(?:\s+Outline)?:\s*(?:Test\s+)?([A-Za-z_][A-Za-z0-9_]*)', spec))
+        # Non-Python: func/fn/function declarations
+        functions.extend(re.findall(r"\bfunc\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
+        functions.extend(re.findall(r"\bfn\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
+        functions.extend(re.findall(r"\bfunction\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", spec))
+        # Java/C# style: "public static Type methodName("
+        functions.extend(re.findall(r"(?:public|private)\s+(?:static\s+)?\w+\s+([a-z][A-Za-z0-9_]*)\s*\(", spec))
+        # Interfaces/structs/enums
+        classes.extend(re.findall(r"\binterface\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
+        classes.extend(re.findall(r"\bstruct\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
+        classes.extend(re.findall(r"\benum\s+([A-Za-z_][A-Za-z0-9_]*)", spec))
 
         # Deduplicate while preserving order
         def uniq(items: List[str]) -> List[str]:

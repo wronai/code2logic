@@ -30,7 +30,6 @@ def main():
 
     files = {
         "Format": os.path.join(out, "benchmark_format.json"),
-        "FuncLogic": os.path.join(out, "benchmark_function_logic.json"),
         "Token": os.path.join(out, "benchmark_token.json"),
         "Project": os.path.join(out, "benchmark_project.json"),
         "Function": os.path.join(out, "benchmark_function.json"),

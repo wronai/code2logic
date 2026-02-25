@@ -165,7 +165,7 @@ def main() -> None:
     lines.append("| Artifact | File | Size | ~Tokens | Description |")
     lines.append("|---|---|---:|---:|---|")
     for a in artifacts:
-        rel = a.path.relative_to(out_dir) if a.path.exists() and out_dir in a.path.parents else a.path
+        rel = a.path.relative_to(out_dir) if out_dir in a.path.parents else a.path
         size = _sizeof(a.path)
         tok_est = _token_estimate_bytes(size)
         file_cell = f"`{rel}`" if isinstance(rel, Path) else f"`{rel}`"

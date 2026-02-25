@@ -1,3 +1,28 @@
+## [1.0.41] - 2026-02-25
+
+### Summary
+
+refactor(examples): CLI interface improvements
+
+### Docs
+
+- docs: update README
+
+### Other
+
+- build: update Makefile
+- update code2logic/base_generator.py
+- update code2logic/benchmarks/common.py
+- update code2logic/benchmarks/runner.py
+- update code2logic/llm_clients_new.py
+- update code2logic/parsers.py
+- update examples/benchmark_report.py
+- update examples/benchmark_summary.py
+- update function-schema.json
+- update function.toon
+- ... and 3 more
+
+
 ## [1.0.40] - 2026-02-25
 
 ### Summary

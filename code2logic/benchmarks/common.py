@@ -189,14 +189,21 @@ Name the test class Test<ClassName> or TestFunctions."""
 
 def get_token_reproduction_prompt(spec: str, fmt: str, file_name: str, language: str = "python") -> str:
     format_hints = {
-        "json": "Parse the JSON structure and implement all classes and functions.",
-        "json_compact": "Parse the compact JSON and implement all elements.",
+        "json": "Parse the JSON structure and implement all classes and functions with exact signatures.",
+        "json_compact": "Parse the compact JSON and implement all elements with exact signatures.",
         "yaml": "Parse the YAML structure and implement all classes and functions with exact signatures.",
-        "gherkin": "Implement scenarios as SIMPLE, MINIMAL code. NO over-engineering. Keep code short and direct.",
-        "markdown": "Parse embedded Gherkin (behaviors) and YAML (structures).",
+        "gherkin": """Parse Gherkin/BDD scenarios and implement them as working code:
+- Each Feature maps to a class or module
+- Each Scenario maps to a function
+- Given/When/Then steps describe the logic flow
+- Implement actual logic, not just stubs
+Focus on the described behavior and implement it directly.""",
+        "markdown": "Parse embedded Gherkin (behaviors) and YAML (structures). Implement all described classes and functions.",
         "logicml": """Parse LogicML and generate VALID code:
 - 'sig:' lines describe function signatures (translate to the target language)
 - 'type: re-export' means this module primarily re-exports symbols
+- 'attrs:' = instance attributes to set in constructor
+- 'bases:' = parent classes to inherit from
 CRITICAL: Ensure valid syntax - balanced brackets, proper indentation, no undefined variables.""",
         "toon": """Parse TOON (Token-Oriented Object Notation) format carefully:
 
@@ -216,20 +223,32 @@ DECORATORS:
 - 'decorators: @staticmethod|@cache' = multiple decorators
 
 CRITICAL: Use imports[], function_docs, and exact signatures to reproduce code accurately.""",
-
-        "function.toon": """Parse function-logic TOON carefully (function/method index):
-
-STRUCTURE:
-- 'modules[N]{path,lang,items}:' module index
-- 'function_details:' per-module tables
-
-CRITICAL:
-- Use the tabular rows (line,name,sig,does,decorators,calls,raises)
-- Reconstruct the full module code even if class bodies are not explicitly described
-- Preserve exact function signatures from 'sig'""",
+        "csv": """Parse the CSV table where each row describes a code element:
+- Columns: path, type (class/method/function), name, signature, language, intent, category, domain, imports
+- 'method' rows belong to the class in the preceding 'class' row
+- Implement all elements with the exact signatures shown
+Generate complete code with all classes, methods, and functions.""",
+        "function.toon": """Parse the function-logic TOON format:
+- 'modules[N]{path,lang,items}:' lists files
+- 'function_details:' contains per-module function listings
+- Each function has: line number, name, signature, description
+- 'ClassName.method_name' = method of that class
+- 'cc:N' after name = cyclomatic complexity
+Implement all listed functions with matching signatures and described behavior.""",
     }
 
-    max_spec = 5000
+    # Language-specific guidance appended to prompt
+    lang_hints = {
+        "javascript": "Use ES6+ syntax (const/let, arrow functions, classes). Use module.exports or export.",
+        "typescript": "Use TypeScript syntax with interfaces, type annotations, and export statements.",
+        "go": "Use proper Go syntax: package declaration, func receivers for methods, error returns.",
+        "rust": "Use proper Rust syntax: impl blocks for methods, pub fn, Result/Option types, ownership.",
+        "java": "Use proper Java syntax: public class, access modifiers, typed parameters, semicolons.",
+        "csharp": "Use proper C# syntax: namespaces, access modifiers, typed parameters, semicolons.",
+        "sql": "Use standard SQL: CREATE TABLE/VIEW/FUNCTION, proper column types, constraints.",
+    }
+
+    max_spec = 8000
     spec_truncated = spec[:max_spec] if len(spec) > max_spec else spec
 
     language_norm = (language or "python").strip().lower()
@@ -245,8 +264,11 @@ CRITICAL:
     }
     lang_label = lang_label_map.get(language_norm, language_norm)
 
+    lang_hint = lang_hints.get(language_norm, '')
+    lang_hint_line = f"\n{lang_hint}" if lang_hint else ''
+
     prompt = f"""Generate {lang_label} code from this {fmt.upper()} specification.
-{format_hints.get(fmt, '')}
+{format_hints.get(fmt, '')}{lang_hint_line}
 
 {spec_truncated}
 
