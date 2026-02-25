@@ -169,7 +169,7 @@ Wszystkie benchmarki są uruchamiane automatycznie przez komendę `make benchmar
 
 ```bash
 # Format Benchmark (porównanie jakości reprodukcji kodu)
-poetry run python examples/15_unified_benchmark.py \
+python examples/15_unified_benchmark.py \
          --type format \
          --folder tests/samples/ \
          --formats yaml toon logicml json markdown csv gherkin function.toon \
@@ -177,14 +177,14 @@ poetry run python examples/15_unified_benchmark.py \
          --output examples/output/benchmark_format.json
 
 # Function Benchmark (reprodukcja pojedynczych funkcji)
-poetry run python examples/15_unified_benchmark.py \
+python examples/15_unified_benchmark.py \
          --type function \
          --file tests/samples/sample_functions.py \
          --limit 10 --verbose \
          --output examples/output/benchmark_function.json
 
 # Token Efficiency Benchmark (efektywność zużycia tokenów)
-poetry run python examples/11_token_benchmark.py \
+python examples/11_token_benchmark.py \
          --folder tests/samples/ \
          --formats yaml toon logicml json markdown csv gherkin function.toon \
          --limit 20 --verbose \
