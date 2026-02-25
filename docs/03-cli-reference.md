@@ -44,6 +44,8 @@ If `CODE2LOGIC_DEFAULT_PROVIDER=auto`, Code2Logic tries providers in priority or
 | `--compact` | | Use compact YAML format (14% smaller, meta.legend transparency) |
 | `--hybrid` | | Use hybrid YAML output (or use `-f hybrid`) |
 | `--ultra-compact` | | Use ultra-compact TOON format (71% smaller) |
+| `--no-repeat-module` | | Reduce repeated directory prefixes in TOON `modules[...]` tables by using `./file` for consecutive entries in the same folder |
+| `--no-repeat-details` | | Reduce repeated directory prefixes in function-logic TOON `function_details` section by using `./file` for consecutive entries in the same folder |
 | `--with-schema` | | Generate JSON schema alongside output |
 | `--verbose` | `-v` | Verbose output with timing |
 | `--debug` | | Debug output (very verbose) |
@@ -120,8 +122,14 @@ code2logic /path/to/project -f toon -o analysis.toon
 # Ultra-compact TOON (71% smaller, single-letter keys)
 code2logic /path/to/project -f toon --ultra-compact -o analysis-ultra.toon
 
+# Reduce repeated directory prefixes in modules[] (uses ./file when staying in the same folder)
+code2logic /path/to/project -f toon --no-repeat-module -o analysis.toon
+
 # Generate schema alongside output
 code2logic /path/to/project -f toon --ultra-compact --with-schema
+
+# Generate function-logic as TOON + compress function_details module keys
+code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-repeat-details
 ```
 
 Token-oriented object notation - most efficient format for LLM consumption.

@@ -652,9 +652,21 @@ code2logic [path] [options]
         help='Write all output to stdout instead of files (including schema and function-logic). Useful for piping.'
     )
     parser.add_argument(
+        '--no-repeat-module',
+        action='store_true',
+        dest='no_repeat_module',
+        help='Reduce repeated directory prefixes in TOON outputs by using ./file for consecutive entries in the same folder (applies to function-logic TOON and TOON module lists).'
+    )
+    parser.add_argument(
         '--no-repeat-name',
         action='store_true',
-        help='Reduce repeated directory prefixes in TOON outputs by using ./file for consecutive entries in the same folder (applies to function-logic TOON and TOON module lists).'
+        dest='no_repeat_module',
+        help=argparse.SUPPRESS
+    )
+    parser.add_argument(
+        '--no-repeat-details',
+        action='store_true',
+        help='Reduce repeated directory prefixes in function-logic TOON section function_details by using ./file for consecutive entries in the same folder.'
     )
     parser.add_argument(
         '--no-install',
@@ -969,7 +981,7 @@ code2logic [path] [options]
             output = generator.generate(
                 project,
                 detail=detail_map.get(args.detail, 'standard'),
-                no_repeat_name=args.no_repeat_name,
+                no_repeat_name=args.no_repeat_module,
             )
 
         # Generate schema if requested
@@ -1021,7 +1033,12 @@ code2logic [path] [options]
         elif lower.endswith(('.yaml', '.yml')):
             logic_out = logic_gen.generate_yaml(project, detail=args.detail)
         elif lower.endswith('.toon'):
-            logic_out = logic_gen.generate_toon(project, detail=args.detail, no_repeat_name=args.no_repeat_name)
+            logic_out = logic_gen.generate_toon(
+                project,
+                detail=args.detail,
+                no_repeat_name=args.no_repeat_module,
+                no_repeat_details=args.no_repeat_details,
+            )
         else:
             logic_out = logic_gen.generate(project, detail=args.detail)
 

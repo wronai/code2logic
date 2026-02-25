@@ -120,7 +120,84 @@ code2logic /path/to/project -f toon -o analysis.toon
 
 # With full detail
 code2logic /path/to/project -f toon -d full
+
+# Reduce repeated directory prefixes in the modules table
+# (when consecutive entries are in the same folder, emits ./file)
+code2logic /path/to/project -f toon --no-repeat-module -o analysis.toon
+
+# Generate function-logic as TOON + reduce repeats in function_details
+code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-repeat-details
+
+# Enable both (modules table + function_details)
+code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-repeat-module --no-repeat-details
 ```
+
+### Reducing Path Repetition (Filesystem Tree Hint)
+
+For large repositories, repeating directory prefixes in every `modules[...]` row or every `function_details` key can waste a lot of tokens.
+
+Code2Logic supports a compact, LLM-friendly convention:
+
+- The first entry in a directory is emitted as a full relative path, e.g. `scripts/build-docs.js`
+- Subsequent consecutive entries in the same directory are emitted as `./<basename>`, e.g. `./seed_auth_users.py`
+
+This signals "same directory as the previous entry" and is typically understood well by LLMs as a filesystem listing.
+
+**Example (modules table):**
+
+Without `--no-repeat-module`:
+
+```toon
+modules[4]{path,lang,lines,kb}:
+  scripts/build-docs.js,js,9,1.2
+  scripts/seed_auth_users.py,py,4,0.4
+  scripts/stats-collector.py,py,14,0.8
+  shared/dsl-runtime.ts,ts,13,1.1
+```
+
+With `--no-repeat-module`:
+
+```toon
+modules[4]{path,lang,lines,kb}:
+  scripts/build-docs.js,js,9,1.2
+  ./seed_auth_users.py,py,4,0.4
+  ./stats-collector.py,py,14,0.8
+  shared/dsl-runtime.ts,ts,13,1.1
+```
+
+**Example (function-logic TOON, function_details):**
+
+```bash
+code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-repeat-details
+```
+
+Output fragment:
+
+```toon
+function_details:
+  firmware/main.py:
+    functions[2]{line,name,kind,sig,async,cc,does}:
+      77,index_page,function,(),true,2,Serve the firmware UI
+      85,health_check,function,(),true,1,Health check endpoint
+  ./test_main.py:
+    functions[1]{line,name,kind,sig,async,cc,does}:
+      14,TestFirmwareSimulator.test_health_check,method,(),false,1,Test basic health endpoint
+```
+
+Notes:
+
+- `--no-repeat-module` affects TOON `modules[...]` tables (main TOON output and function-logic TOON modules table).
+- `--no-repeat-details` affects the module keys under `function_details` in function-logic TOON output.
+
+### Language Codes
+
+For lower token usage, TOON uses short language codes in `lang` columns and in `languages[...]` summary, e.g.:
+
+- `py` = Python
+- `js` = JavaScript
+- `ts` = TypeScript
+
+If a language is unknown or not mapped, the full language name is emitted.
 
 ## Format Syntax
 

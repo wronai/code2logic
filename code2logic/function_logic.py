@@ -59,7 +59,13 @@ class FunctionLogicGenerator:
             return self.generate(project, detail)
         return yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
 
-    def generate_toon(self, project: ProjectInfo, detail: str = 'full', no_repeat_name: bool = False) -> str:
+    def generate_toon(
+        self,
+        project: ProjectInfo,
+        detail: str = 'full',
+        no_repeat_name: bool = False,
+        no_repeat_details: bool = False,
+    ) -> str:
         if detail == 'detailed':
             detail = 'full'
         toon = TOONGenerator()
@@ -92,14 +98,14 @@ class FunctionLogicGenerator:
             if not items:
                 continue
 
-            if no_repeat_name:
+            if no_repeat_details:
                 compressed_path, prev_dir = toon._compress_module_path(m.path, prev_dir)
                 details_key = compressed_path
             else:
                 details_key = m.path
             lines.append(f"  {toon._quote(details_key)}:")
 
-            header = f"name{dm}kind{dm}sig{dm}loc{dm}async{dm}lines{dm}cc"
+            header = f"line{dm}name{dm}kind{dm}sig{dm}async{dm}cc"
             if detail in ('standard', 'full'):
                 header += f"{dm}does"
             if detail == 'full':
@@ -109,15 +115,14 @@ class FunctionLogicGenerator:
 
             for kind, qname, func in items:
                 sig = self._build_sig(func, include_async_prefix=False, language=m.language)
-                loc = self._build_loc(func)
                 is_async = 'true' if getattr(func, 'is_async', False) else 'false'
+                start_line = str(getattr(func, 'start_line', 0) or 0)
                 row = [
+                    start_line,
                     toon._quote(qname),
                     toon._quote(kind),
                     toon._quote(sig),
-                    toon._quote(loc),
                     is_async,
-                    str(getattr(func, 'lines', 0) or 0),
                     str(getattr(func, 'complexity', 1) or 1),
                 ]
 
