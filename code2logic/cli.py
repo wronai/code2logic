@@ -652,6 +652,11 @@ code2logic [path] [options]
         help='Write all output to stdout instead of files (including schema and function-logic). Useful for piping.'
     )
     parser.add_argument(
+        '--no-repeat-name',
+        action='store_true',
+        help='Reduce repeated directory prefixes in TOON outputs by using ./file for consecutive entries in the same folder (applies to function-logic TOON and TOON module lists).'
+    )
+    parser.add_argument(
         '--no-install',
         action='store_true',
         help='Skip auto-installation of dependencies'
@@ -961,7 +966,11 @@ code2logic [path] [options]
                 'standard': 'standard',
                 'full': 'full',
             }
-            output = generator.generate(project, detail=detail_map.get(args.detail, 'standard'))
+            output = generator.generate(
+                project,
+                detail=detail_map.get(args.detail, 'standard'),
+                no_repeat_name=args.no_repeat_name,
+            )
 
         # Generate schema if requested
         if args.with_schema:
@@ -1012,7 +1021,7 @@ code2logic [path] [options]
         elif lower.endswith(('.yaml', '.yml')):
             logic_out = logic_gen.generate_yaml(project, detail=args.detail)
         elif lower.endswith('.toon'):
-            logic_out = logic_gen.generate_toon(project, detail=args.detail)
+            logic_out = logic_gen.generate_toon(project, detail=args.detail, no_repeat_name=args.no_repeat_name)
         else:
             logic_out = logic_gen.generate(project, detail=args.detail)
 

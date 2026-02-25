@@ -59,7 +59,7 @@ class FunctionLogicGenerator:
             return self.generate(project, detail)
         return yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False, width=120)
 
-    def generate_toon(self, project: ProjectInfo, detail: str = 'full') -> str:
+    def generate_toon(self, project: ProjectInfo, detail: str = 'full', no_repeat_name: bool = False) -> str:
         if detail == 'detailed':
             detail = 'full'
         toon = TOONGenerator()
@@ -73,19 +73,31 @@ class FunctionLogicGenerator:
 
         modules = list(project.modules or [])
         lines.append(f"modules[{len(modules)}]{{path{dm}lang{dm}items}}:")
+        prev_dir: str | None = None
         for m in modules:
             items = self._module_items(m)
-            lines.append(f"  {toon._quote(m.path)}{delim}{m.language}{delim}{len(items)}")
+            if no_repeat_name:
+                compressed_path, prev_dir = toon._compress_module_path(m.path, prev_dir)
+                path_out = compressed_path
+            else:
+                path_out = m.path
+            lines.append(f"  {toon._quote(path_out)}{delim}{toon._short_lang(m.language)}{delim}{len(items)}")
 
         lines.append("")
         lines.append("function_details:")
 
+        prev_dir = None
         for m in modules:
             items = self._module_items(m)
             if not items:
                 continue
 
-            lines.append(f"  {toon._quote(m.path)}:")
+            if no_repeat_name:
+                compressed_path, prev_dir = toon._compress_module_path(m.path, prev_dir)
+                details_key = compressed_path
+            else:
+                details_key = m.path
+            lines.append(f"  {toon._quote(details_key)}:")
 
             header = f"name{dm}kind{dm}sig{dm}loc{dm}async{dm}lines{dm}cc"
             if detail in ('standard', 'full'):

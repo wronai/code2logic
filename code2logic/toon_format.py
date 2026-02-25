@@ -33,6 +33,37 @@ class TOONGenerator:
     SPECIAL_CHARS = re.compile(r'[:\"\\\[\]\{\}\n\t\r,]')
     LOOKS_LIKE_LITERAL = re.compile(r'^(true|false|null|-?\d+\.?\d*([eE][+-]?\d+)?|-)$')
 
+    LANGUAGE_ABBREVIATIONS = {
+        'python': 'py',
+        'javascript': 'js',
+        'typescript': 'ts',
+        'tsx': 'tsx',
+        'jsx': 'jsx',
+        'java': 'java',
+        'kotlin': 'kt',
+        'go': 'go',
+        'rust': 'rs',
+        'c': 'c',
+        'cpp': 'cpp',
+        'c++': 'cpp',
+        'csharp': 'cs',
+        'c#': 'cs',
+        'php': 'php',
+        'ruby': 'rb',
+        'swift': 'swift',
+        'scala': 'scala',
+        'bash': 'sh',
+        'shell': 'sh',
+        'sql': 'sql',
+        'yaml': 'yaml',
+        'json': 'json',
+        'toml': 'toml',
+        'markdown': 'md',
+        'html': 'html',
+        'css': 'css',
+        'dockerfile': 'docker',
+    }
+
     def __init__(self, delimiter: str = ',', use_tabs: bool = False):
         """
         Initialize TOON generator.
@@ -46,7 +77,27 @@ class TOONGenerator:
         # parsers/LLMs can read them. Use comma-separated headers regardless of row delimiter.
         self.delim_marker = ','
 
-    def generate(self, project: ProjectInfo, detail: str = 'standard') -> str:
+    def _short_lang(self, lang: str) -> str:
+        lang_norm = (lang or '').strip().lower()
+        return self.LANGUAGE_ABBREVIATIONS.get(lang_norm, lang)
+
+    def _compress_module_path(self, path: str, prev_dir: str | None) -> tuple[str, str]:
+        """Compress repeated directory prefixes for module summary tables.
+
+        If consecutive modules are in the same directory, emit './<basename>' instead
+        of repeating '<dir>/<basename>'. The first entry for a directory stays as the
+        full path.
+        """
+        p = (path or '')
+        if '/' not in p:
+            return p, ''
+
+        cur_dir, base = p.rsplit('/', 1)
+        if prev_dir is not None and cur_dir == prev_dir:
+            return f"./{base}", cur_dir
+        return p, cur_dir
+
+    def generate(self, project: ProjectInfo, detail: str = 'standard', no_repeat_name: bool = False) -> str:
         """
         Generate TOON format from ProjectInfo.
 
@@ -71,26 +122,33 @@ class TOONGenerator:
 
         # Languages as primitive array
         if project.languages:
-            lang_items = [f"{k}:{v}" for k, v in project.languages.items()]
+            lang_items = [f"{self._short_lang(k)}:{v}" for k, v in project.languages.items()]
             lines.append(f"  languages[{len(lang_items)}]: {self.delimiter.join(lang_items)}")
 
         # Modules - tabular format for efficiency
         if project.modules:
             lines.append("")
-            lines.extend(self._generate_modules(project.modules, detail))
+            lines.extend(self._generate_modules(project.modules, detail, no_repeat_name=no_repeat_name))
 
         return '\n'.join(lines)
 
-    def _generate_modules(self, modules: List[ModuleInfo], detail: str) -> List[str]:
+    def _generate_modules(self, modules: List[ModuleInfo], detail: str, no_repeat_name: bool = False) -> List[str]:
         """Generate modules section."""
         lines = []
 
         # Module summary as tabular array
         lines.append(f"modules[{len(modules)}]{{path{self.delim_marker}lang{self.delim_marker}lines{self.delim_marker}kb}}:")
+        prev_dir: str | None = None
         for m in modules:
-            path = self._quote(m.path)
+            if no_repeat_name:
+                path_out, prev_dir = self._compress_module_path(m.path, prev_dir)
+            else:
+                path_out = m.path
+            path = self._quote(path_out)
             kb = round((getattr(m, 'file_bytes', 0) or 0) / 1024, 1)
-            lines.append(f"  {path}{self.delimiter}{m.language}{self.delimiter}{m.lines_code}{self.delimiter}{kb}")
+            lines.append(
+                f"  {path}{self.delimiter}{self._short_lang(m.language)}{self.delimiter}{m.lines_code}{self.delimiter}{kb}"
+            )
 
         # Detailed module info
         if detail in ('standard', 'full'):
