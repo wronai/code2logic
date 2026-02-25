@@ -1,3 +1,14 @@
+## [1.0.36] - 2026-02-25
+
+### Summary
+
+refactor(None): configuration management system
+
+### Other
+
+- update project.functions.toon
+
+
 ## [1.0.35] - 2026-02-24
 
 ### Summary
