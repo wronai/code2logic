@@ -1,4 +1,4 @@
-# code2logic | 156f 42647L | python:146/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
+# code2logic | 156f 42706L | python:146/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[156]:
   multilang_reproduction_tester.py,1442
@@ -148,8 +148,8 @@ M[156]:
   code2logic/schemas/yaml_schema.py,167
   code2logic/schemas/json_schema.py,206
   code2logic/schemas/markdown_schema.py,118
-  code2logic/benchmarks/common.py,228
-  code2logic/benchmarks/runner.py,840
+  code2logic/benchmarks/common.py,258
+  code2logic/benchmarks/runner.py,857
   code2logic/benchmarks/__init__.py,34
   code2logic/benchmarks/results.py,148
   code2logic/core/__init__.py,21
@@ -959,7 +959,7 @@ D:
     TaskQueue: add_task(1),get_pending(0),get_by_status(1)  # Task queue container.
     Project: total_tasks(0)  # Project model with nested models.
   tests/samples/sample_javascript.js:
-    e: Product,filterBy,User,calculateTotal,fetchData,deepClone,debounce
+    e: fetchData,User,Product,calculateTotal,deepClone,filterBy,debounce
     User: constructor(3),getDisplayName(0),deactivate(0)
     Product: constructor(3),addTags(0),isInStock(0),formatPrice(0)
     calculateTotal(items)
@@ -995,7 +995,7 @@ D:
     insert(table:str)->InsertBuilder
     update(table:str)->UpdateBuilder
   tests/samples/sample_typescript.ts:
-    e: Nullable,Order,OrderItem,filterByStatus,Product,User,calculateOrderTotal,groupBy
+    e: groupBy,filterByStatus,Nullable,User,createUser,OrderItem,Product,fetchUser
     Repository: add(1),get(1),getAll(0),delete(1),count(0)
     createUser(id: number;name: string;email: string)->User
     calculateOrderTotal(items: OrderItem[])->number
@@ -1034,8 +1034,13 @@ D:
     handle_api_error(func)
   tests/samples/sample_java.java:
     i: java.util.{ArrayList,Collections,Comparator,List,Objects}
-    e: SampleJava
+    e: SampleJava,Identifiable,Status,User
     SampleJava: 
+    Identifiable: 
+    User: 
+    getId()->String
+    filterActive(List<User> users)->List<User>
+    sortByName(List<User> users)->List<User>
   tests/samples/sample_functions.py:
     i: json,os,typing.{Any,Dict,List,Optional}
     e: calculate_total,filter_by_status,merge_configs,validate_email,load_json_file,get_env_or_default,chunk_list,format_currency
@@ -1052,6 +1057,8 @@ D:
     e: IHasId,User
     IHasId: 
     User: 
+    FilterActive(IEnumerable<User> users)->List<User>
+    FindById(IEnumerable<User> users;string id)->User
   tests/samples/sample_go.go:
     i: errors
     e: User,Product,Order,OrderItem,UserService,Repository,NewUserService,GetUser
@@ -1082,7 +1089,7 @@ D:
     Order:   # Order model.
     Product:   # Product model.
   tests/samples/sample_ts_reexport/math.ts:
-    e: multiply,add
+    e: add,multiply
     add(a: number;b: number)->number
     multiply(a: number;b: number)->number
   examples/code2logic/sample_project/calculator.py:

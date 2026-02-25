@@ -1,8 +1,8 @@
-# code2logic function-logic | 120 modules
+# code2logic function-logic | 122 modules
 # Convention: name with . = method, ~name = async, cc:N shown only when >1
 project: code2logic
-generated: "2026-02-25T16:43:29.936647"
-modules[120]{path,lang,items}:
+generated: "2026-02-25T18:12:54.870321"
+modules[122]{path,lang,items}:
   multilang_reproduction_tester.py,py,28
   universal_validator.py,py,23
   reproduction_test_code.py,py,17
@@ -110,7 +110,9 @@ modules[120]{path,lang,items}:
   ./sample_enum.py,py,5
   ./sample_algorithms.py,py,12
   ./sample_api.py,py,11
+  ./sample_java.java,java,3
   ./sample_functions.py,py,8
+  ./sample_csharp.cs,cs,2
   ./sample_go.go,go,6
   tests/samples/sample_reexport/utils.py,py,2
   tests/samples/sample_ts_reexport/math.ts,ts,2
@@ -1720,6 +1722,11 @@ function_details:
       88,"UserAPI.delete_user cc:2","(user_id:int) -> APIResponse"
       96,UserAPI.list_users,"(limit:int=10, offset:int=0) -> APIResponse"
       109,"UserAPI.search_users cc:4","(query:str) -> APIResponse"
+  tests/samples/sample_java.java:
+    functions[3]{line,name,sig}:
+      0,getId,() -> String
+      0,filterActive,(List<User> users) -> List<User>
+      0,sortByName,(List<User> users) -> List<User>
   tests/samples/sample_functions.py:
     functions[8]{line,name,sig}:
       13,calculate_total,"(items:List[int], tax_rate:float=0.1) -> float"
@@ -1730,6 +1737,10 @@ function_details:
       86,get_env_or_default,"(key:str, default:str='') -> str"
       99,"chunk_list cc:2","(items:List[Any], chunk_size:int) -> List[List[Any]]"
       112,format_currency,"(amount:int, currency:str='USD') -> str"
+  tests/samples/sample_csharp.cs:
+    functions[2]{line,name,sig}:
+      0,FilterActive,(IEnumerable<User> users) -> List<User>
+      0,FindById,"(IEnumerable<User> users, string id) -> User"
   tests/samples/sample_go.go:
     functions[6]{line,name,sig}:
       0,NewUserService,()
@@ -1783,8 +1794,8 @@ function_details:
       124,_generate_token_json_compact,"(project:ProjectInfo) -> str"
       129,"generate_spec_token cc:3","(project:ProjectInfo, fmt:str) -> str"
       143,"get_async_reproduction_prompt cc:2","(spec:str, fmt:str, file_name:str, with_tests:bool=False) -> str"
-      190,"get_token_reproduction_prompt cc:3","(spec:str, fmt:str, file_name:str, language:str='python') -> str"
-      252,get_simple_reproduction_prompt,"(spec:str, fmt:str, file_name:str) -> str"
+      190,"get_token_reproduction_prompt cc:4","(spec:str, fmt:str, file_name:str, language:str='python') -> str"
+      285,get_simple_reproduction_prompt,"(spec:str, fmt:str, file_name:str) -> str"
   code2logic/benchmarks/runner.py:
     functions[18]{line,name,sig}:
       36,"_test_python_syntax cc:2","(code:str) -> bool"
@@ -1793,18 +1804,18 @@ function_details:
       96,"_count_structural_elements cc:9","(code:str, language:str) -> dict"
       144,"_structural_score cc:4","(original:str, generated:str, language:str) -> float"
       157,"_extract_code cc:7","(response:str) -> str"
-      1000,"run_benchmark cc:6","(source:str, benchmark_type:str='format', formats:List[str]=None, limit:Optional[int]=None, output:Optional[str]=None, verbose:bool=False) -> BenchmarkResult"
+      1025,"run_benchmark cc:6","(source:str, benchmark_type:str='format', formats:List[str]=None, limit:Optional[int]=None, output:Optional[str]=None, verbose:bool=False) -> BenchmarkResult"
       184,"BenchmarkRunner.__init__ cc:2","(client:Optional[BaseLLMClient]=None, config:Optional[BenchmarkConfig]=None)"
       200,BenchmarkRunner._should_use_llm,() -> bool
       204,"BenchmarkRunner._get_client cc:3",() -> BaseLLMClient
-      212,"BenchmarkRunner._template_generate_code cc:40","(spec:str, fmt:str, file_name:str, language:str='python') -> str"
-      331,"BenchmarkRunner.run_format_benchmark cc:24","(folder:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
-      461,"BenchmarkRunner._test_format cc:16","(project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], verbose:bool=False, language:str='python') -> FormatResult"
-      536,"BenchmarkRunner.run_file_benchmark cc:16","(file_path:str, formats:List[str]=None, verbose:bool=False) -> BenchmarkResult"
-      636,"BenchmarkRunner.run_function_benchmark cc:12","(file_path:str, function_names:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
-      709,"BenchmarkRunner._test_function cc:19","(func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], verbose:bool=False) -> FunctionResult"
-      798,"BenchmarkRunner.run_project_benchmark cc:35","(project_path:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
-      935,"BenchmarkRunner._reproduce_module cc:4","(module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FileResult"
+      212,"BenchmarkRunner._template_generate_code cc:43","(spec:str, fmt:str, file_name:str, language:str='python') -> str"
+      356,"BenchmarkRunner.run_format_benchmark cc:24","(folder:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
+      486,"BenchmarkRunner._test_format cc:16","(project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], verbose:bool=False, language:str='python') -> FormatResult"
+      561,"BenchmarkRunner.run_file_benchmark cc:16","(file_path:str, formats:List[str]=None, verbose:bool=False) -> BenchmarkResult"
+      661,"BenchmarkRunner.run_function_benchmark cc:12","(file_path:str, function_names:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
+      734,"BenchmarkRunner._test_function cc:19","(func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], verbose:bool=False) -> FunctionResult"
+      823,"BenchmarkRunner.run_project_benchmark cc:35","(project_path:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
+      960,"BenchmarkRunner._reproduce_module cc:4","(module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FileResult"
   code2logic/benchmarks/results.py:
     functions[10]{line,name,sig}:
       48,FormatResult.to_dict,"() -> Dict[str, Any]"

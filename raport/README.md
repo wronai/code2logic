@@ -226,7 +226,7 @@ gherkin            36.5%         95%
 - **JSON:** [418KB](../examples/output/project.json) (największy, najwięcej "szumu")
 - **YAML:** [274KB](../examples/output/project.yaml) (średnia wielkość, czytelny dla człowieka)
 - **TOON:** [71KB](../examples/output/project.toon) (najmniejszy, najbardziej kompaktowy)
-- **Function-logic TOON:** [233KB](../examples/output/project.functions.toon) (specjalizowany, więcej szczegółów funkcji)
+- **Function-logic TOON:** [117KB](../examples/output/function.toon) (specjalizowany, więcej szczegółów funkcji)
 
 **Komendy generujące poszczególne formaty:**
 ```bash
