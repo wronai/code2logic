@@ -4,7 +4,11 @@
 
 Jeśli kiedykolwiek próbowałeś "nakarmić" model językowy (LLM) całym repozytorium kodu, by poprosić go o refaktoryzację, znalezienie błędu czy wygenerowanie dokumentacji, na pewno zderzyłeś się ze ścianą. Ścianą tą jest limit okna kontekstowego oraz zjawisko znane jako *lost in the middle* – model zapomina lub ignoruje informacje znajdujące się w środku długiego promptu. 
 
-Cześć, jestem Tom Sapletta i od dłuższego czasu pracuję nad tym, jak zoptymalizować komunikację między kodem źródłowym a sztuczną inteligencją. Tak właśnie narodził się projekt **Code2Logic**.
+W tym artykule pokazuję wyniki benchmarków jakości *rekonstrukcji* kodu na podstawie specyfikacji. To ważne rozróżnienie: **wysoki wynik benchmarku nie jest dowodem równoważności behawioralnej (runtime)** — mierzymy tu głównie zgodność struktury i semantyki tekstowej (np. klasy/funkcje/sygnatury/nazewnictwo), a pełną poprawność potwierdza dopiero uruchomienie testów.
+
+Cześć, jestem Tom Sapletta i od dłuższego czasu pracuję nad tym, 
+jak zoptymalizować komunikację między kodem źródłowym a sztuczną inteligencją. 
+Tak właśnie narodził się projekt **Code2Logic**.
 
 ## Dlaczego powstał Code2Logic?
 
@@ -66,9 +70,19 @@ Zredukowaliśmy objętość ponad 5-krotnie! Oznacza to, że do kontekstu modelu
 
 #### Przykład claude Code
 
+Wygeneruj manifest function-logic (TOON) w deterministycznej lokalizacji
 ```bash
 code2logic ./ -f toon --compact --no-repeat-module --function-logic -o ./
-claude --dangerously-skip-permissions -p "twój prompt tutaj"
+claude --dangerously-skip-permissions -p "Zrób refaktoryzacje projektu, wykorzystaj plik indeksu project.functions.toon "
+```
+
+Przykład claude Code z załączaniem do promptu
+```bash
+# Dołącz treść manifestu do promptu (najpewniejsza metoda)
+claude --dangerously-skip-permissions -p "$(
+  printf '%s\n\n' "Zrób refaktoryzację projektu. Poniżej masz manifest function-logic w formacie TOON. Użyj go jako źródła prawdy. Zwróć plan zmian + listę plików do edycji."
+  cat ./project.functions.toon
+)"
 ```
 
 ### 2. LLM lepiej rozumie skompresowaną wiedzę
