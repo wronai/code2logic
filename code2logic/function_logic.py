@@ -72,16 +72,24 @@ class FunctionLogicGenerator:
         delim = toon.delimiter
         dm = toon.delim_marker
 
+        # Pre-filter: only modules with at least one function/method
+        all_modules = list(project.modules or [])
+        modules_with_items = [(m, self._module_items(m)) for m in all_modules]
+        modules_with_items = [(m, items) for m, items in modules_with_items if items]
+
         lines: List[str] = []
+
+        # Format header — helps LLM understand the structure
+        lines.append(f"# {project.name} function-logic | {len(modules_with_items)} modules")
+        lines.append("# Convention: name with . = method, ~name = async, cc:N shown only when >1")
+
         lines.append(f"project: {toon._quote(project.name)}")
         if getattr(project, 'generated_at', None):
             lines.append(f"generated: {toon._quote(project.generated_at)}")
 
-        modules = list(project.modules or [])
-        lines.append(f"modules[{len(modules)}]{{path{dm}lang{dm}items}}:")
+        lines.append(f"modules[{len(modules_with_items)}]{{path{dm}lang{dm}items}}:")
         prev_dir: str | None = None
-        for m in modules:
-            items = self._module_items(m)
+        for m, items in modules_with_items:
             if no_repeat_name:
                 compressed_path, prev_dir = toon._compress_module_path(m.path, prev_dir)
                 path_out = compressed_path
@@ -93,11 +101,7 @@ class FunctionLogicGenerator:
         lines.append("function_details:")
 
         prev_dir = None
-        for m in modules:
-            items = self._module_items(m)
-            if not items:
-                continue
-
+        for m, items in modules_with_items:
             if no_repeat_details:
                 compressed_path, prev_dir = toon._compress_module_path(m.path, prev_dir)
                 details_key = compressed_path
@@ -105,7 +109,7 @@ class FunctionLogicGenerator:
                 details_key = m.path
             lines.append(f"  {toon._quote(details_key)}:")
 
-            header = f"line{dm}name{dm}kind{dm}sig{dm}async{dm}cc"
+            header = f"line{dm}name{dm}sig"
             if detail in ('standard', 'full'):
                 header += f"{dm}does"
             if detail == 'full':
@@ -115,15 +119,20 @@ class FunctionLogicGenerator:
 
             for kind, qname, func in items:
                 sig = self._build_sig(func, include_async_prefix=False, language=m.language)
-                is_async = 'true' if getattr(func, 'is_async', False) else 'false'
                 start_line = str(getattr(func, 'start_line', 0) or 0)
+
+                # Encode async as ~ prefix, cc as suffix (only when >1)
+                display_name = qname
+                if getattr(func, 'is_async', False):
+                    display_name = f"~{qname}"
+                cc = getattr(func, 'complexity', 1) or 1
+                if cc > 1:
+                    display_name = f"{display_name} cc:{cc}"
+
                 row = [
                     start_line,
-                    toon._quote(qname),
-                    toon._quote(kind),
+                    toon._quote(display_name),
                     toon._quote(sig),
-                    is_async,
-                    str(getattr(func, 'complexity', 1) or 1),
                 ]
 
                 if detail in ('standard', 'full'):
@@ -141,6 +150,73 @@ class FunctionLogicGenerator:
                 lines.append(f"      {delim.join(row)}")
 
         return "\n".join(lines).rstrip() + "\n"
+
+    def generate_toon_schema(self) -> str:
+        """Generate JSON Schema describing the function-logic TOON format."""
+        import json
+
+        schema = {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "title": "Code2Logic Function-Logic TOON Schema",
+            "description": (
+                "Schema for project.functions.toon — compact function/method index. "
+                "Conventions: name containing '.' = method (Class.method), "
+                "~prefix = async, 'cc:N' suffix = cyclomatic complexity (only when >1)."
+            ),
+            "type": "object",
+            "properties": {
+                "project": {"type": "string", "description": "Project name"},
+                "generated": {"type": "string", "description": "ISO timestamp"},
+                "modules": {
+                    "type": "array",
+                    "description": "Modules with at least one function/method. Rows: path,lang,items. Use ./file for same-dir compression (--no-repeat-module).",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "path": {"type": "string", "description": "Relative path or ./basename if same dir as previous"},
+                            "lang": {"type": "string", "description": "Short language code (py, js, ts, ...)"},
+                            "items": {"type": "integer", "description": "Number of functions+methods in module"}
+                        }
+                    }
+                },
+                "function_details": {
+                    "type": "object",
+                    "description": "Per-module function tables. Keys are module paths (or ./basename with --no-repeat-details).",
+                    "patternProperties": {
+                        ".*": {
+                            "type": "object",
+                            "properties": {
+                                "functions": {
+                                    "type": "array",
+                                    "description": "Tabular rows: line,name,sig[,does][,decorators,calls,raises]",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "line": {"type": "integer", "description": "Start line number"},
+                                            "name": {
+                                                "type": "string",
+                                                "description": (
+                                                    "Function or method name. "
+                                                    "Contains '.' if method (e.g. Class.method). "
+                                                    "Prefixed with ~ if async. "
+                                                    "Suffixed with ' cc:N' if cyclomatic complexity > 1."
+                                                )
+                                            },
+                                            "sig": {"type": "string", "description": "Signature: (params) [-> return_type]"},
+                                            "does": {"type": "string", "description": "Intent/purpose (standard+full detail)"},
+                                            "decorators": {"type": "string", "description": "Pipe-separated decorators (full detail)"},
+                                            "calls": {"type": "string", "description": "Pipe-separated function calls (full detail)"},
+                                            "raises": {"type": "string", "description": "Pipe-separated exceptions (full detail)"}
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return json.dumps(schema, indent=2, ensure_ascii=False)
 
     def _build_data(self, project: ProjectInfo, detail: str) -> dict:
         modules_data = []

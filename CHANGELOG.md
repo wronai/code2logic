@@ -1,3 +1,16 @@
+## [1.0.37] - 2026-02-25
+
+### Summary
+
+refactor(goal): CLI interface improvements
+
+### Other
+
+- update code2logic/cli.py
+- update code2logic/function_logic.py
+- update project.functions.toon
+
+
 ## [1.0.36] - 2026-02-25
 
 ### Summary

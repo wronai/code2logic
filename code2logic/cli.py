@@ -1042,10 +1042,18 @@ code2logic [path] [options]
         else:
             logic_out = logic_gen.generate(project, detail=args.detail)
 
+        # Generate function-logic schema if requested and format is TOON
+        func_schema = None
+        if args.with_schema and lower.endswith('.toon'):
+            func_schema = logic_gen.generate_toon_schema()
+
         if use_stdout:
             # Write to stdout with section marker
             print(f"\n=== FUNCTION_LOGIC ===")
             print(logic_out)
+            if func_schema:
+                print(f"\n=== FUNCTION_LOGIC_SCHEMA ===")
+                print(func_schema)
         elif output_dir:
             # Write to file in output directory
             os.makedirs(output_dir, exist_ok=True)
@@ -1053,6 +1061,12 @@ code2logic [path] [options]
                 f.write(logic_out)
             if args.verbose:
                 log.success(f"Function logic written to: {logic_path}")
+            if func_schema:
+                schema_path = logic_path.replace('.toon', '-schema.json')
+                with open(schema_path, 'w', encoding='utf-8') as f:
+                    f.write(func_schema)
+                if args.verbose:
+                    log.success(f"Function logic schema written to: {schema_path}")
 
     gen_time = time.time() - gen_start
 
