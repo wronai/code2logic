@@ -15,12 +15,14 @@ Usage:
     result.save('output/benchmark.json')
 """
 
-import sys
-import time
 import difflib
 import re
+import sys
+import time
 from pathlib import Path
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from ..analyzer import analyze_project
 from ..llm_clients import BaseLLMClient, get_client
@@ -193,7 +195,7 @@ class BenchmarkRunner:
         """
         self.client = client
         self.config = config or BenchmarkConfig()
-        self._metrics = ReproductionMetrics()
+        # Note: avoid sharing ReproductionMetrics instance across threads.
 
     def _should_use_llm(self) -> bool:
         """Return whether this runner should call an LLM."""
@@ -395,11 +397,41 @@ class {cls}:
                 original_size=len(original),
             )
 
-            for fmt in formats:
-                fmt_result = self._test_format(
-                    single_project, original, fmt, abs_file.name, client, verbose, language=module_info.language
-                )
-                file_result.format_results[fmt] = fmt_result
+            max_workers = int(getattr(self.config, "workers", 1) or 1)
+            if max_workers < 1:
+                max_workers = 1
+
+            # Parallelize per-format reproduction (LLM calls) for the same file.
+            if len(formats) > 1 and max_workers > 1:
+                with ThreadPoolExecutor(max_workers=max_workers) as ex:
+                    futs = {
+                        ex.submit(
+                            self._test_format,
+                            single_project,
+                            original,
+                            fmt,
+                            abs_file.name,
+                            client,
+                            verbose,
+                            module_info.language,
+                        ): fmt
+                        for fmt in formats
+                    }
+                    for fut in as_completed(futs):
+                        fmt = futs[fut]
+                        file_result.format_results[fmt] = fut.result()
+            else:
+                for fmt in formats:
+                    fmt_result = self._test_format(
+                        single_project,
+                        original,
+                        fmt,
+                        abs_file.name,
+                        client,
+                        verbose,
+                        language=module_info.language,
+                    )
+                    file_result.format_results[fmt] = fmt_result
 
             # Set best result as file score
             if file_result.format_results:
@@ -472,7 +504,8 @@ class {cls}:
             # Calculate metrics
             if original and generated:
                 if language_norm == 'python':
-                    analysis = self._metrics.analyze(original, generated, spec, format_name=fmt)
+                    metrics = ReproductionMetrics()
+                    analysis = metrics.analyze(original, generated, spec, format_name=fmt)
                     result.score = analysis.overall_score
                     result.similarity = analysis.text.char_similarity
                 else:
@@ -816,33 +849,71 @@ Requirements:
             if verbose:
                 print(f"\n--- Format: {fmt.upper()} ---")
 
-            for i, module in enumerate(modules):
-                file_result = self._reproduce_module(
-                    module, fmt, project_path, client, verbose
-                )
+            max_workers = int(getattr(self.config, "workers", 1) or 1)
+            if max_workers < 1:
+                max_workers = 1
 
-                # Add format to result
-                if file_result.format_results:
-                    fmt_result = list(file_result.format_results.values())[0]
-                else:
-                    fmt_result = FormatResult(format_name=fmt, score=file_result.score)
-                    file_result.format_results[fmt] = fmt_result
+            # Parallelize per-module reproduction for a given format.
+            if len(modules) > 1 and max_workers > 1:
+                with ThreadPoolExecutor(max_workers=max_workers) as ex:
+                    futs = {
+                        ex.submit(self._reproduce_module, module, fmt, project_path, client, verbose): (i, module)
+                        for i, module in enumerate(modules)
+                    }
+                    for fut in as_completed(futs):
+                        i, _module = futs[fut]
+                        file_result = fut.result()
 
-                # Find existing file result or create new
-                existing = None
-                for fr in result.file_results:
-                    if fr.file_path == file_result.file_path:
-                        existing = fr
-                        break
+                        # Add format to result
+                        if file_result.format_results:
+                            fmt_result = list(file_result.format_results.values())[0]
+                        else:
+                            fmt_result = FormatResult(format_name=fmt, score=file_result.score)
+                            file_result.format_results[fmt] = fmt_result
 
-                if existing:
-                    existing.format_results[fmt] = fmt_result
-                else:
-                    result.file_results.append(file_result)
+                        # Find existing file result or create new
+                        existing = None
+                        for fr in result.file_results:
+                            if fr.file_path == file_result.file_path:
+                                existing = fr
+                                break
 
-                if verbose:
-                    status = "✓" if file_result.score > 50 else "○"
-                    print(f"  [{i+1}/{len(modules)}] {Path(file_result.file_path).name}: {file_result.score:.1f}% {status}")
+                        if existing:
+                            existing.format_results[fmt] = fmt_result
+                        else:
+                            result.file_results.append(file_result)
+
+                        if verbose:
+                            status = "✓" if file_result.score > 50 else "○"
+                            print(f"  [{i+1}/{len(modules)}] {Path(file_result.file_path).name}: {file_result.score:.1f}% {status}")
+            else:
+                for i, module in enumerate(modules):
+                    file_result = self._reproduce_module(
+                        module, fmt, project_path, client, verbose
+                    )
+
+                    # Add format to result
+                    if file_result.format_results:
+                        fmt_result = list(file_result.format_results.values())[0]
+                    else:
+                        fmt_result = FormatResult(format_name=fmt, score=file_result.score)
+                        file_result.format_results[fmt] = fmt_result
+
+                    # Find existing file result or create new
+                    existing = None
+                    for fr in result.file_results:
+                        if fr.file_path == file_result.file_path:
+                            existing = fr
+                            break
+
+                    if existing:
+                        existing.format_results[fmt] = fmt_result
+                    else:
+                        result.file_results.append(file_result)
+
+                    if verbose:
+                        status = "✓" if file_result.score > 50 else "○"
+                        print(f"  [{i+1}/{len(modules)}] {Path(file_result.file_path).name}: {file_result.score:.1f}% {status}")
 
         result.total_time = time.time() - start_time
 

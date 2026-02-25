@@ -103,6 +103,8 @@ def main():
     parser.add_argument('--output', '-o', default='examples/output/unified_benchmark.json')
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--no-llm', action='store_true', help='Run without LLM (template fallback)')
+    parser.add_argument('--workers', type=int, default=3, help='Max parallel workers for LLM calls (default: 3)')
+    parser.add_argument('--max-tokens', type=int, default=4000, help='LLM max_tokens for code generation (default: 4000)')
     args = parser.parse_args()
     
     # Configure
@@ -111,6 +113,8 @@ def main():
         max_files=args.limit,
         verbose=args.verbose,
         use_llm=not args.no_llm,
+        workers=args.workers,
+        max_tokens=args.max_tokens,
     )
     
     runner = BenchmarkRunner(config=config)

@@ -20,8 +20,8 @@ feat(examples): CLI interface improvements
 - update examples/benchmark_report.py
 - update examples/benchmark_summary.py
 - update function.toon
-- update project.functions-schema.json
-- update project.functions.toon
+- update function-schema.json
+- update function.toon
 - ... and 1 more
 
 
@@ -62,7 +62,7 @@ refactor(goal): CLI interface improvements
 
 - update code2logic/cli.py
 - update code2logic/function_logic.py
-- update project.functions.toon
+- update function.toon
 
 
 ## [1.0.36] - 2026-02-25
@@ -73,7 +73,7 @@ refactor(None): configuration management system
 
 ### Other
 
-- update project.functions.toon
+- update function.toon
 
 
 ## [1.0.35] - 2026-02-24

@@ -1,6 +1,25 @@
 .PHONY: help install install-dev install-full clean build test lint format typecheck publish publish-test docs docker
 .PHONY: benchmark benchmark-format benchmark-function benchmark-project benchmark-token benchmark-compare benchmark-toon examples
 
+# Optional: load local environment overrides (API keys, BENCH_USE_LLM, etc.)
+# Safe even if .env is missing.
+-include .env
+
+# Export selected variables so they are visible to subprocesses (python/poetry).
+export BENCH_USE_LLM
+export CODE2LOGIC_DEFAULT_PROVIDER
+export CODE2LOGIC_DEFAULT_MODEL
+export OPENROUTER_API_KEY
+export OPENROUTER_MODEL
+export OPENAI_API_KEY
+export OPENAI_MODEL
+export ANTHROPIC_API_KEY
+export ANTHROPIC_MODEL
+export GROQ_API_KEY
+export GROQ_MODEL
+export TOGETHER_API_KEY
+export TOGETHER_MODEL
+
 POETRY := $(shell command -v poetry 2>/dev/null)
 ifeq ($(POETRY),)
 RUN :=
@@ -380,12 +399,12 @@ benchmark-toon: ## Generate TOON + function-logic for self-analysis
 	@rm -f $(BENCH_OUTPUT)/function.toon $(BENCH_OUTPUT)/function-schema.json 2>/dev/null || true
 	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f toon --compact --name project -o ./" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
 	$(PYTHON) -m code2logic ./ -f toon --compact --name project -o ./
-	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f toon --compact --no-repeat-module --function-logic --with-schema --name project -o ./" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) -m code2logic ./ -f toon --compact --no-repeat-module --function-logic --with-schema --name project -o ./
+	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f toon --compact --no-repeat-module --function-logic function.toon --with-schema --name project -o ./" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
+	$(PYTHON) -m code2logic ./ -f toon --compact --no-repeat-module --function-logic function.toon --with-schema --name project -o ./
 	@cp -f project.toon $(BENCH_OUTPUT)/project.toon 2>/dev/null || true
 	@cp -f project.toon-schema.json $(BENCH_OUTPUT)/project.toon-schema.json 2>/dev/null || true
-	@cp -f project.functions.toon $(BENCH_OUTPUT)/project.functions.toon 2>/dev/null || true
-	@cp -f project.functions-schema.json $(BENCH_OUTPUT)/project.functions-schema.json 2>/dev/null || true
+	@cp -f function.toon $(BENCH_OUTPUT)/function.toon 2>/dev/null || true
+	@cp -f function-schema.json $(BENCH_OUTPUT)/function-schema.json 2>/dev/null || true
 	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f yaml --compact --name project -o $(BENCH_OUTPUT)/" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
 	$(PYTHON) -m code2logic ./ -f yaml --compact --name project -o $(BENCH_OUTPUT)/
 	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f json --name project -o $(BENCH_OUTPUT)/" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
@@ -400,7 +419,7 @@ benchmark-toon: ## Generate TOON + function-logic for self-analysis
 	@echo "$(BLUE)Format size comparison (self-analysis):$(NC)"
 	@printf "  %-25s %10s %10s\n" "Format" "Size" "~Tokens"
 	@printf "  %-25s %10s %10s\n" "-------------------------" "----------" "----------"
-	@for f in $(BENCH_OUTPUT)/project.toon $(BENCH_OUTPUT)/project.functions.toon $(BENCH_OUTPUT)/project.yaml $(BENCH_OUTPUT)/project.json $(BENCH_OUTPUT)/project.md $(BENCH_OUTPUT)/project.txt $(BENCH_OUTPUT)/project.csv; do \
+	@for f in $(BENCH_OUTPUT)/project.toon $(BENCH_OUTPUT)/function.toon $(BENCH_OUTPUT)/project.yaml $(BENCH_OUTPUT)/project.json $(BENCH_OUTPUT)/project.md $(BENCH_OUTPUT)/project.txt $(BENCH_OUTPUT)/project.csv; do \
 		if [ -f "$$f" ]; then \
 			sz=$$(wc -c < "$$f"); \
 			tok=$$((sz / 4)); \
@@ -409,7 +428,7 @@ benchmark-toon: ## Generate TOON + function-logic for self-analysis
 	done
 	@echo ""
 	@echo "$(GREEN)TOON files:$(NC)"
-	@ls -lh $(BENCH_OUTPUT)/project.toon $(BENCH_OUTPUT)/project.functions.toon $(BENCH_OUTPUT)/project.toon-schema.json $(BENCH_OUTPUT)/project.functions-schema.json 2>/dev/null
+	@ls -lh $(BENCH_OUTPUT)/project.toon $(BENCH_OUTPUT)/function.toon $(BENCH_OUTPUT)/project.toon-schema.json $(BENCH_OUTPUT)/function-schema.json 2>/dev/null
 
 benchmark-compare: ## Show summary comparison of all benchmark results
 	@echo ""

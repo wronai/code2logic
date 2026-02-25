@@ -1,7 +1,7 @@
 # code2logic function-logic | 250 modules
 # Convention: name with . = method, ~name = async, cc:N shown only when >1
 project: code2logic
-generated: "2026-02-25T10:39:29.752381"
+generated: "2026-02-25T11:01:59.064741"
 modules[250]{path,lang,items}:
   multilang_reproduction_tester.py,py,28
   universal_validator.py,py,23
@@ -54,7 +54,7 @@ modules[250]{path,lang,items}:
   ./10_function_reproduction.py,py,2
   ./08_format_benchmark.py,py,3
   ./benchmark_report.py,py,8
-  ./benchmark_summary.py,py,1
+  ./benchmark_summary.py,py,4
   ./14_repeatability_test.py,py,10
   ./13_project_benchmark.py,py,2
   ./04_project.py,py,1
@@ -1058,10 +1058,13 @@ function_details:
       51,"_calc_function_summary cc:8","(d:Dict[str,Any]) -> Tuple[int, float, float]"
       62,"_calc_file_summary cc:5","(d:Dict[str,Any]) -> Tuple[int, float, float, float]"
       73,"_read_commands cc:5","(commands_path:Path) -> List[str]"
-      80,"main cc:15",() -> None
+      80,"main cc:18",() -> None
   examples/benchmark_summary.py:
-    functions[1]{line,name,sig}:
-      8,"main cc:15",()
+    functions[4]{line,name,sig}:
+      8,"_fmt_bytes cc:3","(n:int) -> str"
+      16,_token_estimate_bytes,"(n:int) -> int"
+      20,"_artifact_row cc:2","(label:str, path:str) -> str"
+      28,"main cc:20",()
   examples/14_repeatability_test.py:
     functions[10]{line,name,sig}:
       38,"_template_generate cc:10","(spec:str, fmt:str, file_name:str) -> str"
@@ -3930,13 +3933,13 @@ function_details:
   code2logic/benchmarks/common.py:
     functions[8]{line,name,sig}:
       15,"create_single_project cc:2","(module_info, file_path:Path) -> ProjectInfo"
-      31,"generate_spec cc:7","(project:ProjectInfo, fmt:str) -> str"
-      55,"_generate_token_json cc:12","(project:ProjectInfo) -> str"
-      111,_generate_token_json_compact,"(project:ProjectInfo) -> str"
-      116,"generate_spec_token cc:3","(project:ProjectInfo, fmt:str) -> str"
-      130,"get_async_reproduction_prompt cc:2","(spec:str, fmt:str, file_name:str, with_tests:bool=False) -> str"
-      177,"get_token_reproduction_prompt cc:3","(spec:str, fmt:str, file_name:str, language:str='python') -> str"
-      239,get_simple_reproduction_prompt,"(spec:str, fmt:str, file_name:str) -> str"
+      31,"generate_spec cc:8","(project:ProjectInfo, fmt:str) -> str"
+      58,"_generate_token_json cc:12","(project:ProjectInfo) -> str"
+      114,_generate_token_json_compact,"(project:ProjectInfo) -> str"
+      119,"generate_spec_token cc:3","(project:ProjectInfo, fmt:str) -> str"
+      133,"get_async_reproduction_prompt cc:2","(spec:str, fmt:str, file_name:str, with_tests:bool=False) -> str"
+      180,"get_token_reproduction_prompt cc:3","(spec:str, fmt:str, file_name:str, language:str='python') -> str"
+      242,get_simple_reproduction_prompt,"(spec:str, fmt:str, file_name:str) -> str"
   code2logic/benchmarks/runner.py:
     functions[18]{line,name,sig}:
       34,"_test_python_syntax cc:2","(code:str) -> bool"

@@ -88,9 +88,7 @@ def main():
     candidates = [
         ("TOON (project)", os.path.join(out, "project.toon")),
         ("TOON schema (project)", os.path.join(out, "project.toon-schema.json")),
-        ("TOON function-logic", os.path.join(out, "project.functions.toon")),
         ("TOON function-logic", os.path.join(out, "function.toon")),
-        ("Function-logic schema", os.path.join(out, "project.functions-schema.json")),
         ("Function-logic schema", os.path.join(out, "function-schema.json")),
         ("YAML (project)", os.path.join(out, "project.yaml")),
         ("JSON (project)", os.path.join(out, "project.json")),

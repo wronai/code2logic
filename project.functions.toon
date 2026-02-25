@@ -1,7 +1,7 @@
 # code2logic function-logic | 250 modules
 # Convention: name with . = method, ~name = async, cc:N shown only when >1
 project: code2logic
-generated: "2026-02-25T10:58:03.590564"
+generated: "2026-02-25T11:54:10.415591"
 modules[250]{path,lang,items}:
   multilang_reproduction_tester.py,py,28
   universal_validator.py,py,23
@@ -735,13 +735,13 @@ function_details:
       52,"FunctionLogicGenerator.generate_yaml cc:3","(project:ProjectInfo, detail:str='full') -> str"
       62,"FunctionLogicGenerator.generate_toon cc:28","(project:ProjectInfo, detail:str='full', no_repeat_name:bool=False, no_repeat_details:bool=False, include_does:bool=False) -> str"
       155,FunctionLogicGenerator.generate_toon_schema,() -> str
-      222,"FunctionLogicGenerator._build_data cc:5","(project:ProjectInfo, detail:str) -> dict"
-      241,"FunctionLogicGenerator._module_items cc:7","(module) -> List[Tuple[str, str, FunctionInfo]]"
-      253,"FunctionLogicGenerator._build_sig cc:9","(func:FunctionInfo, include_async_prefix:bool=True, language:str='') -> str"
-      270,"FunctionLogicGenerator._build_loc cc:5","(func:FunctionInfo) -> str"
-      277,"FunctionLogicGenerator._build_does cc:5","(func:FunctionInfo) -> str"
-      283,"FunctionLogicGenerator._item_to_dict cc:17","(kind:str, qualified_name:str, func:FunctionInfo, detail:str, module_language:str='') -> dict"
-      322,"FunctionLogicGenerator._format_function cc:15","(kind:str, qualified_name:str, func:FunctionInfo, detail:str, indent:int, module_language:str='') -> List[str]"
+      221,"FunctionLogicGenerator._build_data cc:5","(project:ProjectInfo, detail:str) -> dict"
+      240,"FunctionLogicGenerator._module_items cc:7","(module) -> List[Tuple[str, str, FunctionInfo]]"
+      252,"FunctionLogicGenerator._build_sig cc:9","(func:FunctionInfo, include_async_prefix:bool=True, language:str='') -> str"
+      269,"FunctionLogicGenerator._build_loc cc:5","(func:FunctionInfo) -> str"
+      276,"FunctionLogicGenerator._build_does cc:5","(func:FunctionInfo) -> str"
+      282,"FunctionLogicGenerator._item_to_dict cc:17","(kind:str, qualified_name:str, func:FunctionInfo, detail:str, module_language:str='') -> dict"
+      321,"FunctionLogicGenerator._format_function cc:15","(kind:str, qualified_name:str, func:FunctionInfo, detail:str, indent:int, module_language:str='') -> List[str]"
   code2logic/utils.py:
     functions[3]{line,name,sig}:
       7,estimate_tokens,"(text:str) -> int"
@@ -3942,24 +3942,24 @@ function_details:
       242,get_simple_reproduction_prompt,"(spec:str, fmt:str, file_name:str) -> str"
   code2logic/benchmarks/runner.py:
     functions[18]{line,name,sig}:
-      34,"_test_python_syntax cc:2","(code:str) -> bool"
-      43,"_test_python_runs cc:3","(code:str, timeout:int=5) -> bool"
-      63,"_basic_syntax_ok cc:22","(code:str, language:str) -> bool"
-      94,"_count_structural_elements cc:9","(code:str, language:str) -> dict"
-      142,"_structural_score cc:4","(original:str, generated:str, language:str) -> float"
-      155,"_extract_code cc:7","(response:str) -> str"
-      929,"run_benchmark cc:6","(source:str, benchmark_type:str='format', formats:List[str]=None, limit:Optional[int]=None, output:Optional[str]=None, verbose:bool=False) -> BenchmarkResult"
-      182,"BenchmarkRunner.__init__ cc:2","(client:Optional[BaseLLMClient]=None, config:Optional[BenchmarkConfig]=None)"
-      198,BenchmarkRunner._should_use_llm,() -> bool
-      202,"BenchmarkRunner._get_client cc:3",() -> BaseLLMClient
-      210,"BenchmarkRunner._template_generate_code cc:40","(spec:str, fmt:str, file_name:str, language:str='python') -> str"
-      329,"BenchmarkRunner.run_format_benchmark cc:18","(folder:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
-      429,"BenchmarkRunner._test_format cc:16","(project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], verbose:bool=False, language:str='python') -> FormatResult"
-      503,"BenchmarkRunner.run_file_benchmark cc:16","(file_path:str, formats:List[str]=None, verbose:bool=False) -> BenchmarkResult"
-      603,"BenchmarkRunner.run_function_benchmark cc:12","(file_path:str, function_names:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
-      676,"BenchmarkRunner._test_function cc:19","(func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], verbose:bool=False) -> FunctionResult"
-      765,"BenchmarkRunner.run_project_benchmark cc:23","(project_path:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
-      864,"BenchmarkRunner._reproduce_module cc:4","(module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FileResult"
+      35,"_test_python_syntax cc:2","(code:str) -> bool"
+      44,"_test_python_runs cc:3","(code:str, timeout:int=5) -> bool"
+      64,"_basic_syntax_ok cc:22","(code:str, language:str) -> bool"
+      95,"_count_structural_elements cc:9","(code:str, language:str) -> dict"
+      143,"_structural_score cc:4","(original:str, generated:str, language:str) -> float"
+      156,"_extract_code cc:7","(response:str) -> str"
+      999,"run_benchmark cc:6","(source:str, benchmark_type:str='format', formats:List[str]=None, limit:Optional[int]=None, output:Optional[str]=None, verbose:bool=False) -> BenchmarkResult"
+      183,"BenchmarkRunner.__init__ cc:2","(client:Optional[BaseLLMClient]=None, config:Optional[BenchmarkConfig]=None)"
+      199,BenchmarkRunner._should_use_llm,() -> bool
+      203,"BenchmarkRunner._get_client cc:3",() -> BaseLLMClient
+      211,"BenchmarkRunner._template_generate_code cc:40","(spec:str, fmt:str, file_name:str, language:str='python') -> str"
+      330,"BenchmarkRunner.run_format_benchmark cc:24","(folder:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
+      460,"BenchmarkRunner._test_format cc:16","(project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], verbose:bool=False, language:str='python') -> FormatResult"
+      535,"BenchmarkRunner.run_file_benchmark cc:16","(file_path:str, formats:List[str]=None, verbose:bool=False) -> BenchmarkResult"
+      635,"BenchmarkRunner.run_function_benchmark cc:12","(file_path:str, function_names:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
+      708,"BenchmarkRunner._test_function cc:19","(func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], verbose:bool=False) -> FunctionResult"
+      797,"BenchmarkRunner.run_project_benchmark cc:35","(project_path:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
+      934,"BenchmarkRunner._reproduce_module cc:4","(module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FileResult"
   code2logic/benchmarks/results.py:
     functions[10]{line,name,sig}:
       48,FormatResult.to_dict,"() -> Dict[str, Any]"
