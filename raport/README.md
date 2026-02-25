@@ -145,8 +145,105 @@ Wyniki z naszego *Project Benchmark* (Zdolność LLM do odtworzenia poprawnego s
 
 ![img.png](img.png)
 
-
 Format **TOON uzyskał imponujące 82.7%**, zostawiając JSON (73.5%) daleko w tyle. Jeszcze ciekawszy jest **LogicML**, który zużywa średnio zaledwie 245 tokenów na plik (10-krotnie mniej niż JSON!), a nadal utrzymuje wynik powyżej 76%.
+
+#### Jak działa Project Benchmark
+
+**Project Benchmark** to test, który ocenia jak dobrze różne formaty (YAML, TOON, LogicML) potrafią **reprodukować kod z całego projektu**. Test działa w czterech krokach:
+
+1. **Analiza projektu** - Bierze 20 plików z `tests/samples/`
+2. **Ekstrakcja specyfikacji** - Dla każdego formatu tworzy specyfikację (np. YAML, TOON, LogicML)
+3. **Reprodukcja kodu** - Używa LLM do odtworzenia kodu na podstawie specyfikacji
+4. **Porównanie** - Mierzy podobieństwo oryginalnego kodu do odtworzonego
+
+**Wyniki oznaczają:**
+- **toon: 62.56%** - Format TOON najlepiej odtworzył kod projektu z 20 plików testowych
+- **yaml: 59.87%** - Format YAML był drugi w jakości reprodukcji  
+- **logicml: 59.17%** - Format LogicML miał najniższą skuteczność
+
+**Score** to wskaźnik jakości (składnia, struktura, semantyka), **similarity** to podobieństwo tekstowe. TOON wygrał, bo lepiej zachowuje strukturę i informacje o typach w kompaktowej formie.
+
+#### Jak uruchamiane są benchmarki i używany model LLM
+
+Wszystkie benchmarki są uruchamiane automatycznie przez komendę `make benchmark`, która wykonuje serię testów:
+
+```bash
+# Format Benchmark (porównanie jakości reprodukcji kodu)
+poetry run python examples/15_unified_benchmark.py \
+         --type format \
+         --folder tests/samples/ \
+         --formats yaml toon logicml json markdown csv gherkin function.toon \
+         --limit 20 --verbose \
+         --output examples/output/benchmark_format.json
+
+# Function Benchmark (reprodukcja pojedynczych funkcji)
+poetry run python examples/15_unified_benchmark.py \
+         --type function \
+         --file tests/samples/sample_functions.py \
+         --limit 10 --verbose \
+         --output examples/output/benchmark_function.json
+
+# Token Efficiency Benchmark (efektywność zużycia tokenów)
+poetry run python examples/11_token_benchmark.py \
+         --folder tests/samples/ \
+         --formats yaml toon logicml json markdown csv gherkin function.toon \
+         --limit 20 --verbose \
+         --output examples/output/benchmark_token.json
+```
+
+**Używany model LLM:**
+- **Provider:** OpenRouter
+- **Model:** `arcee-ai/trinity-large-preview:free`
+- **Czas wykonania:** ~2237.3 sekund (37 minut) dla Format Benchmark z 20 plikami
+
+**Przykładowe wyniki Format Benchmark:**
+```
+============================================================
+FORMAT COMPARISON RESULTS
+============================================================
+Provider: openrouter
+Model: arcee-ai/trinity-large-preview:free
+Files: 20
+Time: 2237.3s
+
+Format          Avg Score    Syntax OK
+----------------------------------------
+yaml               62.4%        100%
+json               62.4%        100%
+toon               62.2%        100%
+logicml            60.0%        100%
+csv                54.8%        100%
+markdown           51.2%         90%
+function.toon       45.8%         95%
+gherkin            36.5%         95%
+```
+
+**Różnica między `toon` a `function.toon`:**
+- **`toon` (62.2%)** - Format project-level TOON zawierający klasy, moduły, funkcje i pełną strukturę projektu. Wyższy wynik, bo zawiera więcej kontekstu strukturalnego. **Rozmiar pliku: 71KB**
+- **`function.toon` (45.8%)** - Specjalizowany format function-logic TOON skupiony tylko na logice funkcji, bez kontekstu klas i modułów. Niższy wynik, bo mniejszy kontekst utrudnia LLM odtworzenie pełnej struktury. **Rozmiar pliku: 233KB**
+
+**Rzeczywiste wielkości plików dla całego projektu:**
+- **JSON:** [418KB](../examples/output/project.json) (największy, najwięcej "szumu")
+- **YAML:** [274KB](../examples/output/project.yaml) (średnia wielkość, czytelny dla człowieka)
+- **TOON:** [71KB](../examples/output/project.toon) (najmniejszy, najbardziej kompaktowy)
+- **Function-logic TOON:** [233KB](../examples/output/project.functions.toon) (specjalizowany, więcej szczegółów funkcji)
+
+**Komendy generujące poszczególne formaty:**
+```bash
+# JSON (pełna struktura z nawiasami i kluczami)
+code2logic ./ -f json --name project -o ./
+
+# YAML (czytelna dla człowieka struktura)
+code2logic ./ -f yaml --compact --name project -o ./
+
+# TOON (kompaktowy format project-level)
+code2logic ./ -f toon --compact --name project -o ./
+
+# Function-logic TOON (specjalizowany format logiki funkcji)
+code2logic ./ -f toon --compact --no-repeat-module --function-logic function.toon --with-schema --name project -o ./
+```
+
+**Konfiguracja:** Benchmarki używają domyślnej konfiguracji z 3 workerami równoległymi i limitem 4000 tokenów na generację kodu. Wyniki są zapisywane do plików JSON w `examples/output/` i agregowane w raporcie `BENCHMARK_REPORT.md`.
 
 ## Wnioski i wyzwania na przyszłość
 

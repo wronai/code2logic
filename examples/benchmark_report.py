@@ -168,7 +168,8 @@ def main() -> None:
         rel = a.path.relative_to(out_dir) if out_dir in a.path.parents else a.path
         size = _sizeof(a.path)
         tok_est = _token_estimate_bytes(size)
-        file_cell = f"`{rel}`" if isinstance(rel, Path) else f"`{rel}`"
+        # Create clickable markdown link
+        file_cell = f"[`{rel}`]({rel})" if isinstance(rel, Path) else f"[`{rel}`]({rel})"
         if a.path.exists():
             lines.append(f"| {a.label} | {file_cell} | {_fmt_bytes(size)} | {tok_est:,} | {a.description} |")
         else:
