@@ -1,2 +1,0 @@
-path,type,name,signature,language,intent,category,domain,imports,calls,depends_on,lines,complexity,is_public,is_async,hash
-src/auth.py,function,login,"login(username, password)",python,Authenticate users,security,backend,hashlib;jwt,db.get_user,UserTable,15,3,True,True,d6959faa0f6611bb99e572f9db597ce2697efdb5cddcd601481e059c803d950f

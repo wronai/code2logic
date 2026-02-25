@@ -7,6 +7,15 @@ artifacts/
 out/
 project.c2l.*
 project.func.*
+project.json
+project.yaml
+project.toon
+project.toon-schema.json
+project.logicml.yaml
+project.functions.toon
+project.functions-schema.json
+function.toon
+function-schema.json
 ollama_benchmark_results.csv
 *_benchmark_results.csv
 .idea

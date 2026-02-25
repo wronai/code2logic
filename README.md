@@ -48,10 +48,18 @@ pip install code2logic[nlp]         # Enhanced intents
 
 ## 📖 Quick Start
 ```bash
-code2logic ./ -f yaml --compact --function-logic --with-schema -o project.yaml
-code2logic ./ -f toon --function-logic function.toon --with-schema --name project -o ./
-# Optional: include function intent/purpose column in function.toon
-code2logic ./ -f toon --function-logic function.toon --does --name project -o ./
+# TOON compact (best token efficiency — 5.9x smaller than JSON)
+code2logic ./ -f toon --compact --name project -o ./
+
+# TOON with function-logic + structural context
+code2logic ./ -f toon --compact --no-repeat-module \
+  --function-logic function.toon --function-logic-context minimal --name project -o ./
+
+# TOON-Hybrid (project structure + function details for hub modules)
+code2logic ./ -f toon --hybrid --no-repeat-module --name project -o ./
+
+# YAML compact (human-readable, good compromise)
+code2logic ./ -f yaml --compact --name project -o ./
 ```
     
 ### Command Line
@@ -266,14 +274,20 @@ Similar Functions:
 
 ```text
 code2logic/
-├── analyzer.py      # Main orchestrator
-├── parsers.py       # Tree-sitter + fallback parser
-├── dependency.py    # NetworkX dependency analysis
-├── similarity.py    # Rapidfuzz similar detection
-├── intent.py        # NLP intent generation
-├── generators.py    # Output generators (MD/Compact/JSON)
-├── models.py        # Data structures
-└── cli.py           # Command-line interface
+├── analyzer.py          # Main orchestrator
+├── parsers.py           # Tree-sitter + fallback parser
+├── dependency.py        # NetworkX dependency analysis
+├── similarity.py        # Rapidfuzz similar detection
+├── intent.py            # NLP intent generation
+├── generators.py        # Output generators (MD/Compact/JSON/YAML/CSV)
+├── toon_format.py       # TOON generator (compact, hybrid)
+├── logicml.py           # LogicML generator (typed signatures)
+├── function_logic.py    # Function-logic TOON with structural context
+├── metrics.py           # AST-based quality metrics
+├── models.py            # Data structures
+├── cli.py               # Command-line interface
+├── benchmarks/          # Benchmark runner, results, common utils
+└── llm_clients.py       # Unified LLM client (OpenRouter/Ollama/LiteLLM)
 ```
 
 ## 🔌 Integration Examples
@@ -369,40 +383,39 @@ Compact format is ~10-15x smaller than Markdown.
 
 ## 🔬 Code Reproduction Benchmarks
 
-Code2Logic can reproduce code from specifications using LLMs. Benchmark results:
+Benchmark results (20 files, model: `arcee-ai/trinity-large-preview`, 2026-02-25):
 
-### Format Comparison (Token Efficiency)
+### Project Benchmark — Format Comparison
 
-| Format | Score | Token Efficiency | Spec Tokens | Runs OK |
-| --- | --- | --- | --- | --- |
-| **YAML** | **71.1%** | 42.1 | **366** | 66.7% |
-| **Markdown** | 65.6% | **48.7** | 385 | **100%** |
-| JSON | 61.9% | 23.7 | 605 | 66.7% |
-| Gherkin | 51.3% | 19.1 | 411 | 66.7% |
+| Format | Score | Syntax OK | Runs OK | ~Tokens | Efficiency (p/kT) |
+|--------|------:|----------:|--------:|--------:|---------:|
+| **toon** | **63,8%** | 100% | 60% | 17 875 | **3,57** |
+| json | 62,9% | 100% | 60% | 104 914 | 0,60 |
+| markdown | 62,5% | 100% | 55% | 36 851 | 1,70 |
+| yaml | 62,4% | 100% | 55% | 68 651 | 0,91 |
+| logicml | 60,4% | 100% | 55% | ~30 000 | ~2,01 |
+| csv | 53,0% | 100% | 40% | 80 779 | 0,66 |
+| function.toon | 49,3% | 95% | 35% | 29 271 | 1,68 |
+| gherkin | 38,6% | 95% | 30% | ~25 000 | ~1,54 |
+
+**Behavioral benchmark:** 85,7% (6/7 functions passed).
 
 ### Key Findings
 
-- **YAML is best for score** - 71.1% reproduction accuracy
-- **Markdown is best for token efficiency** - 48.7 score/1000 tokens
-- **YAML uses 39.6% fewer tokens than JSON** with 9.2% higher score
-- **Markdown has 100% runs OK** - generated code always executes
+- **TOON wins on efficiency** — best score (63,8%) at 5,9x fewer tokens than JSON
+- **Syntax OK = 100%** for all major formats — LLM always generates valid syntax
+- **function.toon paradox** — worse than project.toon despite larger file, due to missing class/module context (fixed in v1.0.43 with `--function-logic-context`)
+- **gherkin/csv** — poor fit for code description, their structure doesn't map to programming constructs
 
 ### Run Benchmarks
 
 ```bash
-# Token-aware benchmark
-python examples/11_token_benchmark.py --folder tests/samples/ --no-llm
+make benchmark          # Full benchmark suite (requires OPENROUTER_API_KEY)
 
-# Async multi-format benchmark
-python examples/09_async_benchmark.py --folder tests/samples/ --no-llm
-
-# Function-level reproduction
-python examples/10_function_reproduction.py --file tests/samples/sample_functions.py --no-llm
-
-python examples/15_unified_benchmark.py --folder tests/samples/ --no-llm
-
-# Terminal markdown rendering demo
-python examples/16_terminal_demo.py --folder tests/samples/
+# Or individually:
+python examples/15_unified_benchmark.py --type format --folder tests/samples/ --limit 20
+python examples/15_unified_benchmark.py --type project --folder tests/samples/ --limit 20
+python examples/15_unified_benchmark.py --type function --file tests/samples/sample_functions.py
 ```
 
 ## 🤝 Contributing

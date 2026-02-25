@@ -33,7 +33,6 @@ Convert source code to logical representation for LLM analysis
 
 - [README](../README.md)
 - [Changelog](../CHANGELOG.md)
-- [API Documentation (legacy)](../DOCS.md)
 - [Refactoring Plan](../TODO.md)
 
 ## Overview
@@ -44,24 +43,26 @@ Code2Logic analyzes codebases and generates structured representations optimized
 
 | Feature | Description |
 | ------- | ----------- |
-| Multi-format output | Markdown, JSON, YAML, TOON, LogicML, Gherkin, Compact |
-| LLM-optimized | Token-efficient formats for cost savings |
-| BDD Generation | Automatic Gherkin feature files |
+| Multi-format output | Markdown, JSON, YAML, TOON, LogicML, Gherkin, CSV |
+| LLM-optimized | Token-efficient formats (TOON is 5.9x smaller than JSON) |
+| TOON-Hybrid | Project structure + selective function details for hub modules |
+| AST-based scoring | Accurate structural comparison using Python AST |
 | Duplicate Detection | Find similar/duplicate functions |
-| Dependency Analysis | Module and function dependencies |
-| Multiple Languages | Python, JavaScript, TypeScript, Go, Rust |
+| Dependency Analysis | PageRank, hub detection, clustering |
+| Multiple Languages | Python, JavaScript, TypeScript, Go, Rust, Java |
 
-### Format Comparison
+### Format Comparison (Feb 2026, 20 files)
 
-| Format | Tokens | LLM Accuracy | Best For |
-| ------ | ------ | ------------ | -------- |
-| TOON | ~2K | 70% | Token efficiency (smallest) |
-| Gherkin | ~3K | 95% | Code generation |
-| LogicML | ~5K | 65% | Compression + async |
-| YAML | ~6K | 90% | Human + LLM |
-| Compact | ~200 | 50% | Quick overview |
-| Markdown | ~4K | 60% | Documentation |
-| JSON | ~12K | 75% | RAG/Embeddings |
+| Format | Score | ~Tokens | Efficiency (p/kT) | Best For |
+| ------ | -----:| -------:| ---------:| -------- |
+| **toon** | **63,8%** | 17 875 | **3,57** | Token efficiency (smallest) |
+| json | 62,9% | 104 914 | 0,60 | RAG/embeddings |
+| markdown | 62,5% | 36 851 | 1,70 | Documentation |
+| yaml | 62,4% | 68 651 | 0,91 | Human + LLM |
+| logicml | 60,4% | ~30 000 | ~2,01 | Compression + typed sigs |
+| csv | 53,0% | 80 779 | 0,66 | Data analysis |
+| function.toon | 49,3% | 29 271 | 1,68 | Function-level detail |
+| gherkin | 38,6% | ~25 000 | ~1,54 | BDD scenarios |
 
 ## Quick Start
 

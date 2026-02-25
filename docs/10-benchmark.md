@@ -4,96 +4,73 @@
 
 ## Overview
 
-This document provides comprehensive benchmark results comparing different specification formats for code reproduction using LLMs.
+Benchmark results comparing specification formats for LLM code reproduction.
+Test: 20 files from `tests/samples/`, model: `arcee-ai/trinity-large-preview`, date: 2026-02-25.
 
-## Format Comparison
+## Project Benchmark — Format Comparison
 
-### Benchmark Results (tests/samples/)
+| Format | Score | Syntax OK | Runs OK | ~Tokens | Efficiency (p/kT) |
+|--------|------:|----------:|--------:|--------:|---------:|
+| **toon** | **63,8%** | 100% | 60% | 17 875 | **3,57** |
+| json | 62,9% | 100% | 60% | 104 914 | 0,60 |
+| markdown | 62,5% | 100% | 55% | 36 851 | 1,70 |
+| yaml | 62,4% | 100% | 55% | 68 651 | 0,91 |
+| logicml | 60,4% | 100% | 55% | ~30 000 | ~2,01 |
+| csv | 53,0% | 100% | 40% | 80 779 | 0,66 |
+| function.toon | 49,3% | 95% | 35% | 29 271 | 1,68 |
+| gherkin | 38,6% | 95% | 30% | ~25 000 | ~1,54 |
 
-| Format | Score | Syntax OK | Compression | Token Eff | Avg Lines |
-|--------|-------|-----------|-------------|-----------|-----------|
-| **YAML** | **70.3%** | **100%** | 0.6x | 36.4 | 257 |
-| **LogicML** | 63.6% | **100%** | **0.42x** | 35.9 | 204 |
-| JSON | 62.3% | 50% | 1.1x | 21.7 | 301 |
-| Markdown | 61.2% | 75% | 0.5x | 43.9 | 206 |
-| Gherkin | 44.1% | 50% | 0.6x | 12.5 | 339 |
+**Behavioral benchmark:** 85,7% (6/7 functions passed).
 
-### Key Metrics Explained
+### Key Metrics
 
-- **Score**: Overall reproduction quality (text + structural + semantic similarity)
-- **Syntax OK**: Percentage of generated code that compiles without errors
-- **Compression**: Ratio of spec size to original code size (lower = better)
-- **Token Efficiency**: Score per 100 tokens (higher = better)
-- **Avg Lines**: Average lines of generated code
+- **Score** — overall reproduction quality (text + structural + semantic similarity), AST-based
+- **Syntax OK** — % of generated code that compiles without errors
+- **Runs OK** — % of generated code that executes successfully
+- **Efficiency (p/kT)** — points per 1000 tokens (higher = better)
 
 ## Format Recommendations
 
-| Use Case | Recommended Format | Reason |
-|----------|-------------------|--------|
-| **Production code** | YAML | Highest score (70.3%), 100% syntax OK |
-| **Token-limited LLMs** | LogicML | Best compression (0.42x) |
-| **Documentation** | Markdown | Good balance, readable |
-| **Avoid** | Gherkin | Over-engineering, lowest score |
+| Use Case | Format | Reason |
+|----------|--------|--------|
+| **Best overall** | `toon` | Highest score at 5.9x fewer tokens than JSON |
+| **Human-readable** | `yaml --compact` | Good balance of readability and size |
+| **RAG / vector DB** | `json` | Easy to parse programmatically |
+| **Function detail** | `function.toon --function-logic-context minimal` | With class context headers |
+| **Hub-focused** | `toon --hybrid` | Project structure + function details for key modules |
+| **Typed signatures** | `logicml` (level=typed) | Full type hints in compact format |
 
 ## Running Benchmarks
 
-### Token Benchmark
-
-Compare formats with token usage tracking:
+### Unified Benchmark (recommended)
 
 ```bash
-# All formats
-python examples/11_token_benchmark.py \
+# Full benchmark suite
+make benchmark
+
+# Format benchmark only
+python examples/15_unified_benchmark.py \
+  --type format \
   --folder tests/samples/ \
-  --formats yaml logicml markdown gherkin json
+  --formats yaml toon logicml json markdown csv gherkin function.toon \
+  --limit 20 --verbose
 
-# Offline mode (no API calls)
-python examples/11_token_benchmark.py \
+# Project benchmark
+python examples/15_unified_benchmark.py \
+  --type project \
   --folder tests/samples/ \
-  --formats yaml logicml markdown gherkin json \
-  --no-llm
+  --formats yaml toon logicml json markdown csv gherkin function.toon \
+  --limit 20 --verbose
 
-# Best formats only
-python examples/11_token_benchmark.py \
-  --folder tests/samples/ \
-  --formats yaml logicml
+# Function benchmark
+python examples/15_unified_benchmark.py \
+  --type function \
+  --file tests/samples/sample_functions.py \
+  --limit 10 --verbose
 
-# Limit files
-python examples/11_token_benchmark.py \
-  --folder tests/samples/ \
-  --formats yaml logicml \
-  --limit 5
-```
-
-### Project Benchmark
-
-Test entire project structure:
-
-```bash
-# Analyze project
-python examples/13_project_benchmark.py \
-  --project /path/to/project \
-  --formats yaml logicml markdown
-
-# Offline mode
-python examples/13_project_benchmark.py \
-  --project /path/to/project \
-  --formats yaml logicml markdown \
-  --no-llm
-
-# With verbose output
-python examples/13_project_benchmark.py \
-  --project /path/to/project \
-  --formats yaml logicml \
-  --verbose
-```
-
-### Comprehensive Analysis
-
-Analyze generated code quality:
-
-```bash
-python examples/12_comprehensive_analysis.py --no-llm
+# Behavioral benchmark
+python examples/behavioral_benchmark.py \
+  --file tests/samples/sample_functions.py --verbose
 ```
 
 ## Sample Output
@@ -227,38 +204,23 @@ for name, spec in formats.items():
     print(f"{name}: {tokens} tokens, {len(spec)} chars")
 ```
 
-## Conclusions
-
-### Latest Benchmark Results (January 2026)
-
-| Format | Score | Success | Text Sim | Structural | Semantic |
-|--------|-------|---------|----------|------------|----------|
-| **YAML** | **74.5%** | 100% | **91.8%** | **80.0%** | **83.0%** |
-| **LogicML** | **65.9%** | 100% | 89.7% | 66.7% | 74.7% |
-| Gherkin | 50.2% | 33% | 64.0% | 6.7% | 78.1% |
+## Conclusions (February 2026)
 
 ### Key Findings
 
-1. **YAML is the best for quality** - 74.5% score, 100% success rate
-2. **LogicML is the best for compression** - 0.51x compression ratio
-3. **LogicML has 100% success rate** - reliable code generation
-4. **Gherkin over-engineers** - only 33% success rate, creates extra classes
-5. **LogicML handles async code well** - 76.2% score on async files
+1. **TOON wins on efficiency** — best score (63,8%) at 5.9x fewer tokens than JSON
+2. **Syntax OK = 100%** for all major formats — LLM always generates valid syntax
+3. **Behavioral equivalence = 85,7%** — reproduced code actually works correctly
+4. **function.toon paradox** — worse than project.toon (49,3% vs 63,8%) despite larger file, due to missing class/module context. Fixed with `--function-logic-context minimal`
+5. **gherkin/csv** — poor fit for code description (38,6% / 53,0%)
 
-### Format Strengths
+### Improvements in v1.0.43
 
-| Format | Best For |
-|--------|----------|
-| **YAML** | Overall quality, text similarity |
-| **LogicML** | Compression, token efficiency, async code |
-| **Gherkin** | Semantic descriptions (but low success) |
-
-### Improvements Made
-
-- LogicML prompt improved for async code handling
-- Added explicit instructions for `sig: async (...)` pattern
-- Better dataclass handling with `abstract: true`
-- Improved docstring extraction for semantic reproduction
+- AST-based structural scoring (replaces regex, ratio-based instead of binary)
+- Reproduction prompts rewritten with format-specific parsing instructions
+- function.toon now supports `--function-logic-context` for class/module headers
+- LogicML default changed to `typed` level (10 params with full types)
+- TOON-Hybrid format: project structure + function details for hub modules
 
 ## Environment Requirements
 

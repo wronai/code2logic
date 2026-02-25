@@ -47,6 +47,8 @@ If `CODE2LOGIC_DEFAULT_PROVIDER=auto`, Code2Logic tries providers in priority or
 | `--no-repeat-module` | | Reduce repeated directory prefixes in TOON `modules[...]` tables by using `./file` for consecutive entries in the same folder |
 | `--no-repeat-details` | | Reduce repeated directory prefixes in function-logic TOON `function_details` section by using `./file` for consecutive entries in the same folder |
 | `--does` | | Include the `does` (intent/purpose) column in function-logic TOON output. Omitted by default to save tokens |
+| `--function-logic-context` | | Structural context in function-logic TOON: `none` (flat list), `minimal` (class headers with bases), `full` (classes + properties + imports). Default: `none` |
+| `--hybrid` | | Use hybrid output. For TOON: combines project structure with function-logic details for hub modules. For YAML: use `-f hybrid` |
 | `--with-schema` | | Generate JSON schema alongside output |
 | `--verbose` | `-v` | Verbose output with timing |
 | `--debug` | | Debug output (very verbose) |
@@ -141,11 +143,22 @@ code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-r
 # Generate function-logic TOON with intent descriptions (does column)
 code2logic /path/to/project -f toon --function-logic --does --name project -o ./
 
+# Generate function-logic TOON with structural context (class headers before methods)
+code2logic /path/to/project -f toon --function-logic function.toon \
+  --function-logic-context minimal --name project -o ./
+
+# Full structural context (classes + properties + imports)
+code2logic /path/to/project -f toon --function-logic function.toon \
+  --function-logic-context full --name project -o ./
+
+# TOON-Hybrid (project structure + function details for top hub modules)
+code2logic /path/to/project -f toon --hybrid --no-repeat-module --name project -o ./
+
 # Generate function-logic TOON + schema (function.toon + function-schema.json)
 code2logic /path/to/project -f toon --function-logic function.toon --with-schema --name project -o ./
 ```
 
-Token-oriented object notation - most efficient format for LLM consumption.
+Token-oriented object notation - most efficient format for LLM consumption (5.9x smaller than JSON).
 
 ## Benchmarks (Makefile)
 

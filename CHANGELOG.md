@@ -1,453 +1,75 @@
-## [1.0.43] - 2026-02-25
-
-### Summary
-
-refactor(goal): CLI interface improvements
-
-### Other
-
-- update code2logic/cli.py
-- update code2logic/metrics.py
-- update code2logic/toon_format.py
-
-
-## [1.0.42] - 2026-02-25
-
-### Summary
-
-feat(docs): CLI interface improvements
-
-### Docs
-
-- docs: update 00-index.md
-- docs: update 20-llm-benchmarks-claude.md
-
-### Other
-
-- update code2logic/benchmarks/common.py
-- update code2logic/cli.py
-- update code2logic/logicml.py
-- update project.toon
-
-
-## [1.0.41] - 2026-02-25
-
-### Summary
-
-refactor(examples): CLI interface improvements
-
-### Docs
-
-- docs: update README
-
-### Other
-
-- build: update Makefile
-- update code2logic/base_generator.py
-- update code2logic/benchmarks/common.py
-- update code2logic/benchmarks/runner.py
-- update code2logic/llm_clients_new.py
-- update code2logic/parsers.py
-- update examples/benchmark_report.py
-- update examples/benchmark_summary.py
-- update function-schema.json
-- update function.toon
-- ... and 3 more
-
-
-## [1.0.40] - 2026-02-25
-
-### Summary
-
-feat(docs): configuration management system
-
-### Docs
-
-- docs: update C2L.md
-
-### Other
-
-- update project.functions.toon
-- update spec.csv
-
-
-## [1.0.39] - 2026-02-25
-
-### Summary
-
-feat(examples): CLI interface improvements
-
-### Docs
-
-- docs: update README
-- docs: update 03-cli-reference.md
-- docs: update 07-toon.md
-
-### Other
-
-- update .env.example
-- build: update Makefile
-- update code2logic/benchmarks/common.py
-- update code2logic/function_logic.py
-- update examples/behavioral_benchmark.py
-- update examples/benchmark_report.py
-- update examples/benchmark_summary.py
-- update function.toon
-- update function-schema.json
-- update function.toon
-- ... and 1 more
-
-
-## [1.0.38] - 2026-02-25
-
-### Summary
-
-feat(docs): CLI interface improvements
-
-### Docs
-
-- docs: update README
-- docs: update 03-cli-reference.md
-- docs: update 07-toon.md
-
-### Other
-
-- build: update Makefile
-- update TICKET
-- update code2logic/benchmarks/runner.py
-- update code2logic/function_logic.py
-- update code2logic/metrics.py
-- update examples/behavioral_benchmark.py
-- update examples/benchmark_report.py
-- update examples/benchmark_summary.py
-- update function-schema.json
-- update function.toon
-- ... and 2 more
-
-
-## [1.0.37] - 2026-02-25
-
-### Summary
-
-refactor(goal): CLI interface improvements
-
-### Other
-
-- update code2logic/cli.py
-- update code2logic/function_logic.py
-- update function.toon
-
-
-## [1.0.36] - 2026-02-25
-
-### Summary
-
-refactor(None): configuration management system
-
-### Other
-
-- update function.toon
-
-
-## [1.0.35] - 2026-02-24
-
-### Summary
-
-refactor(None): configuration management system
-
-### Other
-
-- config: update project.c2l.hybrid.yaml
-- update project.c2l.hybrid.yaml-schema.json
-- update project.c2l.toon
-- update project.c2l.toon-schema.json
-- config: update project.c2l.yaml
-- update project.c2l.yaml-schema.json
-- update project.func.json
-- update project.func.logicml
-- update project.func.toon
-- config: update project.func.yaml
-- ... and 3 more
-
-
-## [1.0.34] - 2026-02-24
-
-### Summary
-
-feat(examples): CLI interface improvements
-
-### Other
-
-- update .env.example
-- update code2logic/cli.py
-- update code2logic/config.py
-
-
-## [1.0.33] - 2026-02-23
-
-### Summary
-
-feat(config): deep code analysis engine with 6 supporting modules
-
-### Test
-
-- update tests/test_formats.py
-
-### Build
-
-- update pyproject.toml
-
-### Other
-
-- update code2logic/parsers.py
-- update logic2code/pyproject.toml
-- update logic2test/pyproject.toml
-- update lolm/pyproject.toml
-
-
-## [1.0.32] - 2026-02-15
-
-### Summary
-
-chore(goal): code quality metrics with 2 supporting modules
-
-### Config
-
-- config: update goal.yaml
-
-
-## [1.0.31] - 2026-02-15
-
-### Summary
-
-feat(goal): deep code analysis engine with 7 supporting modules
-
-### Config
-
-- config: update goal.yaml
-
-### Other
-
-- update code2logic/generators.py
-
-
 # Changelog
 
 All notable changes to this project will be documented in this file.
+Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) + [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
+## [1.0.43] - 2026-02-25
 
 ### Added
-- `code2logic llm ...` command group for managing LLM provider configuration.
-- `code2logic llm set-provider auto` for automatic provider fallback.
-- Provider and model priority management:
-  - provider priorities (stored in `~/.code2logic/llm_config.json`)
-  - model priorities by exact model string and prefix (family)
-  - priority modes: `provider-first`, `model-first`, `mixed`
+- **`--function-logic-context`** CLI flag (`none`/`minimal`/`full`) — adds class/module context headers to function.toon output
+- **`--hybrid`** flag for TOON format — combines project structure with function-logic details for hub modules
+- **LogicML `level` parameter** (`compact`/`typed`/`full`) — controls signature richness and type preservation
+- **AST-based structural scoring** in `metrics.py` — uses Python `ast` module instead of regex, with regex fallback
+- **`failure_rate` metric** in `BenchmarkResult` — tracks percentage of files scoring 0%
+- **`generate_hybrid()`** method in `TOONGenerator` — project TOON + selective function details for top-N hub modules
 
 ### Changed
-- Provider auto-selection order now follows configured priorities.
+- **Benchmark aggregation** now includes ALL scores (including zeros) instead of filtering `score > 0`
+- **`_structural_score`** in benchmark runner uses ratio-based scoring (`min/max`) instead of binary exact-match
+- **`_extract_code`** supports 12+ language-specific code block markers (js, ts, go, rust, java, etc.)
+- **Reproduction prompts** rewritten with detailed parsing instructions per format (gherkin, function.toon, csv, markdown, logicml)
+- **Spec truncation limit** increased from 8000 to 12000 chars
+- **Function benchmark** prompt enriched with calls/raises/complexity info, `max_tokens` increased 2000→3000
+- **LogicML default `level`** changed from `compact` to `typed` (10 params with full types)
+- **`BenchmarkResult.load()`** properly reconstructs `FormatResult` objects from JSON
+
+### Fixed
+- Project benchmark merge-score: `FileResult.score` recalculated as average across all format_results after merge
+- Format/project benchmark score loops now include zero scores in per-format averages
+- Function benchmark similarity calculation includes all functions (not just non-zero)
+
+### Removed
+- Dead code: `llm_clients_new.py` stub (unused)
+- Stale generated artifacts from root directory
+
+## [1.0.34] - 2026-02-24
+
+### Changed
+- CLI improvements and config management updates
+- Generator interface unification (`.generate()` signatures standardized)
+
+## [1.0.33] - 2026-02-23
+
+### Added
+- Deep code analysis engine with 6 supporting modules
+- Updated pyproject.toml build configuration
+
+## [1.0.31] - 2026-02-15
+
+### Added
+- Goal-driven analysis engine with 7 supporting modules
+- `code2logic llm` command group for LLM provider/model/key management
+- Provider auto-selection with priority modes (`provider-first`, `model-first`, `mixed`)
 
 ## [1.0.1] - 2026-01-03
 
-### Changed
-- Improved benchmark robustness and artifact hygiene in example scripts.
-- Added packaging tools to development extras.
-
-### Fixed
-- Cleaned and hardened benchmark output generation (atomic writes, cleanup of generated artifacts).
-- Improved error reporting in benchmarking and function reproduction examples.
-
 ### Added
 - Initial release of code2logic
-- Multi-language code analysis support (Python, JavaScript, Java, C/C++)
-- Tree-sitter based AST parsing with fallback parsers
-- NetworkX dependency graph analysis
-- Code similarity detection algorithms
-- LLM integration with Ollama and LiteLLM
-- Intent analysis from natural language queries
-- Multiple output formats (JSON, YAML, CSV, Markdown, Compact)
+- Multi-language code analysis (Python, JavaScript, Java, C/C++)
+- Tree-sitter AST parsing with fallback parsers
+- NetworkX dependency graph analysis (PageRank, hub detection)
+- Code similarity detection (Rapidfuzz)
+- LLM integration (Ollama, LiteLLM, OpenRouter)
+- Output formats: JSON, YAML, CSV, Markdown, Compact, TOON, LogicML, Gherkin
 - MCP server for Claude Desktop integration
 - CLI with auto-dependency installation
-- Docker support with multi-service orchestration
-- Comprehensive test suite with 46 tests
-- Example scripts and documentation
+- Docker support
+- 286 tests
 
-### Changed
-- N/A (initial release)
-
-### Deprecated
-- N/A
-
-### Removed
-- N/A
-
-### Fixed
-- N/A
-
-### Security
-- N/A
-
-## [1.0.0] - 2024-01-XX
+## [1.0.0] - 2024-01-01
 
 ### Added
 - Core project analysis engine
-- Multi-language parsing support
-- Dependency graph analysis
-- Code similarity detection
+- Multi-language parsing, dependency graphs, similarity detection
 - LLM integration framework
-- Intent analysis system
-- Multiple output generators
-- MCP server implementation
-- CLI interface
-- Docker deployment support
-- Comprehensive documentation
-- Full test coverage
-
----
-
-## Version History
-
-### Development Phase
-- **v0.1.0** - Initial project structure and basic parsing
-- **v0.2.0** - Added dependency analysis and similarity detection
-- **v0.3.0** - Integrated LLM support and intent analysis
-- **v0.4.0** - Added MCP server and CLI improvements
-- **v0.5.0** - Enhanced output formats and Docker support
-- **v1.0.0** - Production-ready release with full feature set
-
-### Key Milestones
-- ✅ Multi-language AST parsing
-- ✅ Dependency graph analysis
-- ✅ Code similarity detection
-- ✅ LLM integration (Ollama/LiteLLM)
-- ✅ Intent analysis
-- ✅ Multiple output formats
-- ✅ MCP server for Claude Desktop
-- ✅ CLI with auto-installation
-- ✅ Docker deployment
-- ✅ Comprehensive testing
-- ✅ Documentation and examples
-
----
-
-## Breaking Changes
-
-### v1.0.0
-No breaking changes - this is the initial stable release.
-
----
-
-## Dependencies
-
-### Core Dependencies
-- `networkx>=3.0` - Graph analysis
-- `pyyaml>=6.0` - YAML support
-- `tree-sitter>=0.20.0` - AST parsing
-- `litellm>=1.0.0` - LLM integration
-- `click>=8.0.0` - CLI framework
-- `rich>=13.0.0` - Terminal output
-
-### Optional Dependencies
-- `mcp>=1.0.0` - MCP server support
-- `pytest>=7.0.0` - Testing framework
-- `black>=23.0.0` - Code formatting
-- `mypy>=1.0.0` - Type checking
-
----
-
-## Platform Support
-
-### Supported Python Versions
-- Python 3.8+
-- Tested on 3.8, 3.9, 3.10, 3.11, 3.12
-
-### Supported Operating Systems
-- Linux (primary development platform)
-- macOS
-- Windows (limited testing)
-
-### Container Support
-- Docker Hub images available
-- Multi-architecture support (amd64, arm64)
-
----
-
-## Performance Notes
-
-### Large Project Analysis
-- Tested on projects up to 1000+ files
-- Memory usage scales with project size
-- LLM processing may be rate-limited by provider
-
-### Optimization Tips
-- Use `--no-llm` flag for faster analysis without AI features
-- Consider using compact format for large projects
-- Enable parallel processing for multiple projects
-
----
-
-## Known Issues
-
-### Current Limitations
-- Tree-sitter parsers require language-specific grammars
-- LLM integration requires external services (Ollama/LiteLLM)
-- Large projects may exceed LLM context limits
-- Some language features may not be fully supported
-
-### Planned Fixes
-- Improved error handling for malformed code
-- Better memory management for large projects
-- Enhanced LLM prompt optimization
-- Additional language support
-
----
-
-## Security Considerations
-
-### LLM Integration
-- Code is sent to external LLM services
-- Consider using local Ollama for sensitive code
-- Review LLM provider privacy policies
-
-### File System Access
-- Tool reads project files for analysis
-- No write operations except output generation
-- Respects .gitignore and common exclude patterns
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing to code2logic.
-
-### Development Setup
-```bash
-git clone https://github.com/wronai/code2logic.git
-cd code2logic
-pip install -e .[dev]
-pre-commit install
-```
-
-### Running Tests
-```bash
-pytest --cov=code2logic
-```
-
----
-
-## Support
-
-- **Documentation**: https://code2logic.readthedocs.io
-- **Issues**: https://github.com/wronai/code2logic/issues
-- **Discussions**: https://github.com/wronai/code2logic/discussions
-- **Email**: team@code2logic.dev
-
----
-
-## License
-
-This project is licensed under the Apache License 2.0 - see [LICENSE](LICENSE) file for details.
+- CLI interface and Docker deployment
