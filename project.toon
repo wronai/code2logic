@@ -1,4 +1,4 @@
-# code2logic | 156f 42706L | python:146/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
+# code2logic | 156f 42719L | python:146/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[156]:
   multilang_reproduction_tester.py,1442
@@ -51,7 +51,7 @@ M[156]:
   examples/12_comprehensive_analysis.py,95
   examples/01_quick_start.py,47
   examples/token_efficiency.py,0
-  examples/15_unified_benchmark.py,134
+  examples/15_unified_benchmark.py,143
   examples/09_async_benchmark.py,60
   examples/windsurf_mcp_integration.py,0
   examples/11_token_benchmark.py,69
@@ -519,7 +519,7 @@ D:
     e: main
     main()
   examples/15_unified_benchmark.py:
-    i: argparse,sys,code2logic.benchmarks.{BenchmarkConfig,BenchmarkRunner,run_benchmark},dotenv.load_dotenv,pathlib.Path
+    i: argparse,os,sys,code2logic.benchmarks.{BenchmarkConfig,BenchmarkRunner,run_benchmark},code2logic.llm_clients.get_client,dotenv.load_dotenv,pathlib.Path
     e: print_format_results,print_function_results,print_project_results,main
     print_format_results(result)
     print_function_results(result)
@@ -959,7 +959,7 @@ D:
     TaskQueue: add_task(1),get_pending(0),get_by_status(1)  # Task queue container.
     Project: total_tasks(0)  # Project model with nested models.
   tests/samples/sample_javascript.js:
-    e: fetchData,User,Product,calculateTotal,deepClone,filterBy,debounce
+    e: Product,User,debounce,deepClone,fetchData,filterBy,calculateTotal
     User: constructor(3),getDisplayName(0),deactivate(0)
     Product: constructor(3),addTags(0),isInStock(0),formatPrice(0)
     calculateTotal(items)
@@ -995,7 +995,7 @@ D:
     insert(table:str)->InsertBuilder
     update(table:str)->UpdateBuilder
   tests/samples/sample_typescript.ts:
-    e: groupBy,filterByStatus,Nullable,User,createUser,OrderItem,Product,fetchUser
+    e: Product,createUser,calculateOrderTotal,Repository,Result,User,Nullable,fetchUser
     Repository: add(1),get(1),getAll(0),delete(1),count(0)
     createUser(id: number;name: string;email: string)->User
     calculateOrderTotal(items: OrderItem[])->number
@@ -1089,7 +1089,7 @@ D:
     Order:   # Order model.
     Product:   # Product model.
   tests/samples/sample_ts_reexport/math.ts:
-    e: add,multiply
+    e: multiply,add
     add(a: number;b: number)->number
     multiply(a: number;b: number)->number
   examples/code2logic/sample_project/calculator.py:

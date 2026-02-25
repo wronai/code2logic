@@ -66,7 +66,16 @@ class FunctionLogicGenerator:
         no_repeat_name: bool = False,
         no_repeat_details: bool = False,
         include_does: bool = False,
+        context: str = 'none',
     ) -> str:
+        """Generate function-logic in TOON format.
+
+        Args:
+            context: Structural context level:
+                'none'    - flat function list (original behavior)
+                'minimal' - class headers (name, bases) before methods
+                'full'    - class headers + properties + module imports
+        """
         if detail == 'detailed':
             detail = 'full'
         toon = TOONGenerator()
@@ -81,8 +90,11 @@ class FunctionLogicGenerator:
         lines: List[str] = []
 
         # Format header — helps LLM understand the structure
-        lines.append(f"# {project.name} function-logic | {len(modules_with_items)} modules")
+        ctx_label = f" | context:{context}" if context != 'none' else ""
+        lines.append(f"# {project.name} function-logic | {len(modules_with_items)} modules{ctx_label}")
         lines.append("# Convention: name with . = method, ~name = async, cc:N shown only when >1")
+        if context != 'none':
+            lines.append("# CLASS: header before methods gives structural context (bases, props)")
 
         lines.append(f"project: {toon._quote(project.name)}")
         if getattr(project, 'generated_at', None):
@@ -109,6 +121,25 @@ class FunctionLogicGenerator:
             else:
                 details_key = m.path
             lines.append(f"  {toon._quote(details_key)}:")
+
+            # Emit module imports for 'full' context
+            if context == 'full' and getattr(m, 'imports', None):
+                imports = [i for i in m.imports if i][:20]
+                if imports:
+                    lines.append(f"    imports[{len(imports)}]: {','.join(imports)}")
+
+            # Emit class context headers before function table
+            if context != 'none':
+                classes = getattr(m, 'classes', []) or []
+                if classes:
+                    for cls in classes:
+                        bases = ','.join(getattr(cls, 'bases', []) or []) or '-'
+                        cls_line = f"    CLASS {toon._quote(cls.name)}({bases})"
+                        if context == 'full':
+                            props = getattr(cls, 'properties', []) or []
+                            if props:
+                                cls_line += f" props:[{','.join(props[:15])}]"
+                        lines.append(cls_line)
 
             header = f"line{dm}name{dm}sig"
             if include_does and detail in ('standard', 'full'):

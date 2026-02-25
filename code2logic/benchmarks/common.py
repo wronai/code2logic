@@ -189,22 +189,66 @@ Name the test class Test<ClassName> or TestFunctions."""
 
 def get_token_reproduction_prompt(spec: str, fmt: str, file_name: str, language: str = "python") -> str:
     format_hints = {
-        "json": "Parse the JSON structure and implement all classes and functions with exact signatures.",
+        "json": """Parse the JSON structure carefully:
+- 'modules' array contains file-level info with 'classes' and 'functions'
+- Each class has 'name', 'bases', 'methods' with full signatures
+- Each function has 'name', 'params', 'returns', 'doc'
+- Implement ALL classes with their methods and ALL standalone functions
+- Use the 'doc' field to implement actual logic, not just stubs
+CRITICAL: Match every class/function name and signature exactly.""",
         "json_compact": "Parse the compact JSON and implement all elements with exact signatures.",
-        "yaml": "Parse the YAML structure and implement all classes and functions with exact signatures.",
-        "gherkin": """Parse Gherkin/BDD scenarios and implement them as working code:
-- Each Feature maps to a class or module
-- Each Scenario maps to a function
-- Given/When/Then steps describe the logic flow
-- Implement actual logic, not just stubs
-Focus on the described behavior and implement it directly.""",
-        "markdown": "Parse embedded Gherkin (behaviors) and YAML (structures). Implement all described classes and functions.",
-        "logicml": """Parse LogicML and generate VALID code:
-- 'sig:' lines describe function signatures (translate to the target language)
-- 'type: re-export' means this module primarily re-exports symbols
-- 'attrs:' = instance attributes to set in constructor
+        "yaml": """Parse the YAML structure carefully:
+- Top-level keys describe modules with classes and functions
+- Each class has 'bases', 'properties', 'methods' with signatures
+- Each function has params, return type, and docstring/intent
+- Implement ALL classes, methods, and standalone functions
+- Use intent/docstring to write actual logic, not placeholders
+CRITICAL: Match every name and signature exactly as specified.""",
+        "gherkin": """Parse Gherkin/BDD specification and reconstruct the ORIGINAL source code:
+- 'Feature:' = a class or module (use the name after Feature)
+- 'Scenario:' = a function or method to implement
+- 'Given' steps = setup / preconditions / imports needed
+- 'When' steps = the core action / logic to implement
+- 'Then' steps = expected outcomes / return values / assertions
+- 'And' continues the previous step type
+- '@tag' annotations may indicate decorators or categories
+
+IMPORTANT RULES:
+1. Each Scenario becomes a real function with actual logic (NOT test code)
+2. Given/When/Then describe behavior, translate them to implementation
+3. Include all imports mentioned in Given steps
+4. Use type hints based on parameter descriptions
+5. Implement real logic based on When/Then steps, not just stubs
+6. If a Feature has multiple Scenarios, they are methods of the same class""",
+        "markdown": """Parse the Markdown specification to reconstruct source code:
+- '## Module' or '### Class' headings define code structure
+- Embedded YAML blocks describe attributes, methods, signatures
+- Embedded Gherkin blocks describe behaviors to implement
+- Code blocks show example usage or signatures
+- Tables may list functions with their parameters and return types
+
+IMPORTANT RULES:
+1. Extract class names, method signatures, and function signatures from headings and YAML
+2. Implement all listed methods with actual logic based on descriptions
+3. Include all imports mentioned anywhere in the document
+4. Use type hints from signatures or parameter descriptions
+5. Docstrings should come from the description text""",
+        "logicml": """Parse LogicML and generate VALID, complete code:
+- 'module:' = file to generate
+- 'sig:' lines = EXACT function signatures (translate to target language)
+- 'does:' = function intent/docstring — use this to implement real logic
+- 'type: re-export' = module primarily re-exports symbols from imports
+- 'attrs:' = instance attributes to initialize in __init__/constructor
 - 'bases:' = parent classes to inherit from
-CRITICAL: Ensure valid syntax - balanced brackets, proper indentation, no undefined variables.""",
+- 'decorators:' = decorators to apply
+- 'calls:' = other functions this function calls (implement the call chain)
+- 'raises:' = exceptions this function may raise
+
+CRITICAL RULES:
+1. Translate EVERY 'sig:' line into a real function with actual logic
+2. Use 'does:' text to implement meaningful function bodies
+3. Ensure valid syntax - balanced brackets, proper indentation
+4. Include ALL imports listed in the module""",
         "toon": """Parse TOON (Token-Oriented Object Notation) format carefully:
 
 STRUCTURE:
@@ -222,19 +266,43 @@ DECORATORS:
 - 'decorators: @property' = add @property decorator
 - 'decorators: @staticmethod|@cache' = multiple decorators
 
-CRITICAL: Use imports[], function_docs, and exact signatures to reproduce code accurately.""",
-        "csv": """Parse the CSV table where each row describes a code element:
-- Columns: path, type (class/method/function), name, signature, language, intent, category, domain, imports
-- 'method' rows belong to the class in the preceding 'class' row
-- Implement all elements with the exact signatures shown
-Generate complete code with all classes, methods, and functions.""",
-        "function.toon": """Parse the function-logic TOON format:
-- 'modules[N]{path,lang,items}:' lists files
-- 'function_details:' contains per-module function listings
-- Each function has: line number, name, signature, description
-- 'ClassName.method_name' = method of that class
-- 'cc:N' after name = cyclomatic complexity
-Implement all listed functions with matching signatures and described behavior.""",
+CRITICAL RULES:
+1. Use imports[] to generate all import statements
+2. Use function_docs to write real function bodies (not stubs)
+3. Match exact signatures from sig: fields
+4. Include ALL classes with their methods and ALL standalone functions
+5. Preserve async functions (marked with 'async: true')""",
+        "csv": """Parse the CSV table to reconstruct source code:
+- Columns: path, type, name, signature, language, intent, category, domain, imports
+- 'type=class' rows define classes (look at 'bases' if present)
+- 'type=method' rows are methods of the preceding class
+- 'type=function' rows are standalone functions
+- 'signature' column has the exact function signature to use
+- 'intent' column describes what the function does — use it to implement real logic
+- 'imports' column lists required imports
+
+IMPORTANT RULES:
+1. Group methods under their parent class
+2. Include all imports from the 'imports' column
+3. Match signatures exactly as shown
+4. Use 'intent' to implement actual logic, not just stubs
+5. Add type hints based on signature information""",
+        "function.toon": """Parse the function-logic TOON format to reconstruct source code:
+- 'modules[N]{path,lang,items}:' lists source files and their function count
+- 'function_details:' contains per-module function listings as tables
+- Table columns: line, name, sig[, does, decorators, calls, raises]
+- 'ClassName.method_name' = this is a method of ClassName (create the class)
+- '~function_name' = async function (add async keyword)
+- 'cc:N' suffix on name = cyclomatic complexity hint (more complex logic needed)
+- 'sig' column has exact signature: (params)->ReturnType
+
+CRITICAL RULES:
+1. Create classes for any ClassName that appears as prefix in 'ClassName.method'
+2. Translate EVERY listed function into real code with actual logic
+3. Use 'does' column text to implement meaningful function bodies
+4. Match signatures EXACTLY from the 'sig' column
+5. Include imports needed for the types and calls referenced
+6. Preserve method grouping under their classes""",
     }
 
     # Language-specific guidance appended to prompt
@@ -248,7 +316,7 @@ Implement all listed functions with matching signatures and described behavior."
         "sql": "Use standard SQL: CREATE TABLE/VIEW/FUNCTION, proper column types, constraints.",
     }
 
-    max_spec = 8000
+    max_spec = 12000
     spec_truncated = spec[:max_spec] if len(spec) > max_spec else spec
 
     language_norm = (language or "python").strip().lower()
@@ -267,15 +335,20 @@ Implement all listed functions with matching signatures and described behavior."
     lang_hint = lang_hints.get(language_norm, '')
     lang_hint_line = f"\n{lang_hint}" if lang_hint else ''
 
-    prompt = f"""Generate {lang_label} code from this {fmt.upper()} specification.
+    prompt = f"""Generate complete {lang_label} source code from this {fmt.upper()} specification.
 {format_hints.get(fmt, '')}{lang_hint_line}
 
+SPECIFICATION:
 {spec_truncated}
 
-Requirements:
-- Complete, working {lang_label} code for {file_name}
-- Include imports and type hints
-- Implement all functions with actual logic
+REQUIREMENTS:
+- Output complete, working {lang_label} code for {file_name}
+- Include ALL imports at the top
+- Implement ALL classes, methods, and functions listed in the specification
+- Use type hints throughout
+- Write real logic based on descriptions/intents, NOT placeholder stubs
+- Match function signatures EXACTLY as specified
+- Output ONLY the code, no explanations
 
 ```{language_norm}
 """

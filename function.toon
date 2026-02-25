@@ -1,7 +1,7 @@
 # code2logic function-logic | 122 modules
 # Convention: name with . = method, ~name = async, cc:N shown only when >1
 project: code2logic
-generated: "2026-02-25T18:12:16.330451"
+generated: "2026-02-25T18:56:05.968118"
 modules[122]{path,lang,items}:
   multilang_reproduction_tester.py,py,28
   universal_validator.py,py,23
@@ -895,10 +895,10 @@ function_details:
       23,"main cc:3",()
   examples/15_unified_benchmark.py:
     functions[4]{line,name,sig}:
-      31,"print_format_results cc:5",(result)
-      56,"print_function_results cc:3",(result)
-      74,"print_project_results cc:3",(result)
-      93,"main cc:7",()
+      34,"print_format_results cc:5",(result)
+      59,"print_function_results cc:3",(result)
+      77,"print_project_results cc:3",(result)
+      96,"main cc:9",()
   examples/09_async_benchmark.py:
     functions[2]{line,name,sig}:
       24,"print_results cc:3",(result)

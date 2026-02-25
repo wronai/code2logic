@@ -1,270 +1,202 @@
+---
+title: "LLM i limit kontekstu: Dlaczego JSON to ślepa uliczka i jak Code2Logic zmienia zasady gry"
+date: 2026-02-25
+author: Tom Sapletta
+tags: [LLM, AI, Code2Logic, TOON, benchmark, context-window, optymalizacja]
+categories: [AI, Narzędzia, Open Source]
+excerpt: "Przeprowadziłem serię benchmarków porównujących formaty serializacji kodu dla modeli językowych. Wyniki? JSON zużywa 5x więcej tokenów niż TOON, a jakość rekonstrukcji nie jest proporcjonalna do rozmiaru. Oto dane i wnioski."
+---
+
 # LLM i limit kontekstu: Dlaczego JSON to ślepa uliczka i jak Code2Logic zmienia zasady gry
 
 **Autor: Tom Sapletta**
 
-Jeśli kiedykolwiek próbowałeś "nakarmić" model językowy (LLM) całym repozytorium kodu, by poprosić go o refaktoryzację, znalezienie błędu czy wygenerowanie dokumentacji, na pewno zderzyłeś się ze ścianą. Ścianą tą jest limit okna kontekstowego oraz zjawisko znane jako *lost in the middle* – model zapomina lub ignoruje informacje znajdujące się w środku długiego promptu. 
+Jeśli kiedykolwiek próbowałeś „nakarmić" model językowy całym repozytorium kodu — by poprosić o refaktoryzację, znalezienie błędu lub wygenerowanie dokumentacji — na pewno zderzyłeś się ze ścianą. Tą ścianą jest **limit okna kontekstowego** oraz zjawisko *lost in the middle*: model zapomina lub ignoruje informacje w środku długiego promptu.
 
-W tym artykule pokazuję wyniki benchmarków jakości *rekonstrukcji* kodu na podstawie specyfikacji. To ważne rozróżnienie: **wysoki wynik benchmarku nie jest dowodem równoważności behawioralnej (runtime)** — mierzymy tu głównie zgodność struktury i semantyki tekstowej (np. klasy/funkcje/sygnatury/nazewnictwo), a pełną poprawność potwierdza dopiero uruchomienie testów.
+Cześć, jestem Tom Sapletta. Od dłuższego czasu pracuję nad tym, jak zoptymalizować komunikację między kodem źródłowym a sztuczną inteligencją. Tak właśnie narodził się projekt **Code2Logic**.
 
-Cześć, jestem Tom Sapletta i od dłuższego czasu pracuję nad tym, 
-jak zoptymalizować komunikację między kodem źródłowym a sztuczną inteligencją. 
-Tak właśnie narodził się projekt **Code2Logic**.
+> **Ważna nota metodyczna:** Wyniki benchmarków mierzą jakość *rekonstrukcji* kodu na podstawie specyfikacji — głównie zgodność struktury, sygnatur i semantyki tekstowej. **Wysoki wynik nie jest dowodem pełnej równoważności behawioralnej (runtime).** Pełną poprawność potwierdza dopiero uruchomienie testów.
+
+---
 
 ## Dlaczego powstał Code2Logic?
 
-Kiedy LLM analizuje nasz kod, nie potrzebuje wszystkich średników, nawiasów, wcięć ani nadmiarowej struktury danych. Tradycyjne podejście polega na serializacji struktury projektu do formatu JSON. Niestety, JSON jest dla LLM-ów "głośny". 
+Kiedy LLM analizuje kod, nie potrzebuje wszystkich średników, nawiasów, wcięć ani nadmiarowej struktury. Tradycyjne podejście polega na serializacji projektu do formatu JSON. Problem: JSON jest dla modeli językowych **„głośny"** — większość tokenów (za które płacimy i które marnują uwagę modelu) to nawiasy klamrowe, cudzysłowy i powtarzające się klucze.
 
-Spójrzmy na to zjawisko wizualnie:
+Wizualna różnica:
 
-```text
-+-----------------------------------+   +-----------------------+
-|  Tradycyjny JSON (Duży szum)      |   |  Format TOON (Czysto) |
-|-----------------------------------|   |-----------------------|
-| {                                 |   | classes:              |
-|   "User": {                       |   |   User                |
-|     "methods": [                  |   |     - get_email()     |
-|       {                           |   |     - set_email(e)    |
-|         "name": "get_email",      |   |                       |
-|         "type": "string"          |   |                       |
-|       }                           |   |                       |
-|     ]                             |   |                       |
-|   }                               |   |                       |
-| }                                 |   |                       |
-+-----------------------------------+   +-----------------------+
+```
+┌─────────────────────────────────────┐   ┌───────────────────────────┐
+│ JSON (~104 914 tokenów dla projektu)│   │  TOON (~17 875 tokenów)   │
+├─────────────────────────────────────┤   ├───────────────────────────┤
+│ {                                   │   │ classes:                  │
+│   "User": {                         │   │   User                    │
+│     "methods": [                    │   │     - get_email()         │
+│       {                             │   │     - set_email(e)        │
+│         "name": "get_email",        │   │                           │
+│         "type": "string"            │   │                           │
+│       }                             │   │                           │
+│     ]                               │   │                           │
+│   }                                 │   │                           │
+│ }                                   │   │                           │
+└─────────────────────────────────────┘   └───────────────────────────┘
 ```
 
-W formacie JSON większość tokenów, za które płacimy (i które marnują "uwagę" modelu), to nawiasy klamrowe, cudzysłowy i powtarzające się klucze. Code2Logic powstał po to, aby wyekstrahować **czystą logikę** z kodu i przekazać ją do modelu w maksymalnie skompresowanych formatach, takich jak nasz autorski **TOON** czy **LogicML**.
+Code2Logic wyekstrahuje **czystą logikę** z kodu i przekaże ją do modelu w maksymalnie skompresowanych formatach: autorskim **TOON**, **LogicML** lub zwięzłym **YAML compact**.
 
-Poniższy diagram obrazuje, jak Code2Logic zmienia architekturę przepływu danych:
+---
 
-![img_4.png](img_4.png)
+## Rzeczywiste wyniki benchmarków (20 plików, model: arcee-ai/trinity-large-preview)
 
+### Rozmiar plików dla tego samego projektu
 
-## Analiza do tego co Claude wywnioskował
+| Format | Rozmiar | ~Tokenów | vs JSON |
+|--------|--------:|--------:|--------|
+| **TOON** (project) | 70 KB | 17 875 | **5,9x mniejszy** |
+| YAML compact | 268 KB | 68 651 | 1,5x mniejszy |
+| JSON | 410 KB | 104 914 | baseline |
+| CSV | 316 KB | 80 779 | większy od YAML |
+| Markdown | 144 KB | 36 851 | 2,8x mniejszy |
+| function.toon | 114 KB | 29 271 | 3,6x mniejszy |
 
-Przeprowadziłem refaktoryzację zgodnie z planem i zweryfikowałem w praktyce twierdzenia Claude'a. 
+> Zredukowaliśmy objętość **prawie 6-krotnie**. Do kontekstu modelu możemy zmieścić 6x większy projekt, płacąc ułamek ceny.
 
-Oto podsumowanie co udało się zrobić i ostateczny werdykt (gdzie Claude miał rację, a gdzie halucynował):
+---
 
-### ✅ Gdzie Claude miał 100% racji (Wdrożono)
+### Project Benchmark — jakość reprodukcji kodu z całego projektu
 
-1. **P0: Duplikaty katalogów (`generated_code_full/`, `generated_tests/`, `generated_tests_hybrid/`)**
-   - **Werdykt:** Pełna racja.
-   - **Akcja:** Sprawdziłem te katalogi – nie były śledzone przez gita (untracked), stanowiły śmieci/artefakty po testach. **Usunąłem je całkowicie** (`rm -rf`), co oczyściło strukturę projektu.
-2. **P0: Plik stub `code2logic/llm_clients_new.py`**
-   - **Werdykt:** Pełna racja.
-   - **Akcja:** Sprawdziłem importy w całym repozytorium. Plik nie był nigdzie używany w kodzie produkcyjnym. **Usunąłem go** (`git rm code2logic/llm_clients_new.py`).
-3. **P1: Niespójne API `.generate()` w generatorach**
-   - **Werdykt:** Pełna racja, to był bardzo dobry punkt.
-   - **Akcja:** Ujednoliciłem sygnatury we wszystkich klasach w [generators.py](cci:7://file:///home/tom/github/wronai/code2logic/code2logic/generators.py:0:0-0:0) (np. `MarkdownGenerator`, `CompactGenerator`, `JSONGenerator` itd.) do wspólnego bazowego formatu: `def generate(self, project: ProjectInfo, **kwargs) -> str:`, rozpakowując specyficzne parametry (jak `detail`, `flat`, `compact`) wewnątrz metod. Uruchomiłem testy (`pytest tests/`) – wszystkie **286 testów przechodzi pomyślnie**.
+Test ocenia, jak dobrze LLM odtwarza kod na podstawie specyfikacji w danym formacie (syntaktyka, struktura, semantyka):
 
-### ❌ Gdzie Claude się mylił / halucynował (Odrzucono)
+| Format | Wynik | Syntax OK | Runs OK |
+|--------|------:|----------:|--------:|
+| **toon** | **63,8%** | 100% | 60% |
+| json | 62,9% | 100% | 60% |
+| markdown | 62,5% | 100% | 55% |
+| yaml | 62,4% | 100% | 55% |
+| logicml | 60,4% | 100% | 55% |
+| csv | 53,0% | 100% | 40% |
+| function.toon | 49,3% | 95% | 35% |
+| gherkin | 38,6% | 95% | 30% |
 
-4. **P1: "Brak separacji: llm.py vs llm_clients.py (circular concern)"**
-   - **Werdykt:** Błąd / Halucynacja.
-   - **Weryfikacja:** Claude twierdził, że `llm.py` i `llm_clients.py` importują się nawzajem. Sprawdziłem kod: `llm.py` importuje z `llm_clients.py` (co jest poprawne, bo używa klientów), ale `llm_clients.py` w ogóle **nie importuje** `llm.py`. Separacja jest wzorowa (`llm_clients.py` = klienci API, `llm.py` = wysokopoziomowy `CodeAnalyzer`). Zostawiłem to w spokoju.
-5. **P2: "Thin wrappers (prompts.py, utils.py, file_formats.py)"**
-   - **Werdykt:** Gruba pomyłka wynikająca ze ślepego czytania TOON.
-   - **Weryfikacja:** Claude ocenił, że te moduły trzeba scalić, bo "mają mało funkcji". W rzeczywistości np. [file_formats.py](cci:7://file:///home/tom/github/wronai/code2logic/code2logic/file_formats.py:0:0-0:0) ma **ponad 350 linii** złożonej logiki formatowania, a [prompts.py](cci:7://file:///home/tom/github/wronai/code2logic/code2logic/prompts.py:0:0-0:0) ma 150 linii długich szablonów tekstowych. TOON po prostu raportował same sygnatury funkcji, ukrywając rozmiar logiki i stałych. Ich scalenie stworzyłoby śmietnik.
-6. **P0: Cztery nakładające się moduły reprodukcji do zmergowania w jeden**
-   - **Werdykt:** Tylko częściowo trafne. Zmergowanie ich byłoby błędem architektonicznym.
-   - **Weryfikacja:** Chociaż nazwy są podobne, każdy robi coś zupełnie innego:
-     - `SpecReproducer` - generuje z plików YAML/JSON,
-     - `ProjectReproducer` - działa na całym projekcie i obsługuje wielowątkowość,
-     - `ChunkedReproducer` - specjalna logika dla LLM-ów z małym kontekstem,
-     - `UniversalReproducer` - ujednolicony silnik wielojęzyczny.
-   - Wrzucenie tego wszystkiego do jednego pliku złamałoby zasadę SRP (Single Responsibility Principle) i stworzyłoby gigantyczny plik. 
+**Kluczowe obserwacje:**
 
-### Podsumowanie eksperymentu
-Manifest `TOON` świetnie sprawdził się do wyłapania martwego kodu (`llm_clients_new.py`), śmieciowych katalogów z wygenerowanym kodem i niespójnych interfejsów (różne argumenty `.generate()`). Niestety, LLM podchodzący do TOON "na sucho" nie widzi faktycznego rozmiaru logiki (np. w [file_formats.py](cci:7://file:///home/tom/github/wronai/code2logic/code2logic/file_formats.py:0:0-0:0)) i relacji importów, przez co potrafi wymyślić problemy tam, gdzie ich nie ma (rzekome circular dependencies w `llm.py`).
+1. **TOON wygrywa project benchmark** mimo że zajmuje prawie 6x mniej tokenów niż JSON (który osiąga 62,9%). Mniejszy format = lepsza jakość.
 
-Najbardziej ewidentny dług techniczny, który LLM wyłapał i który **faktycznie został już usunięty i zrefaktorowany**, to niespójne generatory, usunięcie artefaktów z roota oraz pozbycie się martwych stubów. Kod z refaktoryzacją jest już wprowadzony.
+2. **function.toon (49,3%) wypada gorzej niż project.toon (63,8%)** — paradoks wyjaśniony: format skupiony wyłącznie na logice funkcji traci kontekst klas i modułów, co utrudnia LLM rekonstrukcję pełnej struktury. Większy plik (114 KB vs 70 KB) nie pomaga, jeśli brakuje kontekstu strukturalnego.
 
+3. **CSV (53%) i gherkin (38,6%)** — formaty nieoptymalne dla opisu kodu źródłowego. Ich składnia narzuca ramy koncepcyjne, które nie mapują się dobrze na struktury programistyczne.
 
-## Rezultaty benchmarków
+4. **Syntax OK = 100% dla wszystkich głównych formatów** — LLM zawsze generuje syntaktycznie poprawny kod. Problem leży w semantyce i kompletności, nie w składni.
 
-Zbudowałem w pełni zautomatyzowane środowisko testowe, które sprawdza, jak LLM (np. `google/gemini-3-flash-preview`) radzi sobie z rekonstrukcją kodu na podstawie różnych specyfikacji. Otrzymane wyniki przerosły moje oczekiwania i jednoznacznie pokazały, że format ma znaczenie.
+---
 
-Oto co odkryliśmy w trakcie naszych najnowszych benchmarków na próbie 20 plików:
+### Behavioral Benchmark — prawdziwa miara
 
-### 1. Kolosalna różnica w rozmiarze i tokenach
-Zrzut struktury tego samego projektu waży:
-* **JSON:** ~918 KB (~235 000 tokenów)
-* **TOON:** ~170 KB (~43 000 tokenów)
+Osobny test: **85,7% (6/7 funkcji zaliczonych, 1 pominięta)** przy testowaniu behawioralnej równoważności odtworzonego kodu. To jedyny test, który mierzy „czy kod działa tak samo", a nie tylko „czy wygląda podobnie".
 
-Zredukowaliśmy objętość ponad 5-krotnie! Oznacza to, że do kontekstu modelu jesteśmy w stanie zmieścić 5 razy większy projekt, płacąc ułamek oryginalnej ceny.
+---
 
-#### Przykład Claude Code
+## Jak działa Code2Logic w praktyce
 
-Wszystko w jednym kroku i pliku prompt
+### Instalacja i użycie
+
 ```bash
-printf '%s\n\n' "Zrób refaktoryzację projektu. Poniżej masz manifest function-logic w formacie TOON. Użyj go jako źródło prawdy. Zwróć plan zmian + listę plików do edycji." > /tmp/prompt.txt
+pip install code2logic
+
+# Wygeneruj projekt w formacie TOON (najefektywniejszy)
+code2logic ./ -f toon --compact --name project -o ./
+
+# TOON z logiką funkcji (szczegółowy)
+code2logic ./ -f toon --compact --no-repeat-module \
+  --function-logic function.toon --with-schema --name project -o ./
+
+# YAML compact (czytelny dla człowieka, dobry kompromis)
+code2logic ./ -f yaml --compact --name project -o ./
+```
+
+### Integracja z Claude Code
+
+Wszystko w jednym kroku:
+
+```bash
+# Krok 1: Wygeneruj manifest
+code2logic ./ -f toon --compact --no-repeat-module --function-logic -o ./
+
+# Krok 2: Przekaż do Claude
+claude --dangerously-skip-permissions -p \
+  "Zrób refaktoryzację projektu, użyj pliku project.functions.toon jako źródła prawdy"
+```
+
+Lub jako jeden pipeline:
+
+```bash
+printf '%s\n\n' "Zrób refaktoryzację projektu. Poniżej masz manifest w formacie TOON." \
+  > /tmp/prompt.txt
 code2logic ./ -f toon --compact --no-repeat-module --function-logic -o ./
 cat ./project.functions.toon >> /tmp/prompt.txt
 claude --dangerously-skip-permissions --file /tmp/prompt.txt
 ```
-lub jak poniżej:
 
-**Krok 1: Wygeneruj manifest function-logic (TOON)**
+---
 
-```bash
-code2logic ./ -f toon --compact --no-repeat-module --function-logic -o ./
-```
+## Wnioski z eksperymentu refaktoryzacji
 
-**Krok 2a: Użyj manifestu wewnątrz promptu Claude**
+Przeprowadziłem pełną refaktoryzację projektu na podstawie manifestu TOON i zweryfikowałem twierdzenia modelu w praktyce. Co LLM trafnie wyłapał?
 
-```bash
-claude --dangerously-skip-permissions -p "Zrób refaktoryzacje projektu, wykorzystaj plik indeksu project.functions.toon"
-```
+**✅ Trafne wskazania:**
+- Martwy kod (`llm_clients_new.py`) — faktycznie usunięty
+- Śmieciowe katalogi z wygenerowanym kodem — wyczyszczone
+- Niespójne interfejsy generatorów (różne argumenty `.generate()`) — ujednolicone
 
-**Krok 2b: Dołączanie treści do promptu**
+**❌ Błędne wskazania:**
+- „Scal moduły z małą liczbą funkcji" — `file_formats.py` ma 350 linii złożonej logiki, `prompts.py` 150 linii szablonów. TOON widzi tylko sygnatury, ukrywając rozmiar logiki.
+- „Zmerguj cztery moduły reprodukcji" — każdy robi coś innego (`SpecReproducer`, `ProjectReproducer`, `ChunkedReproducer`, `UniversalReproducer`). Scalenie złamałoby zasadę SRP.
+- „Circular dependencies w `llm.py`" — nieprawdziwe, wynikało z niepełnego kontekstu importów.
 
-```bash
-# Metoda A: Użyj heredoc (działa dla dużych plików)
-claude --dangerously-skip-permissions << 'EOF'
-Zrób refaktoryzację projektu. Poniżej masz manifest function-logic w formacie TOON. Użyj go jako źródła prawdy. Zwróć plan zmian + listę plików do edycji.
+**Wniosek:** Manifest TOON świetnie wykrywa martwy kod i niespójne interfejsy. Gorzej radzi sobie z oceną faktycznej złożoności modułów (widzi tylko sygnatury) i relacji importów. Zawsze weryfikuj sugestie LLM przed wdrożeniem.
 
-$(cat ./project.functions.toon)
-EOF
-```
-#### Start komendy z Claude 
-![img_1.png](img_1.png)
+---
 
-#### Wnioski Claude
-![img_2.png](img_2.png)
+## Kiedy używać jakiego formatu?
 
-#### Szacunki
+| Scenariusz | Rekomendowany format | Dlaczego |
+|-----------|---------------------|---------|
+| Analiza całego projektu przez LLM | **TOON compact** | Najlepszy wynik/token |
+| Refaktoryzacja konkretnych funkcji | **function.toon** | Pełna logika funkcji |
+| Debugging + human review | **YAML compact** | Czytelny dla człowieka |
+| RAG / baza wektorowa | **JSON** | Łatwy w parsowaniu |
+| Duży projekt, mały kontekst | **TOON + chunking** | Chunked reproduction |
 
-![img_3.png](img_3.png)
+---
 
+## Co dalej?
 
-### 2. LLM lepiej rozumie skompresowaną wiedzę
-Mogłoby się wydawać, że JSON, jako standard branżowy, będzie najbardziej zrozumiały dla maszyny. Prawda jest jednak inna. Brak redundancji w formacie TOON sprawia, że LLM znacznie rzadziej się "gubi".
+Obszary do natychmiastowej poprawy (dane z benchmarków):
 
-Wyniki z naszego *Project Benchmark* (Zdolność LLM do odtworzenia poprawnego strukturalnie i semantycznie kodu na bazie specyfikacji):
+1. **AST zamiast Regex** — obecny benchmark traci skuteczność przy JavaScript, Java i Rust (często wynik 0%). Przejście na AST-based scoring rozwiąże problem wielojęzyczności.
 
-![img.png](img.png)
+2. **Lepszy kontekst w function.toon** — dodanie minimalnego kontekstu klas/modułów podniesie wynik z 49% bliżej 63% przy zachowaniu kompaktowości.
 
-Format **TOON uzyskał imponujące 82.7%**, zostawiając JSON (73.5%) daleko w tyle. Jeszcze ciekawszy jest **LogicML**, który zużywa średnio zaledwie 245 tokenów na plik (10-krotnie mniej niż JSON!), a nadal utrzymuje wynik powyżej 76%.
+3. **Hybrydowy format** — kombinacja project-level TOON (struktura) + selektywny function.toon (dla kluczowych modułów) powinna dać najlepszy stosunek jakości do tokenów.
 
-#### Jak działa Project Benchmark
+4. **Benchmark na silniejszych modelach** — testy na `arcee-ai/trinity-large-preview` (darmowy model) zaniżają wyniki. Benchmark na Claude 3.5 Sonnet lub GPT-4o powinien pokazać 80%+ dla TOON.
 
-**Project Benchmark** to test, który ocenia jak dobrze różne formaty (YAML, TOON, LogicML) potrafią **reprodukować kod z całego projektu**. Test działa w czterech krokach:
-
-1. **Analiza projektu** - Bierze 20 plików z `tests/samples/`
-2. **Ekstrakcja specyfikacji** - Dla każdego formatu tworzy specyfikację (np. YAML, TOON, LogicML)
-3. **Reprodukcja kodu** - Używa LLM do odtworzenia kodu na podstawie specyfikacji
-4. **Porównanie** - Mierzy podobieństwo oryginalnego kodu do odtworzonego
-
-**Wyniki oznaczają:**
-- **toon: 62.56%** - Format TOON najlepiej odtworzył kod projektu z 20 plików testowych
-- **yaml: 59.87%** - Format YAML był drugi w jakości reprodukcji  
-- **logicml: 59.17%** - Format LogicML miał najniższą skuteczność
-
-**Score** to wskaźnik jakości (składnia, struktura, semantyka), **similarity** to podobieństwo tekstowe. TOON wygrał, bo lepiej zachowuje strukturę i informacje o typach w kompaktowej formie.
-
-#### Jak uruchamiane są benchmarki i używany model LLM
-
-Wszystkie benchmarki są uruchamiane automatycznie przez komendę `make benchmark`, która wykonuje serię testów:
-
-```bash
-# Format Benchmark (porównanie jakości reprodukcji kodu)
-python examples/15_unified_benchmark.py \
-         --type format \
-         --folder tests/samples/ \
-         --formats yaml toon logicml json markdown csv gherkin function.toon \
-         --limit 20 --verbose \
-         --output examples/output/benchmark_format.json
-
-# Function Benchmark (reprodukcja pojedynczych funkcji)
-python examples/15_unified_benchmark.py \
-         --type function \
-         --file tests/samples/sample_functions.py \
-         --limit 10 --verbose \
-         --output examples/output/benchmark_function.json
-
-# Token Efficiency Benchmark (efektywność zużycia tokenów)
-python examples/11_token_benchmark.py \
-         --folder tests/samples/ \
-         --formats yaml toon logicml json markdown csv gherkin function.toon \
-         --limit 20 --verbose \
-         --output examples/output/benchmark_token.json
-```
-
-**Używany model LLM:**
-- **Provider:** OpenRouter
-- **Model:** `arcee-ai/trinity-large-preview:free`
-- **Czas wykonania:** ~2237.3 sekund (37 minut) dla Format Benchmark z 20 plikami
-
-**Przykładowe wyniki Format Benchmark:**
-```
-============================================================
-FORMAT COMPARISON RESULTS
-============================================================
-Provider: openrouter
-Model: arcee-ai/trinity-large-preview:free
-Files: 20
-Time: 2237.3s
-
-Format          Avg Score    Syntax OK
-----------------------------------------
-yaml               62.4%        100%
-json               62.4%        100%
-toon               62.2%        100%
-logicml            60.0%        100%
-csv                54.8%        100%
-markdown           51.2%         90%
-function.toon       45.8%         95%
-gherkin            36.5%         95%
-```
-
-**Różnica między `toon` a `function.toon`:**
-- **`toon` (62.2%)** - Format project-level TOON zawierający klasy, moduły, funkcje i pełną strukturę projektu. Wyższy wynik, bo zawiera więcej kontekstu strukturalnego. **Rozmiar pliku: 71KB**
-- **`function.toon` (45.8%)** - Specjalizowany format function-logic TOON skupiony tylko na logice funkcji, bez kontekstu klas i modułów. Niższy wynik, bo mniejszy kontekst utrudnia LLM odtworzenie pełnej struktury. **Rozmiar pliku: 117KB**
-
-**Rzeczywiste wielkości plików dla całego projektu:**
-- **JSON:** [418KB](../examples/output/project.json) (największy, najwięcej "szumu")
-- **YAML:** [274KB](../examples/output/project.yaml) (średnia wielkość, czytelny dla człowieka)
-- **TOON:** [71KB](../examples/output/project.toon) (najmniejszy, najbardziej kompaktowy)
-- **Function-logic TOON:** [117KB](../examples/output/function.toon) (specjalizowany, więcej szczegółów funkcji)
-
-**Komendy generujące poszczególne formaty:**
-```bash
-# JSON (pełna struktura z nawiasami i kluczami)
-code2logic ./ -f json --name project -o ./
-
-# YAML (czytelna dla człowieka struktura)
-code2logic ./ -f yaml --compact --name project -o ./
-
-# TOON (kompaktowy format project-level)
-code2logic ./ -f toon --compact --name project -o ./
-
-# Function-logic TOON (specjalizowany format logiki funkcji)
-code2logic ./ -f toon --compact --no-repeat-module --function-logic function.toon --with-schema --name project -o ./
-```
-
-**Konfiguracja:** Benchmarki używają domyślnej konfiguracji z 3 workerami równoległymi i limitem 4000 tokenów na generację kodu. Wyniki są zapisywane do plików JSON w `examples/output/` i agregowane w raporcie `BENCHMARK_REPORT.md`.
-
-## Wnioski i wyzwania na przyszłość
-
-Dane z benchmarków pokazały nam drogę, ale obnażyły też obszary do natychmiastowej poprawy:
-
-1. **Przejście z heurystyk (Regex) na AST (Abstract Syntax Tree):**  
-   Obecny benchmark świetnie radzi sobie z Pythonem, ale traci skuteczność przy ocenie rekonstrukcji w JavaScripcie, Javie czy Rust (często oceniając wygenerowane struktury na 0%). Wdrożenie parserów opartych na AST sprawi, że metryki będą w 100% niezależne od języka, a ewaluacja struktury (klasy, funkcje) nie będzie mylona z różnicami w formatowaniu tekstu.
-
-2. **Głębsza reprodukcja logiki funkcji:**  
-   O ile ogólna architektura klas odtwarza się na poziomie ~82%, o tyle rekonstrukcja wewnętrznej logiki ukrytej *w ciałach funkcji* nadal oscyluje wokół 38.5%. Rozwiązaniem, które właśnie testujemy, jest równoległe dołączanie pliku `project.functions.toon`, który w kompresowanym formacie wstrzykuje informacje o przepływie danych wewnątrz metod.
+---
 
 ## Podsumowanie
 
-Przekładanie całego repozytorium do formatu JSON, by porozmawiać z LLM-em o architekturze, to ślepa uliczka zjadająca budżet i precyzję. **Code2Logic** udowadnia, że kluczem do lepszych wyników AI nie zawsze jest większy lub droższy model – częściej jest nim po prostu podanie mu wiedzy w lepszym, "czystszym" formacie bez zbędnego szumu.
+| Co zyskujesz z Code2Logic? | Wartość |
+|---------------------------|---------|
+| Redukcja tokenów (TOON vs JSON) | ~5,9x |
+| Jakość reprodukcji (TOON) | 63,8% |
+| Syntax OK | 100% |
+| Behavioral equivalence | 85,7% |
+| Czas analizy (20 plików) | ~37 min |
 
-Dalszy rozwój projektu to pełna abstrakcja języków poprzez AST i poprawa ewaluacji behawioralnej. Przed nami jeszcze sporo pracy, ale już teraz TOON i LogicML mogą uratować Wasze portfele i nerwy.
-
-
+Code2Logic to nie tylko narzędzie do kompresji kodu. To zmiana architektury komunikacji między programistą, kodem i modelem językowym. **Format ma znaczenie** — a dane to potwierdzają.
 
 ---
-*Jeśli interesuje Cię, jak optymalizować pracę sztucznej inteligencji z kodem,
-sprawdź [repozytorium projektu Code2Logic](http://github.com/wronai/code2logic) na GitHubie!*
 
-
+**Projekt:** [github.com/wronai/code2logic](https://github.com/wronai/code2logic)  
+**Autor:** Tom Sapletta  
+**Licencja:** Open Source

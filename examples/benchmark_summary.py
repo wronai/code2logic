@@ -49,7 +49,7 @@ def main():
         if d.get("benchmark_type") == "function":
             fr = d.get("function_results") or []
             total = d.get("total_functions", len(fr))
-            sims = [x.get("similarity", 0.0) for x in fr if x.get("similarity", 0.0) > 0]
+            sims = [x.get("similarity", 0.0) for x in fr]
             avg_sim = sum(sims) / len(sims) if sims else 0.0
             syn = (sum(1 for x in fr if x.get("syntax_ok")) / len(fr) * 100) if fr else 0.0
             print(

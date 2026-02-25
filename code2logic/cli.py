@@ -674,6 +674,13 @@ code2logic [path] [options]
         help='Include the does/intent column in function-logic TOON output. Without this flag, the does column is omitted to save tokens.'
     )
     parser.add_argument(
+        '--function-logic-context',
+        choices=['none', 'minimal', 'full'],
+        default='none',
+        dest='function_logic_context',
+        help='Structural context in function-logic TOON: none (flat list), minimal (class headers with bases), full (classes + properties + imports). Default: none.'
+    )
+    parser.add_argument(
         '--no-install',
         action='store_true',
         help='Skip auto-installation of dependencies'

@@ -65,7 +65,7 @@ class LogicMLGenerator:
     """
 
     FORMAT_NAME: str = "logicml"
-    FILE_EXTENSION: str = ".logicml"
+    FILE_EXTENSION: str = ".logicml.yaml"
     TOKEN_EFFICIENCY: float = 1.4  # 40% better than YAML
     REPRODUCTION_FIDELITY: float = 0.97
 

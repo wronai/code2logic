@@ -53,7 +53,7 @@ def _calc_function_summary(d: Dict[str, Any]) -> Tuple[int, float, float]:
     fr = d.get("function_results") or []
     if not fr:
         return 0, 0.0, 0.0
-    sims = [x.get("similarity", 0.0) for x in fr if x.get("similarity", 0.0) > 0]
+    sims = [x.get("similarity", 0.0) for x in fr]
     avg_sim = sum(sims) / len(sims) if sims else 0.0
     ok = sum(1 for x in fr if x.get("syntax_ok"))
     return len(fr), avg_sim, (ok / len(fr)) * 100
@@ -126,26 +126,30 @@ def main() -> None:
 
     lines.append("## Summary")
     lines.append("")
-    lines.append("| Benchmark | Items | Score/Similarity | Syntax OK | Runs OK | Best |")
-    lines.append("|---|---:|---:|---:|---:|---|")
+    lines.append("| Benchmark | Items | Score/Similarity | Syntax OK | Runs OK | Fail% | Best |")
+    lines.append("|---|---:|---:|---:|---:|---:|---|")
+
+    def _fail_pct(d: Optional[Dict[str, Any]]) -> str:
+        fr = float(d.get('failure_rate', 0.0)) if d else 0.0
+        return f"{fr:.0f}%" if fr > 0 else "0%"
 
     if fmt:
         n, avg, syn, run = _calc_file_summary(fmt)
-        lines.append(f"| Format | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {fmt.get('best_format','')} ({fmt.get('best_score',0):.1f}%) |")
+        lines.append(f"| Format | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {_fail_pct(fmt)} | {fmt.get('best_format','')} ({fmt.get('best_score',0):.1f}%) |")
     if flog:
         n, avg, syn, run = _calc_file_summary(flog)
         lines.append(
-            f"| Function-logic format | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {flog.get('best_format','')} ({flog.get('best_score',0):.1f}%) |"
+            f"| Function-logic format | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {_fail_pct(flog)} | {flog.get('best_format','')} ({flog.get('best_score',0):.1f}%) |"
         )
     if tok:
         n, avg, syn, run = _calc_file_summary(tok)
-        lines.append(f"| Token | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {tok.get('best_format','')} ({tok.get('best_score',0):.1f}%) |")
+        lines.append(f"| Token | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {_fail_pct(tok)} | {tok.get('best_format','')} ({tok.get('best_score',0):.1f}%) |")
     if proj:
         n, avg, syn, run = _calc_file_summary(proj)
-        lines.append(f"| Project | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {proj.get('best_format','')} ({proj.get('best_score',0):.1f}%) |")
+        lines.append(f"| Project | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {_fail_pct(proj)} | {proj.get('best_format','')} ({proj.get('best_score',0):.1f}%) |")
     if fun:
         nfun, avg_sim, syn = _calc_function_summary(fun)
-        lines.append(f"| Function | {nfun} funcs | {avg_sim:.1f}% | {syn:.0f}% | - | - |")
+        lines.append(f"| Function | {nfun} funcs | {avg_sim:.1f}% | {syn:.0f}% | - | - | - |")
 
     if beh:
         total = int(beh.get("total_functions") or 0)

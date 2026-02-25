@@ -13,6 +13,7 @@ Usage:
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -26,6 +27,8 @@ from code2logic.benchmarks import (
     BenchmarkConfig,
     run_benchmark,
 )
+
+from code2logic.llm_clients import get_client
 
 
 def print_format_results(result):
@@ -105,6 +108,8 @@ def main():
     parser.add_argument('--no-llm', action='store_true', help='Run without LLM (template fallback)')
     parser.add_argument('--workers', type=int, default=3, help='Max parallel workers for LLM calls (default: 3)')
     parser.add_argument('--max-tokens', type=int, default=4000, help='LLM max_tokens for code generation (default: 4000)')
+    parser.add_argument('--provider', default=None, help="Force LLM provider (e.g. openrouter, litellm, ollama, groq, together)")
+    parser.add_argument('--model', default=None, help="Force LLM model string (e.g. anthropic/claude-3.5-sonnet)")
     args = parser.parse_args()
     
     # Configure
@@ -116,8 +121,16 @@ def main():
         workers=args.workers,
         max_tokens=args.max_tokens,
     )
-    
-    runner = BenchmarkRunner(config=config)
+
+    client = None
+    if not args.no_llm:
+        # Allow explicit provider/model selection (e.g. Claude via OpenRouter).
+        # lolm also supports env var LLM_PROVIDER; keep it in sync for transparency.
+        if args.provider:
+            os.environ["LLM_PROVIDER"] = args.provider
+        client = get_client(provider=args.provider, model=args.model)
+
+    runner = BenchmarkRunner(client=client, config=config)
     
     print(f"Running {args.type} benchmark...")
     print(f"Formats: {', '.join(args.formats)}")

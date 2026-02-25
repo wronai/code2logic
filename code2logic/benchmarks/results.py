@@ -118,6 +118,7 @@ class BenchmarkResult:
     avg_similarity: float = 0.0
     syntax_ok_rate: float = 0.0
     runs_ok_rate: float = 0.0
+    failure_rate: float = 0.0
 
     # Best format (for format comparisons)
     best_format: str = ""
@@ -144,17 +145,18 @@ class BenchmarkResult:
 
     def calculate_aggregates(self):
         """Calculate aggregate metrics from detailed results."""
-        # File results
+        # File results – include ALL scores (zeros count as failures)
         if self.file_results:
-            scores = [r.score for r in self.file_results if r.score > 0]
-            self.avg_score = sum(scores) / len(scores) if scores else 0
+            all_scores = [r.score for r in self.file_results]
+            self.avg_score = sum(all_scores) / len(all_scores) if all_scores else 0
+            self.failure_rate = sum(1 for s in all_scores if s == 0) / len(all_scores) * 100
             self.syntax_ok_rate = sum(1 for r in self.file_results if r.syntax_ok) / len(self.file_results) * 100
             self.runs_ok_rate = sum(1 for r in self.file_results if r.runs_ok) / len(self.file_results) * 100
 
-        # Function results
+        # Function results – include ALL similarities
         if self.function_results:
-            sims = [r.similarity for r in self.function_results if r.similarity > 0]
-            self.avg_similarity = sum(sims) / len(sims) if sims else 0
+            all_sims = [r.similarity for r in self.function_results]
+            self.avg_similarity = sum(all_sims) / len(all_sims) if all_sims else 0
 
         # Format results
         if self.format_results:
@@ -187,9 +189,23 @@ class BenchmarkResult:
         """Load result from JSON file."""
         data = json.loads(Path(path).read_text())
         # Reconstruct nested objects
-        file_results = [FileResult(**r) for r in data.pop('file_results', [])]
+        raw_file_results = data.pop('file_results', [])
+        file_results = []
+        for r in raw_file_results:
+            fmt_results_raw = r.pop('format_results', {})
+            fr = FileResult(**r)
+            fr.format_results = {
+                k: FormatResult(**v) if isinstance(v, dict) else v
+                for k, v in fmt_results_raw.items()
+            }
+            file_results.append(fr)
         function_results = [FunctionResult(**r) for r in data.pop('function_results', [])]
         format_results = [FormatResult(**r) for r in data.pop('format_results', [])]
+
+        # Remove unknown fields that may not be in the dataclass
+        import dataclasses
+        known_fields = {f.name for f in dataclasses.fields(cls)}
+        data = {k: v for k, v in data.items() if k in known_fields}
 
         result = cls(**data)
         result.file_results = file_results

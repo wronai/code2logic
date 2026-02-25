@@ -147,11 +147,15 @@ def _structural_score(original: str, generated: str, language: str) -> float:
     if not o:
         return 0.0
     keys = list(o.keys())
-    matches = 0
+    total = 0.0
     for k in keys:
-        if o.get(k, 0) == g.get(k, 0):
-            matches += 1
-    return matches / max(len(keys), 1) * 100
+        ov = o.get(k, 0)
+        gv = g.get(k, 0)
+        if ov == 0 and gv == 0:
+            total += 1.0
+        elif max(ov, gv) > 0:
+            total += min(ov, gv) / max(ov, gv)
+    return total / max(len(keys), 1) * 100
 
 
 def _extract_code(response: str) -> str:
@@ -159,8 +163,16 @@ def _extract_code(response: str) -> str:
     if not response:
         return ""
 
-    # Try to find code block
-    for marker in ['```python', '```py', '```']:
+    # Try to find code block — check language-specific markers first, then generic
+    markers = [
+        '```python', '```py',
+        '```javascript', '```js', '```typescript', '```ts',
+        '```go', '```rust', '```rs',
+        '```java', '```csharp', '```cs', '```c#',
+        '```sql',
+        '```',
+    ]
+    for marker in markers:
         if marker in response:
             start = response.find(marker) + len(marker)
             if start < len(response) and response[start] == '\n':
@@ -469,12 +481,12 @@ class {cls}:
 
         result.total_time = time.time() - start_time
 
-        # Calculate format aggregates
+        # Calculate format aggregates – include ALL scores (zeros = failures)
         for fmt in formats:
             scores = [
                 fr.format_results[fmt].score
                 for fr in result.file_results
-                if fmt in fr.format_results and fr.format_results[fmt].score > 0
+                if fmt in fr.format_results
             ]
             if scores:
                 result.format_scores[fmt] = sum(scores) / len(scores)
@@ -762,24 +774,34 @@ class {cls}:
 
             result.original_code = '\n'.join(lines[start:end])
 
-            # Create spec
+            # Create spec with richer context
+            calls_str = ', '.join(getattr(func, 'calls', []) or []) or 'None'
+            raises_str = ', '.join(getattr(func, 'raises', []) or []) or 'None'
+            cc = getattr(func, 'complexity', 1) or 1
             spec = f"""Function: {func.name}
 Language: {language}
 Signature: {func.name}({', '.join(func.params)}) -> {func.return_type or 'None'}
 Description: {func.intent or func.docstring or 'No description'}
 Is Async: {func.is_async}
 Decorators: {', '.join(func.decorators) if func.decorators else 'None'}
+Calls: {calls_str}
+Raises: {raises_str}
+Complexity: {cc}
 Lines: {func.lines}
 """
 
-            prompt = f"""Generate ONLY the function code based on this specification:
+            prompt = f"""Generate ONLY the complete function code based on this specification:
 
 {spec}
 
-Requirements:
-- Generate complete, working {language} function
-- Match the signature exactly
-- Output ONLY the function code
+REQUIREMENTS:
+- Generate a complete, working {language} function with REAL logic (not a stub)
+- Match the signature EXACTLY: {func.name}({', '.join(func.params)}) -> {func.return_type or 'None'}
+- Use the Description to implement actual behavior
+- Include decorators if specified
+- The function should be ~{func.lines} lines long
+- Include proper error handling if Raises is specified
+- Output ONLY the function code, no explanations
 
 ```{language}
 """
@@ -793,7 +815,7 @@ Requirements:
                 result.gen_time = 0.0
             else:
                 start_time = time.time()
-                response = client.generate(prompt, max_tokens=2000)
+                response = client.generate(prompt, max_tokens=3000)
                 result.gen_time = time.time() - start_time
                 result.reproduced_code = _extract_code(response)
 
@@ -942,16 +964,22 @@ Requirements:
 
         result.total_time = time.time() - start_time
 
-        # Calculate format aggregates
+        # Calculate format aggregates – include ALL scores (zeros = failures)
         for fmt in formats:
             scores = []
             for fr in result.file_results:
                 if fmt in fr.format_results:
-                    score = fr.format_results[fmt].score
-                    if score > 0:
-                        scores.append(score)
+                    scores.append(fr.format_results[fmt].score)
             if scores:
                 result.format_scores[fmt] = sum(scores) / len(scores)
+
+        # Recalculate each file's score as average across all its formats
+        for fr in result.file_results:
+            if fr.format_results:
+                fmt_scores = [r.score for r in fr.format_results.values()]
+                fr.score = sum(fmt_scores) / len(fmt_scores)
+                fr.syntax_ok = all(r.syntax_ok for r in fr.format_results.values())
+                fr.runs_ok = any(r.runs_ok for r in fr.format_results.values())
 
         result.calculate_aggregates()
 
