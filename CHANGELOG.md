@@ -1,3 +1,22 @@
+## [1.0.42] - 2026-02-25
+
+### Summary
+
+feat(docs): CLI interface improvements
+
+### Docs
+
+- docs: update 00-index.md
+- docs: update 20-llm-benchmarks-claude.md
+
+### Other
+
+- update code2logic/benchmarks/common.py
+- update code2logic/cli.py
+- update code2logic/logicml.py
+- update project.toon
+
+
 ## [1.0.41] - 2026-02-25
 
 ### Summary

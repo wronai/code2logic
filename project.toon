@@ -1,4 +1,4 @@
-# code2logic | 156f 42719L | python:146/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
+# code2logic | 156f 42879L | python:146/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
 M[156]:
   multilang_reproduction_tester.py,1442
@@ -12,7 +12,7 @@ M[156]:
   code2logic/file_formats.py,278
   code2logic/project_reproducer.py,318
   code2logic/base.py,49
-  code2logic/cli.py,909
+  code2logic/cli.py,917
   code2logic/llm.py,287
   code2logic/errors.py,371
   code2logic/code_review.py,205
@@ -31,7 +31,7 @@ M[156]:
   code2logic/__main__.py,12
   code2logic/refactor.py,308
   code2logic/logicml.py,285
-  code2logic/function_logic.py,300
+  code2logic/function_logic.py,326
   code2logic/utils.py,16
   code2logic/generators.py,1787
   code2logic/markdown_format.py,265
@@ -58,7 +58,7 @@ M[156]:
   examples/06_metrics.py,85
   examples/10_function_reproduction.py,51
   examples/08_format_benchmark.py,90
-  examples/benchmark_report.py,167
+  examples/benchmark_report.py,170
   examples/benchmark_summary.py,100
   examples/14_repeatability_test.py,331
   examples/13_project_benchmark.py,70
@@ -148,10 +148,10 @@ M[156]:
   code2logic/schemas/yaml_schema.py,167
   code2logic/schemas/json_schema.py,206
   code2logic/schemas/markdown_schema.py,118
-  code2logic/benchmarks/common.py,258
-  code2logic/benchmarks/runner.py,857
+  code2logic/benchmarks/common.py,326
+  code2logic/benchmarks/runner.py,883
   code2logic/benchmarks/__init__.py,34
-  code2logic/benchmarks/results.py,148
+  code2logic/benchmarks/results.py,162
   code2logic/core/__init__.py,21
   code2logic/formats/__init__.py,31
   code2logic/tools/__init__.py,28
@@ -406,7 +406,7 @@ D:
   code2logic/function_logic.py:
     i: models.{FunctionInfo,ProjectInfo},shared_utils.{remove_self_from_params,truncate_docstring},toon_format.TOONGenerator,typing.{List,Tuple}
     e: FunctionLogicGenerator
-    FunctionLogicGenerator: __init__(1),generate(2),generate_json(2),generate_yaml(2),generate_toon(5)
+    FunctionLogicGenerator: __init__(1),generate(2),generate_json(2),generate_yaml(2),generate_toon(6)
   code2logic/utils.py:
     i: shutil,pathlib.Path
     e: estimate_tokens,write_text_atomic,cleanup_generated_root
@@ -959,7 +959,7 @@ D:
     TaskQueue: add_task(1),get_pending(0),get_by_status(1)  # Task queue container.
     Project: total_tasks(0)  # Project model with nested models.
   tests/samples/sample_javascript.js:
-    e: Product,User,debounce,deepClone,fetchData,filterBy,calculateTotal
+    e: filterBy,fetchData,User,Product,debounce,deepClone,calculateTotal
     User: constructor(3),getDisplayName(0),deactivate(0)
     Product: constructor(3),addTags(0),isInStock(0),formatPrice(0)
     calculateTotal(items)
@@ -995,7 +995,7 @@ D:
     insert(table:str)->InsertBuilder
     update(table:str)->UpdateBuilder
   tests/samples/sample_typescript.ts:
-    e: Product,createUser,calculateOrderTotal,Repository,Result,User,Nullable,fetchUser
+    e: Order,Nullable,Repository,filterByStatus,Result,createUser,processOrder,User
     Repository: add(1),get(1),getAll(0),delete(1),count(0)
     createUser(id: number;name: string;email: string)->User
     calculateOrderTotal(items: OrderItem[])->number

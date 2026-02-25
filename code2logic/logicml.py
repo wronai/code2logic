@@ -80,14 +80,22 @@ class LogicMLGenerator:
     def __init__(self, verbose: bool = False) -> None:
         self.verbose = verbose
 
-    def generate(self, project: ProjectInfo, detail: str = 'standard') -> LogicMLSpec:
-        """Generate LogicML specification for a project."""
+    def generate(self, project: ProjectInfo, detail: str = 'standard', level: str = 'typed') -> LogicMLSpec:
+        """Generate LogicML specification for a project.
+
+        Args:
+            detail: Content detail ('minimal', 'standard', 'full')
+            level: Signature richness level:
+                'compact' - short params (6 max), minimal types
+                'typed'   - full params with types (10 max), return types always shown
+                'full'    - typed + calls/raises always shown
+        """
         parts: List[str] = []
         total_classes = 0
         total_functions = 0
 
         for module in project.modules:
-            module_spec = self._generate_module(module, detail)
+            module_spec = self._generate_module(module, detail, level)
             if module_spec.strip():
                 parts.append(module_spec)
             total_classes += len(module.classes)
@@ -104,7 +112,7 @@ class LogicMLGenerator:
             function_count=total_functions,
         )
 
-    def _generate_module(self, module: ModuleInfo, detail: str) -> str:
+    def _generate_module(self, module: ModuleInfo, detail: str, level: str = 'typed') -> str:
         """Generate LogicML for a single module."""
         lines: List[str] = []
         path = Path(module.path)
@@ -158,12 +166,12 @@ class LogicMLGenerator:
 
         # Classes
         for cls in module.classes:
-            class_yaml = self._generate_class(cls, detail)
+            class_yaml = self._generate_class(cls, detail, level)
             lines.append(class_yaml)
 
         # Top-level functions
         if module.functions:
-            funcs_yaml = self._generate_functions(module.functions, detail)
+            funcs_yaml = self._generate_functions(module.functions, detail, level)
             lines.append(funcs_yaml)
 
         return '\n'.join(lines)
@@ -196,7 +204,7 @@ class LogicMLGenerator:
 
         return '\n'.join(lines) if len(lines) > 1 else ''
 
-    def _generate_class(self, cls: ClassInfo, detail: str) -> str:
+    def _generate_class(self, cls: ClassInfo, detail: str, level: str = 'typed') -> str:
         """Generate LogicML for a class."""
         lines: List[str] = [f'\n{cls.name}:']
 
@@ -245,22 +253,27 @@ class LogicMLGenerator:
         if cls.methods:
             lines.append('  methods:')
             for method in cls.methods[:20]:
-                method_yaml = self._generate_method(method, detail, indent=4)
+                method_yaml = self._generate_method(method, detail, level, indent=4)
                 lines.append(method_yaml)
 
         return '\n'.join(lines)
 
-    def _generate_method(self, method: FunctionInfo, detail: str, indent: int = 2) -> str:
-        """Generate LogicML for a method."""
+    def _generate_method(self, method: FunctionInfo, detail: str, level: str = 'typed', indent: int = 2) -> str:
+        """Generate LogicML for a method.
+
+        Args:
+            level: 'compact' (6 params), 'typed' (10 params, full types), 'full' (typed + calls/raises)
+        """
         prefix = ' ' * indent
         lines: List[str] = [f'{prefix}{method.name}:']
 
         # Check for property decorator
         is_property = 'property' in method.decorators
 
-        # Signature - remove self/cls for compactness
-        clean_params = remove_self_from_params(method.params[:7])
-        params = ', '.join(clean_params[:6])
+        # Signature - param count depends on level
+        max_params = 6 if level == 'compact' else 10
+        clean_params = remove_self_from_params(method.params[:max_params + 1])
+        params = ', '.join(clean_params[:max_params])
         ret = method.return_type or 'None'
 
         sig = f'({params}) -> {ret}'
@@ -271,19 +284,31 @@ class LogicMLGenerator:
 
         lines.append(f'{prefix}  sig: {sig}')
 
-        # Intent/docstring as "does" - truncated for efficiency
+        # Intent/docstring as "does" - longer for typed/full levels
+        does_max = 80 if level in ('typed', 'full') else 60
         if method.docstring:
-            does = truncate_docstring(method.docstring, max_length=60)
+            does = truncate_docstring(method.docstring, max_length=does_max)
             if does:
                 lines.append(f'{prefix}  does: "{does}"')
         elif method.intent:
-            intent = method.intent[:60].replace('\n', ' ').replace('"', "'")
+            intent = method.intent[:does_max].replace('\n', ' ').replace('"', "'")
             lines.append(f'{prefix}  does: "{intent}"')
 
         # Edge cases (from raises)
         if method.raises and detail in ('standard', 'full'):
             for exc in method.raises[:2]:
                 lines.append(f'{prefix}  edge: "error → raise {exc}"')
+            # In 'full' level, also emit raises as list for LLM reconstruction
+            if level == 'full':
+                raises_str = ", ".join(method.raises[:5])
+                lines.append(f'{prefix}  raises: [{raises_str}]')
+
+        # Calls (only in 'full' level or detail='full')
+        if level == 'full' and getattr(method, 'calls', None):
+            calls = (method.calls or [])[:10]
+            if calls:
+                calls_str = ", ".join(calls)
+                lines.append(f'{prefix}  calls: [{calls_str}]')
 
         # Side effects
         side_effects = self._detect_side_effects(method)
@@ -298,12 +323,12 @@ class LogicMLGenerator:
 
         return '\n'.join(lines)
 
-    def _generate_functions(self, functions: List[FunctionInfo], detail: str) -> str:
+    def _generate_functions(self, functions: List[FunctionInfo], detail: str, level: str = 'typed') -> str:
         """Generate LogicML for top-level functions."""
         lines: List[str] = ['\nfunctions:']
 
         for func in functions[:20]:
-            func_yaml = self._generate_method(func, detail, indent=2)
+            func_yaml = self._generate_method(func, detail, level, indent=2)
             lines.append(func_yaml)
 
         return '\n'.join(lines)

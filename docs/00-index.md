@@ -27,6 +27,7 @@ Convert source code to logical representation for LLM analysis
 | 17 | [LOLM](17-lolm.md) | LLM provider management |
 | 18 | [Reproduction Testing](18-reproduction-testing.md) | Format validation and code regeneration |
 | 19 | [Monorepo Workflow](19-monorepo-workflow.md) | Managing all packages from repo root |
+| 20 | [LLM Benchmarks + Claude](20-llm-benchmarks-claude.md) | Run benchmarks with LLM enabled and force Claude (Anthropic) |
 
 ## Repository Links
 

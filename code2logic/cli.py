@@ -1051,6 +1051,7 @@ code2logic [path] [options]
                 no_repeat_name=args.no_repeat_module,
                 no_repeat_details=args.no_repeat_details,
                 include_does=args.does,
+                context=getattr(args, 'function_logic_context', 'none') or 'none',
             )
         else:
             logic_out = logic_gen.generate(project, detail=args.detail)

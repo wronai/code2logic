@@ -41,6 +41,7 @@ def generate_spec(project: ProjectInfo, fmt: str) -> str:
             no_repeat_name=True,
             no_repeat_details=True,
             include_does=True,
+            context="minimal",
         )
     if fmt == "csv":
         gen = CSVGenerator()
