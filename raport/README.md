@@ -220,7 +220,7 @@ gherkin            36.5%         95%
 
 **Różnica między `toon` a `function.toon`:**
 - **`toon` (62.2%)** - Format project-level TOON zawierający klasy, moduły, funkcje i pełną strukturę projektu. Wyższy wynik, bo zawiera więcej kontekstu strukturalnego. **Rozmiar pliku: 71KB**
-- **`function.toon` (45.8%)** - Specjalizowany format function-logic TOON skupiony tylko na logice funkcji, bez kontekstu klas i modułów. Niższy wynik, bo mniejszy kontekst utrudnia LLM odtworzenie pełnej struktury. **Rozmiar pliku: 233KB**
+- **`function.toon` (45.8%)** - Specjalizowany format function-logic TOON skupiony tylko na logice funkcji, bez kontekstu klas i modułów. Niższy wynik, bo mniejszy kontekst utrudnia LLM odtworzenie pełnej struktury. **Rozmiar pliku: 117KB**
 
 **Rzeczywiste wielkości plików dla całego projektu:**
 - **JSON:** [418KB](../examples/output/project.json) (największy, najwięcej "szumu")
