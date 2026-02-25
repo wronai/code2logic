@@ -1,3 +1,19 @@
+## [1.0.40] - 2026-02-25
+
+### Summary
+
+feat(docs): configuration management system
+
+### Docs
+
+- docs: update C2L.md
+
+### Other
+
+- update project.functions.toon
+- update spec.csv
+
+
 ## [1.0.39] - 2026-02-25
 
 ### Summary

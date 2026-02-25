@@ -64,6 +64,13 @@ Zrzut struktury tego samego projektu waży:
 
 Zredukowaliśmy objętość ponad 5-krotnie! Oznacza to, że do kontekstu modelu jesteśmy w stanie zmieścić 5 razy większy projekt, płacąc ułamek oryginalnej ceny.
 
+#### Przykład claude Code
+
+```bash
+code2logic ./ -f toon --compact --no-repeat-module --function-logic -o ./
+claude --dangerously-skip-permissions -p "twój prompt tutaj"
+```
+
 ### 2. LLM lepiej rozumie skompresowaną wiedzę
 Mogłoby się wydawać, że JSON, jako standard branżowy, będzie najbardziej zrozumiały dla maszyny. Prawda jest jednak inna. Brak redundancji w formacie TOON sprawia, że LLM znacznie rzadziej się "gubi".
 
