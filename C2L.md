@@ -68,21 +68,45 @@ Zrzut struktury tego samego projektu waży:
 
 Zredukowaliśmy objętość ponad 5-krotnie! Oznacza to, że do kontekstu modelu jesteśmy w stanie zmieścić 5 razy większy projekt, płacąc ułamek oryginalnej ceny.
 
-#### Przykład claude Code
+#### Przykład Claude Code
 
-Wygeneruj manifest function-logic (TOON) w deterministycznej lokalizacji
+**Krok 1: Wygeneruj manifest function-logic (TOON)**
+
 ```bash
 code2logic ./ -f toon --compact --no-repeat-module --function-logic -o ./
-claude --dangerously-skip-permissions -p "Zrób refaktoryzacje projektu, wykorzystaj plik indeksu project.functions.toon "
 ```
 
-Przykład claude Code z załączaniem do promptu
+**Krok 2: Użyj manifestu w promptie Claude (wersja prosta)**
+
 ```bash
-# Dołącz treść manifestu do promptu (najpewniejsza metoda)
-claude --dangerously-skip-permissions -p "$(
-  printf '%s\n\n' "Zrób refaktoryzację projektu. Poniżej masz manifest function-logic w formacie TOON. Użyj go jako źródła prawdy. Zwróć plan zmian + listę plików do edycji."
-  cat ./project.functions.toon
-)"
+claude --dangerously-skip-permissions -p "Zrób refaktoryzacje projektu, wykorzystaj plik indeksu project.functions.toon"
+```
+
+**Krok 3: Pełne rozwiązanie z dołączaniem treści do promptu (najpewniejsze)**
+
+```bash
+# Metoda A: Użyj heredoc (działa dla dużych plików)
+claude --dangerously-skip-permissions << 'EOF'
+Zrób refaktoryzację projektu. Poniżej masz manifest function-logic w formacie TOON. Użyj go jako źródła prawdy. Zwróć plan zmian + listę plików do edycji.
+
+$(cat ./project.functions.toon)
+EOF
+```
+#### Start komendy z Claude 
+![img_1.png](img_1.png)
+
+#### Wnioski Claude
+![img_2.png](img_2.png)
+
+#### Szacunki
+
+![img_3.png](img_3.png)
+
+```bash
+# Metoda B: Zapisz do pliku tymczasowego (jeśli heredoc nie działa)
+printf '%s\n\n' "Zrób refaktoryzację projektu. Poniżej masz manifest function-logic w formacie TOON. Użyj go jako źródło prawdy. Zwróć plan zmian + listę plików do edycji." > /tmp/prompt.txt
+cat ./project.functions.toon >> /tmp/prompt.txt
+claude --dangerously-skip-permissions --file /tmp/prompt.txt
 ```
 
 ### 2. LLM lepiej rozumie skompresowaną wiedzę
