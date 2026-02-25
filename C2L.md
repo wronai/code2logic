@@ -76,13 +76,13 @@ Zredukowaliśmy objętość ponad 5-krotnie! Oznacza to, że do kontekstu modelu
 code2logic ./ -f toon --compact --no-repeat-module --function-logic -o ./
 ```
 
-**Krok 2: Użyj manifestu w promptie Claude (wersja prosta)**
+**Krok 2a: Użyj manifestu wewnątrz promptu Claude**
 
 ```bash
 claude --dangerously-skip-permissions -p "Zrób refaktoryzacje projektu, wykorzystaj plik indeksu project.functions.toon"
 ```
 
-**Krok 3: Pełne rozwiązanie z dołączaniem treści do promptu (najpewniejsze)**
+**Krok 2b: Dołączanie treści do promptu**
 
 ```bash
 # Metoda A: Użyj heredoc (działa dla dużych plików)
