@@ -139,8 +139,13 @@ def main() -> None:
     if beh:
         total = int(beh.get("total_functions") or 0)
         passed = int(beh.get("passed_functions") or 0)
+        skipped = int(beh.get("skipped_functions") or 0)
+        considered = int(beh.get("considered_functions") or max(total - skipped, 0))
         rate = float(beh.get("pass_rate") or 0.0)
-        lines.append(f"| Behavioral | {total} funcs | {rate:.1f}% | - | - | {passed}/{total} passed |")
+        suffix = f"{passed}/{considered} passed"
+        if skipped:
+            suffix += f" ({skipped} skipped)"
+        lines.append(f"| Behavioral | {total} funcs | {rate:.1f}% | - | - | {suffix} |")
 
     lines.append("")
 
@@ -178,6 +183,7 @@ def main() -> None:
     lines.append("  - Structural heuristics (counts of classes/functions/imports/attributes)")
     lines.append("  - Semantic heuristics (identifier overlap, signature/decorator presence, type hints, docstrings)")
     lines.append("- In `--no-llm` template mode the reproduced code is a placeholder skeleton, so scores reflect spec extractability rather than true code regeneration.")
+    lines.append("- The behavioral benchmark will **skip** functions that look like template stubs (e.g. `return None`). Run with an LLM-enabled function reproduction to measure behavioral equivalence.")
 
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(str(report_path))

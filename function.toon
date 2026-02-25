@@ -1,8 +1,8 @@
-# code2logic function-logic | 249 modules
+# code2logic function-logic | 250 modules
 # Convention: name with . = method, ~name = async, cc:N shown only when >1
 project: code2logic
-generated: "2026-02-25T10:34:53.053450"
-modules[249]{path,lang,items}:
+generated: "2026-02-25T10:39:29.752381"
+modules[250]{path,lang,items}:
   multilang_reproduction_tester.py,py,28
   universal_validator.py,py,23
   reproduction_test_code.py,py,17
@@ -58,6 +58,7 @@ modules[249]{path,lang,items}:
   ./14_repeatability_test.py,py,10
   ./13_project_benchmark.py,py,2
   ./04_project.py,py,1
+  ./behavioral_benchmark.py,py,8
   ./03_reproduction.py,py,1
   ./16_terminal_demo.py,py,10
   ./02_refactoring.py,py,1
@@ -1057,7 +1058,7 @@ function_details:
       51,"_calc_function_summary cc:8","(d:Dict[str,Any]) -> Tuple[int, float, float]"
       62,"_calc_file_summary cc:5","(d:Dict[str,Any]) -> Tuple[int, float, float, float]"
       73,"_read_commands cc:5","(commands_path:Path) -> List[str]"
-      80,"main cc:11",() -> None
+      80,"main cc:15",() -> None
   examples/benchmark_summary.py:
     functions[1]{line,name,sig}:
       8,"main cc:15",()
@@ -1080,6 +1081,16 @@ function_details:
   examples/04_project.py:
     functions[1]{line,name,sig}:
       25,"main cc:5",()
+  examples/behavioral_benchmark.py:
+    functions[8]{line,name,sig}:
+      48,"_load_module_from_path cc:3","(path:Path, module_name:str) -> Any"
+      57,"_exec_function_from_code cc:3","(code:str, function_name:str) -> Callable[..., Any]"
+      79,"_values_equal cc:3","(got:Any, expected:Any) -> bool"
+      85,"_run_case cc:3","(label:str, fn:Callable[Any,Any], expected:Any) -> CaseResult"
+      95,"_looks_like_template_stub cc:5","(code:str) -> bool"
+      103,"_cases_for cc:9","(function_name:str) -> List[Tuple[str, Callable[[], Tuple[Tuple[Any, ...], Dict[str, Any]]]]]"
+      164,"_apply_env_hook cc:2","(kwargs:Dict[str,Any]) -> Dict[str, Any]"
+      172,"main cc:19",() -> None
   examples/03_reproduction.py:
     functions[1]{line,name,sig}:
       29,"main cc:3",()

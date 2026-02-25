@@ -41,6 +41,7 @@ class FunctionBehaviorResult:
     function_name: str
     cases: List[CaseResult]
     ok: bool
+    skipped: bool = False
     error: str = ""
 
 
@@ -85,9 +86,18 @@ def _run_case(label: str, fn: Callable[[], Any], expected: Any) -> CaseResult:
     try:
         got = fn()
         ok = _values_equal(got, expected)
-        return CaseResult(name=label, ok=ok, expected=expected, got=got)
+        err = "" if ok else "mismatch"
+        return CaseResult(name=label, ok=ok, expected=expected, got=got, error=err)
     except Exception as e:
         return CaseResult(name=label, ok=False, expected=expected, got=None, error=str(e)[:200])
+
+
+def _looks_like_template_stub(code: str) -> bool:
+    s = (code or "").strip()
+    if not s:
+        return True
+    # Very common offline skeleton pattern in this repo's benchmarks.
+    return "return None" in s and "pass" not in s and "raise" not in s
 
 
 def _cases_for(function_name: str) -> List[Tuple[str, Callable[[], Tuple[Tuple[Any, ...], Dict[str, Any]]]]]:
@@ -185,6 +195,18 @@ def main() -> None:
             results.append(FunctionBehaviorResult(function_name=fn_name, cases=[], ok=False, error="no cases defined"))
             continue
 
+        if _looks_like_template_stub(reproduced_code):
+            results.append(
+                FunctionBehaviorResult(
+                    function_name=fn_name,
+                    cases=[],
+                    ok=False,
+                    skipped=True,
+                    error="template stub (run with LLM to measure behavioral equivalence)",
+                )
+            )
+            continue
+
         try:
             repro_fn = _exec_function_from_code(reproduced_code, fn_name)
         except Exception as e:
@@ -211,21 +233,27 @@ def main() -> None:
         results.append(FunctionBehaviorResult(function_name=fn_name, cases=case_results, ok=ok))
 
     total = len(results)
+    skipped = sum(1 for r in results if r.skipped)
+    considered = max(total - skipped, 0)
     passed = sum(1 for r in results if r.ok)
-    pass_rate = (passed / total * 100) if total else 0.0
+    pass_rate = (passed / considered * 100) if considered else 0.0
 
     out = {
         "benchmark_type": "behavioral",
         "timestamp": d.get("timestamp"),
         "source": str(source_path),
         "input_function_benchmark": str(bench_path),
+        "note": "If function reproduction was run with --no-llm template stubs, behavioral equivalence is expected to be skipped/low.",
         "total_functions": total,
+        "skipped_functions": skipped,
+        "considered_functions": considered,
         "passed_functions": passed,
         "pass_rate": pass_rate,
         "results": [
             {
                 "function_name": r.function_name,
                 "ok": r.ok,
+                "skipped": r.skipped,
                 "error": r.error,
                 "cases": [asdict(c) for c in r.cases],
             }

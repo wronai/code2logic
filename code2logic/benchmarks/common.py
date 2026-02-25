@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from ..generators import JSONGenerator, YAMLGenerator
+from ..generators import CSVGenerator, JSONGenerator, YAMLGenerator
 from ..gherkin import GherkinGenerator
 from ..logicml import LogicMLGenerator
 from ..markdown_format import MarkdownHybridGenerator
@@ -32,6 +32,9 @@ def generate_spec(project: ProjectInfo, fmt: str) -> str:
     if fmt == "gherkin":
         gen = GherkinGenerator()
         return gen.generate(project)
+    if fmt == "csv":
+        gen = CSVGenerator()
+        return gen.generate(project, detail="full")
     if fmt == "yaml":
         gen = YAMLGenerator()
         return gen.generate(project, detail="full")

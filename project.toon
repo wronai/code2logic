@@ -1,6 +1,6 @@
-# code2logic | 298f 62803L | python:288/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
+# code2logic | 299f 63144L | python:289/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
-M[298]:
+M[299]:
   multilang_reproduction_tester.py,1442
   universal_validator.py,1063
   reproduction_test_code.py,629
@@ -57,11 +57,12 @@ M[298]:
   examples/06_metrics.py,85
   examples/10_function_reproduction.py,51
   examples/08_format_benchmark.py,90
-  examples/benchmark_report.py,143
-  examples/benchmark_summary.py,59
+  examples/benchmark_report.py,156
+  examples/benchmark_summary.py,102
   examples/14_repeatability_test.py,331
   examples/13_project_benchmark.py,70
   examples/04_project.py,55
+  examples/behavioral_benchmark.py,220
   examples/03_reproduction.py,57
   examples/06_metrics_simple.py,0
   examples/16_terminal_demo.py,178
@@ -290,7 +291,7 @@ M[298]:
   code2logic/schemas/yaml_schema.py,167
   code2logic/schemas/json_schema.py,206
   code2logic/schemas/markdown_schema.py,118
-  code2logic/benchmarks/common.py,215
+  code2logic/benchmarks/common.py,218
   code2logic/benchmarks/runner.py,781
   code2logic/benchmarks/__init__.py,34
   code2logic/benchmarks/results.py,148
@@ -709,6 +710,9 @@ D:
   examples/benchmark_summary.py:
     i: json,os,sys
     e: main
+    _fmt_bytes(n:int)->str
+    _token_estimate_bytes(n:int)->int
+    _artifact_row(label:str;path:str)->str
     main()
   examples/14_repeatability_test.py:
     i: argparse,difflib,json,sys,time,datetime,dataclasses.{dataclass,field},pathlib.Path,typing.Dict
@@ -732,6 +736,19 @@ D:
     i: sys,argparse,code2logic.{compare_codebases,reproduce_project},dotenv.load_dotenv,pathlib.Path
     e: main
     main()
+  examples/behavioral_benchmark.py:
+    i: json,os,tempfile,dataclasses.{asdict,dataclass},importlib.util,pathlib.Path,typing.{Any,Callable,Dict}
+    e: CaseResult,FunctionBehaviorResult,main
+    CaseResult: 
+    FunctionBehaviorResult: 
+    _load_module_from_path(path:Path;module_name:str)->Any
+    _exec_function_from_code(code:str;function_name:str)->Callable[..., Any]
+    _values_equal(got:Any;expected:Any)->bool
+    _run_case(label:str;fn:Callable[Any;Any];expected:Any)->CaseResult
+    _looks_like_template_stub(code:str)->bool
+    _cases_for(function_name:str)->List[Tuple[str, Callable[[], Tuple[Tuple[Any, ...], Dict[str, Any]]]]]
+    _apply_env_hook(kwargs:Dict[str;Any])->Dict[str, Any]
+    main()->None
   examples/03_reproduction.py:
     i: sys,argparse,code2logic.{UniversalReproducer,generate_file_gherkin,reproduce_file},dotenv.load_dotenv,pathlib.Path
     e: main
@@ -2497,7 +2514,7 @@ D:
     TaskQueue: add_task(1),get_pending(0),get_by_status(1)  # Task queue container.
     Project: total_tasks(0)  # Project model with nested models.
   tests/samples/sample_javascript.js:
-    e: fetchData,deepClone,User,filterBy,Product,calculateTotal,debounce
+    e: Product,calculateTotal,fetchData,debounce,filterBy,deepClone,User
     User: constructor(3),getDisplayName(0),deactivate(0)
     Product: constructor(3),addTags(0),isInStock(0),formatPrice(0)
     calculateTotal(items)
@@ -2533,7 +2550,7 @@ D:
     insert(table:str)->InsertBuilder
     update(table:str)->UpdateBuilder
   tests/samples/sample_typescript.ts:
-    e: Repository,calculateOrderTotal,processOrder,groupBy,User,Result,createUser,Product
+    e: calculateOrderTotal,Product,OrderItem,fetchUser,Result,createUser,Order,Nullable
     Repository: add(1),get(1),getAll(0),delete(1),count(0)
     createUser(id: number;name: string;email: string)->User
     calculateOrderTotal(items: OrderItem[])->number
@@ -2679,7 +2696,7 @@ D:
     validate_markdown(spec:str)->Tuple[bool, List[str]]
     extract_markdown_sections(spec:str)->Dict[str, Any]
   code2logic/benchmarks/common.py:
-    i: json,datetime,generators.{JSONGenerator,YAMLGenerator},gherkin.GherkinGenerator,logicml.LogicMLGenerator,markdown_format.MarkdownHybridGenerator,models.ProjectInfo,pathlib.Path,toon_format.TOONGenerator
+    i: json,datetime,generators.{CSVGenerator,JSONGenerator,YAMLGenerator},gherkin.GherkinGenerator,logicml.LogicMLGenerator,markdown_format.MarkdownHybridGenerator,models.ProjectInfo,pathlib.Path
     e: create_single_project,generate_spec,generate_spec_token,get_async_reproduction_prompt,get_token_reproduction_prompt,get_simple_reproduction_prompt
     create_single_project(module_info;file_path:Path)->ProjectInfo
     generate_spec(project:ProjectInfo;fmt:str)->str

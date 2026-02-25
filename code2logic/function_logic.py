@@ -160,7 +160,7 @@ class FunctionLogicGenerator:
             "$schema": "https://json-schema.org/draft/2020-12/schema",
             "title": "Code2Logic Function-Logic TOON Schema",
             "description": (
-                "Schema for function.toon — compact function/method index. "
+                "Schema for function-logic TOON output (e.g. project.functions.toon) — compact function/method index. "
                 "Conventions: name containing '.' = method (Class.method), "
                 "~prefix = async, 'cc:N' suffix = cyclomatic complexity (only when >1)."
             ),
