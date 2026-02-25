@@ -100,13 +100,8 @@ Mogłoby się wydawać, że JSON, jako standard branżowy, będzie najbardziej z
 
 Wyniki z naszego *Project Benchmark* (Zdolność LLM do odtworzenia poprawnego strukturalnie i semantycznie kodu na bazie specyfikacji):
 
-```mermaid
-xychart-beta
-    title "Jakość Reprodukcji Projektu przez LLM (Wynik w %)"
-    x-axis ["TOON", "YAML", "Markdown", "LogicML", "JSON", "CSV", "Gherkin"]
-    y-axis "Zgodność rekonstrukcji (%)" 40 --> 90
-    bar [82.7, 79.2, 76.2, 76.0, 73.5, 67.8, 48.0]
-```
+![img.png](img.png)
+
 
 Format **TOON uzyskał imponujące 82.7%**, zostawiając JSON (73.5%) daleko w tyle. Jeszcze ciekawszy jest **LogicML**, który zużywa średnio zaledwie 245 tokenów na plik (10-krotnie mniej niż JSON!), a nadal utrzymuje wynik powyżej 76%.
 
