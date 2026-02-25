@@ -132,6 +132,92 @@ class TOONGenerator:
 
         return '\n'.join(lines)
 
+    def generate_hybrid(
+        self,
+        project: ProjectInfo,
+        detail: str = 'full',
+        no_repeat_name: bool = True,
+        hub_top_n: int = 5,
+        hub_functions_detail: str = 'full',
+    ) -> str:
+        """Generate TOON-Hybrid: project structure + function-logic for hub modules.
+
+        Combines project-level TOON (classes, imports, structure) with
+        selective function-logic details for the most important modules.
+
+        Args:
+            project: Analyzed project info
+            detail: Detail level for project structure
+            no_repeat_name: Compress repeated directory prefixes
+            hub_top_n: Number of top modules to include function details for
+            hub_functions_detail: Detail level for function-logic ('standard', 'full')
+
+        Returns:
+            Hybrid TOON string
+        """
+        from .function_logic import FunctionLogicGenerator
+        from .shared_utils import remove_self_from_params
+
+        # Generate base project TOON
+        base = self.generate(project, detail=detail, no_repeat_name=no_repeat_name)
+
+        # Identify hub modules: use dependency_metrics if available, otherwise sort by function count
+        hub_paths: set = set()
+        dep_metrics = getattr(project, 'dependency_metrics', {}) or {}
+        if dep_metrics:
+            ranked = sorted(dep_metrics.items(), key=lambda x: getattr(x[1], 'pagerank', 0), reverse=True)
+            hub_paths = {path for path, node in ranked[:hub_top_n]}
+        else:
+            # Fallback: rank by total functions + methods
+            def _item_count(m):
+                return len(getattr(m, 'functions', []) or []) + sum(
+                    len(getattr(c, 'methods', []) or []) for c in (getattr(m, 'classes', []) or [])
+                )
+            ranked_modules = sorted(project.modules, key=_item_count, reverse=True)
+            hub_paths = {m.path for m in ranked_modules[:hub_top_n]}
+
+        if not hub_paths:
+            return base
+
+        # Generate function-logic section for hub modules only
+        hub_modules = [m for m in project.modules if m.path in hub_paths]
+        if not hub_modules:
+            return base
+
+        logic_gen = FunctionLogicGenerator()
+        lines = [base, "", "# === Hub Module Function Details ==="]
+
+        for m in hub_modules:
+            items = logic_gen._module_items(m)
+            if not items:
+                continue
+            lines.append(f"  {self._quote(m.path)}:")
+
+            # Emit class context
+            classes = getattr(m, 'classes', []) or []
+            for cls in classes:
+                bases = ','.join(getattr(cls, 'bases', []) or []) or '-'
+                lines.append(f"    CLASS {self._quote(cls.name)}({bases})")
+
+            # Emit function table
+            header = f"line{self.delim_marker}name{self.delim_marker}sig{self.delim_marker}does"
+            lines.append(f"    functions[{len(items)}]{{{header}}}:")
+
+            for kind, qname, func in items:
+                sig = logic_gen._build_sig(func, include_async_prefix=False, language=m.language)
+                start_line = str(getattr(func, 'start_line', 0) or 0)
+                display_name = qname
+                if getattr(func, 'is_async', False):
+                    display_name = f"~{qname}"
+                cc = getattr(func, 'complexity', 1) or 1
+                if cc > 1:
+                    display_name = f"{display_name} cc:{cc}"
+                does = logic_gen._build_does(func)
+                row = [start_line, self._quote(display_name), self._quote(sig), self._quote(does)]
+                lines.append(f"      {self.delimiter.join(row)}")
+
+        return '\n'.join(lines)
+
     def _generate_modules(self, modules: List[ModuleInfo], detail: str, no_repeat_name: bool = False) -> List[str]:
         """Generate modules section."""
         lines = []

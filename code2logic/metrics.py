@@ -303,23 +303,11 @@ class ReproductionMetrics:
         return (dot_product / (magnitude1 * magnitude2)) * 100
 
     def _compute_structural_metrics(self, original: str, generated: str) -> StructuralMetrics:
-        """Compute structural metrics."""
+        """Compute structural metrics using AST when possible, regex as fallback."""
         metrics = StructuralMetrics()
 
-        # Count elements
-        def count_elements(code: str) -> Dict[str, int]:
-            return {
-                'classes': len(re.findall(r'^class\s+\w+', code, re.MULTILINE)),
-                'functions': len(re.findall(r'^(?:async\s+)?def\s+\w+', code, re.MULTILINE)),
-                'methods': len(re.findall(r'^\s+(?:async\s+)?def\s+\w+', code, re.MULTILINE)),
-                'imports': len(re.findall(r'^(?:from|import)\s+', code, re.MULTILINE)),
-                # Capture both annotated attributes and simple assignments.
-                # This is still heuristic, but avoids undercounting common code.
-                'attributes': len(re.findall(r'^\s+\w+\s*(?::\s*[^=\n]+)?\s*=', code, re.MULTILINE)),
-            }
-
-        orig = count_elements(original)
-        gen = count_elements(generated)
+        orig = self._count_elements_ast(original)
+        gen = self._count_elements_ast(generated)
 
         metrics.classes_original = orig['classes']
         metrics.classes_generated = gen['classes']
@@ -341,15 +329,15 @@ class ReproductionMetrics:
         metrics.attributes_generated = gen['attributes']
         metrics.attributes_match = orig['attributes'] == gen['attributes']
 
-        # Structural score
-        matches = sum([
-            metrics.classes_match,
-            metrics.functions_match,
-            metrics.methods_match,
-            metrics.imports_match,
-            metrics.attributes_match,
-        ])
-        metrics.structural_score = (matches / 5) * 100
+        # Ratio-based structural score (partial credit instead of binary)
+        total = 0.0
+        for key in ('classes', 'functions', 'methods', 'imports', 'attributes'):
+            ov, gv = orig[key], gen[key]
+            if ov == 0 and gv == 0:
+                total += 1.0
+            elif max(ov, gv) > 0:
+                total += min(ov, gv) / max(ov, gv)
+        metrics.structural_score = (total / 5) * 100
 
         # Element coverage
         total_orig = sum(orig.values())
@@ -358,6 +346,59 @@ class ReproductionMetrics:
             metrics.element_coverage = min(total_gen / total_orig, 1.0) * 100
 
         return metrics
+
+    @staticmethod
+    def _count_elements_ast(code: str) -> Dict[str, int]:
+        """Count structural elements using Python AST, with regex fallback."""
+        import ast as _ast
+
+        try:
+            tree = _ast.parse(code)
+        except SyntaxError:
+            # Fallback to regex for unparseable code
+            return {
+                'classes': len(re.findall(r'^class\s+\w+', code, re.MULTILINE)),
+                'functions': len(re.findall(r'^(?:async\s+)?def\s+\w+', code, re.MULTILINE)),
+                'methods': len(re.findall(r'^\s+(?:async\s+)?def\s+\w+', code, re.MULTILINE)),
+                'imports': len(re.findall(r'^(?:from|import)\s+', code, re.MULTILINE)),
+                'attributes': len(re.findall(r'^\s+\w+\s*(?::\s*[^=\n]+)?\s*=', code, re.MULTILINE)),
+            }
+
+        classes = 0
+        functions = 0
+        methods = 0
+        imports = 0
+        attributes = 0
+
+        for node in _ast.walk(tree):
+            if isinstance(node, _ast.ClassDef):
+                classes += 1
+                # Count methods inside classes
+                for item in node.body:
+                    if isinstance(item, (_ast.FunctionDef, _ast.AsyncFunctionDef)):
+                        methods += 1
+                    # Count class-level attributes (annotated or assigned)
+                    elif isinstance(item, (_ast.Assign, _ast.AnnAssign)):
+                        attributes += 1
+            elif isinstance(node, (_ast.FunctionDef, _ast.AsyncFunctionDef)):
+                # Only count as top-level function if not inside a class
+                # (methods already counted above)
+                pass
+            elif isinstance(node, (_ast.Import, _ast.ImportFrom)):
+                imports += 1
+
+        # Count top-level functions (not methods)
+        for node in _ast.iter_child_nodes(tree):
+            if isinstance(node, (_ast.FunctionDef, _ast.AsyncFunctionDef)):
+                functions += 1
+
+        return {
+            'classes': classes,
+            'functions': functions,
+            'methods': methods,
+            'imports': imports,
+            'attributes': attributes,
+        }
 
     def _compute_semantic_metrics(self, original: str, generated: str) -> SemanticMetrics:
         """Compute semantic preservation metrics."""

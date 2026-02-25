@@ -1,3 +1,16 @@
+## [1.0.43] - 2026-02-25
+
+### Summary
+
+refactor(goal): CLI interface improvements
+
+### Other
+
+- update code2logic/cli.py
+- update code2logic/metrics.py
+- update code2logic/toon_format.py
+
+
 ## [1.0.42] - 2026-02-25
 
 ### Summary

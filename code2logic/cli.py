@@ -978,11 +978,18 @@ code2logic [path] [options]
         # For TOON, --compact means ultra-compact format
         compact = args.compact if hasattr(args, 'compact') else False
         ultra_compact = args.ultra_compact if hasattr(args, 'ultra_compact') else False
+        use_hybrid = args.hybrid if hasattr(args, 'hybrid') else False
 
         # Use compact or ultra_compact flag (compact takes precedence for TOON)
         use_ultra_compact = ultra_compact or compact
 
-        if use_ultra_compact:
+        if use_hybrid:
+            output = generator.generate_hybrid(
+                project,
+                detail='full',
+                no_repeat_name=args.no_repeat_module,
+            )
+        elif use_ultra_compact:
             output = generator.generate_ultra_compact(project)
         else:
             detail_map = {
