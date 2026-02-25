@@ -325,7 +325,7 @@ status: ## Show library status
 BENCH_SAMPLES := tests/samples
 BENCH_OUTPUT  := examples/output
 BENCH_LIMIT   := 20
-BENCH_FORMATS := yaml toon logicml json markdown csv gherkin
+BENCH_FORMATS := yaml toon logicml json markdown csv gherkin function.toon
 
 # Set BENCH_USE_LLM=1 to run benchmarks with a configured LLM provider
 # (e.g. OpenRouter) instead of offline template mode.
@@ -336,7 +336,7 @@ else
 BENCH_NO_LLM_FLAG := --no-llm
 endif
 
-benchmark: benchmark-format benchmark-function benchmark-token benchmark-project benchmark-toon benchmark-compare ## Run all benchmarks (no LLM)
+benchmark: benchmark-format benchmark-function-logic benchmark-function benchmark-token benchmark-project benchmark-toon benchmark-compare ## Run all benchmarks (no LLM)
 	@echo ""
 	@echo "$(GREEN)All benchmarks completed!$(NC)"
 	@echo "Results in $(BENCH_OUTPUT)/"
@@ -359,6 +359,17 @@ benchmark-format: ## Benchmark format reproduction (yaml/toon/logicml/json)
 		--formats $(BENCH_FORMATS) \
 		--limit $(BENCH_LIMIT) --verbose \
 		--output $(BENCH_OUTPUT)/benchmark_format.json
+
+benchmark-function-logic: ## Benchmark function-logic TOON reproduction as a standalone format
+	@echo "$(BLUE)━━━ Function-Logic Format Benchmark ━━━$(NC)"
+	@mkdir -p $(BENCH_OUTPUT)
+	@printf '%s\n' "$(PYTHON) examples/15_unified_benchmark.py $(BENCH_NO_LLM_FLAG) --type format --folder $(BENCH_SAMPLES)/ --formats function.toon --limit $(BENCH_LIMIT) --verbose --output $(BENCH_OUTPUT)/benchmark_function_logic.json" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
+	$(PYTHON) examples/15_unified_benchmark.py \
+		$(BENCH_NO_LLM_FLAG) --type format \
+		--folder $(BENCH_SAMPLES)/ \
+		--formats function.toon \
+		--limit $(BENCH_LIMIT) --verbose \
+		--output $(BENCH_OUTPUT)/benchmark_function_logic.json
 
 benchmark-function: ## Benchmark function-level reproduction
 	@echo "$(BLUE)━━━ Function Benchmark ━━━$(NC)"

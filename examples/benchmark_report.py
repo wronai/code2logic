@@ -84,6 +84,11 @@ def main() -> None:
 
     artifacts: List[Artifact] = [
         Artifact("Format benchmark", out_dir / "benchmark_format.json", "Format comparison across multiple files"),
+        Artifact(
+            "Function-logic format benchmark",
+            out_dir / "benchmark_function_logic.json",
+            "Standalone format benchmark for function-logic TOON (function.toon)",
+        ),
         Artifact("Token benchmark", out_dir / "benchmark_token.json", "Token efficiency comparison"),
         Artifact("Project benchmark", out_dir / "benchmark_project.json", "Project-level benchmark"),
         Artifact("Function benchmark", out_dir / "benchmark_function.json", "Function-level benchmark"),
@@ -104,6 +109,7 @@ def main() -> None:
     ]
 
     fmt = _load_json(out_dir / "benchmark_format.json")
+    flog = _load_json(out_dir / "benchmark_function_logic.json")
     tok = _load_json(out_dir / "benchmark_token.json")
     proj = _load_json(out_dir / "benchmark_project.json")
     fun = _load_json(out_dir / "benchmark_function.json")
@@ -126,6 +132,11 @@ def main() -> None:
     if fmt:
         n, avg, syn, run = _calc_file_summary(fmt)
         lines.append(f"| Format | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {fmt.get('best_format','')} ({fmt.get('best_score',0):.1f}%) |")
+    if flog:
+        n, avg, syn, run = _calc_file_summary(flog)
+        lines.append(
+            f"| Function-logic format | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {flog.get('best_format','')} ({flog.get('best_score',0):.1f}%) |"
+        )
     if tok:
         n, avg, syn, run = _calc_file_summary(tok)
         lines.append(f"| Token | {n} files | {avg:.1f}% | {syn:.0f}% | {run:.0f}% | {tok.get('best_format','')} ({tok.get('best_score',0):.1f}%) |")

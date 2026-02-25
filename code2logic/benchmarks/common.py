@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from ..generators import CSVGenerator, JSONGenerator, YAMLGenerator
+from ..function_logic import FunctionLogicGenerator
 from ..gherkin import GherkinGenerator
 from ..logicml import LogicMLGenerator
 from ..markdown_format import MarkdownHybridGenerator
@@ -32,6 +33,15 @@ def generate_spec(project: ProjectInfo, fmt: str) -> str:
     if fmt == "gherkin":
         gen = GherkinGenerator()
         return gen.generate(project)
+    if fmt == "function.toon":
+        gen = FunctionLogicGenerator()
+        return gen.generate_toon(
+            project,
+            detail="full",
+            no_repeat_name=True,
+            no_repeat_details=True,
+            include_does=True,
+        )
     if fmt == "csv":
         gen = CSVGenerator()
         return gen.generate(project, detail="full")
@@ -206,6 +216,17 @@ DECORATORS:
 - 'decorators: @staticmethod|@cache' = multiple decorators
 
 CRITICAL: Use imports[], function_docs, and exact signatures to reproduce code accurately.""",
+
+        "function.toon": """Parse function-logic TOON carefully (function/method index):
+
+STRUCTURE:
+- 'modules[N]{path,lang,items}:' module index
+- 'function_details:' per-module tables
+
+CRITICAL:
+- Use the tabular rows (line,name,sig,does,decorators,calls,raises)
+- Reconstruct the full module code even if class bodies are not explicitly described
+- Preserve exact function signatures from 'sig'""",
     }
 
     max_spec = 5000
