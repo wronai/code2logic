@@ -120,6 +120,12 @@ code2logic /path/to/project -f hybrid -o analysis.hybrid.yaml
 # Standard TOON (token-efficient)
 code2logic /path/to/project -f toon -o analysis.toon
 
+# Function-logic TOON (outputs function.toon + optional schema)
+code2logic /path/to/project -f toon --compact --function-logic function.toon --name project -o ./
+
+# Same as above, but also compress repeated module paths and generate JSON Schema
+code2logic /path/to/project -f toon --compact --no-repeat-module --function-logic function.toon --with-schema --name project -o ./
+
 # Ultra-compact TOON (71% smaller, single-letter keys)
 code2logic /path/to/project -f toon --ultra-compact -o analysis-ultra.toon
 
@@ -135,11 +141,36 @@ code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-r
 # Generate function-logic TOON with intent descriptions (does column)
 code2logic /path/to/project -f toon --function-logic --does --name project -o ./
 
-# Generate function-logic TOON + schema (project.functions.toon + project.functions-schema.json)
-code2logic /path/to/project -f toon --function-logic --with-schema --name project -o ./
+# Generate function-logic TOON + schema (function.toon + function-schema.json)
+code2logic /path/to/project -f toon --function-logic function.toon --with-schema --name project -o ./
 ```
 
 Token-oriented object notation - most efficient format for LLM consumption.
+
+## Benchmarks (Makefile)
+
+This repository includes reproducibility benchmarks that compare formats by how well they can be used to regenerate runnable code (heuristic scoring).
+
+```bash
+make benchmark
+```
+
+Generated artifacts (written to `examples/output/`):
+
+- `BENCHMARK_REPORT.md`
+  - Links all artifacts and summarizes the run
+- `BENCHMARK_COMMANDS.sh`
+  - Exact commands used to generate each artifact
+- `benchmark_format.json`, `benchmark_project.json`, `benchmark_token.json`, `benchmark_function.json`
+  - Raw benchmark results
+- `project.toon`, `function.toon` (+ `*-schema.json`)
+  - Self-analysis outputs used for size/token comparisons
+
+Run all example scripts step-by-step:
+
+```bash
+make examples
+```
 
 ## Detail Levels
 

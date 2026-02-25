@@ -49,9 +49,9 @@ pip install code2logic[nlp]         # Enhanced intents
 ## 📖 Quick Start
 ```bash
 code2logic ./ -f yaml --compact --function-logic --with-schema -o project.yaml
-code2logic ./ -f toon --function-logic --with-schema --name project -o ./
-# Optional: include function intent/purpose column in project.functions.toon
-code2logic ./ -f toon --function-logic --does --name project -o ./
+code2logic ./ -f toon --function-logic function.toon --with-schema --name project -o ./
+# Optional: include function intent/purpose column in function.toon
+code2logic ./ -f toon --function-logic function.toon --does --name project -o ./
 ```
     
 ### Command Line

@@ -1,0 +1,16 @@
+# TICKET
+#
+# Configuration for ticket prefixing in commit messages.
+#
+# Supported keys:
+# - prefix: ticket prefix to prepend to commit titles (e.g. ABC-123)
+# - format: formatting template. Available variables:
+#     {ticket} - value of prefix
+#     {title}  - generated conventional commit title
+#
+# Examples:
+# prefix=ABC-123
+# format=[{ticket}] {title}
+
+prefix=
+format=[{ticket}] {title}

@@ -1,6 +1,6 @@
-# code2logic | 297f 62604L | python:287/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
+# code2logic | 298f 62803L | python:288/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
-M[297]:
+M[298]:
   multilang_reproduction_tester.py,1442
   universal_validator.py,1063
   reproduction_test_code.py,629
@@ -57,7 +57,8 @@ M[297]:
   examples/06_metrics.py,85
   examples/10_function_reproduction.py,51
   examples/08_format_benchmark.py,90
-  examples/benchmark_summary.py,44
+  examples/benchmark_report.py,143
+  examples/benchmark_summary.py,59
   examples/14_repeatability_test.py,331
   examples/13_project_benchmark.py,70
   examples/04_project.py,55
@@ -290,7 +291,7 @@ M[297]:
   code2logic/schemas/json_schema.py,206
   code2logic/schemas/markdown_schema.py,118
   code2logic/benchmarks/common.py,215
-  code2logic/benchmarks/runner.py,779
+  code2logic/benchmarks/runner.py,781
   code2logic/benchmarks/__init__.py,34
   code2logic/benchmarks/results.py,148
   code2logic/core/__init__.py,21
@@ -693,6 +694,18 @@ D:
     print_format_comparison(result)
     print_per_file_results(result)
     main()
+  examples/benchmark_report.py:
+    i: json,os,shlex,datetime,dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: Artifact,main
+    Artifact: 
+    _load_json(path:Path)->Optional[Dict[str, Any]]
+    _sizeof(path:Path)->int
+    _fmt_bytes(n:int)->str
+    _token_estimate_bytes(n:int)->int
+    _calc_function_summary(d:Dict[str;Any])->Tuple[int, float, float]
+    _calc_file_summary(d:Dict[str;Any])->Tuple[int, float, float, float]
+    _read_commands(commands_path:Path)->List[str]
+    main()->None
   examples/benchmark_summary.py:
     i: json,os,sys
     e: main
@@ -2484,7 +2497,7 @@ D:
     TaskQueue: add_task(1),get_pending(0),get_by_status(1)  # Task queue container.
     Project: total_tasks(0)  # Project model with nested models.
   tests/samples/sample_javascript.js:
-    e: calculateTotal,User,Product,fetchData,debounce,filterBy,deepClone
+    e: fetchData,deepClone,User,filterBy,Product,calculateTotal,debounce
     User: constructor(3),getDisplayName(0),deactivate(0)
     Product: constructor(3),addTags(0),isInStock(0),formatPrice(0)
     calculateTotal(items)
@@ -2520,7 +2533,7 @@ D:
     insert(table:str)->InsertBuilder
     update(table:str)->UpdateBuilder
   tests/samples/sample_typescript.ts:
-    e: Result,groupBy,Order,Repository,User,OrderItem,Nullable,fetchUser
+    e: Repository,calculateOrderTotal,processOrder,groupBy,User,Result,createUser,Product
     Repository: add(1),get(1),getAll(0),delete(1),count(0)
     createUser(id: number;name: string;email: string)->User
     calculateOrderTotal(items: OrderItem[])->number
@@ -2607,7 +2620,7 @@ D:
     Order:   # Order model.
     Product:   # Product model.
   tests/samples/sample_ts_reexport/math.ts:
-    e: add,multiply
+    e: multiply,add
     add(a: number;b: number)->number
     multiply(a: number;b: number)->number
   examples/code2logic/sample_project/calculator.py:

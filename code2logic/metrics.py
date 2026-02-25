@@ -310,10 +310,12 @@ class ReproductionMetrics:
         def count_elements(code: str) -> Dict[str, int]:
             return {
                 'classes': len(re.findall(r'^class\s+\w+', code, re.MULTILINE)),
-                'functions': len(re.findall(r'^def\s+\w+', code, re.MULTILINE)),
-                'methods': len(re.findall(r'^\s+def\s+\w+', code, re.MULTILINE)),
+                'functions': len(re.findall(r'^(?:async\s+)?def\s+\w+', code, re.MULTILINE)),
+                'methods': len(re.findall(r'^\s+(?:async\s+)?def\s+\w+', code, re.MULTILINE)),
                 'imports': len(re.findall(r'^(?:from|import)\s+', code, re.MULTILINE)),
-                'attributes': len(re.findall(r'^\s+\w+\s*:\s*\w+', code, re.MULTILINE)),
+                # Capture both annotated attributes and simple assignments.
+                # This is still heuristic, but avoids undercounting common code.
+                'attributes': len(re.findall(r'^\s+\w+\s*(?::\s*[^=\n]+)?\s*=', code, re.MULTILINE)),
             }
 
         orig = count_elements(original)

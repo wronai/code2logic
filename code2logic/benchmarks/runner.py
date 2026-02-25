@@ -54,8 +54,10 @@ def _test_python_runs(code: str, timeout: int = 5) -> bool:
                 capture_output=True, timeout=timeout
             )
             return result.returncode == 0
+    except subprocess.TimeoutExpired:
+        return False
     except Exception:
-        return True  # Timeout might mean waiting for input
+        return False
 
 
 def _basic_syntax_ok(code: str, language: str) -> bool:

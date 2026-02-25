@@ -128,8 +128,21 @@ code2logic /path/to/project -f toon --no-repeat-module -o analysis.toon
 # Generate function-logic as TOON + reduce repeats in function_details
 code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-repeat-details
 
-# Enable both (modules table + function_details)
-code2logic /path/to/project -f toon --function-logic --name project -o ./ --no-repeat-module --no-repeat-details
+# Generate function-logic TOON
+# Output file: function.toon
+code2logic /path/to/project -f toon --function-logic function.toon --name project -o ./
+
+# Generate function-logic TOON + schema
+# Output files:
+# - function.toon
+# - function-schema.json
+code2logic /path/to/project -f toon --function-logic function.toon --with-schema --name project -o ./
+
+# Generate function-logic TOON + schema + compress repeated module paths
+# Output files:
+# - function.toon
+# - function-schema.json
+code2logic /path/to/project -f toon --compact --no-repeat-module --function-logic function.toon --with-schema --name project -o ./
 ```
 
 ### Reducing Path Repetition (Filesystem Tree Hint)
@@ -237,8 +250,8 @@ Use `--does` when you need the LLM to understand **what each function does**, no
 When `--with-schema` is used with `--function-logic` and TOON format, a JSON schema is written alongside:
 
 ```bash
-code2logic /path/to/project -f toon --function-logic --with-schema --name project -o ./
-# Produces: project.functions.toon + project.functions-schema.json
+code2logic /path/to/project -f toon --function-logic function.toon --with-schema --name project -o ./
+# Produces: function.toon + function-schema.json
 ```
 
 If using `--stdout`, the function-logic schema is printed under the `=== FUNCTION_LOGIC_SCHEMA ===` section marker.

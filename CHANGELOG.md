@@ -1,3 +1,30 @@
+## [1.0.38] - 2026-02-25
+
+### Summary
+
+feat(docs): CLI interface improvements
+
+### Docs
+
+- docs: update README
+- docs: update 03-cli-reference.md
+- docs: update 07-toon.md
+
+### Other
+
+- build: update Makefile
+- update TICKET
+- update code2logic/benchmarks/runner.py
+- update code2logic/function_logic.py
+- update code2logic/metrics.py
+- update examples/behavioral_benchmark.py
+- update examples/benchmark_report.py
+- update examples/benchmark_summary.py
+- update function-schema.json
+- update function.toon
+- ... and 2 more
+
+
 ## [1.0.37] - 2026-02-25
 
 ### Summary

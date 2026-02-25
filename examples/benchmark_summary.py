@@ -26,15 +26,30 @@ def main():
         if not os.path.exists(path):
             continue
         d = json.load(open(path))
-        total = d.get("total_files", d.get("total_functions", "-"))
-        print(
-            f"{name:<12} {total:>6} "
-            f"{d.get('avg_score', 0):>9.1f}% "
-            f"{d.get('syntax_ok_rate', 0):>9.0f}% "
-            f"{d.get('runs_ok_rate', 0):>9.0f}% "
-            f"{d.get('best_format', '-'):>14} "
-            f"{d.get('total_time', 0):>7.1f}s"
-        )
+        if d.get("benchmark_type") == "function":
+            fr = d.get("function_results") or []
+            total = d.get("total_functions", len(fr))
+            sims = [x.get("similarity", 0.0) for x in fr if x.get("similarity", 0.0) > 0]
+            avg_sim = sum(sims) / len(sims) if sims else 0.0
+            syn = (sum(1 for x in fr if x.get("syntax_ok")) / len(fr) * 100) if fr else 0.0
+            print(
+                f"{name:<12} {total:>6} "
+                f"{avg_sim:>9.1f}% "
+                f"{syn:>9.0f}% "
+                f"{'-':>9} "
+                f"{'-':>14} "
+                f"{d.get('total_time', 0):>7.1f}s"
+            )
+        else:
+            total = d.get("total_files", "-")
+            print(
+                f"{name:<12} {total:>6} "
+                f"{d.get('avg_score', 0):>9.1f}% "
+                f"{d.get('syntax_ok_rate', 0):>9.0f}% "
+                f"{d.get('runs_ok_rate', 0):>9.0f}% "
+                f"{d.get('best_format', '-'):>14} "
+                f"{d.get('total_time', 0):>7.1f}s"
+            )
 
     print()
 
