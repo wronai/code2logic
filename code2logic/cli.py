@@ -646,6 +646,11 @@ Detail levels (columns in csv/json/yaml):
         help='Disable Tree-sitter (use fallback parser)'
     )
     parser.add_argument(
+        '--no-gitignore',
+        action='store_true',
+        help='Do not respect .gitignore (scan all files under path)'
+    )
+    parser.add_argument(
         '--no-similarity',
         action='store_true',
         help='Disable similarity detection (RapidFuzz) to speed up analysis on large projects'
@@ -829,6 +834,7 @@ Detail levels (columns in csv/json/yaml):
         use_treesitter=not args.no_treesitter,
         verbose=args.verbose or args.debug,
         enable_similarity=not args.no_similarity,
+        respect_gitignore=not args.no_gitignore,
     )
     project = analyzer.analyze()
     analyze_time = time.time() - analyze_start

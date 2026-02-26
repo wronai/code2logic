@@ -6,6 +6,7 @@ Provides the high-level API for analyzing codebases.
 
 import logging
 import os
+import subprocess
 import sys
 import time
 from collections import defaultdict
@@ -109,6 +110,7 @@ class ProjectAnalyzer:
         verbose: bool = False,
         include_private: bool = False,
         enable_similarity: bool = True,
+        respect_gitignore: bool = True,
     ):
         """
         Initialize the project analyzer.
@@ -124,6 +126,7 @@ class ProjectAnalyzer:
         self.verbose = verbose
         self.include_private = include_private
         self.enable_similarity = enable_similarity
+        self.respect_gitignore = respect_gitignore
         self.modules: List[ModuleInfo] = []
         self.languages: Dict[str, int] = defaultdict(int)
 
@@ -225,11 +228,16 @@ class ProjectAnalyzer:
         files_matched = 0
         scan_progress_every = 500
 
-        for root, dirnames, filenames in os.walk(self.root_path):
-            dirnames[:] = [d for d in dirnames if d not in self.IGNORE_DIRS]
-            for filename in filenames:
+        git_file_list: Optional[List[Path]] = None
+        if self.respect_gitignore:
+            git_file_list = self._get_git_nonignored_files()
+            if git_file_list is not None and self.verbose:
+                log.info("Using git file list (non-ignored): files=%d", len(git_file_list))
+
+        if git_file_list is not None:
+            for fp in git_file_list:
                 files_seen += 1
-                fp = Path(root) / filename
+                filename = fp.name
 
                 if filename in self.IGNORE_FILES:
                     continue
@@ -293,6 +301,75 @@ class ProjectAnalyzer:
                         module.file_bytes = len(content.encode('utf-8', errors='ignore'))
                     self.modules.append(module)
 
+        else:
+            for root, dirnames, filenames in os.walk(self.root_path):
+                dirnames[:] = [d for d in dirnames if d not in self.IGNORE_DIRS]
+                for filename in filenames:
+                    files_seen += 1
+                    fp = Path(root) / filename
+
+                    if filename in self.IGNORE_FILES:
+                        continue
+
+                    ext = fp.suffix.lower()
+                    language = self.LANGUAGE_EXTENSIONS.get(ext)
+                    if language is None and ext == '':
+                        try:
+                            with fp.open('r', encoding='utf-8', errors='ignore') as f:
+                                language = self._language_from_shebang(f.readline())
+                        except Exception:
+                            language = None
+
+                    if language is None:
+                        continue
+
+                    files_matched += 1
+                    self.languages[language] += 1
+
+                    if self.verbose and files_seen > 0 and (files_seen % scan_progress_every) == 0:
+                        log.info(
+                            "Scan progress: seen=%d matched=%d parsed=%d modules=%d time=%.2fs",
+                            files_seen,
+                            files_matched,
+                            files_parsed,
+                            len(self.modules),
+                            time.time() - scan_start,
+                        )
+
+                    try:
+                        content = fp.read_text(encoding='utf-8', errors='ignore')
+                    except Exception:
+                        continue
+
+                    try:
+                        rel_path = str(fp.relative_to(self.root_path))
+                    except Exception:
+                        rel_path = str(fp)
+
+                    module = None
+                    try:
+                        if self.ts_parser and self.ts_parser.is_available(language):
+                            module = self.ts_parser.parse(rel_path, content, language)
+                    except Exception as e:
+                        if self.verbose:
+                            log.debug("Tree-sitter parser failed for %s: %s", rel_path, e)
+
+                    if module is None:
+                        try:
+                            module = self.fallback_parser.parse(rel_path, content, language)
+                        except Exception as e:
+                            if self.verbose:
+                                log.debug("Fallback parser failed for %s: %s", rel_path, e)
+                            continue
+
+                    if module:
+                        files_parsed += 1
+                        try:
+                            module.file_bytes = fp.stat().st_size
+                        except Exception:
+                            module.file_bytes = len(content.encode('utf-8', errors='ignore'))
+                        self.modules.append(module)
+
         if self.verbose:
             log.info(
                 "Scan finished: seen=%d matched=%d parsed=%d modules=%d time=%.2fs",
@@ -302,6 +379,34 @@ class ProjectAnalyzer:
                 len(self.modules),
                 time.time() - scan_start,
             )
+
+    def _get_git_nonignored_files(self) -> Optional[List[Path]]:
+        """Return list of non-ignored files according to git, or None if unavailable."""
+        git_dir = self.root_path / '.git'
+        if not git_dir.exists():
+            return None
+
+        try:
+            proc = subprocess.run(
+                ['git', '-C', str(self.root_path), 'ls-files', '-co', '--exclude-standard'],
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                text=True,
+            )
+        except Exception:
+            return None
+
+        if proc.returncode != 0:
+            return None
+
+        files: List[Path] = []
+        for line in (proc.stdout or '').splitlines():
+            rel = (line or '').strip()
+            if not rel:
+                continue
+            files.append(self.root_path / rel)
+        return files
 
     def _detect_entrypoints(self) -> List[str]:
         """Detect project entry points."""
