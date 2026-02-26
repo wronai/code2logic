@@ -18,4 +18,4 @@ __all__ = [
     "ProcessingError",
 ]
 
-__version__ = "1.0.47"
+__version__ = "1.0.48"

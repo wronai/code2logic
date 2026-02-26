@@ -285,6 +285,152 @@ def function_{i:04d}(param_{i}: int) -> str:
         assert result.functions[49].name == "function_0049"
 
 
+def parse_js(parser, code: str):
+    """Helper to parse JavaScript code."""
+    return parser.parse('test.js', code, 'javascript')
+
+
+class TestJavaScriptFunctionExtraction:
+    """Test JS function extraction: arrow fns, function expressions, IIFEs, nested, etc."""
+
+    def test_regular_function_declaration(self, parser):
+        code = 'function walk(dir, onFile) {\n  console.log(dir);\n}\n'
+        result = parse_js(parser, code)
+        names = [f.name for f in result.functions]
+        assert 'walk' in names
+
+    def test_async_function_declaration(self, parser):
+        code = 'async function fetchData(url) {\n  return await fetch(url);\n}\n'
+        result = parse_js(parser, code)
+        fn = next(f for f in result.functions if f.name == 'fetchData')
+        assert fn.is_async
+
+    def test_const_arrow_function(self, parser):
+        code = 'const getArg = (name, def) => {\n  return name;\n};\n'
+        result = parse_js(parser, code)
+        names = [f.name for f in result.functions]
+        assert 'getArg' in names
+        fn = next(f for f in result.functions if f.name == 'getArg')
+        assert len(fn.params) == 2
+
+    def test_let_arrow_function(self, parser):
+        code = 'let processItem = (item) => {\n  return item;\n};\n'
+        result = parse_js(parser, code)
+        names = [f.name for f in result.functions]
+        assert 'processItem' in names
+
+    def test_var_arrow_function(self, parser):
+        code = 'var shouldIgnore = (filePath) => {\n  return false;\n};\n'
+        result = parse_js(parser, code)
+        names = [f.name for f in result.functions]
+        assert 'shouldIgnore' in names
+
+    def test_const_function_expression(self, parser):
+        code = 'const validate = function(input) {\n  return !!input;\n};\n'
+        result = parse_js(parser, code)
+        names = [f.name for f in result.functions]
+        assert 'validate' in names
+
+    def test_var_function_expression(self, parser):
+        code = 'var formatOutput = function(data, indent) {\n  return JSON.stringify(data);\n};\n'
+        result = parse_js(parser, code)
+        names = [f.name for f in result.functions]
+        assert 'formatOutput' in names
+
+    def test_iife_named_function(self, parser):
+        code = '(function main() {\n  console.log("hello");\n})();\n'
+        result = parse_js(parser, code)
+        names = [f.name for f in result.functions]
+        assert 'main' in names
+
+    def test_nested_function_in_body(self, parser):
+        code = '''function findFiles(dir) {
+  const files = [];
+  function traverse(currentDir) {
+    console.log(currentDir);
+  }
+  traverse(dir);
+  return files;
+}
+'''
+        result = parse_js(parser, code)
+        names = [f.name for f in result.functions]
+        assert 'findFiles' in names
+        assert 'traverse' in names
+
+    def test_deeply_nested_functions(self, parser):
+        code = '''function outer(data) {
+  function middle(items) {
+    function inner(a, b) {
+      return a - b;
+    }
+    return items.sort(inner);
+  }
+  return middle(data);
+}
+'''
+        result = parse_js(parser, code)
+        names = [f.name for f in result.functions]
+        assert 'outer' in names
+        assert 'middle' in names
+        assert 'inner' in names
+
+    def test_module_exports_shorthand(self, parser):
+        code = '''function foo() {}
+function bar() {}
+module.exports = { foo, bar };
+'''
+        result = parse_js(parser, code)
+        assert 'foo' in result.exports
+        assert 'bar' in result.exports
+
+    def test_commonjs_require_imports(self, parser):
+        code = "const fs = require('fs');\nconst path = require('path');\n"
+        result = parse_js(parser, code)
+        assert 'fs' in result.imports
+        assert 'path' in result.imports
+
+    def test_class_with_methods(self, parser):
+        code = '''class FileProcessor {
+  constructor(rootDir) {
+    this.rootDir = rootDir;
+  }
+  async analyze(filePath) {
+    return {};
+  }
+  static fromConfig(configPath) {
+    return new FileProcessor('.');
+  }
+}
+'''
+        result = parse_js(parser, code)
+        assert len(result.classes) == 1
+        cls = result.classes[0]
+        assert cls.name == 'FileProcessor'
+        method_names = [m.name for m in cls.methods]
+        assert 'constructor' in method_names
+        assert 'analyze' in method_names
+        assert 'fromConfig' in method_names
+
+    def test_export_clause(self, parser):
+        code = '''function foo() {}
+const bar = () => {};
+export { foo, bar };
+'''
+        result = parse_js(parser, code)
+        assert 'foo' in result.exports
+        assert 'bar' in result.exports
+
+    def test_no_duplicate_functions(self, parser):
+        """Ensure same function isn't listed twice."""
+        code = '''function walk(dir) {}
+module.exports = { walk };
+'''
+        result = parse_js(parser, code)
+        walk_fns = [f for f in result.functions if f.name == 'walk']
+        assert len(walk_fns) == 1
+
+
 class TestMethodSignatureIntegrity:
     """Additional tests for method signature integrity."""
     

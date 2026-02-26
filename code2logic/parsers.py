@@ -1038,6 +1038,12 @@ class TreeSitterParser:
         root = tree.root_node
         imports, classes, functions, types, constants, exports = [], [], [], [], [], []
         docstring = None
+        seen_fn_names: set = set()
+
+        def _add_func(func):
+            if func and func.name not in seen_fn_names:
+                functions.append(func)
+                seen_fn_names.add(func.name)
 
         for child in root.children:
             node_type = child.type
@@ -1047,6 +1053,15 @@ class TreeSitterParser:
                 for c in child.children:
                     if c.type == 'string':
                         imports.append(self._text(c, content).strip('"\''))
+
+            # CommonJS require imports
+            elif node_type in ('lexical_declaration', 'variable_declaration'):
+                self._extract_js_require_imports(child, content, imports)
+                func = self._extract_js_var_fn(child, content)
+                _add_func(func)
+                const = self._extract_js_constant(child, content)
+                if const:
+                    constants.append(const)
 
             # Exports
             elif node_type == 'export_statement':
@@ -1059,12 +1074,12 @@ class TreeSitterParser:
                     elif c.type == 'function_declaration':
                         func = self._extract_js_function(c, content)
                         if func:
-                            functions.append(func)
+                            _add_func(func)
                             exports.append(func.name)
-                    elif c.type == 'lexical_declaration':
-                        func = self._extract_js_arrow_fn(c, content)
+                    elif c.type in ('lexical_declaration', 'variable_declaration'):
+                        func = self._extract_js_var_fn(c, content)
                         if func:
-                            functions.append(func)
+                            _add_func(func)
                             exports.append(func.name)
                     elif c.type in ('interface_declaration', 'type_alias_declaration'):
                         t = self._extract_ts_type(c, content)
@@ -1076,6 +1091,12 @@ class TreeSitterParser:
                         if t:
                             types.append(t)
                             exports.append(t.name)
+                    elif c.type == 'export_clause':
+                        for spec in c.children:
+                            if spec.type == 'export_specifier':
+                                name_node = self._find_child(spec, 'identifier')
+                                if name_node:
+                                    exports.append(self._text(name_node, content))
 
             # Non-exported declarations
             elif node_type == 'class_declaration':
@@ -1085,25 +1106,25 @@ class TreeSitterParser:
                     exports.append(cls.name)
             elif node_type == 'function_declaration':
                 func = self._extract_js_function(child, content)
+                _add_func(func)
                 if func:
-                    functions.append(func)
                     exports.append(func.name)
-            elif node_type == 'lexical_declaration':
-                func = self._extract_js_arrow_fn(child, content)
-                if func:
-                    functions.append(func)
-                const = self._extract_js_constant(child, content)
-                if const:
-                    constants.append(const)
             elif node_type in ('interface_declaration', 'type_alias_declaration'):
                 t = self._extract_ts_type(child, content)
                 if t:
                     types.append(t)
                     exports.append(t.name)
 
+            # expression_statement: IIFEs, module.exports, assignments
+            elif node_type == 'expression_statement':
+                self._extract_from_expression_stmt(child, content, functions, exports, seen_fn_names)
+
             # Leading comment as docstring
             elif node_type == 'comment' and not docstring:
                 docstring = self._extract_js_comment(child, content)
+
+        # Walk entire tree for nested functions (inside other function bodies)
+        self._walk_nested_functions(root, content, functions, seen_fn_names)
 
         lines = content.split('\n')
         return ModuleInfo(
@@ -1233,37 +1254,219 @@ class TreeSitterParser:
             end_line=node.end_point[0] + 1
         )
 
-    def _extract_js_arrow_fn(self, node, content: str) -> Optional[FunctionInfo]:
-        """Extract arrow function assigned to const."""
+    def _extract_js_var_fn(self, node, content: str) -> Optional[FunctionInfo]:
+        """Extract arrow function or function expression assigned to const/let/var."""
         for c in node.children:
             if c.type == 'variable_declarator':
                 name_node = self._find_child(c, 'identifier')
-                arrow = self._find_child(c, 'arrow_function')
-                if name_node and arrow:
-                    name = self._text(name_node, content)
-                    is_async = 'async' in self._text(arrow, content)[:30]
-                    params = []
-                    pn = self._find_child(arrow, 'formal_parameters')
-                    if pn:
-                        params = self._extract_js_params(pn, content)
-                    return FunctionInfo(
-                        name=name,
-                        params=params[:8],
-                        return_type=None,
-                        docstring=None,
-                        calls=[],
-                        raises=[],
-                        complexity=1,
-                        lines=node.end_point[0] - node.start_point[0] + 1,
-                        decorators=[],
-                        is_async=is_async,
-                        is_static=False,
-                        is_private=name.startswith('_'),
-                        intent=self.intent_gen.generate(name),
-                        start_line=node.start_point[0] + 1,
-                        end_line=node.end_point[0] + 1
-                    )
+                if not name_node:
+                    continue
+                # Arrow function: const foo = (...) => { ... }
+                fn_node = self._find_child(c, 'arrow_function')
+                # Function expression: const foo = function(...) { ... }
+                if fn_node is None:
+                    fn_node = self._find_child(c, 'function')
+                # Also handle: const foo = async function(...) { ... }  (via function_expression)
+                if fn_node is None:
+                    fn_node = self._find_child(c, 'function_expression')
+                if fn_node is None:
+                    # Check for call_expression wrapping function (e.g. memoize(function...))
+                    continue
+                name = self._text(name_node, content)
+                fn_text = self._text(fn_node, content)[:50]
+                is_async = fn_text.strip().startswith('async')
+                params = []
+                pn = self._find_child(fn_node, 'formal_parameters')
+                if pn:
+                    params = self._extract_js_params(pn, content)
+                return_type = None
+                type_ann = self._find_child(fn_node, 'type_annotation')
+                if type_ann:
+                    return_type = self._text(type_ann, content).lstrip(':').strip()
+                return FunctionInfo(
+                    name=name,
+                    params=params[:8],
+                    return_type=return_type,
+                    docstring=None,
+                    calls=[],
+                    raises=[],
+                    complexity=1,
+                    lines=node.end_point[0] - node.start_point[0] + 1,
+                    decorators=[],
+                    is_async=is_async,
+                    is_static=False,
+                    is_private=name.startswith('_'),
+                    intent=self.intent_gen.generate(name),
+                    start_line=node.start_point[0] + 1,
+                    end_line=node.end_point[0] + 1
+                )
         return None
+
+    def _extract_js_arrow_fn(self, node, content: str) -> Optional[FunctionInfo]:
+        """Extract arrow function assigned to const (backward compat alias)."""
+        return self._extract_js_var_fn(node, content)
+
+    def _extract_js_require_imports(self, node, content: str, imports: list):
+        """Extract CommonJS require() imports from variable declarations."""
+        for c in node.children:
+            if c.type == 'variable_declarator':
+                # const fs = require('fs')
+                val = self._find_child(c, 'call_expression')
+                if val:
+                    fn = self._find_child(val, 'identifier')
+                    if fn and self._text(fn, content) == 'require':
+                        args = self._find_child(val, 'arguments')
+                        if args:
+                            for arg in args.children:
+                                if arg.type == 'string':
+                                    imports.append(self._text(arg, content).strip('"\''))
+
+    def _extract_from_expression_stmt(self, node, content: str,
+                                       functions: list, exports: list,
+                                       seen_fn_names: set):
+        """Extract functions/exports from expression_statement nodes.
+
+        Handles:
+        - IIFE: (function main() { ... })()
+        - module.exports = { name1, name2 }
+        - module.exports.foo = function() {}
+        - exports.foo = function() {}
+        """
+        if not node.children:
+            return
+        expr = node.children[0]
+
+        # IIFE: (function name() { ... })() or (function name() { ... }())
+        if expr.type == 'call_expression':
+            callee = self._find_child(expr, 'parenthesized_expression')
+            if callee:
+                for sub in callee.children:
+                    if sub.type == 'function_expression' or sub.type == 'function':
+                        name_node = self._find_child(sub, 'identifier')
+                        if name_node:
+                            name = self._text(name_node, content)
+                            if name not in seen_fn_names:
+                                params = []
+                                pn = self._find_child(sub, 'formal_parameters')
+                                if pn:
+                                    params = self._extract_js_params(pn, content)
+                                fn_text = self._text(sub, content)[:50]
+                                functions.append(FunctionInfo(
+                                    name=name,
+                                    params=params[:8],
+                                    return_type=None,
+                                    docstring=None,
+                                    calls=[],
+                                    raises=[],
+                                    complexity=1,
+                                    lines=sub.end_point[0] - sub.start_point[0] + 1,
+                                    decorators=[],
+                                    is_async=fn_text.strip().startswith('async'),
+                                    is_static=False,
+                                    is_private=name.startswith('_'),
+                                    intent=self.intent_gen.generate(name),
+                                    start_line=sub.start_point[0] + 1,
+                                    end_line=sub.end_point[0] + 1
+                                ))
+                                seen_fn_names.add(name)
+            # Also check direct function call: main()
+            fn_node = self._find_child(expr, 'identifier')
+            if not fn_node:
+                return
+
+        # module.exports = { ... } or module.exports.foo = ...
+        if expr.type == 'assignment_expression':
+            left = self._find_child(expr, 'member_expression')
+            right = None
+            for c in expr.children:
+                if c.type == 'object':
+                    right = c
+                    break
+                if c.type in ('function_expression', 'function', 'arrow_function'):
+                    right = c
+                    break
+
+            if left:
+                left_text = self._text(left, content)
+                # module.exports = { User, Product, ... }
+                if left_text in ('module.exports', 'exports') and right and right.type == 'object':
+                    for prop in right.children:
+                        if prop.type == 'shorthand_property_identifier':
+                            exports.append(self._text(prop, content))
+                        elif prop.type == 'pair':
+                            key = self._find_child(prop, 'property_identifier')
+                            if key:
+                                exports.append(self._text(key, content))
+
+                # module.exports.foo = function() {} or exports.foo = function() {}
+                elif (left_text.startswith('module.exports.') or left_text.startswith('exports.')):
+                    name = left_text.split('.')[-1]
+                    exports.append(name)
+                    if right and right.type in ('function_expression', 'function', 'arrow_function'):
+                        if name not in seen_fn_names:
+                            params = []
+                            pn = self._find_child(right, 'formal_parameters')
+                            if pn:
+                                params = self._extract_js_params(pn, content)
+                            functions.append(FunctionInfo(
+                                name=name,
+                                params=params[:8],
+                                return_type=None,
+                                docstring=None,
+                                calls=[],
+                                raises=[],
+                                complexity=1,
+                                lines=right.end_point[0] - right.start_point[0] + 1,
+                                decorators=[],
+                                is_async=False,
+                                is_static=False,
+                                is_private=name.startswith('_'),
+                                intent=self.intent_gen.generate(name),
+                                start_line=right.start_point[0] + 1,
+                                end_line=right.end_point[0] + 1
+                            ))
+                            seen_fn_names.add(name)
+
+    def _walk_nested_functions(self, root, content: str, functions: list, seen_fn_names: set):
+        """Recursively walk AST to find nested function declarations.
+
+        Finds function declarations inside other function bodies (not at top level).
+        Skips top-level nodes (already processed) and class methods (handled by class extraction).
+        """
+        def _walk(node, depth):
+            if depth > 20:
+                return
+            for child in node.children:
+                if child.type == 'function_declaration':
+                    # Only add if not already seen (top-level ones already added)
+                    name_node = self._find_child(child, 'identifier')
+                    if name_node:
+                        name = self._text(name_node, content)
+                        if name not in seen_fn_names:
+                            func = self._extract_js_function(child, content)
+                            if func:
+                                functions.append(func)
+                                seen_fn_names.add(name)
+                # Recurse into blocks, but skip class bodies (methods handled separately)
+                if child.type in ('statement_block', 'if_statement', 'for_statement',
+                                  'for_in_statement', 'while_statement', 'try_statement',
+                                  'catch_clause', 'switch_statement', 'switch_body',
+                                  'switch_case', 'switch_default',
+                                  'function_declaration', 'arrow_function',
+                                  'function_expression', 'function',
+                                  'export_statement', 'labeled_statement',
+                                  'parenthesized_expression', 'call_expression',
+                                  'expression_statement', 'arguments',
+                                  'lexical_declaration', 'variable_declaration',
+                                  'variable_declarator'):
+                    _walk(child, depth + 1)
+
+        # Start from root children to skip depth 0 (already handled by main loop)
+        for child in root.children:
+            if child.type in ('function_declaration', 'export_statement',
+                              'lexical_declaration', 'variable_declaration',
+                              'expression_statement'):
+                _walk(child, 1)
 
     def _extract_js_params(self, params_node, content: str) -> List[str]:
         """Extract JS/TS function parameters."""
@@ -1912,28 +2115,87 @@ class UniversalParser:
             ))
             exports.append(name)
 
-        # Arrow function patterns
+        # Arrow function patterns (const/let/var)
         for m in re.finditer(
-            r'(?:export\s+)?const\s+(\w+)\s*=\s*(?:async\s+)?\([^)]*\)\s*(?::\s*[^=]+)?\s*=>',
+            r'(?:export\s+)?(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?\([^)]*\)\s*(?::\s*[^=]+)?\s*=>',
             content
         ):
             name = m.group(1)
-            functions.append(FunctionInfo(
-                name=name,
-                params=[],
-                return_type=None,
-                docstring=None,
-                calls=[],
-                raises=[],
-                complexity=1,
-                lines=1,
-                decorators=[],
-                is_async='async' in m.group(0),
-                is_static=False,
-                is_private=name.startswith('_'),
-                intent=self.intent_gen.generate(name)
-            ))
-            exports.append(name)
+            if not any(f.name == name for f in functions):
+                functions.append(FunctionInfo(
+                    name=name,
+                    params=[],
+                    return_type=None,
+                    docstring=None,
+                    calls=[],
+                    raises=[],
+                    complexity=1,
+                    lines=1,
+                    decorators=[],
+                    is_async='async' in m.group(0),
+                    is_static=False,
+                    is_private=name.startswith('_'),
+                    intent=self.intent_gen.generate(name)
+                ))
+                exports.append(name)
+
+        # Function expression patterns (const/let/var foo = function(...) {})
+        for m in re.finditer(
+            r'(?:export\s+)?(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?function\s*\(([^)]*)\)',
+            content
+        ):
+            name = m.group(1)
+            if not any(f.name == name for f in functions):
+                params = [p.strip() for p in (m.group(2) or '').split(',') if p.strip()][:8]
+                functions.append(FunctionInfo(
+                    name=name,
+                    params=params,
+                    return_type=None,
+                    docstring=None,
+                    calls=[],
+                    raises=[],
+                    complexity=1,
+                    lines=1,
+                    decorators=[],
+                    is_async='async' in m.group(0),
+                    is_static=False,
+                    is_private=name.startswith('_'),
+                    intent=self.intent_gen.generate(name)
+                ))
+                exports.append(name)
+
+        # IIFE with named function: (function main() { ... })()
+        for m in re.finditer(
+            r'\(\s*function\s+(\w+)\s*\(([^)]*)\)',
+            content
+        ):
+            name = m.group(1)
+            if not any(f.name == name for f in functions):
+                params = [p.strip() for p in (m.group(2) or '').split(',') if p.strip()][:8]
+                functions.append(FunctionInfo(
+                    name=name,
+                    params=params,
+                    return_type=None,
+                    docstring=None,
+                    calls=[],
+                    raises=[],
+                    complexity=1,
+                    lines=1,
+                    decorators=[],
+                    is_async=False,
+                    is_static=False,
+                    is_private=name.startswith('_'),
+                    intent=self.intent_gen.generate(name)
+                ))
+
+        # module.exports = { name1, name2, ... }
+        m = re.search(r'module\.exports\s*=\s*\{([^}]+)\}', content)
+        if m:
+            for raw in m.group(1).split(','):
+                part = raw.strip().split(':')[0].strip().split(' ')[0].strip()
+                if part and re.match(r'^[A-Za-z_]\w*$', part):
+                    if part not in exports:
+                        exports.append(part)
 
         # Interface/Type patterns
         for m in re.finditer(r'(?:export\s+)?(interface|type)\s+(\w+)', content):

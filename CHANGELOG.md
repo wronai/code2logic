@@ -1,3 +1,19 @@
+## [1.0.48] - 2026-02-26
+
+### Summary
+
+feat(tests): configuration management system
+
+### Test
+
+- update tests/samples/sample_javascript_advanced.js
+- update tests/test_parser_integrity.py
+
+### Other
+
+- update code2logic/parsers.py
+
+
 ## [1.0.47] - 2026-02-26
 
 ### Summary
