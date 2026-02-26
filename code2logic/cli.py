@@ -510,6 +510,7 @@ def _code2logic_llm_cli(argv: list[str]) -> None:
 
 
 def main(argv=None):
+    cli_start = time.time()
     parser = argparse.ArgumentParser(
         description='Analyze source code and generate logical representations',
         formatter_class=argparse.RawDescriptionHelpFormatter

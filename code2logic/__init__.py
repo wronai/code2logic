@@ -18,7 +18,7 @@ Example:
     >>> print(output)
 """
 
-__version__ = "1.0.45"
+__version__ = "1.0.46"
 __author__ = "Softreck"
 __email__ = "info@softreck.dev"
 __license__ = "MIT"

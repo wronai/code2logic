@@ -5,6 +5,7 @@ Provides the high-level API for analyzing codebases.
 """
 
 import logging
+import os
 import sys
 import time
 from collections import defaultdict
@@ -218,63 +219,89 @@ class ProjectAnalyzer:
 
     def _scan_files(self):
         """Scan and parse all source files."""
-        for fp in self.root_path.rglob('*'):
-            if not fp.is_file():
-                continue
+        scan_start = time.time()
+        files_seen = 0
+        files_parsed = 0
+        files_matched = 0
+        scan_progress_every = 500
 
-            # Skip ignored directories
-            if any(d in fp.parts for d in self.IGNORE_DIRS):
-                continue
+        for root, dirnames, filenames in os.walk(self.root_path):
+            dirnames[:] = [d for d in dirnames if d not in self.IGNORE_DIRS]
+            for filename in filenames:
+                files_seen += 1
+                fp = Path(root) / filename
 
-            # Skip ignored files
-            if fp.name in self.IGNORE_FILES:
-                continue
-
-            ext = fp.suffix.lower()
-            language = self.LANGUAGE_EXTENSIONS.get(ext)
-            if language is None and ext == '':
-                try:
-                    with fp.open('r', encoding='utf-8', errors='ignore') as f:
-                        language = self._language_from_shebang(f.readline())
-                except Exception:
-                    language = None
-
-            if language is None:
-                continue
-
-            self.languages[language] += 1
-
-            # Read file
-            try:
-                content = fp.read_text(encoding='utf-8', errors='ignore')
-            except Exception:
-                continue
-
-            rel_path = str(fp.relative_to(self.root_path))
-
-            # Try Tree-sitter first, then fallback
-            module = None
-            try:
-                if self.ts_parser and self.ts_parser.is_available(language):
-                    module = self.ts_parser.parse(rel_path, content, language)
-            except Exception as e:
-                if self.verbose:
-                    log.debug("Tree-sitter parser failed for %s: %s", rel_path, e)
-
-            if module is None:
-                try:
-                    module = self.fallback_parser.parse(rel_path, content, language)
-                except Exception as e:
-                    if self.verbose:
-                        log.debug("Fallback parser failed for %s: %s", rel_path, e)
+                if filename in self.IGNORE_FILES:
                     continue
 
-            if module:
+                ext = fp.suffix.lower()
+                language = self.LANGUAGE_EXTENSIONS.get(ext)
+                if language is None and ext == '':
+                    try:
+                        with fp.open('r', encoding='utf-8', errors='ignore') as f:
+                            language = self._language_from_shebang(f.readline())
+                    except Exception:
+                        language = None
+
+                if language is None:
+                    continue
+
+                files_matched += 1
+                self.languages[language] += 1
+
+                if self.verbose and files_seen > 0 and (files_seen % scan_progress_every) == 0:
+                    log.info(
+                        "Scan progress: seen=%d matched=%d parsed=%d modules=%d time=%.2fs",
+                        files_seen,
+                        files_matched,
+                        files_parsed,
+                        len(self.modules),
+                        time.time() - scan_start,
+                    )
+
                 try:
-                    module.file_bytes = fp.stat().st_size
+                    content = fp.read_text(encoding='utf-8', errors='ignore')
                 except Exception:
-                    module.file_bytes = len(content.encode('utf-8', errors='ignore'))
-                self.modules.append(module)
+                    continue
+
+                try:
+                    rel_path = str(fp.relative_to(self.root_path))
+                except Exception:
+                    rel_path = str(fp)
+
+                module = None
+                try:
+                    if self.ts_parser and self.ts_parser.is_available(language):
+                        module = self.ts_parser.parse(rel_path, content, language)
+                except Exception as e:
+                    if self.verbose:
+                        log.debug("Tree-sitter parser failed for %s: %s", rel_path, e)
+
+                if module is None:
+                    try:
+                        module = self.fallback_parser.parse(rel_path, content, language)
+                    except Exception as e:
+                        if self.verbose:
+                            log.debug("Fallback parser failed for %s: %s", rel_path, e)
+                        continue
+
+                if module:
+                    files_parsed += 1
+                    try:
+                        module.file_bytes = fp.stat().st_size
+                    except Exception:
+                        module.file_bytes = len(content.encode('utf-8', errors='ignore'))
+                    self.modules.append(module)
+
+        if self.verbose:
+            log.info(
+                "Scan finished: seen=%d matched=%d parsed=%d modules=%d time=%.2fs",
+                files_seen,
+                files_matched,
+                files_parsed,
+                len(self.modules),
+                time.time() - scan_start,
+            )
 
     def _detect_entrypoints(self) -> List[str]:
         """Detect project entry points."""
