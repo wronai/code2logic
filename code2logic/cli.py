@@ -10,6 +10,7 @@ Usage:
 
 import argparse
 import json
+import logging
 import os
 import signal
 import subprocess
@@ -508,24 +509,12 @@ def _code2logic_llm_cli(argv: list[str]) -> None:
         return
 
 
-def main():
-    """Main CLI entry point."""
-    cli_start = time.time()
-
-    try:
-        signal.signal(signal.SIGPIPE, signal.SIG_DFL)
-    except Exception:
-        pass
-
-    if len(sys.argv) > 1 and sys.argv[1] == 'llm':
-        _code2logic_llm_cli(sys.argv[2:])
-        return
-
+def main(argv=None):
     parser = argparse.ArgumentParser(
-        prog='code2logic',
-        description='Convert source code to logical representation for LLM analysis',
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog='''
+        description='Analyze source code and generate logical representations',
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    epilog='''
 Examples:
   code2logic /path/to/project                    # Standard Markdown
   code2logic /path/to/project -f csv             # CSV (best for LLM, ~50% smaller)
@@ -551,41 +540,6 @@ Detail levels (columns in csv/json/yaml):
   standard - + intent, category, domain, imports (8 columns)
   full     - + calls, lines, complexity, hash (16 columns)
 '''
-    )
-
-    def _maybe_print_pretty_help() -> bool:
-        """Print colorized help as markdown when appropriate.
-
-        Returns True if help was printed and the CLI should exit early.
-        """
-        force_pretty = os.environ.get("CODE2LOGIC_PRETTY_HELP") == "1" or bool(os.environ.get("FORCE_COLOR"))
-        if not force_pretty:
-            if not hasattr(sys.stdout, "isatty") or not sys.stdout.isatty():
-                return False
-        try:
-            from .terminal import render
-        except Exception:
-            return False
-
-        help_md = f"""# code2logic
-
-Convert source code to logical representation for LLM analysis.
-
-## Usage
-
-```bash
-code2logic [path] [options]
-```
-
-## Help
-
-```text
-{parser.format_help().rstrip()}
-```
-"""
-        render.markdown(help_md)
-        return True
-
     parser.add_argument(
         'path',
         nargs='?',
@@ -691,6 +645,11 @@ code2logic [path] [options]
         help='Disable Tree-sitter (use fallback parser)'
     )
     parser.add_argument(
+        '--no-similarity',
+        action='store_true',
+        help='Disable similarity detection (RapidFuzz) to speed up analysis on large projects'
+    )
+    parser.add_argument(
         '-v', '--verbose',
         action='store_true',
         help='Verbose output with progress info'
@@ -732,11 +691,10 @@ code2logic [path] [options]
     )
 
     if len(sys.argv) == 1 or any(a in ("-h", "--help") for a in sys.argv[1:]):
-        if not _maybe_print_pretty_help():
-            parser.print_help()
+        parser.print_help()
         return
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if not args.no_install and os.environ.get("CODE2LOGIC_NO_INSTALL") in ("1", "true", "True", "yes", "YES"):
         args.no_install = True
@@ -749,6 +707,11 @@ code2logic [path] [options]
 
     # Initialize logger
     log = Logger(verbose=args.verbose, debug=args.debug)
+
+    logging.basicConfig(
+        level=(logging.DEBUG if args.debug else (logging.INFO if args.verbose else logging.WARNING)),
+        format='[%(levelname)s] %(message)s',
+    )
 
     if args.verbose and not args.quiet:
         log.header("CODE2LOGIC")
@@ -842,9 +805,7 @@ code2logic [path] [options]
 
     # Path is required for analysis
     if args.path is None:
-        # Keep behavior consistent with --help
-        if not _maybe_print_pretty_help():
-            parser.print_help()
+        parser.print_help()
         return
 
     # Validate path
@@ -865,7 +826,8 @@ code2logic [path] [options]
     analyzer = ProjectAnalyzer(
         args.path,
         use_treesitter=not args.no_treesitter,
-        verbose=args.debug
+        verbose=args.verbose or args.debug,
+        enable_similarity=not args.no_similarity,
     )
     project = analyzer.analyze()
     analyze_time = time.time() - analyze_start

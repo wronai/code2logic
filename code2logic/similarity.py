@@ -4,10 +4,14 @@ Similarity detector using Rapidfuzz.
 Detects similar functions across modules to identify
 potential duplicates and refactoring opportunities.
 """
-
+import logging
+import time
+from collections import defaultdict
 from typing import Dict, List
 
 from .models import ModuleInfo
+
+log = logging.getLogger(__name__)
 
 # Optional Rapidfuzz import
 RAPIDFUZZ_AVAILABLE = False
@@ -43,6 +47,8 @@ class SimilarityDetector:
             threshold: Minimum similarity score (0-100) to consider as similar
         """
         self.threshold = threshold
+        self.max_functions = 8000
+        self.progress_every = 250
 
     def find_similar_functions(self, modules: List[ModuleInfo]) -> Dict[str, List[str]]:
         """
@@ -57,6 +63,8 @@ class SimilarityDetector:
         """
         if not RAPIDFUZZ_AVAILABLE:
             return {}
+
+        start = time.time()
 
         # Collect all functions
         all_funcs: List[dict] = []
@@ -76,14 +84,34 @@ class SimilarityDetector:
         if len(all_funcs) < 2:
             return {}
 
+        if len(all_funcs) > self.max_functions:
+            log.warning(
+                "Skipping similarity detection: too many functions (%d > %d). Use --no-similarity to silence this.",
+                len(all_funcs),
+                self.max_functions,
+            )
+            return {}
+
         # Find similar functions
         similar: Dict[str, List[str]] = {}
         names = [f['name'] for f in all_funcs]
+
+        name_to_fulls: Dict[str, List[str]] = defaultdict(list)
+        for f in all_funcs:
+            name_to_fulls[f['name']].append(f['full'])
 
         for i, func in enumerate(all_funcs):
             # Skip common names that would produce false positives
             if func['name'] in ('__init__', 'constructor', 'toString', 'valueOf'):
                 continue
+
+            if i > 0 and (i % self.progress_every) == 0:
+                log.debug(
+                    "Similarity progress: %d/%d (%.2fs)",
+                    i,
+                    len(all_funcs),
+                    time.time() - start,
+                )
 
             matches = process.extract(
                 func['name'],
@@ -95,15 +123,13 @@ class SimilarityDetector:
             sim_list = []
             for match_name, score, _ in matches:
                 if score >= self.threshold and match_name != func['name']:
-                    # Find full name
-                    for other in all_funcs:
-                        if other['name'] == match_name:
-                            sim_list.append(f"{other['full']} ({score}%)")
-                            break
+                    for full in name_to_fulls.get(match_name, [])[:3]:
+                        sim_list.append(f"{full} ({score}%)")
 
             if sim_list:
                 similar[func['full']] = sim_list
 
+        log.debug("Similarity finished: funcs=%d matches=%d time=%.2fs", len(all_funcs), len(similar), time.time() - start)
         return similar
 
     def find_duplicate_signatures(self, modules: List[ModuleInfo]) -> Dict[str, List[str]]:

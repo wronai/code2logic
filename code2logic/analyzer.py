@@ -4,7 +4,9 @@ Main project analyzer orchestrating all analysis components.
 Provides the high-level API for analyzing codebases.
 """
 
+import logging
 import sys
+import time
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
@@ -15,6 +17,8 @@ from .intent import NLTK_AVAILABLE, SPACY_AVAILABLE
 from .models import ModuleInfo, ProjectInfo
 from .parsers import TREE_SITTER_AVAILABLE, TreeSitterParser, UniversalParser
 from .similarity import RAPIDFUZZ_AVAILABLE, SimilarityDetector
+
+log = logging.getLogger(__name__)
 
 
 class ProjectAnalyzer:
@@ -103,6 +107,7 @@ class ProjectAnalyzer:
         use_treesitter: bool = True,
         verbose: bool = False,
         include_private: bool = False,
+        enable_similarity: bool = True,
     ):
         """
         Initialize the project analyzer.
@@ -112,10 +117,12 @@ class ProjectAnalyzer:
             use_treesitter: Whether to use Tree-sitter for parsing
             verbose: Whether to print status messages
             include_private: Whether to include private functions/classes
+            enable_similarity: Whether to enable similarity detection
         """
         self.root_path = Path(root_path).resolve()
         self.verbose = verbose
         self.include_private = include_private
+        self.enable_similarity = enable_similarity
         self.modules: List[ModuleInfo] = []
         self.languages: Dict[str, int] = defaultdict(int)
 
@@ -137,10 +144,10 @@ class ProjectAnalyzer:
     def _print_status(self):
         """Print library availability status."""
         parts = []
-        parts.append("TS✓" if TREE_SITTER_AVAILABLE else "TS✗")
-        parts.append("NX✓" if NETWORKX_AVAILABLE else "NX✗")
-        parts.append("RF✓" if RAPIDFUZZ_AVAILABLE else "RF✗")
-        parts.append("NLP✓" if (SPACY_AVAILABLE or NLTK_AVAILABLE) else "NLP✗")
+        parts.append("TS" if TREE_SITTER_AVAILABLE else "TS")
+        parts.append("NX" if NETWORKX_AVAILABLE else "NX")
+        parts.append("RF" if RAPIDFUZZ_AVAILABLE else "RF")
+        parts.append("NLP" if (SPACY_AVAILABLE or NLTK_AVAILABLE) else "NLP")
         print(f"Libs: {' '.join(parts)}", file=sys.stderr)
 
     def analyze(self) -> ProjectInfo:
@@ -150,18 +157,49 @@ class ProjectAnalyzer:
         Returns:
             ProjectInfo with complete analysis results
         """
+        analyze_start = time.time()
+
         # Scan and parse files
+        t0 = time.time()
         self._scan_files()
+        t_scan = time.time() - t0
+        if self.verbose:
+            log.info(
+                "Scan complete: modules=%d languages=%s time=%.2fs",
+                len(self.modules),
+                dict(self.languages),
+                t_scan,
+            )
 
         # Build dependency graph
+        t0 = time.time()
         dep_graph = self.dep_analyzer.build_graph(self.modules)
         dep_metrics = self.dep_analyzer.analyze_metrics()
+        t_dep = time.time() - t0
+        if self.verbose:
+            log.info("Dependency analysis complete: nodes=%d time=%.2fs", len(dep_graph or {}), t_dep)
 
         # Detect entry points
+        t0 = time.time()
         entrypoints = self._detect_entrypoints()
+        t_ep = time.time() - t0
+        if self.verbose:
+            log.info("Entrypoint detection complete: entrypoints=%d time=%.2fs", len(entrypoints), t_ep)
 
         # Find similar functions
-        similar = self.sim_detector.find_similar_functions(self.modules)
+        similar: Dict[str, List[str]] = {}
+        if self.enable_similarity:
+            t0 = time.time()
+            similar = self.sim_detector.find_similar_functions(self.modules)
+            t_sim = time.time() - t0
+            if self.verbose:
+                log.info("Similarity detection complete: matches=%d time=%.2fs", len(similar), t_sim)
+        else:
+            if self.verbose:
+                log.info("Similarity detection skipped (--no-similarity)")
+
+        if self.verbose:
+            log.info("Total analysis time: %.2fs", time.time() - analyze_start)
 
         return ProjectInfo(
             name=self.root_path.name,
@@ -221,14 +259,14 @@ class ProjectAnalyzer:
                     module = self.ts_parser.parse(rel_path, content, language)
             except Exception as e:
                 if self.verbose:
-                    print(f"Tree-sitter parser failed for {rel_path}: {e}", file=sys.stderr)
+                    log.debug("Tree-sitter parser failed for %s: %s", rel_path, e)
 
             if module is None:
                 try:
                     module = self.fallback_parser.parse(rel_path, content, language)
                 except Exception as e:
                     if self.verbose:
-                        print(f"Fallback parser failed for {rel_path}: {e}", file=sys.stderr)
+                        log.debug("Fallback parser failed for %s: %s", rel_path, e)
                     continue
 
             if module:

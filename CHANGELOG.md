@@ -1,3 +1,16 @@
+## [1.0.45] - 2026-02-26
+
+### Summary
+
+refactor(goal): code analysis engine
+
+### Other
+
+- update code2logic/analyzer.py
+- update code2logic/cli.py
+- update code2logic/similarity.py
+
+
 ## [1.0.44] - 2026-02-26
 
 ### Summary
