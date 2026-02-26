@@ -1,3 +1,24 @@
+## [1.0.44] - 2026-02-26
+
+### Summary
+
+refactor(examples): configuration management system
+
+### Docs
+
+- docs: update README
+
+### Other
+
+- update .gitignore
+- update examples/output/project.toon
+- update function.toon
+- update project.json
+- update project.toon
+- config: update project.yaml
+- update raport/mermaid-init.js
+
+
 # Changelog
 
 All notable changes to this project will be documented in this file.

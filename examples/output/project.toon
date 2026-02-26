@@ -1,6 +1,10 @@
-# code2logic | 152f 39071L | python:142/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
+# code2logic | 156f 42719L | python:146/sql:1/javascript:1/rust:1/typescript:4/java:1/csharp:1/go:1
 # Keys: M=modules, D=details, i=imports, c=classes, f=functions, m=methods
-M[152]:
+M[156]:
+  multilang_reproduction_tester.py,1442
+  universal_validator.py,1063
+  reproduction_test_code.py,629
+  unify_generators.py,24
   generated_code/analyzer.py,41
   generated_code/__init__.py,8
   code2logic/llm_profiler.py,490
@@ -8,7 +12,7 @@ M[152]:
   code2logic/file_formats.py,278
   code2logic/project_reproducer.py,318
   code2logic/base.py,49
-  code2logic/cli.py,924
+  code2logic/cli.py,909
   code2logic/llm.py,287
   code2logic/errors.py,371
   code2logic/code_review.py,205
@@ -23,11 +27,11 @@ M[152]:
   code2logic/prompts.py,120
   code2logic/chunked_reproduction.py,358
   code2logic/__init__.py,392
-  code2logic/metrics.py,479
+  code2logic/metrics.py,446
   code2logic/__main__.py,12
   code2logic/refactor.py,308
-  code2logic/logicml.py,305
-  code2logic/function_logic.py,326
+  code2logic/logicml.py,285
+  code2logic/function_logic.py,300
   code2logic/utils.py,16
   code2logic/generators.py,1787
   code2logic/markdown_format.py,265
@@ -37,7 +41,7 @@ M[152]:
   code2logic/benchmark.py,349
   code2logic/base_generator.py,5
   code2logic/terminal.py,496
-  code2logic/toon_format.py,663
+  code2logic/toon_format.py,597
   code2logic/dependency.py,187
   code2logic/mcp_server.py,297
   code2logic/reproduction.py,333
@@ -54,7 +58,7 @@ M[152]:
   examples/06_metrics.py,85
   examples/10_function_reproduction.py,51
   examples/08_format_benchmark.py,90
-  examples/benchmark_report.py,170
+  examples/benchmark_report.py,167
   examples/benchmark_summary.py,100
   examples/14_repeatability_test.py,331
   examples/13_project_benchmark.py,70
@@ -144,16 +148,51 @@ M[152]:
   code2logic/schemas/yaml_schema.py,167
   code2logic/schemas/json_schema.py,206
   code2logic/schemas/markdown_schema.py,118
-  code2logic/benchmarks/common.py,327
-  code2logic/benchmarks/runner.py,883
+  code2logic/benchmarks/common.py,258
+  code2logic/benchmarks/runner.py,857
   code2logic/benchmarks/__init__.py,34
-  code2logic/benchmarks/results.py,162
+  code2logic/benchmarks/results.py,148
   code2logic/core/__init__.py,21
   code2logic/formats/__init__.py,31
   code2logic/tools/__init__.py,28
   code2logic/llm/__init__.py,40
   code2logic/integrations/__init__.py,5
 D:
+  multilang_reproduction_tester.py:
+    i: json,yaml,re,abc.{ABC,abstractmethod},dataclasses.{dataclass,field},enum.{Enum,auto},pathlib.Path
+    e: Language,ElementType,Severity,ValidationIssue,LanguageFeature,ValidationResult,LanguageRequirements,LANGUAGE_REQUIREMENTS
+    Language:   # Obsługiwane języki programowania.
+    ElementType:   # Typy elementów kodu.
+    Severity:   # Poziom ważności brakującej informacji.
+    ValidationIssue:   # Problem znaleziony podczas walidacji.
+    LanguageFeature:   # Cecha języka programowania.
+    run_tests(yaml_path:str=None;hybrid_path:str=None;toon_path:str=None)
+    main()
+  universal_validator.py:
+    i: json,yaml,re,sys,abc.{ABC,abstractmethod},dataclasses.{dataclass,field},enum.{Enum,auto}
+    e: LanguageConfig,LanguagePatterns,ValidationIssue,ValidationReport,UniversalValidator,FormatComparator,main
+    LanguageConfig: get(1),supported_languages(0)  # Konfiguracja wymagań dla każdego języka.
+    LanguagePatterns: get(1)  # Wzorce regex i walidatory dla każdego...
+    ValidationIssue:   # Problem znaleziony podczas walidacji.
+    ValidationReport:   # Raport z walidacji.
+    UniversalValidator: __init__(3),parse(0),_parse_toon(0),validate(0),_validate_module(1)  # Uniwersalny walidator formatów Code2L...
+    main()
+  reproduction_test_code.py:
+    i: gzip,hashlib,re,csv,dataclasses.dataclass,pathlib.Path,typing.{Any,Dict,List,Optional}
+    e: QualityResult,detect_signature_quality,detect_constant_quality,compute_quality_score,format_quality_summary,evaluate_formats,print_quality_report,FormatStats
+    QualityResult: 
+    FormatStats: gzip_ratio(0)
+    ReproducedFromTOON:   # Reprodukcja z TOON - ~55% poprawności...
+    ReproducedFromYAML:   # Reprodukcja z YAML - ~75% poprawności...
+    ReproducedFromHybrid:   # Reprodukcja z Hybrid YAML - ~85% popr...
+    detect_signature_quality(signature_block:str)->Tuple[dict, List[str]]
+    detect_constant_quality(constants_block:str)->Tuple[dict, List[str]]
+    compute_quality_score(name:str;sig_block:str;const_block:str)->QualityResult
+    format_quality_summary(result:QualityResult)->str
+    evaluate_formats()->List[QualityResult]
+    print_quality_report()->None
+    _read_text(path:Path)->str
+    _basic_text_stats(format_name:str;content:str)->FormatStats
   generated_code/analyzer.py:
     i: typing.{Any,Dict,List,Optional}
     e: ProjectAnalyzer,analyze_project,get_library_status
@@ -362,12 +401,12 @@ D:
     i: dataclasses.dataclass,models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo},pathlib.Path,typing.{Dict,List,Optional,Set}
     e: LogicMLSpec,LogicMLGenerator,generate_logicml,LOGICML_EXAMPLE
     LogicMLSpec:   # LogicML specification output.
-    LogicMLGenerator: __init__(1),generate(3),_generate_module(3),_generate_imports(1),_generate_class(3)  # Generates LogicML format - optimized...
+    LogicMLGenerator: __init__(1),generate(2),_generate_module(2),_generate_imports(1),_generate_class(2)  # Generates LogicML format - optimized...
     generate_logicml(project:ProjectInfo;detail:str='standard')->str
   code2logic/function_logic.py:
     i: models.{FunctionInfo,ProjectInfo},shared_utils.{remove_self_from_params,truncate_docstring},toon_format.TOONGenerator,typing.{List,Tuple}
     e: FunctionLogicGenerator
-    FunctionLogicGenerator: __init__(1),generate(2),generate_json(2),generate_yaml(2),generate_toon(6)
+    FunctionLogicGenerator: __init__(1),generate(2),generate_json(2),generate_yaml(2),generate_toon(5)
   code2logic/utils.py:
     i: shutil,pathlib.Path
     e: estimate_tokens,write_text_atomic,cleanup_generated_root
@@ -434,7 +473,7 @@ D:
   code2logic/toon_format.py:
     i: re,models.{ClassInfo,FunctionInfo,ModuleInfo,ProjectInfo,TypeInfo},shared_utils.compact_imports,typing.{Any,Dict,List}
     e: TOONGenerator,TOONParser,generate_toon,parse_toon
-    TOONGenerator: __init__(2),_short_lang(1),_compress_module_path(2),generate(3),generate_hybrid(5)  # Generates TOON format output from Pro...
+    TOONGenerator: __init__(2),_short_lang(1),_compress_module_path(2),generate(3),_generate_modules(3)  # Generates TOON format output from Pro...
     TOONParser: __init__(0),parse(1),_parse_value(1)  # Parse TOON format back to Python dict.
     generate_toon(project:ProjectInfo;detail:str='standard';use_tabs:bool=False)->str
     parse_toon(content:str)->Dict[str, Any]
@@ -920,7 +959,7 @@ D:
     TaskQueue: add_task(1),get_pending(0),get_by_status(1)  # Task queue container.
     Project: total_tasks(0)  # Project model with nested models.
   tests/samples/sample_javascript.js:
-    e: filterBy,User,Product,debounce,fetchData,deepClone,calculateTotal
+    e: Product,User,debounce,deepClone,fetchData,filterBy,calculateTotal
     User: constructor(3),getDisplayName(0),deactivate(0)
     Product: constructor(3),addTags(0),isInStock(0),formatPrice(0)
     calculateTotal(items)
@@ -956,7 +995,7 @@ D:
     insert(table:str)->InsertBuilder
     update(table:str)->UpdateBuilder
   tests/samples/sample_typescript.ts:
-    e: User,Nullable,groupBy,Result,fetchUser,processOrder,OrderItem,filterByStatus
+    e: Product,createUser,calculateOrderTotal,Repository,Result,User,Nullable,fetchUser
     Repository: add(1),get(1),getAll(0),delete(1),count(0)
     createUser(id: number;name: string;email: string)->User
     calculateOrderTotal(items: OrderItem[])->number

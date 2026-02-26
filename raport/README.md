@@ -11,6 +11,8 @@ excerpt: "Przeprowadziłem serię benchmarków porównujących formaty serializa
 
 **Autor: Tom Sapletta**
 
+<script type="module" src="./mermaid-init.js"></script>
+
 Jeśli kiedykolwiek próbowałeś „nakarmić" model językowy całym repozytorium kodu — by poprosić o refaktoryzację, znalezienie błędu lub wygenerowanie dokumentacji — na pewno zderzyłeś się ze ścianą. Tą ścianą jest **limit okna kontekstowego** oraz zjawisko *lost in the middle*: model zapomina lub ignoruje informacje w środku długiego promptu.
 
 Cześć, jestem Tom Sapletta. Od dłuższego czasu pracuję nad tym, jak zoptymalizować komunikację między kodem źródłowym a sztuczną inteligencją. Tak właśnie narodził się projekt **Code2Logic**.
@@ -18,10 +20,11 @@ Cześć, jestem Tom Sapletta. Od dłuższego czasu pracuję nad tym, jak zoptyma
 > **Ważna nota metodyczna:** Wyniki benchmarków mierzą jakość *rekonstrukcji* kodu na podstawie specyfikacji — głównie zgodność struktury, sygnatur i semantyki tekstowej. **Wysoki wynik nie jest dowodem pełnej równoważności behawioralnej (runtime).** Pełną poprawność potwierdza dopiero uruchomienie testów.
 
 ---
-
 ## Dlaczego powstał Code2Logic?
 
 Kiedy LLM analizuje kod, nie potrzebuje wszystkich średników, nawiasów, wcięć ani nadmiarowej struktury. Tradycyjne podejście polega na serializacji projektu do formatu JSON. Problem: JSON jest dla modeli językowych **„głośny"** — większość tokenów (za które płacimy i które marnują uwagę modelu) to nawiasy klamrowe, cudzysłowy i powtarzające się klucze.
+
+Diagram przepływu: od kodu do specyfikacji i z powrotem (LLM):
 
 Wizualna różnica:
 
@@ -44,8 +47,11 @@ Wizualna różnica:
 
 Code2Logic wyekstrahuje **czystą logikę** z kodu i przekaże ją do modelu w maksymalnie skompresowanych formatach: autorskim **TOON**, **LogicML** lub zwięzłym **YAML compact**.
 
----
+Diagram „jak Code2Logic zmienia architekturę przepływu danych”:
 
+![Schemat przepływu Code2Logic](img_4.png)
+
+---
 ## Rzeczywiste wyniki benchmarków (20 plików, model: arcee-ai/trinity-large-preview)
 
 ### Rozmiar plików dla tego samego projektu
@@ -62,10 +68,13 @@ Code2Logic wyekstrahuje **czystą logikę** z kodu i przekaże ją do modelu w m
 > Zredukowaliśmy objętość **prawie 6-krotnie**. Do kontekstu modelu możemy zmieścić 6x większy projekt, płacąc ułamek ceny.
 
 ---
-
 ### Project Benchmark — jakość reprodukcji kodu z całego projektu
 
 Test ocenia, jak dobrze LLM odtwarza kod na podstawie specyfikacji w danym formacie (syntaktyka, struktura, semantyka):
+
+Wykres porównawczy (wizualizacja):
+
+![Project Benchmark – wykres](img.png)
 
 | Format | Wynik | Syntax OK | Runs OK |
 |--------|------:|----------:|--------:|
@@ -89,13 +98,11 @@ Test ocenia, jak dobrze LLM odtwarza kod na podstawie specyfikacji w danym forma
 4. **Syntax OK = 100% dla wszystkich głównych formatów** — LLM zawsze generuje syntaktycznie poprawny kod. Problem leży w semantyce i kompletności, nie w składni.
 
 ---
-
 ### Behavioral Benchmark — prawdziwa miara
 
 Osobny test: **85,7% (6/7 funkcji zaliczonych, 1 pominięta)** przy testowaniu behawioralnej równoważności odtworzonego kodu. To jedyny test, który mierzy „czy kod działa tak samo", a nie tylko „czy wygląda podobnie".
 
 ---
-
 ## Jak działa Code2Logic w praktyce
 
 ### Instalacja i użycie
@@ -137,8 +144,19 @@ cat ./project.functions.toon >> /tmp/prompt.txt
 claude --dangerously-skip-permissions --file /tmp/prompt.txt
 ```
 
----
+Start komendy (zrzut):
 
+![Start komendy w Claude](img_1.png)
+
+Wnioski wygenerowane przez Claude (zrzut):
+
+![Wnioski Claude](img_2.png)
+
+Szacunki / koszty (zrzut):
+
+![Szacunki](img_3.png)
+
+---
 ## Wnioski z eksperymentu refaktoryzacji
 
 Przeprowadziłem pełną refaktoryzację projektu na podstawie manifestu TOON i zweryfikowałem twierdzenia modelu w praktyce. Co LLM trafnie wyłapał?
@@ -156,7 +174,6 @@ Przeprowadziłem pełną refaktoryzację projektu na podstawie manifestu TOON i 
 **Wniosek:** Manifest TOON świetnie wykrywa martwy kod i niespójne interfejsy. Gorzej radzi sobie z oceną faktycznej złożoności modułów (widzi tylko sygnatury) i relacji importów. Zawsze weryfikuj sugestie LLM przed wdrożeniem.
 
 ---
-
 ## Kiedy używać jakiego formatu?
 
 | Scenariusz | Rekomendowany format | Dlaczego |
@@ -168,7 +185,6 @@ Przeprowadziłem pełną refaktoryzację projektu na podstawie manifestu TOON i 
 | Duży projekt, mały kontekst | **TOON + chunking** | Chunked reproduction |
 
 ---
-
 ## Co dalej?
 
 Obszary do natychmiastowej poprawy (dane z benchmarków):
@@ -182,7 +198,6 @@ Obszary do natychmiastowej poprawy (dane z benchmarków):
 4. **Benchmark na silniejszych modelach** — testy na `arcee-ai/trinity-large-preview` (darmowy model) zaniżają wyniki. Benchmark na Claude 3.5 Sonnet lub GPT-4o powinien pokazać 80%+ dla TOON.
 
 ---
-
 ## Podsumowanie
 
 | Co zyskujesz z Code2Logic? | Wartość |
@@ -196,6 +211,23 @@ Obszary do natychmiastowej poprawy (dane z benchmarków):
 Code2Logic to nie tylko narzędzie do kompresji kodu. To zmiana architektury komunikacji między programistą, kodem i modelem językowym. **Format ma znaczenie** — a dane to potwierdzają.
 
 ---
+## Linki i artefakty (dane źródłowe)
+
+- **Raport końcowy benchmarków**
+  - `../examples/output/BENCHMARK_REPORT.md`
+- **Wyniki (JSON)**
+  - `../examples/output/benchmark_format.json`
+  - `../examples/output/benchmark_project.json`
+  - `../examples/output/benchmark_token.json`
+  - `../examples/output/benchmark_function.json`
+  - `../examples/output/benchmark_behavioral.json`
+- **Przykładowe specyfikacje projektu (te same dane w różnych formatach)**
+  - `../examples/output/project.toon`
+  - `../examples/output/project.yaml`
+  - `../examples/output/project.json`
+  - `../examples/output/project.md`
+  - `../examples/output/project.csv`
+  - `../examples/output/project.functions.toon`
 
 **Projekt:** [github.com/wronai/code2logic](https://github.com/wronai/code2logic)  
 **Autor:** Tom Sapletta  
