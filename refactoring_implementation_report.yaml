@@ -1,0 +1,110 @@
+implementation_date: '2026-02-28T20:17:07.238722'
+backup_location: backups
+total_actions: 19
+phases_completed: 2
+status: completed
+actions_log:
+- phase: 1
+  action: "4. Zredukuj z\u0142o\u017Cono\u015B\u0107 o ~25% zachowuj\u0105c przep\u0142\
+    yw danych"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.237671'
+- phase: 1
+  action: "\u2022 pipeline_runner_utils._debug"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.237837'
+- phase: 1
+  action: "\u2022 pipeline_runner_utils._MarkdownConsoleWrapper.print"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.237920'
+- phase: 1
+  action: 1. Skonsoliduj podobne typy danych w 0 grupach
+  type: consolidation
+  status: completed
+  timestamp: '2026-02-28T20:17:07.237991'
+- phase: 1
+  action: "2. Upro\u015B\u0107 top 5 hub\xF3w poprzez ekstrakcj\u0119 wsp\xF3lnych\
+    \ funkcji"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238056'
+- phase: 1
+  action: "3. Stw\xF3rz abstrakcje dla 2 w\u0119z\u0142\xF3w o wysokim PageRank"
+  type: creation
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238124'
+- phase: 1
+  action: "4. Zredukuj z\u0142o\u017Cono\u015B\u0107 o ~25% zachowuj\u0105c przep\u0142\
+    yw danych"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238201'
+- phase: 1
+  action: "\u2022 Wykryto 0 hub\xF3w danych (betweenness > 0.05)"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238273'
+- phase: 1
+  action: "\u2022 Wykryto 2 w\u0119z\u0142\xF3w o wysokim PageRank (> 0.02)"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238330'
+- phase: 1
+  action: "\u2022 Znaleziono 0 mo\u017Cliwo\u015Bci konsolidacji typ\xF3w"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238387'
+- phase: 1
+  action: 1. Skonsoliduj podobne typy danych w 0 grupach
+  type: consolidation
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238454'
+- phase: 1
+  action: "2. Upro\u015B\u0107 top 5 hub\xF3w poprzez ekstrakcj\u0119 wsp\xF3lnych\
+    \ funkcji"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238512'
+- phase: 1
+  action: "3. Stw\xF3rz abstrakcje dla 2 w\u0119z\u0142\xF3w o wysokim PageRank"
+  type: creation
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238568'
+- phase: 1
+  action: "\u2022 pipeline_runner_utils._debug"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238623'
+- phase: 1
+  action: "\u2022 pipeline_runner_utils._MarkdownConsoleWrapper.print"
+  type: general
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238699'
+- phase: 2
+  action: Creating abstractions for high PageRank nodes
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238708'
+- phase: 2
+  action: Consolidating similar data types
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238711'
+- phase: 2
+  action: Extracting common functions
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238717'
+- phase: 2
+  action: Optimizing data flow patterns
+  status: completed
+  timestamp: '2026-02-28T20:17:07.238719'
+files_created:
+- pipeline_runner_utils_improved.py
+- complexity_reduction_examples.py
+- general_refactoring_template.py
+next_steps:
+- Test refactored components
+- Validate functionality
+- Update documentation
+- Deploy to production

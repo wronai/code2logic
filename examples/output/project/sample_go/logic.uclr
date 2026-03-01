@@ -1,0 +1,29 @@
+# UCLR: tests/samples/sample_go.go
+# Lang: go
+
+@imports
+  import (
+
+@struct  User
+
+@struct  Product
+
+@struct  Order
+
+@struct  OrderItem
+
+@interface  Repository
+
+@struct  UserService
+@method  GetUser()
+
+@method  CreateUser()
+
+
+@func  NewUserService()
+
+@func  CalculateTotal()
+
+@func  FilterProducts()
+
+@func  FormatPrice()

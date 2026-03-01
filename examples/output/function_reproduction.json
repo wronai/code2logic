@@ -1,0 +1,76 @@
+{
+  "benchmark_type": "function",
+  "timestamp": "2026-02-25T10:37:24.818656",
+  "source_path": "tests/samples/sample_functions.py",
+  "total_files": 0,
+  "total_functions": 5,
+  "avg_score": 0.0,
+  "avg_similarity": 40.630358680478786,
+  "syntax_ok_rate": 0.0,
+  "runs_ok_rate": 0.0,
+  "best_format": "",
+  "best_score": 0.0,
+  "file_results": [],
+  "function_results": [
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "calculate_total",
+      "language": "python",
+      "original_code": "def calculate_total(items: List[int], tax_rate: float = 0.1) -> float:\n    \"\"\"Calculate total with tax.\n    \n    Args:\n        items: List of item prices\n        tax_rate: Tax rate (default 10%)\n        \n    Returns:\n        Total price including tax\n    \"\"\"\n    subtotal = sum(items)\n    return subtotal * (1 + tax_rate)",
+      "reproduced_code": "def calculate_total(items:List[int], tax_rate:float=0.1) -> float:\n    return None\n",
+      "similarity": 45.103857566765576,
+      "syntax_ok": true,
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "filter_by_status",
+      "language": "python",
+      "original_code": "def filter_by_status(records: List[Dict], status: str) -> List[Dict]:\n    \"\"\"Filter records by status.\n    \n    Args:\n        records: List of record dictionaries\n        status: Status to filter by\n        \n    Returns:\n        Filtered list of records\n    \"\"\"\n    return [r for r in records if r.get('status') == status]",
+      "reproduced_code": "def filter_by_status(records:List[Dict], status:str) -> List[Dict]:\n    return None\n",
+      "similarity": 45.481049562682216,
+      "syntax_ok": true,
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "merge_configs",
+      "language": "python",
+      "original_code": "def merge_configs(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:\n    \"\"\"Merge two configuration dictionaries.\n    \n    Args:\n        base: Base configuration\n        override: Override values\n        \n    Returns:\n        Merged configuration\n    \"\"\"\n    result = base.copy()\n    result.update(override)\n    return result",
+      "reproduced_code": "def merge_configs(base:Dict[str,Any], override:Dict[str,Any]) -> Dict[str,Any]:\n    return None\n",
+      "similarity": 48.08743169398907,
+      "syntax_ok": true,
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "validate_email",
+      "language": "python",
+      "original_code": "def validate_email(email: str) -> bool:\n    \"\"\"Validate email format.\n    \n    Args:\n        email: Email address to validate\n        \n    Returns:\n        True if valid, False otherwise\n    \"\"\"\n    if not email or '@' not in email:\n        return False\n    parts = email.split('@')\n    return len(parts) == 2 and len(parts[0]) > 0 and '.' in parts[1]",
+      "reproduced_code": "def validate_email(email:str) -> bool:\n    return None\n",
+      "similarity": 28.059701492537314,
+      "syntax_ok": true,
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "load_json_file",
+      "language": "python",
+      "original_code": "def load_json_file(path: str) -> Optional[Dict]:\n    \"\"\"Load JSON file safely.\n    \n    Args:\n        path: Path to JSON file\n        \n    Returns:\n        Parsed JSON data or None if error\n    \"\"\"\n    try:\n        with open(path, 'r') as f:\n            return json.load(f)\n    except (FileNotFoundError, json.JSONDecodeError):\n        return None",
+      "reproduced_code": "def load_json_file(path:str) -> Optional[Dict]:\n    return None\n",
+      "similarity": 36.41975308641975,
+      "syntax_ok": true,
+      "gen_time": 0.0,
+      "error": ""
+    }
+  ],
+  "format_results": [],
+  "format_scores": {},
+  "provider": "none",
+  "model": "none",
+  "total_time": 0.002795696258544922
+}

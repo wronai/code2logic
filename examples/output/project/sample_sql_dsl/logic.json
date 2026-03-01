@@ -1,0 +1,588 @@
+{
+  "source_file": "tests/samples/sample_sql_dsl.py",
+  "source_language": "python",
+  "source_hash": "9a5212270d8b",
+  "module_doc": "  from typing import List, Optional, Dict, Any, Union from dataclasses import dataclass, field from enum import Enum   class SQLOperator(Enum): \"\"\"SQL comparison operators.",
+  "imports": [],
+  "elements": [
+    {
+      "type": "class",
+      "name": "JoinType",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "Enum"
+      ],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Condition",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "column",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "operator",
+          "type": "SQLOperator",
+          "default": ""
+        },
+        {
+          "name": "value",
+          "type": "Any",
+          "default": "None"
+        }
+      ],
+      "children": [
+        {
+          "type": "method",
+          "name": "to_sql",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "str",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Join",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "table",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "on_left",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "on_right",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "join_type",
+          "type": "JoinType",
+          "default": "JoinType.INNER"
+        }
+      ],
+      "children": [
+        {
+          "type": "method",
+          "name": "to_sql",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "str",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "QueryBuilder",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "__init__",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "table",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "select",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "\"QueryBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "where",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "column",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "operator",
+              "type": "Union[SQLOperator",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "str",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "value",
+              "type": "Any",
+              "default": "None",
+              "is_optional": false
+            }
+          ],
+          "return_type": "\"QueryBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "join",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "table",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "on_left",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "on_right",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "join_type",
+              "type": "JoinType",
+              "default": "JoinType.INNER",
+              "is_optional": false
+            }
+          ],
+          "return_type": "\"QueryBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "order_by",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "\"QueryBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "group_by",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "\"QueryBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "limit",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "count",
+              "type": "int",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "\"QueryBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "offset",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "count",
+              "type": "int",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "\"QueryBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "build",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "str",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "InsertBuilder",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "__init__",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "table",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "columns",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "\"InsertBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "values",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "\"InsertBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "build",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "str",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "UpdateBuilder",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "__init__",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "table",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "set",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "column",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "value",
+              "type": "Any",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "\"UpdateBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "where",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "column",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "operator",
+              "type": "SQLOperator",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "value",
+              "type": "Any",
+              "default": "None",
+              "is_optional": false
+            }
+          ],
+          "return_type": "\"UpdateBuilder\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "build",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "str",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "select",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "str",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "QueryBuilder",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "insert",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "str",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "InsertBuilder",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "update",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "str",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "UpdateBuilder",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

@@ -1,0 +1,25 @@
+# UCLR: tests/samples/sample_reexport/models.py
+# Lang: python
+# Doc: Sample models for re-export testing.
+
+@imports
+  from dataclasses import dataclass
+  from typing import List, Optional
+
+@dataclass
+@class  User
+  .id: int
+  .name: str
+  .email: str
+
+@dataclass
+@class  Order
+  .id: str
+  .user_id: int
+  .items: List[str]
+
+@dataclass
+@class  Product
+  .sku: str
+  .name: str
+  .price: float

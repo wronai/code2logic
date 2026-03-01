@@ -1,0 +1,240 @@
+{
+  "source_file": "tests/samples/sample_class.py",
+  "source_language": "python",
+  "source_hash": "a74d10126568",
+  "module_doc": " Sample file with a class for reproduction testing.  This file contains a class with methods to test if code2logic can accurately reproduce class-based code. ",
+  "imports": [
+    "from typing import List, Dict, Optional, Any"
+  ],
+  "elements": [
+    {
+      "type": "class",
+      "name": "Calculator",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "history",
+          "type": "List of past calculations",
+          "default": ""
+        },
+        {
+          "name": "precision",
+          "type": "Decimal precision for results",
+          "default": ""
+        },
+        {
+          "name": "precision",
+          "type": "Decimal places for rounding",
+          "default": ""
+        },
+        {
+          "name": "a",
+          "type": "First number",
+          "default": ""
+        },
+        {
+          "name": "b",
+          "type": "Second number",
+          "default": ""
+        },
+        {
+          "name": "a",
+          "type": "First number",
+          "default": ""
+        },
+        {
+          "name": "b",
+          "type": "Second number",
+          "default": ""
+        },
+        {
+          "name": "a",
+          "type": "First number",
+          "default": ""
+        },
+        {
+          "name": "b",
+          "type": "Second number",
+          "default": ""
+        },
+        {
+          "name": "a",
+          "type": "Dividend",
+          "default": ""
+        },
+        {
+          "name": "b",
+          "type": "Divisor",
+          "default": ""
+        }
+      ],
+      "children": [
+        {
+          "type": "method",
+          "name": "__init__",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "precision",
+              "type": "int",
+              "default": "2",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "add",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "a",
+              "type": "float",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "b",
+              "type": "float",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "float",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "subtract",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "a",
+              "type": "float",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "b",
+              "type": "float",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "float",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "multiply",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "a",
+              "type": "float",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "b",
+              "type": "float",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "float",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "divide",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "a",
+              "type": "float",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "b",
+              "type": "float",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "Optional[float]",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "clear_history",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "None",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "get_history",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "List[str]",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

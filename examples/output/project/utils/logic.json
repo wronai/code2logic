@@ -1,0 +1,66 @@
+{
+  "source_file": "tests/samples/sample_reexport/utils.py",
+  "source_language": "python",
+  "source_hash": "c3beb4d8ce46",
+  "module_doc": "Sample utilities for re-export testing.",
+  "imports": [
+    "from typing import Any, Dict"
+  ],
+  "elements": [
+    {
+      "type": "function",
+      "name": "process_data",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "data",
+          "type": "Dict[str",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "Any",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "validate_input",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "data",
+          "type": "Dict[str",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "Any",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "bool",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

@@ -1,0 +1,603 @@
+{
+  "benchmark_type": "format",
+  "timestamp": "2026-02-25T12:48:51.005455",
+  "source_path": "tests/samples/",
+  "total_files": 20,
+  "total_functions": 0,
+  "avg_score": 45.50889996240199,
+  "avg_similarity": 0.0,
+  "syntax_ok_rate": 90.0,
+  "runs_ok_rate": 50.0,
+  "best_format": "function.toon",
+  "best_score": 45.50889996240199,
+  "file_results": [
+    {
+      "file_path": "tests/samples/sample_sql.sql",
+      "language": "sql",
+      "original_size": 2569,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 18.25897187196896,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": false,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 463,
+          "spec_tokens": 115,
+          "generated_size": 768,
+          "score": 18.25897187196896,
+          "similarity": 4.655674102812803,
+          "syntax_ok": true,
+          "runs_ok": false,
+          "compression_ratio": 0.1802257687816271,
+          "token_efficiency": 15.8773668451904,
+          "gen_time": 6.874085187911987,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_dataclasses.py",
+      "language": "python",
+      "original_size": 1790,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 40.40335347882435,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": true,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 245,
+          "spec_tokens": 61,
+          "generated_size": 1074,
+          "score": 40.40335347882435,
+          "similarity": 0.7681564245810055,
+          "syntax_ok": true,
+          "runs_ok": true,
+          "compression_ratio": 0.13687150837988826,
+          "token_efficiency": 66.23500570299073,
+          "gen_time": 12.77619481086731,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_async.py",
+      "language": "python",
+      "original_size": 6400,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 53.68201370224725,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": true,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 2498,
+          "spec_tokens": 624,
+          "generated_size": 4143,
+          "score": 53.68201370224725,
+          "similarity": 33.63369060039837,
+          "syntax_ok": true,
+          "runs_ok": true,
+          "compression_ratio": 0.3903125,
+          "token_efficiency": 8.602886811257573,
+          "gen_time": 82.94145822525024,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_class.py",
+      "language": "python",
+      "original_size": 2431,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 79.64398533273209,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": true,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 1061,
+          "spec_tokens": 265,
+          "generated_size": 1420,
+          "score": 79.64398533273209,
+          "similarity": 45.13113477018956,
+          "syntax_ok": true,
+          "runs_ok": true,
+          "compression_ratio": 0.4364459070341423,
+          "token_efficiency": 30.05433408782343,
+          "gen_time": 36.84375214576721,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_pydantic.py",
+      "language": "python",
+      "original_size": 2132,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 0.0,
+      "similarity": 0.0,
+      "syntax_ok": false,
+      "runs_ok": false,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 875,
+          "spec_tokens": 218,
+          "generated_size": 0,
+          "score": 0.0,
+          "similarity": 0.0,
+          "syntax_ok": false,
+          "runs_ok": false,
+          "compression_ratio": 0.0,
+          "token_efficiency": 0.0,
+          "gen_time": 0.0,
+          "error": "Request failed: The read operation timed out"
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_javascript.js",
+      "language": "javascript",
+      "original_size": 3737,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 40.419035314384146,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": false,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 644,
+          "spec_tokens": 161,
+          "generated_size": 2970,
+          "score": 40.419035314384146,
+          "similarity": 25.598621877691645,
+          "syntax_ok": true,
+          "runs_ok": false,
+          "compression_ratio": 0.17233074658817232,
+          "token_efficiency": 25.10499087849947,
+          "gen_time": 44.35036063194275,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_rust.rs",
+      "language": "rust",
+      "original_size": 4481,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 10.123843416370107,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": false,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 1568,
+          "spec_tokens": 392,
+          "generated_size": 3929,
+          "score": 10.123843416370107,
+          "similarity": 14.462633451957297,
+          "syntax_ok": true,
+          "runs_ok": false,
+          "compression_ratio": 0.3499218924347244,
+          "token_efficiency": 2.5826131164209456,
+          "gen_time": 103.55216717720032,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_sql_dsl.py",
+      "language": "python",
+      "original_size": 6902,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 56.4050466565259,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": true,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 2639,
+          "spec_tokens": 659,
+          "generated_size": 5505,
+          "score": 56.4050466565259,
+          "similarity": 11.557991456435882,
+          "syntax_ok": true,
+          "runs_ok": true,
+          "compression_ratio": 0.38235294117647056,
+          "token_efficiency": 8.559187656528968,
+          "gen_time": 96.79596090316772,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_typescript.ts",
+      "language": "typescript",
+      "original_size": 3161,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 38.666666666666664,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": false,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 727,
+          "spec_tokens": 181,
+          "generated_size": 1764,
+          "score": 38.666666666666664,
+          "similarity": 23.095238095238095,
+          "syntax_ok": true,
+          "runs_ok": false,
+          "compression_ratio": 0.2299905093324897,
+          "token_efficiency": 21.362799263351747,
+          "gen_time": 26.73664879798889,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_enum.py",
+      "language": "python",
+      "original_size": 2102,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 55.76071435693856,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": true,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 841,
+          "spec_tokens": 210,
+          "generated_size": 1130,
+          "score": 55.76071435693856,
+          "similarity": 39.851485148514854,
+          "syntax_ok": true,
+          "runs_ok": true,
+          "compression_ratio": 0.4000951474785918,
+          "token_efficiency": 26.55272112235169,
+          "gen_time": 23.4781653881073,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_algorithms.py",
+      "language": "python",
+      "original_size": 5636,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 85.43190255739299,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": true,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 1880,
+          "spec_tokens": 470,
+          "generated_size": 3942,
+          "score": 85.43190255739299,
+          "similarity": 67.21653789935267,
+          "syntax_ok": true,
+          "runs_ok": true,
+          "compression_ratio": 0.33356990773598294,
+          "token_efficiency": 18.17700054412617,
+          "gen_time": 61.85509753227234,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_api.py",
+      "language": "python",
+      "original_size": 4137,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 46.797095389797235,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": true,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 1730,
+          "spec_tokens": 432,
+          "generated_size": 2836,
+          "score": 46.797095389797235,
+          "similarity": 12.534059945504087,
+          "syntax_ok": true,
+          "runs_ok": true,
+          "compression_ratio": 0.4181774232535654,
+          "token_efficiency": 10.83266096986047,
+          "gen_time": 35.914690256118774,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_java.java",
+      "language": "java",
+      "original_size": 1378,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 1.8944792341466925,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": false,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 235,
+          "spec_tokens": 58,
+          "generated_size": 16626,
+          "score": 1.8944792341466925,
+          "similarity": 2.7063989059238467,
+          "syntax_ok": true,
+          "runs_ok": false,
+          "compression_ratio": 0.17053701015965167,
+          "token_efficiency": 3.2663435071494695,
+          "gen_time": 249.37199807167053,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "language": "python",
+      "original_size": 2862,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 79.82221326407492,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": true,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 1306,
+          "spec_tokens": 326,
+          "generated_size": 1752,
+          "score": 79.82221326407492,
+          "similarity": 51.36540962288687,
+          "syntax_ok": true,
+          "runs_ok": true,
+          "compression_ratio": 0.45632424877707894,
+          "token_efficiency": 24.48534149204752,
+          "gen_time": 30.133169651031494,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_csharp.cs",
+      "language": "csharp",
+      "original_size": 869,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 11.268512556342563,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": false,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 235,
+          "spec_tokens": 58,
+          "generated_size": 1092,
+          "score": 11.268512556342563,
+          "similarity": 16.097875080489377,
+          "syntax_ok": true,
+          "runs_ok": false,
+          "compression_ratio": 0.27042577675489066,
+          "token_efficiency": 19.428469924728557,
+          "gen_time": 10.089603662490845,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_go.go",
+      "language": "go",
+      "original_size": 2769,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 36.34354133087727,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": false,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 836,
+          "spec_tokens": 209,
+          "generated_size": 1848,
+          "score": 36.34354133087727,
+          "similarity": 23.347916186967534,
+          "syntax_ok": true,
+          "runs_ok": false,
+          "compression_ratio": 0.30191404839292163,
+          "token_efficiency": 17.389254225300128,
+          "gen_time": 22.58341693878174,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_reexport/exceptions.py",
+      "language": "python",
+      "original_size": 193,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 49.2871269538435,
+      "similarity": 0.0,
+      "syntax_ok": false,
+      "runs_ok": false,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 229,
+          "spec_tokens": 57,
+          "generated_size": 19733,
+          "score": 49.2871269538435,
+          "similarity": 1.2546421760513902,
+          "syntax_ok": false,
+          "runs_ok": false,
+          "compression_ratio": 1.1865284974093264,
+          "token_efficiency": 86.4686437786728,
+          "gen_time": 180.64599347114563,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_reexport/__init__.py",
+      "language": "python",
+      "original_size": 412,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 47.77513674816691,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": true,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 225,
+          "spec_tokens": 56,
+          "generated_size": 1723,
+          "score": 47.77513674816691,
+          "similarity": 0.7494145199063231,
+          "syntax_ok": true,
+          "runs_ok": true,
+          "compression_ratio": 0.5461165048543689,
+          "token_efficiency": 85.31274419315518,
+          "gen_time": 25.168533086776733,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_reexport/utils.py",
+      "language": "python",
+      "original_size": 380,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 71.22429985222062,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": true,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 569,
+          "spec_tokens": 142,
+          "generated_size": 703,
+          "score": 71.22429985222062,
+          "similarity": 38.59649122807017,
+          "syntax_ok": true,
+          "runs_ok": true,
+          "compression_ratio": 1.4973684210526317,
+          "token_efficiency": 50.15795764240889,
+          "gen_time": 9.682708501815796,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_reexport/models.py",
+      "language": "python",
+      "original_size": 396,
+      "spec_size": 0,
+      "generated_size": 0,
+      "score": 41.46116060211709,
+      "similarity": 0.0,
+      "syntax_ok": true,
+      "runs_ok": false,
+      "format_results": {
+        "function.toon": {
+          "format_name": "function.toon",
+          "spec_size": 221,
+          "spec_tokens": 55,
+          "generated_size": 2782,
+          "score": 41.46116060211709,
+          "similarity": 1.762114537444934,
+          "syntax_ok": true,
+          "runs_ok": false,
+          "compression_ratio": 0.5580808080808081,
+          "token_efficiency": 75.38392836748562,
+          "gen_time": 26.077301263809204,
+          "error": ""
+        }
+      },
+      "gen_time": 0.0,
+      "error": ""
+    }
+  ],
+  "function_results": [],
+  "format_results": [],
+  "format_scores": {
+    "function.toon": 45.50889996240199
+  },
+  "provider": "openrouter",
+  "model": "arcee-ai/trinity-large-preview:free",
+  "total_time": 1206.8692047595978
+}

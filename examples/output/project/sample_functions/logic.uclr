@@ -1,0 +1,24 @@
+# UCLR: tests/samples/sample_functions.py
+# Lang: python
+# Doc:  Sample file with functions for reproduction testing.  This file contains functions to test if code2
+
+@imports
+  from typing import List, Dict, Optional, Any
+  import json
+  import os
+
+@func  calculate_total(items: List[int], tax_rate: float = 0.1) -> float
+
+@func  filter_by_status(records: List[Dict], status: str) -> List[Dict]
+
+@func  merge_configs(base: Dict[str, Any: , override: Dict[str, Any: ) -> Dict[str, Any]
+
+@func  validate_email(email: str) -> bool
+
+@func  load_json_file(path: str) -> Optional[Dict]
+
+@func  get_env_or_default(key: str, default: str = "") -> str
+
+@func  chunk_list(items: List[Any], chunk_size: int) -> List[List[Any]]
+
+@func  format_currency(amount: int, currency: str = "USD") -> str

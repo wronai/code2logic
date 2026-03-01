@@ -1,0 +1,322 @@
+{
+  "source_file": "tests/samples/sample_sql.sql",
+  "source_language": "sql",
+  "source_hash": "7055c4d121ce",
+  "module_doc": "",
+  "imports": [],
+  "elements": [
+    {
+      "type": "class",
+      "name": "users",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "SERIAL"
+        },
+        {
+          "name": "PRIMARY",
+          "type": "KEY"
+        },
+        {
+          "name": "username",
+          "type": "VARCHAR(50)"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "email",
+          "type": "VARCHAR(100)"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "password_hash",
+          "type": "VARCHAR(255)"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "is_active",
+          "type": "BOOLEAN"
+        },
+        {
+          "name": "DEFAULT",
+          "type": "TRUE"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP"
+        },
+        {
+          "name": "DEFAULT",
+          "type": "CURRENT_TIMESTAMP"
+        },
+        {
+          "name": "updated_at",
+          "type": "TIMESTAMP"
+        },
+        {
+          "name": "DEFAULT",
+          "type": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "products",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "SERIAL"
+        },
+        {
+          "name": "PRIMARY",
+          "type": "KEY"
+        },
+        {
+          "name": "sku",
+          "type": "VARCHAR(50)"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR(200)"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "description",
+          "type": "TEXT"
+        },
+        {
+          "name": "price",
+          "type": "DECIMAL(10, 2)"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER"
+        },
+        {
+          "name": "DEFAULT",
+          "type": "0"
+        },
+        {
+          "name": "category_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "REFERENCES",
+          "type": "categories(id)"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP"
+        },
+        {
+          "name": "DEFAULT",
+          "type": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "orders",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "SERIAL"
+        },
+        {
+          "name": "PRIMARY",
+          "type": "KEY"
+        },
+        {
+          "name": "user_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "REFERENCES",
+          "type": "users(id)"
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR(20)"
+        },
+        {
+          "name": "total",
+          "type": "DECIMAL(10, 2)"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "shipping_address",
+          "type": "TEXT"
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP"
+        },
+        {
+          "name": "DEFAULT",
+          "type": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "order_items",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "SERIAL"
+        },
+        {
+          "name": "PRIMARY",
+          "type": "KEY"
+        },
+        {
+          "name": "order_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "REFERENCES",
+          "type": "orders(id)"
+        },
+        {
+          "name": "product_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "REFERENCES",
+          "type": "products(id)"
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        },
+        {
+          "name": "unit_price",
+          "type": "DECIMAL(10, 2)"
+        },
+        {
+          "name": "NOT",
+          "type": "NULL"
+        }
+      ],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "order_summary",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [
+        "view"
+      ],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "calculate_order_total",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "update_order_total",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

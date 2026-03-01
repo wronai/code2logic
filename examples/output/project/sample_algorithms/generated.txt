@@ -1,0 +1,34 @@
+"""  from typing import List, Optional, Tuple, Generator, TypeVar from functools import lru_cache  T = TypeVar('T')   def binary_search(arr: List[int], target: int) -> int: """Binary search implementatio"""
+
+def quicksort(arr: List[int]) -> List[int]:
+    pass
+
+def merge_sort(arr: List[int]) -> List[int]:
+    pass
+
+def _merge(left: List[int], right: List[int]) -> List[int]:
+    pass
+
+def fibonacci(n: int) -> int:
+    pass
+
+def fibonacci_generator(limit: int) -> Generator[int, None, None]:
+    pass
+
+def is_prime(n: int) -> bool:
+    pass
+
+def sieve_of_eratosthenes(limit: int) -> List[int]:
+    pass
+
+def gcd(a: int, b: int) -> int:
+    pass
+
+def lcm(a: int, b: int) -> int:
+    pass
+
+def levenshtein_distance(s1: str, s2: str) -> int:
+    pass
+
+def knapsack_01(weights: List[int], values: List[int], capacity: int) -> int:
+    pass

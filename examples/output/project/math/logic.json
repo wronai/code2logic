@@ -1,0 +1,64 @@
+{
+  "source_file": "tests/samples/sample_ts_reexport/math.ts",
+  "source_language": "typescript",
+  "source_hash": "dc9af7d72f1d",
+  "module_doc": "",
+  "imports": [],
+  "elements": [
+    {
+      "type": "function",
+      "name": "add",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "a",
+          "type": "number",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "b",
+          "type": "number",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "n",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "multiply",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "a",
+          "type": "number",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "b",
+          "type": "number",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "n",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

@@ -1,0 +1,42 @@
+# UCLR: tests/samples/sample_pydantic.py
+# Lang: python
+# Doc:  Sample Pydantic models for testing.  Tests: - BaseModel inheritance - Field() with aliases - Valida
+
+@imports
+  from pydantic import BaseModel, Field, field_validator
+  from typing import List, Optional
+  from datetime import datetime
+  from enum import Enum
+
+@class  TaskStatus extends str, Enum
+
+@class  Task extends BaseModel
+  .id: str
+  .name: str
+  .description: Optional[str] = None
+  .status: TaskStatus = TaskStatus.PENDING
+  .priority: int = Field(default=1, ge=1, le=5)
+  .created_at: Optional[datetime] = Field(default=None, alias="createdAt")
+  .tags: List[str] = Field(default_factory=list)
+@method  name_not_empty(cls: , v: str) -> str
+
+
+@class  TaskQueue extends BaseModel
+  .name: str = "default"
+  .tasks: List[Task] = Field(default_factory=list)
+  .max_size: int = Field(default=100, ge=1)
+@method  add_task(task: Task) -> bool
+
+@method  get_pending() -> List[Task]
+
+@method  get_by_status(status: TaskStatus) -> List[Task]
+
+
+@class  Project extends BaseModel
+  .id: str
+  .name: str
+  .owner: str
+  .queues: List[TaskQueue] = Field(default_factory=list)
+  .metadata: dict = Field(default_factory=dict)
+@method  total_tasks() -> int
+

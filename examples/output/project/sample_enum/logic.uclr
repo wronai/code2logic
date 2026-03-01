@@ -1,0 +1,27 @@
+# UCLR: tests/samples/sample_enum.py
+# Lang: python
+# Doc:  Sample enum types for testing.  Tests: - Basic Enum - IntEnum - StrEnum - auto() values - Custom va
+
+@imports
+  from enum import Enum, IntEnum, auto
+  from typing import List
+
+@class  Status extends Enum
+
+@class  Priority extends IntEnum
+
+@class  Color extends Enum
+@method  from_hex(cls: , hex_code: str) -> "Color"
+
+
+@class  HttpStatus extends IntEnum
+@method  is_success() -> bool
+
+@method  is_error() -> bool
+
+
+@class  TaskType extends Enum
+@method  get_timeout() -> int
+
+@method  get_allowed_statuses() -> List[Status]
+

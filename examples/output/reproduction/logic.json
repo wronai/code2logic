@@ -1,0 +1,277 @@
+{
+  "source_file": "tests/samples/sample_dataclasses.py",
+  "source_language": "python",
+  "source_hash": "b9f0107a4a0f",
+  "module_doc": " Sample file with dataclasses for reproduction testing.  This file contains simple dataclasses to test if code2logic can accurately reproduce data model definitions. ",
+  "imports": [
+    "from dataclasses import dataclass, field",
+    "from typing import Optional, List, Dict",
+    "from datetime import datetime"
+  ],
+  "elements": [
+    {
+      "type": "class",
+      "name": "User",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "Unique user identifier",
+          "default": ""
+        },
+        {
+          "name": "name",
+          "type": "User's full name",
+          "default": ""
+        },
+        {
+          "name": "email",
+          "type": "Email address",
+          "default": ""
+        },
+        {
+          "name": "is_active",
+          "type": "Whether user is active",
+          "default": ""
+        },
+        {
+          "name": "created_at",
+          "type": "Account creation timestamp",
+          "default": ""
+        },
+        {
+          "name": "id",
+          "type": "int",
+          "default": ""
+        },
+        {
+          "name": "name",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "email",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "default": "True"
+        },
+        {
+          "name": "created_at",
+          "type": "str",
+          "default": "\"\""
+        }
+      ],
+      "children": [],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Product",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "sku",
+          "type": "Stock keeping unit",
+          "default": ""
+        },
+        {
+          "name": "name",
+          "type": "Product name",
+          "default": ""
+        },
+        {
+          "name": "price",
+          "type": "Price in cents",
+          "default": ""
+        },
+        {
+          "name": "quantity",
+          "type": "Available quantity",
+          "default": ""
+        },
+        {
+          "name": "tags",
+          "type": "List of product tags",
+          "default": ""
+        },
+        {
+          "name": "sku",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "name",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "price",
+          "type": "int",
+          "default": ""
+        },
+        {
+          "name": "quantity",
+          "type": "int",
+          "default": "0"
+        },
+        {
+          "name": "tags",
+          "type": "List[str]",
+          "default": "field(default_factory=list)"
+        }
+      ],
+      "children": [],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Order",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "order_id",
+          "type": "Unique order identifier",
+          "default": ""
+        },
+        {
+          "name": "items",
+          "type": "List of product SKUs",
+          "default": ""
+        },
+        {
+          "name": "total",
+          "type": "Order total in cents",
+          "default": ""
+        },
+        {
+          "name": "status",
+          "type": "Order status",
+          "default": ""
+        },
+        {
+          "name": "metadata",
+          "type": "Additional order data",
+          "default": ""
+        },
+        {
+          "name": "order_id",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "default": ""
+        },
+        {
+          "name": "items",
+          "type": "List[str]",
+          "default": ""
+        },
+        {
+          "name": "total",
+          "type": "int",
+          "default": ""
+        },
+        {
+          "name": "status",
+          "type": "str",
+          "default": "\"pending\""
+        },
+        {
+          "name": "metadata",
+          "type": "Dict[str, str]",
+          "default": "field(default_factory=dict)"
+        }
+      ],
+      "children": [],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Address",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "street",
+          "type": "Street address",
+          "default": ""
+        },
+        {
+          "name": "city",
+          "type": "City name",
+          "default": ""
+        },
+        {
+          "name": "country",
+          "type": "Country code",
+          "default": ""
+        },
+        {
+          "name": "postal_code",
+          "type": "Postal/ZIP code",
+          "default": ""
+        },
+        {
+          "name": "street",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "city",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "country",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "postal_code",
+          "type": "str",
+          "default": ""
+        }
+      ],
+      "children": [],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

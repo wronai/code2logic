@@ -1,0 +1,10 @@
+# UCLR: tests/samples/sample_reexport/utils.py
+# Lang: python
+# Doc: Sample utilities for re-export testing.
+
+@imports
+  from typing import Any, Dict
+
+@func  process_data(data: Dict[str, Any: ) -> Dict[str, Any]
+
+@func  validate_input(data: Dict[str, Any: ) -> bool

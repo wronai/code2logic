@@ -1,186 +1,74 @@
 [build-system]
-requires = ["poetry-core>=1.8.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
 
-[tool.poetry]
-name = "code2logic"
-version = "1.0.48"
-description = "Code2Logic - Source code to logical representation converter for LLM analysis, featuring Tree-sitter parsing, dependency graph analysis, and multi-language support."
+[project]
+name = "code2flow"
+version = "0.2.1"
+description = "High-performance Python code flow analysis with NLP query processing - CFG, DFG, call graphs, and intelligent code queries"
 readme = "README.md"
+requires-python = ">=3.8"
 license = "Apache-2.0"
 authors = [
-    "Softreck <tom@sapletta.com>",
-    "Tom Sapletta <tom@sapletta.com>",
+    {name = "STTS Project"},
+    {name = "Tom Sapletta", email = "tom@sapletta.com"},
 ]
-maintainers = ["Softreck <tom@sapletta.com>"]
 keywords = [
-    "code-analysis",
-    "llm",
-    "ast",
     "static-analysis",
-    "tree-sitter",
-    "code-understanding",
-    "documentation",
-    "dependency-graph",
+    "control-flow",
+    "data-flow",
+    "call-graph",
+    "reverse-engineering",
     "nlp",
+    "code-analysis",
+    "ast"
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Quality Assurance",
 ]
-packages = [{ include = "code2logic" }]
-
-[tool.poetry.urls]
-Homepage = "https://github.com/wronai/code2logic"
-Documentation = "https://code2logic.readthedocs.io"
-Repository = "https://github.com/wronai/code2logic.git"
-Issues = "https://github.com/wronai/code2logic/issues"
-Changelog = "https://github.com/wronai/code2logic/blob/main/CHANGELOG.md"
-
-[tool.poetry.dependencies]
-python = ">=3.9,<4.0"
-pyyaml = { version = ">=6.0", optional = true }
-lolm = { version = ">=0.1.0", optional = true }
-
-tree-sitter = { version = ">=0.21.0", optional = true }
-tree-sitter-python = { version = ">=0.21.0", optional = true }
-tree-sitter-javascript = { version = ">=0.21.0", optional = true }
-tree-sitter-typescript = { version = ">=0.21.0", optional = true }
-networkx = { version = ">=3.0", optional = true }
-rapidfuzz = { version = ">=3.0", optional = true }
-nltk = { version = ">=3.8", optional = true }
-httpx = { version = ">=0.25.0", optional = true }
-litellm = { version = ">=1.0.0", optional = true }
-
-[tool.poetry.extras]
-treesitter = [
-    "tree-sitter",
-    "tree-sitter-python",
-    "tree-sitter-javascript",
-    "tree-sitter-typescript",
-]
-graph = ["networkx"]
-similarity = ["rapidfuzz"]
-nlp = ["nltk"]
-llm = ["lolm", "httpx", "litellm"]
-full = [
-    "pyyaml",
-    "lolm",
-    "tree-sitter",
-    "tree-sitter-python",
-    "tree-sitter-javascript",
-    "tree-sitter-typescript",
-    "networkx",
-    "rapidfuzz",
-    "nltk",
+dependencies = [
+    "networkx>=2.6",
+    "matplotlib>=3.4",
+    "pyyaml>=5.4",
+    "numpy>=1.20",
 ]
 
-[tool.poetry.group.dev.dependencies]
-pytest = ">=7.0"
-pytest-cov = ">=4.0"
-black = ">=23.0"
-ruff = ">=0.1.0"
-mypy = ">=1.0"
-pre-commit = ">=3.0"
-build = ">=1.0.0"
-twine = ">=4.0.0"
-bumpver = ">=2023.1129"
-
-[tool.poetry.group.docs.dependencies]
-mkdocs = ">=1.5"
-mkdocs-material = ">=9.0"
-mkdocstrings = { version = ">=0.24", extras = ["python"] }
-
-[tool.poetry.scripts]
-code2logic = "code2logic.cli:main"
-code2logic-mcp = "code2logic.mcp_server:run_server"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_functions = ["test_*"]
-addopts = [
-    "-v",
-    "--tb=short",
-    "--cov=code2logic",
-    "--cov-report=term-missing",
-    "-p",
-    "no:aiohttp",
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.2",
+    "pytest-cov>=2.12",
+    "black>=21.0",
+    "flake8>=3.9",
+    "mypy>=0.910",
 ]
 
-[tool.coverage.run]
-source = ["code2logic"]
-branch = true
+[project.scripts]
+code2flow = "code2flow.cli:main"
 
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise NotImplementedError",
-    "if TYPE_CHECKING:",
-    "if __name__ == .__main__.:",
-]
+[project.urls]
+Homepage = "https://github.com/wronai/stts"
+Repository = "https://github.com/wronai/stts"
+Issues = "https://github.com/wronai/stts/issues"
 
 [tool.black]
 line-length = 100
-target-version = ["py39", "py310", "py311", "py312"]
-include = '\.pyi?$'
-
-[tool.ruff]
-line-length = 100
-target-version = "py39"
-
-[tool.ruff.lint]
-select = [
-    "E",      # pycodestyle errors
-    "W",      # pycodestyle warnings
-    "F",      # pyflakes
-    "I",      # isort
-    "C4",     # flake8-comprehensions
-    "B",      # flake8-bugbear
-    "UP",     # pyupgrade
-]
-ignore = [
-    "E501",   # line too long (handled by black)
-    "B008",   # do not perform function calls in argument defaults
-]
-
-[tool.ruff.lint.isort]
-known-first-party = ["code2logic"]
+target-version = ['py38']
 
 [tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_ignores = true
-disallow_untyped_defs = true
-exclude = [
-    "tests/",
-    "build/",
-    "dist/",
-]
-
-[[tool.mypy.overrides]]
-module = [
-    "tree_sitter",
-    "tree_sitter_python",
-    "tree_sitter_javascript",
-    "tree_sitter_typescript",
-    "networkx",
-    "rapidfuzz",
-    "nltk",
-    "spacy",
-]
+python_version = "3.8"
 ignore_missing_imports = true
 
-[tool.bumpver]
-current_version = "1.0.30"
-version_pattern = "MAJOR.MINOR.PATCH"
-commit = false
-tag = false
-
-[tool.bumpver.file_patterns]
-"pyproject.toml" = [
-    "^version = \"{version}\"",
-    "^current_version = \"{version}\"",
-]
-"code2logic/__init__.py" = ["__version__ = \"{version}\""]
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"

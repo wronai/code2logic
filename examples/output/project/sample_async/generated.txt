@@ -1,0 +1,20 @@
+from dataclasses import dataclass, field
+from typing import Optional, List, Dict, Any
+
+"""  import asyncio from typing import List, Dict, Optional, Any, TypeVar from dataclasses import dataclass, field from datetime import datetime from contextlib import asynccontextmanager  T = TypeVar('T"""
+
+@dataclass
+class TaskResult:
+    task_id: str
+    success: bool
+    data: Optional[Any] = None
+    error: Optional[str] = None
+    duration_ms: float = 0.0
+
+class AsyncTaskQueue:
+    def __init__(self, max_concurrent: int = 5):
+        pass
+
+class AsyncCache:
+    def __init__(self, ttl_seconds: int = 300):
+        pass

@@ -1,0 +1,42 @@
+total_tests: 5
+passed_tests: 0
+failed_tests: 5
+success_rate: 0.0
+performance_metrics: {}
+test_results:
+- test: validation_framework
+  status: FAILED
+  details: No module named 'validation'
+  traceback: "Traceback (most recent call last):\n  File \"/home/tom/github/wronai/nlp2cmd/debug/code2flow/optimization/test_optimization.py\"\
+    , line 56, in test_validation_framework\n    from validation.framework import\
+    \ (\n    ...<2 lines>...\n    )\nModuleNotFoundError: No module named 'validation'\n"
+- test: processing_framework
+  status: FAILED
+  details: No module named 'processing'
+  traceback: "Traceback (most recent call last):\n  File \"/home/tom/github/wronai/nlp2cmd/debug/code2flow/optimization/test_optimization.py\"\
+    , line 109, in test_processing_framework\n    from processing.framework import\
+    \ (\n    ...<3 lines>...\n    )\nModuleNotFoundError: No module named 'processing'\n"
+- test: refactored_executor
+  status: FAILED
+  details: No module named 'execution'
+  traceback: "Traceback (most recent call last):\n  File \"/home/tom/github/wronai/nlp2cmd/debug/code2flow/optimization/test_optimization.py\"\
+    , line 169, in test_refactored_executor\n    from execution.refactored_executor\
+    \ import (\n    ...<2 lines>...\n    )\nModuleNotFoundError: No module named 'execution'\n"
+- test: performance_comparison
+  status: FAILED
+  details: No module named 'validation'
+  traceback: "Traceback (most recent call last):\n  File \"/home/tom/github/wronai/nlp2cmd/debug/code2flow/optimization/test_optimization.py\"\
+    , line 240, in test_performance_comparison\n    from validation.framework import\
+    \ validate_form_field\nModuleNotFoundError: No module named 'validation'\n"
+- test: integration
+  status: FAILED
+  details: No module named 'validation'
+  traceback: "Traceback (most recent call last):\n  File \"/home/tom/github/wronai/nlp2cmd/debug/code2flow/optimization/test_optimization.py\"\
+    , line 299, in test_integration\n    from validation.framework import validate_form_field\n\
+    ModuleNotFoundError: No module named 'validation'\n"
+overall_status: PARTIAL_SUCCESS
+recommendations:
+- Fix failed tests before deployment
+- Review error handling in failed components
+- Add more robust error checking
+- Consider fallback mechanisms for critical failures

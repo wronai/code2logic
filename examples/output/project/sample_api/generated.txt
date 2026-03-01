@@ -1,0 +1,38 @@
+from dataclasses import dataclass, field
+from typing import Optional, List, Dict, Any
+
+"""  from typing import Dict, List, Optional, Any from dataclasses import dataclass, field from datetime import datetime import json   @dataclass class APIResponse: """Standard API response structure."""
+
+@dataclass
+class User:
+    id: int
+    username: str
+    email: str
+    roles: List[str] = field(default_factory=list)
+    created_at: str = ""
+
+class APIError(Exception):
+    def __init__(self, message: str, code: int = 400):
+        pass
+
+class UserAPI:
+    def __init__(self):
+        pass
+    def create_user(self, username: str, email: str, roles: List[str] = None) -> APIResponse:
+        pass
+    def get_user(self, user_id: int) -> APIResponse:
+        pass
+    def update_user(self, user_id: int) -> APIResponse:
+        pass
+    def delete_user(self, user_id: int) -> APIResponse:
+        pass
+    def list_users(self, limit: int = 10, offset: int = 0) -> APIResponse:
+        pass
+    def search_users(self, query: str) -> APIResponse:
+        pass
+
+def handle_api_error(func):
+    pass
+
+def wrapper():
+    pass

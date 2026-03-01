@@ -1,0 +1,230 @@
+{
+  "source_file": "tests/samples/sample_functions.py",
+  "source_language": "python",
+  "source_hash": "3cf15b422180",
+  "module_doc": " Sample file with functions for reproduction testing.  This file contains functions to test if code2logic can accurately reproduce function-based code. ",
+  "imports": [
+    "from typing import List, Dict, Optional, Any",
+    "import json",
+    "import os"
+  ],
+  "elements": [
+    {
+      "type": "function",
+      "name": "calculate_total",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "items",
+          "type": "List[int]",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "tax_rate",
+          "type": "float",
+          "default": "0.1",
+          "is_optional": false
+        }
+      ],
+      "return_type": "float",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "filter_by_status",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "records",
+          "type": "List[Dict]",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "status",
+          "type": "str",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "List[Dict]",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "merge_configs",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "base",
+          "type": "Dict[str",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "Any",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "override",
+          "type": "Dict[str",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "Any",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "Dict[str, Any]",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "validate_email",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "email",
+          "type": "str",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "bool",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "load_json_file",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "str",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "Optional[Dict]",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "get_env_or_default",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "key",
+          "type": "str",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "default",
+          "type": "str",
+          "default": "\"\"",
+          "is_optional": false
+        }
+      ],
+      "return_type": "str",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "chunk_list",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "items",
+          "type": "List[Any]",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "chunk_size",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "List[List[Any]]",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "format_currency",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "amount",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "currency",
+          "type": "str",
+          "default": "\"USD\"",
+          "is_optional": false
+        }
+      ],
+      "return_type": "str",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

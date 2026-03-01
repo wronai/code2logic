@@ -1,0 +1,262 @@
+# code2logic | 152f 39758L | python:140/javascript:3/csharp:1/go:1/java:1/rust:1/sql:1/typescript:4
+
+ENTRY: code2logic/__init__.py code2logic/__main__.py code2logic/base_generator.py
+
+DEPS:
+  __init__->analyzer,adaptive,benchmark,chunked_reproduction,base
+  __main__->cli
+  adaptive->reproduction,file_formats,llm_clients
+  analyzer->dependency,intent,parsers,models
+  base_generator->models
+  benchmark->gherkin,generators,analyzer,file_formats
+  __init__->runner,common,results
+  common->function_logic,logicml,markdown_format,models,toon_format+2
+  runner->analyzer,metrics,llm_clients,common,terminal+1
+  chunked_reproduction->utils
+  __init__->dependency,analyzer,errors,models
+  dependency->models
+  __init__->logicml,markdown_format,file_formats,toon_format,gherkin+1
+  function_logic->models,toon_format,shared_utils
+  generators->models,shared_utils
+  gherkin->models
+  __init__->mcp_server
+  llm->llm_clients
+  __init__->intent,llm_clients
+  llm_profiler->utils
+
+
+[code2logic]
+  __init__.py (392L) F:analyze_quality,reproduce_project
+  __main__.py (12L) -
+  adaptive.py (469L) C:ChunkInfo,AdaptiveResult,AdaptiveReproducer | F:get_llm_capabilities | AdaptiveReproducer:{__init__(client:BaseLLMClient=None,model:str=None);select_format(file_path:Path,content:str)->str;should_chunk(content:str)->bool;chunk_content(content:str,file_path:Path)->List[ChunkInfo];generate_chunk_spec(chunk:ChunkInfo,format_name:str)->str;reproduce(file_path:str,output_dir:str=None)->AdaptiveResult}
+  analyzer.py (410L) C:ProjectAnalyzer | F:analyze_project,get_library_status | ProjectAnalyzer:{__init__(root_path:str,use_treesitter:bool=True,verbose:bool=False);analyze()->ProjectInfo;get_statistics()->Dict}
+  base.py (49L) C:VerboseMixin,BaseParser,BaseGenerator | VerboseMixin:{__init__(verbose:bool=False);log(msg:str,level:str='info');debug(msg:str);info(msg:str);warn(msg:str);error(msg:str)} | BaseParser:{__init__(verbose:bool=False);parse(content:str,language:str=None);parse_file(path:str)} | BaseGenerator:{__init__(verbose:bool=False);generate(project,detail:str='full')->str}
+  base_generator.py (5L) C:ProjectGenerator | ProjectGenerator:{generate(project:ProjectInfo)->Any}
+  benchmark.py (349L) C:FormatResult,BenchmarkResult,ReproductionBenchmark | F:run_benchmark | ReproductionBenchmark:{__init__(client:BaseLLMClient=None);generate_spec(file_path:Path,format_name:str,detail:str='full')->str;reproduce_with_format(file_path:Path,format_name:str,original_code:str)->FormatResult;run_single(file_path:str,formats:List[str]=None)->BenchmarkResult;run_all(files:List[str],output_dir:str=None)->Dict[str, Any]}
+
+[code2logic/benchmarks]
+  __init__.py (34L) -
+  common.py (327L) F:create_single_project,generate_spec
+  results.py (162L) C:FormatResult,FileResult,FunctionResult | FormatResult:{to_dict()->Dict[str, Any]} | FileResult:{to_dict()->Dict[str, Any]} | FunctionResult:{to_dict()->Dict[str, Any]}
+  runner.py (883L) C:BenchmarkRunner | BenchmarkRunner:{__init__(client:Optional[BaseLLMClient]=None,config:Optional[BenchmarkConfig]=None);run_format_benchmark(folder:str,formats:List[str]=None,limit:Optional[int]=None)->BenchmarkResult;run_file_benchmark(file_path:str,formats:List[str]=None,verbose:bool=False)->BenchmarkResult;run_function_benchmark(file_path:str,function_names:List[str]=None,limit:Optional[int]=None)->BenchmarkResult;run_project_benchmark(project_path:str,formats:List[str]=None,limit:Optional[int]=None)->BenchmarkResult}
+
+[code2logic]
+  chunked_reproduction.py (358L) C:Chunk,ChunkedSpec,ChunkedResult | F:get_llm_limit,chunk_yaml_spec,chunk_gherkin_spec,chunk_markdown_spec
+  cli.py (907L) C:Colors,Logger | F:ensure_dependencies | Logger:{__init__(verbose:bool=False,debug:bool=False);info(msg:str);success(msg:str);warning(msg:str);error(msg:str);step(msg:str)}
+  code_review.py (205L) C:CodeReviewer | F:analyze_code_quality,check_security_issues,check_performance_issues | CodeReviewer:{__init__(client=None);review(project,focus:str='all')->Dict[str, Any];generate_report(results:Dict[str,Any],project_name:str='Project')->str}
+  config.py (174L) C:Config | F:load_env,get_api_key,get_model | Config:{__init__(env_file:str=None);get_api_key(provider:str)->Optional[str];get_model(provider:str)->str;get_ollama_host()->str;get_default_provider()->str;is_verbose()->bool}
+
+[code2logic/core]
+  __init__.py (21L) -
+
+[code2logic]
+  dependency.py (187L) C:DependencyAnalyzer | F:is_networkx_available | DependencyAnalyzer:{__init__();build_graph(modules:List[ModuleInfo])->Dict[str, List[str]];analyze_metrics()->Dict[str, DependencyNode];get_entrypoints()->List[str];get_hubs()->List[str];detect_cycles()->List[List[str]]}
+  errors.py (371L) C:ErrorSeverity,ErrorType,AnalysisError | F:create_error_handler | AnalysisError:{to_dict()->Dict[str, Any]}
+  file_formats.py (278L) F:generate_file_csv,generate_file_json,generate_file_yaml
+
+[code2logic/formats]
+  __init__.py (31L) -
+
+[code2logic]
+  function_logic.py (326L) C:FunctionLogicGenerator | FunctionLogicGenerator:{__init__(verbose:bool=False)->None;generate(project:ProjectInfo,detail:str='full')->str;generate_json(project:ProjectInfo,detail:str='full')->str;generate_yaml(project:ProjectInfo,detail:str='full')->str;generate_toon(project:ProjectInfo,detail:str='full',no_repeat_name:bool=False)->str;generate_toon_schema()->str}
+  generators.py (1787L) C:MarkdownGenerator,CompactGenerator,JSONGenerator | F:bytes_to_kb | MarkdownGenerator:{generate(project:ProjectInfo,detail_level:str='standard')->str} | CompactGenerator:{generate(project:ProjectInfo)->str} | JSONGenerator:{generate(project:ProjectInfo,flat:bool=False,detail:str='standard')->str;generate_from_module(module:ModuleInfo,detail:str='full')->str}
+  gherkin.py (764L) C:GherkinScenario,GherkinFeature,StepDefinition | F:csv_to_gherkin,gherkin_to_test_data
+
+[code2logic/integrations]
+  __init__.py (5L) -
+
+[code2logic]
+  intent.py (429L) C:IntentType,Intent,EnhancedIntentGenerator | EnhancedIntentGenerator:{__init__(lang:str='en');generate(name:str,docstring:Optional[str]=None)->str;get_available_features()->dict[str, bool]}
+  llm.py (287L) C:LLMConfig,CodeAnalyzer | F:get_available_backends | CodeAnalyzer:{__init__(model:str=None,provider:str=None,base_url:str=None);is_available()->bool;suggest_refactoring(project)->list[dict[str, Any]];find_semantic_duplicates(project)->list[dict[str, Any]];generate_code(project,target_lang:str,module_filter:Optional[str]=None)->dict[str, str];translate_function(name:str,signature:str,intent:str)->str}
+
+[code2logic/llm]
+  __init__.py (40L) -
+
+[code2logic]
+  llm_clients.py (209L) F:get_priority_mode
+  llm_profiler.py (490L) C:LLMProfile,ProfileTestResult,LLMProfiler | F:load_profiles,save_profile,get_profile | LLMProfile:{__post_init__()} | LLMProfiler:{__init__(client,verbose:bool=True);run_profile(quick:bool=False)->LLMProfile}
+  logicml.py (305L) C:LogicMLSpec,LogicMLGenerator | F:generate_logicml | LogicMLGenerator:{__init__(verbose:bool=False)->None;generate(project:ProjectInfo,detail:str='standard',level:str='typed')->LogicMLSpec}
+  markdown_format.py (265L) C:MarkdownSpec,MarkdownHybridGenerator | F:generate_markdown_hybrid,generate_file_markdown | MarkdownHybridGenerator:{__init__(verbose:bool=False);generate(project:ProjectInfo,detail:str='full')->MarkdownSpec}
+  mcp_server.py (297L) F:handle_request,call_tool,run_server
+  metrics.py (479L) C:TextMetrics,StructuralMetrics,SemanticMetrics | F:analyze_reproduction,compare_formats
+  models.py (296L) C:FunctionInfo,ClassInfo,TypeInfo
+  parsers.py (2265L) C:_PyFunctionBodyAnalyzer,TreeSitterParser,UniversalParser | _PyFunctionBodyAnalyzer:{__init__();visit_Call(node);visit_Raise(node);visit_If(node);visit_For(node);visit_AsyncFor(node)} | TreeSitterParser:{__init__();is_available(language:str)->bool;get_supported_languages()->List[str];parse(filepath:str,content:str,language:str)->Optional[ModuleInfo]} | UniversalParser:{__init__();parse(filepath:str,content:str,language:str)->Optional[ModuleInfo]}
+  project_reproducer.py (318L) C:FileResult,ProjectResult,ProjectReproducer | F:reproduce_project | ProjectReproducer:{__init__(client:BaseLLMClient=None,max_workers:int=4,target_lang:str=None);find_source_files(project_path:str,extensions:Set[str]=None,exclude_patterns:List[str]=None)->List[Path];reproduce_file(file_path:Path,output_dir:Path)->FileResult;reproduce_project(project_path:str,output_dir:str=None,parallel:bool=False)->ProjectResult}
+  prompts.py (120L) F:get_reproduction_prompt,get_review_prompt,get_fix_prompt
+  quality.py (212L) C:QualityIssue,QualityReport,QualityAnalyzer | F:analyze_quality,get_quality_summary | QualityReport:{to_dict()->Dict[str, Any]} | QualityAnalyzer:{__init__(thresholds:Dict[str,int]=None);analyze(project:ProjectInfo)->QualityReport;analyze_modules(modules:List[ModuleInfo])->QualityReport}
+  refactor.py (308L) C:DuplicateGroup,RefactoringSuggestion,RefactoringReport | F:find_duplicates,analyze_quality,suggest_refactoring,compare_codebases | RefactoringReport:{to_dict()->Dict[str, Any];to_markdown()->str}
+  reproducer.py (537L) C:ReproductionStatus,FileValidation,ReproductionResult | F:reproduce_project,validate_files | FileValidation:{score()->float;to_dict()->Dict[str, Any]} | ReproductionResult:{success_rate()->float;average_score()->float;summary()->str}
+  reproduction.py (333L) C:CodeReproducer | F:generate_file_gherkin,compare_code,extract_code_block | CodeReproducer:{__init__(client:BaseLLMClient=None,provider:str=None);reproduce_file(source_path:str,output_dir:str=None)->Dict[str, Any];generate_from_gherkin(gherkin:str,language:str='python')->str}
+
+[code2logic/schemas]
+  __init__.py (25L) -
+  json_schema.py (206L) C:JSONMethodSchema,JSONClassSchema,JSONFunctionSchema | F:validate_json,parse_json_spec
+  logicml_schema.py (184L) C:LogicMLMethod,LogicMLClass,LogicMLModule | F:validate_logicml,parse_logicml_header,extract_logicml_signature
+  markdown_schema.py (118L) C:MarkdownMethod,MarkdownClass,MarkdownModule | F:validate_markdown,extract_markdown_sections
+  yaml_schema.py (167L) C:MethodSchema,ClassSchema,FunctionSchema | F:validate_yaml
+
+[code2logic]
+  shared_utils.py (279L) F:compact_imports,deduplicate_imports,abbreviate_type,expand_type
+  similarity.py (201L) C:SimilarityDetector | F:is_rapidfuzz_available,get_refactoring_suggestions | SimilarityDetector:{__init__(threshold:float=80.0);find_similar_functions(modules:List[ModuleInfo])->Dict[str, List[str]];find_duplicate_signatures(modules:List[ModuleInfo])->Dict[str, List[str]]}
+  terminal.py (496L) C:ShellRenderer,RenderAPI | F:get_renderer,set_renderer | ShellRenderer:{__init__(use_colors:bool=True,verbose:bool=True);enable_log()->None;get_log()->str;clear_log()->None;heading(level:int,text:str)->None;codeblock(language:Language,content:str)->None} | RenderAPI:{heading(level:int,text:str)->None;code(lang:Language,content:str)->None;codeblock(lang:Language,content:str)->None;markdown(text:str)->None;success(message:str)->None;error(message:str)->None}
+
+[code2logic/tools]
+  __init__.py (28L) -
+
+[code2logic]
+  toon_format.py (663L) C:TOONGenerator,TOONParser | F:generate_toon,parse_toon | TOONGenerator:{__init__(delimiter:str=',',use_tabs:bool=False);generate(project:ProjectInfo,detail:str='standard',no_repeat_name:bool=False)->str;generate_hybrid(project:ProjectInfo,detail:str='full',no_repeat_name:bool=True)->str;generate_compact(project:ProjectInfo)->str;generate_full(project:ProjectInfo)->str;generate_schema(format_type:str='standard')->str} | TOONParser:{__init__();parse(content:str)->Dict[str, Any]}
+  universal.py (957L) C:ElementType,Language,Parameter | F:reproduce_file
+  utils.py (16L) F:estimate_tokens,write_text_atomic,cleanup_generated_root
+
+[examples]
+  01_quick_start.py (47L) F:main
+  02_refactoring.py (45L) F:main
+  03_reproduction.py (57L) F:main
+  04_project.py (55L) F:main
+  05_llm_integration.py (87L) F:main
+  06_metrics.py (85L) F:analyze_file,main
+  06_metrics_simple.py (0L) -
+  08_format_benchmark.py (90L) F:print_format_comparison,print_per_file_results,main
+  09_async_benchmark.py (60L) F:print_results,main
+  10_function_reproduction.py (51L) F:print_results,main
+  11_token_benchmark.py (69L) F:print_token_efficiency,main
+  12_comprehensive_analysis.py (95L) F:print_comprehensive_analysis,main
+  12_comprehensive_analysis_simple.py (0L) -
+  13_project_benchmark.py (70L) F:print_project_results,main
+  14_repeatability_test.py (331L) C:RunResult,RepeatabilityResult | F:generate_spec,get_reproduction_prompt,calculate_similarity
+  15_unified_benchmark.py (143L) F:print_format_results,print_function_results,print_project_results,main
+  16_terminal_demo.py (178L) F:demo_headings,demo_codeblocks,demo_status_messages,demo_progress
+  behavioral_benchmark.py (220L) C:CaseResult,FunctionBehaviorResult
+  benchmark_report.py (170L) C:Artifact
+  benchmark_summary.py (100L) F:main
+
+[examples/code2logic/sample_project]
+  __init__.py (1L) -
+
+[examples/code2logic/sample_project/api]
+  client.py (15L) C:Response,APIClient | APIClient:{get(url:str)->Response;post(url:str,data:dict)->Response}
+
+[examples/code2logic/sample_project]
+  calculator.py (22L) C:Calculator | F:factorial | Calculator:{add(a:float,b:float)->float;divide(a:float,b:float)->float}
+
+[examples/code2logic/sample_project/models]
+  user.py (9L) C:User
+
+[examples]
+  duplicate_detection.py (0L) -
+  token_efficiency.py (0L) -
+  windsurf_mcp_integration.py (0L) -
+
+[logic2code]
+  __init__.py (13L) -
+  __main__.py (8L) -
+  cli.py (152L) F:main
+
+[logic2code/examples]
+  01_quickstart.py (72L) F:example_basic_generation,example_with_config,example_stubs_only,example_single_module
+  02_llm_enhanced.py (77L) F:example_llm_generation,example_hybrid_generation,example_compare_outputs
+
+[logic2code]
+  generator.py (233L) C:GeneratorConfig,GenerationResult,CodeGenerator | CodeGenerator:{__init__(logic_file:Union[str,Path],config:Optional[GeneratorConfig]=None);project()->ProjectSpec;generate(output_dir:Union[str,Path],modules:Optional[List[str]]=None)->GenerationResult;generate_module(module_path:str)->str;generate_class(class_name:str,module_path:Optional[str]=None)->str;generate_function(func_name:str,module_path:Optional[str]=None)->str}
+  renderers.py (297L) C:RenderConfig,BaseRenderer,PythonRenderer | BaseRenderer:{__init__(config:Optional[RenderConfig]=None);render_module(module:ModuleSpec)->str;render_class(cls:ClassSpec)->str;render_function(func:FunctionSpec)->str} | PythonRenderer:{render_module(module:ModuleSpec)->str;render_class(cls:ClassSpec)->str;render_function(func:FunctionSpec)->str;render_init_file(modules:List[ModuleSpec])->str}
+
+[logic2code/tests]
+  __init__.py (1L) -
+  test_basic.py (40L) F:test_import_logic2code,test_import_generator,test_config_defaults,test_generator_config_custom
+
+[logic2test]
+  __init__.py (14L) -
+  __main__.py (8L) -
+  cli.py (131L) F:main
+
+[logic2test/examples]
+  01_quickstart.py (62L) F:example_basic_generation,example_with_config,example_generate_all_types
+  02_custom_templates.py (92L) F:example_function_test,example_class_test,example_dataclass_test,example_async_function_test
+
+[logic2test]
+  generator.py (328L) C:GeneratorConfig,GenerationResult,TestGenerator | TestGenerator:{__init__(logic_file:Union[str,Path],config:Optional[GeneratorConfig]=None);project()->ProjectSpec;generate_unit_tests(output_dir:Union[str,Path],modules:Optional[List[str]]=None)->GenerationResult;generate_integration_tests(output_dir:Union[str,Path],entry_points:Optional[List[str]]=None)->GenerationResult;generate_property_tests(output_dir:Union[str,Path])->GenerationResult;summary()->Dict}
+  parsers.py (272L) C:FunctionSpec,ClassSpec,ModuleSpec
+  templates.py (198L) C:TestTemplate | TestTemplate:{render_test_file_header(module_path:str,imports:List[str]=None)->str;render_function_test(func_name:str,params:List[str],return_type:Optional[str]=None)->str;render_class_test(class_name:str,bases:List[str],is_dataclass:bool=False)->str;render_dataclass_test(class_name:str,fields:List[dict])->str}
+
+[logic2test/tests]
+  __init__.py (1L) -
+  test_basic.py (31L) F:test_import_logic2test,test_import_generator,test_config_defaults,test_generator_config_custom
+
+[lolm]
+  __init__.py (103L) -
+  __main__.py (10L) -
+  cli.py (231L) F:cmd_status,cmd_set_provider,cmd_set_model,cmd_key_set
+  clients.py (274L) C:LLMRateLimitError,OpenRouterClient,OllamaClient | LLMRateLimitError:{__init__(message:str,provider:str='',status_code:int=429);__str__()} | OpenRouterClient:{__init__(api_key:str=None,model:str=None);generate(prompt:str,system:str=None,max_tokens:int=4000)->str;is_available()->bool;list_recommended_models()->List[tuple]} | OllamaClient:{__init__(model:str=None,host:str=None);generate(prompt:str,system:str=None,max_tokens:int=4000)->str;is_available()->bool;list_models()->List[str];list_recommended_models()->List[tuple]}
+  config.py (271L) C:LLMConfig | F:get_config_dir,get_config_path,load_config,save_config | LLMConfig:{to_dict()->Dict[str, Any];from_dict(data:Dict[str,Any])->'LLMConfig'}
+
+[lolm/examples]
+  01_quickstart.py (60L) F:example_simple_client,example_specific_provider,example_manager,example_fallback
+  02_configuration.py (88L) F:show_defaults,show_recommended_models,show_current_config,example_modify_config
+  03_code_generation.py (86L) F:generate_function,generate_class,explain_code,review_code
+
+[lolm]
+  manager.py (412L) C:ProviderInfo,LLMManager | F:get_client,list_available_providers | ProviderInfo:{__init__(name:str,status:LLMProviderStatus,client:Optional[BaseLLMClient]=None)} | LLMManager:{__init__(verbose:bool=False,enable_rotation:bool=True);is_available()->bool;is_ready()->bool;primary_provider()->Optional[BaseLLMClient];providers()->Dict[str, ProviderInfo];initialize()->None}
+  provider.py (121L) C:LLMProviderStatus,GenerateOptions,LLMResponse | GenerateOptions:{to_messages()->List[Dict[str, str]]}
+  rotation.py (560L) C:ProviderState,RateLimitType,RateLimitInfo | F:parse_rate_limit_headers,is_rate_limit_error,create_rotation_manager | RateLimitInfo:{get_wait_seconds()->float}
+
+[lolm/tests]
+  __init__.py (1L) -
+  test_basic.py (51L) F:test_import_lolm,test_import_config,test_import_clients,test_config_defaults
+
+[raport]
+  mermaid-init.js (29L) F:convertMermaidCodeBlocks,renderMermaid
+
+[scripts]
+  configure_llm.py (360L) F:log,check_ollama,check_litellm,check_env_keys
+
+[tests]
+  __init__.py (3L) -
+  conftest.py (314L) F:sample_python_code,sample_javascript_code,sample_java_code,temp_project_dir
+
+[tests/samples]
+  sample_algorithms.py (184L) F:binary_search,quicksort,merge_sort
+  sample_api.py (106L) C:APIResponse,User,APIError | F:fetch_user_async,create_user_async,handle_api_error | APIError:{__init__(message:str,code:int=400)}
+  sample_async.py (163L) C:Task,TaskResult,AsyncTaskQueue | F:async_timer,fetch_with_retry,parallel_map,race | AsyncTaskQueue:{__init__(max_concurrent:int=5);add_task(task:Task)->None;get_task(task_id:str)->Optional[Task];process_task(task_id:str,handler)->TaskResult;process_all(handler)->List[TaskResult]}
+  sample_class.py (74L) C:Calculator | Calculator:{__init__(precision:int=2);add(a:float,b:float)->float;subtract(a:float,b:float)->float;multiply(a:float,b:float)->float;divide(a:float,b:float)->Optional[float];clear_history()->None}
+  sample_csharp.cs (28L) C:IHasId,User | F:FilterActive,FindById
+  sample_dataclasses.py (68L) C:User,Product,Order
+  sample_enum.py (78L) C:Status,Priority,Color | Color:{from_hex(hex_code:str)->"Color"}
+  sample_functions.py (89L) F:calculate_total,filter_by_status,merge_configs,validate_email
+  sample_go.go (90L) C:User,Product,Order | F:NewUserService,GetUser,CreateUser,CalculateTotal
+  sample_java.java (43L) C:SampleJava,Identifiable,User | F:getId,filterActive,sortByName
+  sample_javascript.js (154L) C:User,Product | F:calculateTotal,filterBy,fetchData,debounce | User:{constructor(id,name,email);getDisplayName();deactivate()} | Product:{constructor(sku,name,price);addTags();isInStock();formatPrice()}
+  sample_javascript_advanced.js (111L) C:FileProcessor | F:getArg,processItem,validate,fetchResource | FileProcessor:{constructor(rootDir);analyze(filePath);fromConfig(configPath);getResults()}
+  sample_pydantic.py (62L) C:TaskStatus,Task,TaskQueue | Task:{name_not_empty(v:str)->str} | TaskQueue:{add_task(task:Task)->bool;get_pending()->List[Task];get_by_status(status:TaskStatus)->List[Task]}
+
+[tests/samples/sample_reexport]
+  __init__.py (17L) -
+  exceptions.py (7L) C:ValidationError,ProcessingError
+  models.py (21L) C:User,Order,Product
+  utils.py (8L) F:process_data,validate_input
+
+[tests/samples]
+  sample_rust.rs (168L) C:User,Product,Order
+  sample_sql.sql (73L) C:users,products,orders | F:calculate_order_total,update_order_total
+  sample_sql_dsl.py (177L) C:SQLOperator,JoinType,Condition | F:select,insert,update | Condition:{to_sql()->str}
+
+[tests/samples/sample_ts_reexport]
+  index.ts (2L) -
+  math.ts (6L) F:add,multiply
+  types.ts (5L) -
+
+[tests/samples]
+  sample_typescript.ts (114L) C:Repository | F:createUser,calculateOrderTotal,filterByStatus,groupBy | Repository:{add(item: T)->void;get(id: T['id'])->Nullable<T>;getAll()->T[];delete(id: T['id'])->boolean;count()->number}
+
+[tests]
+  test_analyzer.py (180L) C:TestProjectAnalyzer,TestAnalyzeProjectFunction,TestGetLibraryStatus | TestProjectAnalyzer:{test_init(temp_project_dir);test_init_with_verbose(temp_project_dir,capsys);test_analyze_returns_project_info(sample_project);test_analyze_finds_source_files(sample_project);test_ignores_non_source_files(temp_project_dir);test_ignores_common_dirs(temp_project_dir)} | TestAnalyzeProjectFunction:{test_analyze_project(sample_project)} | TestGetLibraryStatus:{test_get_library_status()}
+  test_e2e_projects.py (82L) F:test_e2e_pipeline_code2logic_logic2test_logic2code
+  test_error_handling.py (311L) C:TestFilesystemErrors,TestParsingErrors,TestGenerationErrors | F:error_handler,strict_handler,temp_project | TestFilesystemErrors:{test_file_not_found(error_handler);test_permission_denied(error_handler,tmp_path);test_file_too_large(tmp_path);test_binary_file_detection(error_handler,tmp_path);test_encoding_fallback(error_handler,tmp_path);test_empty_file(error_handler,tmp_path)} | TestParsingErrors:{test_syntax_error_in_python(error_handler,tmp_path);test_deeply_nested_code(error_handler);test_unsupported_language(error_handler)} | TestGenerationErrors:{test_yaml_with_special_characters(temp_project);test_json_with_unicode(temp_project);test_write_to_readonly_location(error_handler,tmp_path);test_write_creates_directories(error_handler,tmp_path)}
+  test_formats.py (393L) C:TestAllFormatsGeneration,TestRustSupport,TestFormatValidation | F:sample_code,sample_project,samples_project,rust_sample_project | TestAllFormatsGeneration:{test_format_generates_output(sample_project,fmt);test_format_contains_class_info(sample_project,fmt);test_format_contains_function_info(sample_project,fmt)} | TestRustSupport:{test_rust_parsing_finds_top_level_and_impl_methods(rust_sample_project);test_rust_shows_up_in_toon_and_function_logic(rust_sample_project)} | TestFormatValidation:{test_yaml_validation_valid(sample_project);test_yaml_validation_invalid();test_json_validation_valid(sample_project);test_json_validation_invalid();test_logicml_validation_valid(sample_project);test_markdown_validation_valid(sample_project)}
+  test_generators.py (207L) C:TestMarkdownGenerator,TestCompactGenerator,TestJSONGenerator | F:sample_project | TestMarkdownGenerator:{test_generate_basic(sample_project);test_generate_includes_modules(sample_project);test_generate_includes_classes(sample_project);test_generate_includes_functions(sample_project);test_generate_includes_entrypoints(sample_project);test_detail_levels(sample_project)} | TestCompactGenerator:{test_generate_basic(sample_project);test_generate_includes_hubs(sample_project);test_compact_is_smaller(sample_project)} | TestJSONGenerator:{test_generate_valid_json(sample_project);test_generate_structure(sample_project);test_generate_modules(sample_project);test_generate_functions(sample_project);test_generate_classes(sample_project)}
+  test_intent.py (353L) C:TestIntentAnalyzer | F:make_function,make_class,make_module,make_project | TestIntentAnalyzer:{test_init();test_extract_keywords();test_calculate_intent_confidence();test_identify_target_module(sample_project_model);test_identify_target_function(sample_project_model);test_identify_target_class(sample_project_model)}
+  test_llm_priority.py (44L) F:test_get_client_auto_prefers_override_provider_on_tie,test_get_client_auto_model_first_uses_model_priority
+  test_llm_profiler.py (416L) C:TestLLMProfile,TestDefaultProfiles,TestProfileStorage | TestLLMProfile:{test_profile_creation();test_profile_id_consistency();test_profile_defaults();test_profile_custom_values()} | TestDefaultProfiles:{test_gpt4_profile();test_gpt4_turbo_profile();test_claude_profile();test_qwen_coder_profile();test_deepseek_profile();test_llama_70b_profile()} | TestProfileStorage:{test_save_and_load_profile(tmp_path);test_load_empty_profiles(tmp_path);test_get_profile(tmp_path);test_get_nonexistent_profile(tmp_path);test_get_or_create_profile_existing(tmp_path);test_get_or_create_profile_new(tmp_path)}
+  test_parser_integrity.py (361L) C:TestFunctionNameExtraction,TestSignatureParsing,TestClassNameIntegrity | F:parser,parse_python,parse_js | TestFunctionNameExtraction:{test_function_name_not_truncated(parser);test_multiple_function_names(parser)} | TestSignatureParsing:{test_signature_with_types(parser);test_signature_with_defaults(parser)} | TestClassNameIntegrity:{test_class_name_no_whitespace(parser);test_class_with_bases(parser)}
+  test_reproduction.py (208L) C:TestYAMLGenerator,TestGherkinGenerator,TestMarkdownGenerator | TestYAMLGenerator:{test_yaml_basic();test_yaml_includes_classes();test_yaml_includes_functions()} | TestGherkinGenerator:{test_gherkin_basic();test_gherkin_has_scenarios()} | TestMarkdownGenerator:{test_markdown_basic();test_markdown_has_yaml_section()}
+  test_shared_utils.py (249L) C:TestCompactImports,TestDeduplicateImports,TestAbbreviateType | TestCompactImports:{test_groups_submodules();test_preserves_standalone();test_limits_output();test_handles_empty();test_skips_module_module_duplicates()} | TestDeduplicateImports:{test_removes_base_when_specific_exists();test_handles_empty()} | TestAbbreviateType:{test_simple_types();test_complex_types();test_optional_type();test_preserves_unknown();test_handles_empty()}
+  test_yaml_compact.py (187L) C:TestYAMLShortKeys,TestSelfRemoval,TestImportDeduplication | F:sample_project | TestYAMLShortKeys:{test_short_keys_in_module(sample_project);test_short_keys_in_class(sample_project)} | TestSelfRemoval:{test_no_self_in_signature(sample_project)} | TestImportDeduplication:{test_typing_grouped(sample_project)}

@@ -1,0 +1,327 @@
+{
+  "source_file": "tests/samples/sample_javascript.js",
+  "source_language": "javascript",
+  "source_hash": "61f2317506a6",
+  "module_doc": "",
+  "imports": [],
+  "elements": [
+    {
+      "type": "class",
+      "name": "User",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "constructor",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "name",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "email",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "getDisplayName",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "deactivate",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Product",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "constructor",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "sku",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "name",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "price",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "addTags",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "isInStock",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "formatPrice",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "currency",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "clearTimeout",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "timeout",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "calculateTotal",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "items",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "taxRate",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "filterBy",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "arr",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "predicate",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "fetchData",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "debounce",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "func",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "wait",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "deepClone",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "obj",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

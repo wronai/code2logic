@@ -1,0 +1,68 @@
+# UCLR: tests/samples/sample_sql.sql
+# Lang: sql
+
+@class  users
+  .id: SERIAL
+  .PRIMARY: KEY
+  .username: VARCHAR(50)
+  .NOT: NULL
+  .email: VARCHAR(100)
+  .NOT: NULL
+  .password_hash: VARCHAR(255)
+  .NOT: NULL
+  .is_active: BOOLEAN
+  .DEFAULT: TRUE
+  .created_at: TIMESTAMP
+  .DEFAULT: CURRENT_TIMESTAMP
+  .updated_at: TIMESTAMP
+  .DEFAULT: CURRENT_TIMESTAMP
+
+@class  products
+  .id: SERIAL
+  .PRIMARY: KEY
+  .sku: VARCHAR(50)
+  .NOT: NULL
+  .name: VARCHAR(200)
+  .NOT: NULL
+  .description: TEXT
+  .price: DECIMAL(10, 2)
+  .NOT: NULL
+  .quantity: INTEGER
+  .DEFAULT: 0
+  .category_id: INTEGER
+  .REFERENCES: categories(id)
+  .created_at: TIMESTAMP
+  .DEFAULT: CURRENT_TIMESTAMP
+
+@class  orders
+  .id: SERIAL
+  .PRIMARY: KEY
+  .user_id: INTEGER
+  .NOT: NULL
+  .REFERENCES: users(id)
+  .status: VARCHAR(20)
+  .total: DECIMAL(10, 2)
+  .NOT: NULL
+  .shipping_address: TEXT
+  .created_at: TIMESTAMP
+  .DEFAULT: CURRENT_TIMESTAMP
+
+@class  order_items
+  .id: SERIAL
+  .PRIMARY: KEY
+  .order_id: INTEGER
+  .NOT: NULL
+  .REFERENCES: orders(id)
+  .product_id: INTEGER
+  .NOT: NULL
+  .REFERENCES: products(id)
+  .quantity: INTEGER
+  .NOT: NULL
+  .unit_price: DECIMAL(10, 2)
+  .NOT: NULL
+
+@class view order_summary
+
+@func  calculate_order_total()
+
+@func  update_order_total()

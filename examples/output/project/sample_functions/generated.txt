@@ -1,0 +1,29 @@
+""" Sample file with functions for reproduction testing.  This file contains functions to test if code2logic can accurately reproduce function-based code. """
+
+from typing import List, Dict, Optional, Any
+import json
+import os
+
+def calculate_total(items: List[int], tax_rate: float = 0.1) -> float:
+    pass
+
+def filter_by_status(records: List[Dict], status: str) -> List[Dict]:
+    pass
+
+def merge_configs(base: Dict[str, Any, override: Dict[str, Any) -> Dict[str, Any]:
+    pass
+
+def validate_email(email: str) -> bool:
+    pass
+
+def load_json_file(path: str) -> Optional[Dict]:
+    pass
+
+def get_env_or_default(key: str, default: str = "") -> str:
+    pass
+
+def chunk_list(items: List[Any], chunk_size: int) -> List[List[Any]]:
+    pass
+
+def format_currency(amount: int, currency: str = "USD") -> str:
+    pass

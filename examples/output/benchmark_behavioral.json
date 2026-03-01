@@ -1,0 +1,211 @@
+{
+  "benchmark_type": "behavioral",
+  "timestamp": "2026-02-26T19:31:39.309413",
+  "source": "tests/samples/sample_functions.py",
+  "input_function_benchmark": "examples/output/benchmark_function.json",
+  "note": "If function reproduction was run with --no-llm template stubs, behavioral equivalence is expected to be skipped/low.",
+  "total_functions": 8,
+  "skipped_functions": 1,
+  "considered_functions": 7,
+  "passed_functions": 6,
+  "pass_rate": 85.71428571428571,
+  "results": [
+    {
+      "function_name": "calculate_total",
+      "ok": true,
+      "skipped": false,
+      "error": "",
+      "cases": [
+        {
+          "name": "basic",
+          "ok": true,
+          "expected": 330.0,
+          "got": 330.0,
+          "error": ""
+        },
+        {
+          "name": "no_tax",
+          "ok": true,
+          "expected": 300.0,
+          "got": 300.0,
+          "error": ""
+        }
+      ]
+    },
+    {
+      "function_name": "filter_by_status",
+      "ok": true,
+      "skipped": false,
+      "error": "",
+      "cases": [
+        {
+          "name": "ok_only",
+          "ok": true,
+          "expected": [
+            {
+              "id": 1,
+              "status": "ok"
+            },
+            {
+              "id": 3,
+              "status": "ok"
+            }
+          ],
+          "got": [
+            {
+              "id": 1,
+              "status": "ok"
+            },
+            {
+              "id": 3,
+              "status": "ok"
+            }
+          ],
+          "error": ""
+        }
+      ]
+    },
+    {
+      "function_name": "merge_configs",
+      "ok": true,
+      "skipped": false,
+      "error": "",
+      "cases": [
+        {
+          "name": "merge",
+          "ok": true,
+          "expected": {
+            "a": 1,
+            "b": 9,
+            "c": 3
+          },
+          "got": {
+            "a": 1,
+            "b": 9,
+            "c": 3
+          },
+          "error": ""
+        }
+      ]
+    },
+    {
+      "function_name": "validate_email",
+      "ok": true,
+      "skipped": false,
+      "error": "",
+      "cases": [
+        {
+          "name": "valid",
+          "ok": true,
+          "expected": true,
+          "got": true,
+          "error": ""
+        },
+        {
+          "name": "invalid_missing_at",
+          "ok": true,
+          "expected": false,
+          "got": false,
+          "error": ""
+        },
+        {
+          "name": "invalid_domain",
+          "ok": true,
+          "expected": false,
+          "got": false,
+          "error": ""
+        }
+      ]
+    },
+    {
+      "function_name": "load_json_file",
+      "ok": false,
+      "skipped": true,
+      "error": "template stub (run with LLM to measure behavioral equivalence)",
+      "cases": []
+    },
+    {
+      "function_name": "get_env_or_default",
+      "ok": true,
+      "skipped": false,
+      "error": "",
+      "cases": [
+        {
+          "name": "default",
+          "ok": true,
+          "expected": "zzz",
+          "got": "zzz",
+          "error": ""
+        },
+        {
+          "name": "present",
+          "ok": true,
+          "expected": "abc",
+          "got": "abc",
+          "error": ""
+        }
+      ]
+    },
+    {
+      "function_name": "chunk_list",
+      "ok": true,
+      "skipped": false,
+      "error": "",
+      "cases": [
+        {
+          "name": "chunks",
+          "ok": true,
+          "expected": [
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              5
+            ]
+          ],
+          "got": [
+            [
+              1,
+              2
+            ],
+            [
+              3,
+              4
+            ],
+            [
+              5
+            ]
+          ],
+          "error": ""
+        }
+      ]
+    },
+    {
+      "function_name": "format_currency",
+      "ok": false,
+      "skipped": false,
+      "error": "",
+      "cases": [
+        {
+          "name": "usd",
+          "ok": false,
+          "expected": "USD 123.45",
+          "got": "$12,345.00",
+          "error": "mismatch"
+        },
+        {
+          "name": "eur",
+          "ok": false,
+          "expected": "EUR 0.00",
+          "got": "\u20ac0.00",
+          "error": "mismatch"
+        }
+      ]
+    }
+  ]
+}

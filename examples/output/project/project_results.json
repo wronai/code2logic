@@ -1,0 +1,332 @@
+{
+  "project_path": "tests/samples/",
+  "total_files": 23,
+  "successful_files": 23,
+  "failed_files": 0,
+  "total_source_chars": 55278,
+  "total_logic_chars": 13276,
+  "total_generated_chars": 12879,
+  "avg_compression": 4.59570230263576,
+  "avg_similarity": 24.01,
+  "avg_structural": 50.00086956521739,
+  "files": [
+    {
+      "file_path": "tests/samples/sample_algorithms.py",
+      "language": "python",
+      "source_chars": 5636,
+      "logic_chars": 720,
+      "generated_chars": 838,
+      "compression": 7.8277777777777775,
+      "similarity": 10.63,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_api.py",
+      "language": "python",
+      "source_chars": 4137,
+      "logic_chars": 834,
+      "generated_chars": 1115,
+      "compression": 4.960431654676259,
+      "similarity": 26.09,
+      "structural": 0.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_async.py",
+      "language": "python",
+      "source_chars": 6400,
+      "logic_chars": 445,
+      "generated_chars": 616,
+      "compression": 14.382022471910112,
+      "similarity": 13.19,
+      "structural": 0.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_class.py",
+      "language": "python",
+      "source_chars": 2431,
+      "logic_chars": 813,
+      "generated_chars": 657,
+      "compression": 2.990159901599016,
+      "similarity": 19.78,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_csharp.cs",
+      "language": "csharp",
+      "source_chars": 869,
+      "logic_chars": 171,
+      "generated_chars": 90,
+      "compression": 5.081871345029239,
+      "similarity": 22.86,
+      "structural": 66.67,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_dataclasses.py",
+      "language": "python",
+      "source_chars": 1790,
+      "logic_chars": 1369,
+      "generated_chars": 1395,
+      "compression": 1.3075237399561723,
+      "similarity": 52.1,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_enum.py",
+      "language": "python",
+      "source_chars": 2102,
+      "logic_chars": 585,
+      "generated_chars": 582,
+      "compression": 3.5931623931623933,
+      "similarity": 22.45,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "language": "python",
+      "source_chars": 2862,
+      "logic_chars": 783,
+      "generated_chars": 814,
+      "compression": 3.6551724137931036,
+      "similarity": 18.35,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_go.go",
+      "language": "go",
+      "source_chars": 2769,
+      "logic_chars": 322,
+      "generated_chars": 246,
+      "compression": 8.599378881987578,
+      "similarity": 22.76,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_java.java",
+      "language": "java",
+      "source_chars": 1378,
+      "logic_chars": 228,
+      "generated_chars": 165,
+      "compression": 6.043859649122807,
+      "similarity": 26.92,
+      "structural": 66.67,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_javascript.js",
+      "language": "javascript",
+      "source_chars": 3737,
+      "logic_chars": 507,
+      "generated_chars": 507,
+      "compression": 7.370808678500986,
+      "similarity": 0.0,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_pydantic.py",
+      "language": "python",
+      "source_chars": 2132,
+      "logic_chars": 1217,
+      "generated_chars": 685,
+      "compression": 1.7518488085456039,
+      "similarity": 29.27,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_reexport/__init__.py",
+      "language": "python",
+      "source_chars": 412,
+      "logic_chars": 65,
+      "generated_chars": 0,
+      "compression": 6.338461538461538,
+      "similarity": 0.0,
+      "structural": 33.33,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_reexport/exceptions.py",
+      "language": "python",
+      "source_chars": 193,
+      "logic_chars": 201,
+      "generated_chars": 135,
+      "compression": 0.9601990049751243,
+      "similarity": 83.33,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_reexport/models.py",
+      "language": "python",
+      "source_chars": 396,
+      "logic_chars": 394,
+      "generated_chars": 323,
+      "compression": 1.0050761421319796,
+      "similarity": 92.31,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_reexport/utils.py",
+      "language": "python",
+      "source_chars": 380,
+      "logic_chars": 266,
+      "generated_chars": 202,
+      "compression": 1.4285714285714286,
+      "similarity": 28.57,
+      "structural": 50.0,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_rust.rs",
+      "language": "rust",
+      "source_chars": 4481,
+      "logic_chars": 373,
+      "generated_chars": 347,
+      "compression": 12.013404825737265,
+      "similarity": 14.71,
+      "structural": 66.67,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_sql.sql",
+      "language": "sql",
+      "source_chars": 2569,
+      "logic_chars": 1266,
+      "generated_chars": 1212,
+      "compression": 2.029225908372828,
+      "similarity": 8.39,
+      "structural": 66.67,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_sql_dsl.py",
+      "language": "python",
+      "source_chars": 6902,
+      "logic_chars": 1463,
+      "generated_chars": 1910,
+      "compression": 4.717703349282297,
+      "similarity": 26.56,
+      "structural": 33.33,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_ts_reexport/index.ts",
+      "language": "typescript",
+      "source_chars": 184,
+      "logic_chars": 69,
+      "generated_chars": 0,
+      "compression": 2.6666666666666665,
+      "similarity": 0.0,
+      "structural": 66.67,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_ts_reexport/math.ts",
+      "language": "typescript",
+      "source_chars": 187,
+      "logic_chars": 151,
+      "generated_chars": 90,
+      "compression": 1.2384105960264902,
+      "similarity": 0.0,
+      "structural": 66.67,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_ts_reexport/types.ts",
+      "language": "typescript",
+      "source_chars": 170,
+      "logic_chars": 69,
+      "generated_chars": 0,
+      "compression": 2.463768115942029,
+      "similarity": 0.0,
+      "structural": 66.67,
+      "success": true,
+      "error": null
+    },
+    {
+      "file_path": "tests/samples/sample_typescript.ts",
+      "language": "typescript",
+      "source_chars": 3161,
+      "logic_chars": 965,
+      "generated_chars": 950,
+      "compression": 3.2756476683937823,
+      "similarity": 33.96,
+      "structural": 66.67,
+      "success": true,
+      "error": null
+    }
+  ],
+  "by_language": {
+    "python": {
+      "count": 13,
+      "similarity": 32.51,
+      "structural": 39.74307692307692
+    },
+    "csharp": {
+      "count": 1,
+      "similarity": 22.86,
+      "structural": 66.67
+    },
+    "go": {
+      "count": 1,
+      "similarity": 22.76,
+      "structural": 50.0
+    },
+    "java": {
+      "count": 1,
+      "similarity": 26.92,
+      "structural": 66.67
+    },
+    "javascript": {
+      "count": 1,
+      "similarity": 0.0,
+      "structural": 50.0
+    },
+    "rust": {
+      "count": 1,
+      "similarity": 14.71,
+      "structural": 66.67
+    },
+    "sql": {
+      "count": 1,
+      "similarity": 8.39,
+      "structural": 66.67
+    },
+    "typescript": {
+      "count": 4,
+      "similarity": 8.49,
+      "structural": 66.67
+    }
+  }
+}

@@ -1,0 +1,28 @@
+package sample
+
+type User struct {
+}
+
+type Product struct {
+}
+
+type Order struct {
+}
+
+type OrderItem struct {
+}
+
+type UserService struct {
+}
+
+func NewUserService() {
+}
+
+func CalculateTotal() {
+}
+
+func FilterProducts() {
+}
+
+func FormatPrice() {
+}

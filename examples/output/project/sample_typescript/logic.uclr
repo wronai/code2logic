@@ -1,0 +1,54 @@
+# UCLR: tests/samples/sample_typescript.ts
+# Lang: typescript
+
+@interface  User
+  .id: number
+  .name: string
+  .email: string
+  .isActive: boolean
+  .createdAt: Date
+
+@interface  Product
+  .sku: string
+  .name: string
+  .price: number
+  .quantity: number
+  .tags: string[]
+
+@interface  OrderItem
+  .productId: string
+  .quantity: number
+  .unitPrice: number
+
+@interface  Order
+  .id: string
+  .userId: number
+  .items: OrderItem[]
+  .total: number
+  .status: 'pending' | 'processing' | 'shipped' | 'delivered'
+
+
+
+@func  createUser(id: number, name: string, email: string) -> U
+
+@func  calculateOrderTotal(items: OrderItem[]) -> n
+
+@func  filterByStatus(items: T[], status: string) -> T
+
+@func  groupBy(items: T[], key: K) -> M
+
+@func  fetchUser(id: number) -> P
+
+@func  processOrder(order: Order) -> P
+
+@class  Repository
+@method  add(item: T) -> v
+
+@method  get(id: T['id']) -> N
+
+@method  getAll() -> T
+
+@method  delete(id: T['id']) -> b
+
+@method  count() -> n
+

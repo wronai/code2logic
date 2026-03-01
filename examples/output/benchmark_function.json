@@ -1,0 +1,110 @@
+{
+  "benchmark_type": "function",
+  "timestamp": "2026-02-26T19:31:39.309413",
+  "source_path": "tests/samples/sample_functions.py",
+  "total_files": 0,
+  "total_functions": 8,
+  "avg_score": 0.0,
+  "avg_similarity": 39.05434409722976,
+  "syntax_ok_rate": 0.0,
+  "runs_ok_rate": 0.0,
+  "failure_rate": 0.0,
+  "best_format": "",
+  "best_score": 0.0,
+  "file_results": [],
+  "function_results": [
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "calculate_total",
+      "language": "python",
+      "original_code": "def calculate_total(items: List[int], tax_rate: float = 0.1) -> float:\n    \"\"\"Calculate total with tax.\n    \n    Args:\n        items: List of item prices\n        tax_rate: Tax rate (default 10%)\n        \n    Returns:\n        Total price including tax\n    \"\"\"\n    subtotal = sum(items)\n    return subtotal * (1 + tax_rate)",
+      "reproduced_code": "from typing import List\n\ndef calculate_total(items: List[int], tax_rate: float = 0.1) -> float:\n    subtotal = sum(items)\n    tax = subtotal * tax_rate\n    total = subtotal + tax\n    return total",
+      "similarity": 52.17391304347826,
+      "syntax_ok": true,
+      "gen_time": 4.652132749557495,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "filter_by_status",
+      "language": "python",
+      "original_code": "def filter_by_status(records: List[Dict], status: str) -> List[Dict]:\n    \"\"\"Filter records by status.\n    \n    Args:\n        records: List of record dictionaries\n        status: Status to filter by\n        \n    Returns:\n        Filtered list of records\n    \"\"\"\n    return [r for r in records if r.get('status') == status]",
+      "reproduced_code": "def filter_by_status(records: List[Dict], status: str) -> List[Dict]:\n    filtered_records = []\n    for record in records:\n        if record.get('status') == status:\n            filtered_records.append(record)\n    return filtered_records",
+      "similarity": 40.511727078891255,
+      "syntax_ok": true,
+      "gen_time": 3.8957431316375732,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "merge_configs",
+      "language": "python",
+      "original_code": "def merge_configs(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:\n    \"\"\"Merge two configuration dictionaries.\n    \n    Args:\n        base: Base configuration\n        override: Override values\n        \n    Returns:\n        Merged configuration\n    \"\"\"\n    result = base.copy()\n    result.update(override)\n    return result",
+      "reproduced_code": "from typing import Dict, Any\n\ndef merge_configs(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:\n    result = base.copy()\n    for key, value in override.items():\n        if key in result and isinstance(result[key], dict) and isinstance(value, dict):\n            result[key] = merge_configs(result[key], value)\n        else:\n            result[key] = value\n    return result",
+      "similarity": 29.03752039151713,
+      "syntax_ok": true,
+      "gen_time": 3.9745876789093018,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "validate_email",
+      "language": "python",
+      "original_code": "def validate_email(email: str) -> bool:\n    \"\"\"Validate email format.\n    \n    Args:\n        email: Email address to validate\n        \n    Returns:\n        True if valid, False otherwise\n    \"\"\"\n    if not email or '@' not in email:\n        return False\n    parts = email.split('@')\n    return len(parts) == 2 and len(parts[0]) > 0 and '.' in parts[1]",
+      "reproduced_code": "def validate_email(email: str) -> bool:\n    if not email or \"@\" not in email:\n        return False\n    parts = email.split(\"@\")\n    if len(parts) != 2:\n        return False\n    local, domain = parts\n    if not local or not domain:\n        return False\n    if \".\" not in domain:\n        return False\n    domain_parts = domain.split(\".\")\n    if len(domain_parts) < 2:\n        return False\n    for part in domain_parts:\n        if not part:\n            return False\n    return True",
+      "similarity": 13.8763197586727,
+      "syntax_ok": true,
+      "gen_time": 9.855196475982666,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "load_json_file",
+      "language": "python",
+      "original_code": "def load_json_file(path: str) -> Optional[Dict]:\n    \"\"\"Load JSON file safely.\n    \n    Args:\n        path: Path to JSON file\n        \n    Returns:\n        Parsed JSON data or None if error\n    \"\"\"\n    try:\n        with open(path, 'r') as f:\n            return json.load(f)\n    except (FileNotFoundError, json.JSONDecodeError):\n        return None",
+      "reproduced_code": "import json\nfrom typing import Optional, Dict\n\ndef load_json_file(path: str) -> Optional[Dict]:\n    try:\n        with open(path, 'r', encoding='utf-8') as file:\n            return json.load(file)\n    except (FileNotFoundError, json.JSONDecodeError, IOError):\n        return None",
+      "similarity": 45.059288537549406,
+      "syntax_ok": true,
+      "gen_time": 6.463352680206299,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "get_env_or_default",
+      "language": "python",
+      "original_code": "def get_env_or_default(key: str, default: str = \"\") -> str:\n    \"\"\"Get environment variable or default.\n    \n    Args:\n        key: Environment variable name\n        default: Default value if not found\n        \n    Returns:\n        Environment value or default\n    \"\"\"\n    return os.environ.get(key, default)",
+      "reproduced_code": "import os\n\ndef get_env_or_default(key: str, default: str = '') -> str:\n    value = os.environ.get(key)\n    if value is None:\n        return default\n    return value",
+      "similarity": 46.31043256997455,
+      "syntax_ok": true,
+      "gen_time": 8.002156257629395,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "chunk_list",
+      "language": "python",
+      "original_code": "def chunk_list(items: List[Any], chunk_size: int) -> List[List[Any]]:\n    \"\"\"Split list into chunks.\n    \n    Args:\n        items: List to split\n        chunk_size: Size of each chunk\n        \n    Returns:\n        List of chunks\n    \"\"\"\n    return [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]",
+      "reproduced_code": "def chunk_list(items: list, chunk_size: int) -> list:\n    return [items[i:i + chunk_size] for i in range(0, len(items), chunk_size)]",
+      "similarity": 65.97402597402598,
+      "syntax_ok": true,
+      "gen_time": 4.058751344680786,
+      "error": ""
+    },
+    {
+      "file_path": "tests/samples/sample_functions.py",
+      "function_name": "format_currency",
+      "language": "python",
+      "original_code": "def format_currency(amount: int, currency: str = \"USD\") -> str:\n    \"\"\"Format amount as currency.\n    \n    Args:\n        amount: Amount in cents\n        currency: Currency code\n        \n    Returns:\n        Formatted currency string\n    \"\"\"\n    dollars = amount / 100\n    return f\"{currency} {dollars:.2f}\"",
+      "reproduced_code": "def format_currency(amount: int, currency: str = 'USD') -> str:\n    currency_symbols = {\n        'USD': '$',\n        'EUR': '\u20ac',\n        'GBP': '\u00a3',\n        'JPY': '\u00a5',\n        'CAD': 'C$',\n        'AUD': 'A$',\n        'CHF': 'CHF ',\n        'CNY': '\u00a5',\n        'SEK': 'kr',\n        'NZD': 'NZ$'\n    }\n    symbol = currency_symbols.get(currency, '$')\n    if currency in ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'CHF', 'CNY', 'SEK', 'NZD']:\n        return f\"{symbol}{amount:,.2f}\"\n    elif currency == 'JPY':\n        return f\"{symbol}{amount:,.0f}\"\n    else:\n        return f\"{symbol}{amount:,.2f}\"",
+      "similarity": 19.491525423728813,
+      "syntax_ok": true,
+      "gen_time": 13.951760530471802,
+      "error": ""
+    }
+  ],
+  "format_results": [],
+  "format_scores": {},
+  "provider": "openrouter",
+  "model": "arcee-ai/trinity-large-preview:free",
+  "total_time": 54.87758684158325
+}

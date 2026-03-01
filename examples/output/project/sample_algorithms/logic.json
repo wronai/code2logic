@@ -1,0 +1,277 @@
+{
+  "source_file": "tests/samples/sample_algorithms.py",
+  "source_language": "python",
+  "source_hash": "43399b6a7d9c",
+  "module_doc": "  from typing import List, Optional, Tuple, Generator, TypeVar from functools import lru_cache  T = TypeVar('T')   def binary_search(arr: List[int], target: int) -> int: \"\"\"Binary search implementatio",
+  "imports": [],
+  "elements": [
+    {
+      "type": "function",
+      "name": "quicksort",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "arr",
+          "type": "List[int]",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "List[int]",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "merge_sort",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "arr",
+          "type": "List[int]",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "List[int]",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "_merge",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "left",
+          "type": "List[int]",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "right",
+          "type": "List[int]",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "List[int]",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "fibonacci",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "int",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "fibonacci_generator",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "limit",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "Generator[int, None, None]",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "is_prime",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "n",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "bool",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "sieve_of_eratosthenes",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "limit",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "List[int]",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "gcd",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "a",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "b",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "int",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "lcm",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "a",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "b",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "int",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "levenshtein_distance",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "s1",
+          "type": "str",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "s2",
+          "type": "str",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "int",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "knapsack_01",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "weights",
+          "type": "List[int]",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "values",
+          "type": "List[int]",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "capacity",
+          "type": "int",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "int",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

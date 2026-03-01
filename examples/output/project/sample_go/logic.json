@@ -1,0 +1,183 @@
+{
+  "source_file": "tests/samples/sample_go.go",
+  "source_language": "go",
+  "source_hash": "113d6626e20c",
+  "module_doc": "",
+  "imports": [
+    "import ("
+  ],
+  "elements": [
+    {
+      "type": "struct",
+      "name": "User",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "struct",
+      "name": "Product",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "struct",
+      "name": "Order",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "struct",
+      "name": "OrderItem",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "interface",
+      "name": "Repository",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "struct",
+      "name": "UserService",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "GetUser",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "CreateUser",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "NewUserService",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "CalculateTotal",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "FilterProducts",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "FormatPrice",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {
+    "package": "sample"
+  }
+}

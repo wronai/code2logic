@@ -1,0 +1,11 @@
+# UCLR: tests/samples/sample_csharp.cs
+# Lang: csharp
+
+@imports
+  using System;
+  using System.Collections.Generic;
+  using System.Linq;
+
+@interface  IHasId
+
+@class  User

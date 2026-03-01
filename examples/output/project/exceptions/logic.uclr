@@ -1,0 +1,7 @@
+# UCLR: tests/samples/sample_reexport/exceptions.py
+# Lang: python
+# Doc: Sample exceptions for re-export testing.
+
+@class  ValidationError extends Exception
+
+@class  ProcessingError extends Exception

@@ -1,0 +1,124 @@
+{
+  "source_file": "tests/samples/sample_async.py",
+  "source_language": "python",
+  "source_hash": "854361c524ca",
+  "module_doc": "  import asyncio from typing import List, Dict, Optional, Any, TypeVar from dataclasses import dataclass, field from datetime import datetime from contextlib import asynccontextmanager  T = TypeVar('T",
+  "imports": [],
+  "elements": [
+    {
+      "type": "class",
+      "name": "TaskResult",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "task_id",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "success",
+          "type": "bool",
+          "default": ""
+        },
+        {
+          "name": "data",
+          "type": "Optional[Any]",
+          "default": "None"
+        },
+        {
+          "name": "error",
+          "type": "Optional[str]",
+          "default": "None"
+        },
+        {
+          "name": "duration_ms",
+          "type": "float",
+          "default": "0.0"
+        }
+      ],
+      "children": [],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "AsyncTaskQueue",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "__init__",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "max_concurrent",
+              "type": "int",
+              "default": "5",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "AsyncCache",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "__init__",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "ttl_seconds",
+              "type": "int",
+              "default": "300",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

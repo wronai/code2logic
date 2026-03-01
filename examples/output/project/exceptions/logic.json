@@ -1,0 +1,42 @@
+{
+  "source_file": "tests/samples/sample_reexport/exceptions.py",
+  "source_language": "python",
+  "source_hash": "f8e1d83bdfcf",
+  "module_doc": "Sample exceptions for re-export testing.",
+  "imports": [],
+  "elements": [
+    {
+      "type": "class",
+      "name": "ValidationError",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "Exception"
+      ],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "ProcessingError",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "Exception"
+      ],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

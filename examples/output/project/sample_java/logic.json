@@ -1,0 +1,30 @@
+{
+  "source_file": "tests/samples/sample_java.java",
+  "source_language": "java",
+  "source_hash": "da4b5df7abf6",
+  "module_doc": "",
+  "imports": [
+    "import java.util.ArrayList;",
+    "import java.util.Collections;",
+    "import java.util.Comparator;",
+    "import java.util.List;",
+    "import java.util.Objects;"
+  ],
+  "elements": [
+    {
+      "type": "class",
+      "name": "SampleJava",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

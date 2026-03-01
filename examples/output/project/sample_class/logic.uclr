@@ -1,0 +1,33 @@
+# UCLR: tests/samples/sample_class.py
+# Lang: python
+# Doc:  Sample file with a class for reproduction testing.  This file contains a class with methods to test
+
+@imports
+  from typing import List, Dict, Optional, Any
+
+@class  Calculator
+  .history: List of past calculations
+  .precision: Decimal precision for results
+  .precision: Decimal places for rounding
+  .a: First number
+  .b: Second number
+  .a: First number
+  .b: Second number
+  .a: First number
+  .b: Second number
+  .a: Dividend
+  .b: Divisor
+@method  __init__(precision: int = 2)
+
+@method  add(a: float, b: float) -> float
+
+@method  subtract(a: float, b: float) -> float
+
+@method  multiply(a: float, b: float) -> float
+
+@method  divide(a: float, b: float) -> Optional[float]
+
+@method  clear_history() -> None
+
+@method  get_history() -> List[str]
+

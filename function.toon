@@ -1,0 +1,1791 @@
+# code2logic function-logic | 120 modules
+# Convention: name with . = method, ~name = async, cc:N shown only when >1
+project: code2logic
+generated: "2026-02-26T20:34:41.775358"
+modules[120]{path,lang,items}:
+  code2logic/__init__.py,py,2
+  ./adaptive.py,py,15
+  ./analyzer.py,py,10
+  ./base.py,py,11
+  ./base_generator.py,py,1
+  ./benchmark.py,py,9
+  code2logic/benchmarks/common.py,py,8
+  ./results.py,py,10
+  ./runner.py,py,18
+  code2logic/chunked_reproduction.py,py,12
+  ./cli.py,py,27
+  ./code_review.py,py,6
+  ./config.py,py,16
+  ./dependency.py,py,11
+  ./errors.py,py,13
+  ./file_formats.py,py,4
+  ./function_logic.py,py,13
+  ./generators.py,py,60
+  ./gherkin.py,py,29
+  ./intent.py,py,18
+  ./llm.py,py,8
+  ./llm_clients.py,py,12
+  ./llm_profiler.py,py,23
+  ./logicml.py,py,9
+  ./markdown_format.py,py,10
+  ./mcp_server.py,py,3
+  ./metrics.py,py,15
+  ./parsers.py,py,79
+  ./project_reproducer.py,py,8
+  ./prompts.py,py,3
+  ./quality.py,py,10
+  ./refactor.py,py,7
+  ./reproducer.py,py,28
+  ./reproduction.py,py,8
+  code2logic/schemas/json_schema.py,py,4
+  ./logicml_schema.py,py,3
+  ./markdown_schema.py,py,2
+  ./yaml_schema.py,py,3
+  code2logic/shared_utils.py,py,12
+  ./similarity.py,py,6
+  ./terminal.py,py,52
+  ./toon_format.py,py,21
+  ./universal.py,py,31
+  ./utils.py,py,3
+  examples/01_quick_start.py,py,1
+  ./02_refactoring.py,py,1
+  ./03_reproduction.py,py,1
+  ./04_project.py,py,1
+  ./05_llm_integration.py,py,1
+  ./06_metrics.py,py,3
+  ./08_format_benchmark.py,py,3
+  ./09_async_benchmark.py,py,2
+  ./10_function_reproduction.py,py,2
+  ./11_token_benchmark.py,py,2
+  ./12_comprehensive_analysis.py,py,2
+  ./13_project_benchmark.py,py,2
+  ./14_repeatability_test.py,py,10
+  ./15_unified_benchmark.py,py,4
+  ./16_terminal_demo.py,py,10
+  ./behavioral_benchmark.py,py,8
+  ./benchmark_report.py,py,8
+  ./benchmark_summary.py,py,4
+  examples/code2logic/sample_project/api/client.py,py,2
+  examples/code2logic/sample_project/calculator.py,py,3
+  logic2code/cli.py,py,1
+  logic2code/examples/01_quickstart.py,py,4
+  ./02_llm_enhanced.py,py,3
+  logic2code/generator.py,py,11
+  ./renderers.py,py,15
+  logic2code/tests/test_basic.py,py,5
+  logic2test/cli.py,py,1
+  logic2test/examples/01_quickstart.py,py,3
+  ./02_custom_templates.py,py,4
+  logic2test/generator.py,py,11
+  ./parsers.py,py,11
+  ./templates.py,py,4
+  logic2test/tests/test_basic.py,py,4
+  lolm/cli.py,py,11
+  ./clients.py,py,20
+  ./config.py,py,14
+  lolm/examples/01_quickstart.py,py,4
+  ./02_configuration.py,py,5
+  ./03_code_generation.py,py,4
+  lolm/manager.py,py,25
+  ./provider.py,py,14
+  ./rotation.py,py,37
+  lolm/tests/test_basic.py,py,6
+  raport/mermaid-init.js,js,2
+  scripts/configure_llm.py,py,11
+  tests/conftest.py,py,9
+  tests/samples/sample_algorithms.py,py,12
+  ./sample_api.py,py,11
+  ./sample_async.py,py,15
+  ./sample_class.py,py,7
+  ./sample_csharp.cs,cs,2
+  ./sample_enum.py,py,5
+  ./sample_functions.py,py,8
+  ./sample_go.go,go,6
+  ./sample_java.java,java,3
+  ./sample_javascript.js,js,12
+  ./sample_javascript_advanced.js,js,18
+  ./sample_pydantic.py,py,5
+  tests/samples/sample_reexport/utils.py,py,2
+  tests/samples/sample_rust.rs,rs,19
+  ./sample_sql.sql,sql,2
+  ./sample_sql_dsl.py,py,22
+  tests/samples/sample_ts_reexport/math.ts,ts,2
+  tests/samples/sample_typescript.ts,ts,11
+  tests/test_analyzer.py,py,16
+  ./test_e2e_projects.py,py,6
+  ./test_error_handling.py,py,29
+  ./test_formats.py,py,41
+  ./test_generators.py,py,15
+  ./test_intent.py,py,34
+  ./test_llm_priority.py,py,3
+  ./test_llm_profiler.py,py,42
+  ./test_parser_integrity.py,py,33
+  ./test_reproduction.py,py,23
+  ./test_shared_utils.py,py,47
+  ./test_yaml_compact.py,py,11
+
+function_details:
+  code2logic/__init__.py:
+    functions[2]{line,name,sig}:
+      253,"analyze_quality cc:2",(target)
+      259,"reproduce_project cc:2","(source:str)"
+  code2logic/adaptive.py:
+    functions[15]{line,name,sig}:
+      597,"get_llm_capabilities cc:5","(model:str) -> Dict[str, Any]"
+      123,"AdaptiveReproducer.__init__ cc:3","(client:BaseLLMClient=None, model:str=None)"
+      134,"AdaptiveReproducer._get_capabilities cc:5","() -> Dict[str, Any]"
+      147,"AdaptiveReproducer.select_format cc:9","(file_path:Path, content:str) -> str"
+      182,"AdaptiveReproducer.should_chunk cc:2","(content:str) -> bool"
+      203,"AdaptiveReproducer.chunk_content cc:21","(content:str, file_path:Path) -> List[ChunkInfo]"
+      321,"AdaptiveReproducer.generate_chunk_spec cc:4","(chunk:ChunkInfo, format_name:str) -> str"
+      343,"AdaptiveReproducer._gherkin_for_chunk cc:8","(chunk:ChunkInfo) -> str"
+      376,"AdaptiveReproducer._yaml_for_chunk cc:2","(chunk:ChunkInfo) -> str"
+      390,AdaptiveReproducer._json_for_chunk,"(chunk:ChunkInfo) -> str"
+      401,"AdaptiveReproducer.reproduce cc:2","(file_path:str, output_dir:str=None) -> AdaptiveResult"
+      425,"AdaptiveReproducer._reproduce_single cc:6","(path:Path, content:str, format_name:str, output_dir:str=None) -> AdaptiveResult"
+      477,"AdaptiveReproducer._reproduce_chunked cc:3","(path:Path, content:str, format_name:str, output_dir:str=None) -> AdaptiveResult"
+      527,AdaptiveReproducer._generate_from_spec,"(spec:str, format_name:str, file_ext:str) -> str"
+      560,AdaptiveReproducer._save_result,"(output_dir:Path, original:str, spec:str, generated:str, result:AdaptiveResult)"
+  code2logic/analyzer.py:
+    functions[10]{line,name,sig}:
+      455,analyze_project,"(path:str, use_treesitter:bool=True, verbose:bool=False) -> ProjectInfo"
+      480,get_library_status,"() -> Dict[str, bool]"
+      96,"ProjectAnalyzer._language_from_shebang cc:5","(first_line:str) -> Optional[str]"
+      106,"ProjectAnalyzer.__init__ cc:4","(root_path:str, use_treesitter:bool=True, verbose:bool=False, include_private:bool=False, enable_similarity:bool=True, respect_gitignore:bool=True)"
+      148,"ProjectAnalyzer._print_status cc:6",()
+      157,"ProjectAnalyzer.analyze cc:11",() -> ProjectInfo
+      223,"ProjectAnalyzer._scan_files cc:49",()
+      383,"ProjectAnalyzer._get_git_nonignored_files cc:8","() -> Optional[List[Path]]"
+      411,"ProjectAnalyzer._detect_entrypoints cc:8","() -> List[str]"
+      438,"ProjectAnalyzer.get_statistics cc:5",() -> Dict
+  code2logic/base.py:
+    functions[11]{line,name,sig}:
+      16,"VerboseMixin.__init__ cc:2","(verbose:bool=False)"
+      22,"VerboseMixin.log cc:2","(msg:str, level:str='info')"
+      28,VerboseMixin.debug,"(msg:str)"
+      32,VerboseMixin.info,"(msg:str)"
+      36,VerboseMixin.warn,"(msg:str)"
+      40,VerboseMixin.error,"(msg:str)"
+      48,BaseParser.__init__,"(verbose:bool=False)"
+      51,BaseParser.parse,"(content:str, language:str=None)"
+      55,BaseParser.parse_file,"(path:str)"
+      63,BaseGenerator.__init__,"(verbose:bool=False)"
+      66,BaseGenerator.generate,"(project, detail:str='full') -> str"
+  code2logic/base_generator.py:
+    functions[1]{line,name,sig}:
+      5,ProjectGenerator.generate,"(project:ProjectInfo) -> Any"
+  code2logic/benchmark.py:
+    functions[9]{line,name,sig}:
+      428,run_benchmark,"(files:List[str], output_dir:str='benchmark_results', provider:str=None, model:str=None) -> Dict[str, Any]"
+      138,"ReproductionBenchmark.__init__ cc:2","(client:BaseLLMClient=None)"
+      153,"ReproductionBenchmark.generate_spec cc:5","(file_path:Path, format_name:str, detail:str='full') -> str"
+      179,"ReproductionBenchmark.reproduce_with_format cc:3","(file_path:Path, format_name:str, original_code:str) -> FormatResult"
+      252,"ReproductionBenchmark.run_single cc:7","(file_path:str, formats:List[str]=None) -> BenchmarkResult"
+      304,"ReproductionBenchmark.run_all cc:4","(files:List[str], output_dir:str=None) -> Dict[str, Any]"
+      337,"ReproductionBenchmark._generate_summary cc:8","(results:List[BenchmarkResult]) -> Dict[str, Any]"
+      362,"ReproductionBenchmark._save_results cc:2","(output_dir:Path, results:List[BenchmarkResult], summary:Dict)"
+      379,"ReproductionBenchmark._generate_report cc:7","(results:List[BenchmarkResult], summary:Dict) -> str"
+  code2logic/benchmarks/common.py:
+    functions[8]{line,name,sig}:
+      16,"create_single_project cc:2","(module_info, file_path:Path) -> ProjectInfo"
+      32,"generate_spec cc:9","(project:ProjectInfo, fmt:str) -> str"
+      69,"_generate_token_json cc:12","(project:ProjectInfo) -> str"
+      125,_generate_token_json_compact,"(project:ProjectInfo) -> str"
+      130,"generate_spec_token cc:3","(project:ProjectInfo, fmt:str) -> str"
+      144,"get_async_reproduction_prompt cc:2","(spec:str, fmt:str, file_name:str, with_tests:bool=False) -> str"
+      191,"get_token_reproduction_prompt cc:4","(spec:str, fmt:str, file_name:str, language:str='python') -> str"
+      359,get_simple_reproduction_prompt,"(spec:str, fmt:str, file_name:str) -> str"
+  code2logic/benchmarks/results.py:
+    functions[10]{line,name,sig}:
+      48,FormatResult.to_dict,"() -> Dict[str, Any]"
+      76,"FileResult.to_dict cc:2","() -> Dict[str, Any]"
+      101,FunctionResult.to_dict,"() -> Dict[str, Any]"
+      142,"BenchmarkResult.__post_init__ cc:2",()
+      146,"BenchmarkResult.calculate_aggregates cc:16",()
+      172,"BenchmarkResult.to_dict cc:4","() -> Dict[str, Any]"
+      179,BenchmarkResult.to_json,"(indent:int=2) -> str"
+      182,BenchmarkResult.save,"(path:str)"
+      188,"BenchmarkResult.load cc:9","(path:str) -> 'BenchmarkResult'"
+      244,BenchmarkConfig.to_dict,"() -> Dict[str, Any]"
+  code2logic/benchmarks/runner.py:
+    functions[18]{line,name,sig}:
+      36,"_test_python_syntax cc:2","(code:str) -> bool"
+      45,"_test_python_runs cc:3","(code:str, timeout:int=5) -> bool"
+      65,"_basic_syntax_ok cc:22","(code:str, language:str) -> bool"
+      96,"_count_structural_elements cc:9","(code:str, language:str) -> dict"
+      144,"_structural_score cc:6","(original:str, generated:str, language:str) -> float"
+      161,"_extract_code cc:7","(response:str) -> str"
+      1053,"run_benchmark cc:6","(source:str, benchmark_type:str='format', formats:List[str]=None, limit:Optional[int]=None, output:Optional[str]=None, verbose:bool=False) -> BenchmarkResult"
+      196,"BenchmarkRunner.__init__ cc:2","(client:Optional[BaseLLMClient]=None, config:Optional[BenchmarkConfig]=None)"
+      212,BenchmarkRunner._should_use_llm,() -> bool
+      216,"BenchmarkRunner._get_client cc:3",() -> BaseLLMClient
+      224,"BenchmarkRunner._template_generate_code cc:43","(spec:str, fmt:str, file_name:str, language:str='python') -> str"
+      368,"BenchmarkRunner.run_format_benchmark cc:23","(folder:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
+      498,"BenchmarkRunner._test_format cc:16","(project, original:str, fmt:str, file_name:str, client:Optional[BaseLLMClient], verbose:bool=False, language:str='python') -> FormatResult"
+      573,"BenchmarkRunner.run_file_benchmark cc:16","(file_path:str, formats:List[str]=None, verbose:bool=False) -> BenchmarkResult"
+      673,"BenchmarkRunner.run_function_benchmark cc:12","(file_path:str, function_names:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
+      746,"BenchmarkRunner._test_function cc:25","(func, content:str, language:str, file_path:Path, client:Optional[BaseLLMClient], verbose:bool=False) -> FunctionResult"
+      845,"BenchmarkRunner.run_project_benchmark cc:39","(project_path:str, formats:List[str]=None, limit:Optional[int]=None, verbose:bool=False) -> BenchmarkResult"
+      988,"BenchmarkRunner._reproduce_module cc:4","(module_info, fmt:str, project_root:str, client:Optional[BaseLLMClient], verbose:bool=False) -> FileResult"
+  code2logic/chunked_reproduction.py:
+    functions[12]{line,name,sig}:
+      68,"get_llm_limit cc:3","(model_name:str) -> int"
+      79,"chunk_yaml_spec cc:13","(spec:str, max_tokens:int=2000) -> List[Chunk]"
+      144,"chunk_gherkin_spec cc:13","(spec:str, max_tokens:int=2000) -> List[Chunk]"
+      225,"chunk_markdown_spec cc:7","(spec:str, max_tokens:int=2000) -> List[Chunk]"
+      276,"chunk_spec cc:5","(spec:str, fmt:str, max_tokens:int=2000) -> ChunkedSpec"
+      298,"get_chunk_prompt cc:2","(chunk:Chunk, fmt:str, file_name:str, chunk_num:int, total_chunks:int) -> str"
+      319,"merge_chunk_codes cc:8","(codes:List[str], file_name:str) -> str"
+      431,auto_chunk_reproduce,"(spec:str, fmt:str, file_name:str, client, model_name:str='default') -> ChunkedResult"
+      443,adaptive_chunk_reproduce,"(spec:str, fmt:str, file_name:str, client, provider:str='unknown', model:str='unknown') -> ChunkedResult"
+      351,"ChunkedReproducer.__init__ cc:2","(client, model_name:str='default', max_tokens:Optional[int]=None)"
+      359,"ChunkedReproducer.reproduce cc:6","(spec:str, fmt:str, file_name:str) -> ChunkedResult"
+      422,"ChunkedReproducer._extract_code cc:3","(response:str) -> str"
+  code2logic/cli.py:
+    functions[27]{line,name,sig}:
+      99,"ensure_dependencies cc:6",()
+      138,_get_env_file_path,() -> str
+      142,"_read_text_file cc:2","(path:str) -> str"
+      150,"_write_text_file cc:2","(path:str, content:str) -> None"
+      158,"_set_env_var cc:5","(var_name:str, value:str) -> str"
+      186,"_unset_env_var cc:4","(var_name:str) -> str"
+      198,_get_litellm_config_path,() -> str
+      202,_get_user_llm_config_path,() -> str
+      206,"_load_user_llm_config cc:4",() -> dict
+      217,_save_user_llm_config,"(data:dict) -> str"
+      225,"_load_litellm_yaml cc:6",() -> dict
+      244,"_save_litellm_yaml cc:2","(data:dict) -> str"
+      256,"_infer_provider_from_litellm_model cc:3","(litellm_model:str) -> str"
+      264,"_code2logic_llm_cli cc:34","(argv:list[str]) -> None"
+      512,"main cc:94",(argv=None)
+      39,Logger.__init__,"(verbose:bool=False, debug:bool=False)"
+      45,Logger._elapsed,() -> str
+      50,Logger.info,"(msg:str)"
+      54,Logger.success,"(msg:str)"
+      58,Logger.warning,"(msg:str)"
+      62,Logger.error,"(msg:str)"
+      66,"Logger.step cc:2","(msg:str)"
+      72,"Logger.detail cc:2","(msg:str)"
+      77,"Logger.debug_msg cc:2","(msg:str)"
+      82,"Logger.stats cc:2","(label:str, value)"
+      87,"Logger.separator cc:2",()
+      92,"Logger.header cc:2","(msg:str)"
+  code2logic/code_review.py:
+    functions[6]{line,name,sig}:
+      39,"analyze_code_quality cc:15","(project) -> Dict[str, List[Dict]]"
+      102,"check_security_issues cc:13","(project) -> Dict[str, List[Dict]]"
+      141,"check_performance_issues cc:7","(project) -> Dict[str, List[Dict]]"
+      171,CodeReviewer.__init__,(client=None)
+      179,"CodeReviewer.review cc:7","(project, focus:str='all') -> Dict[str, Any]"
+      222,"CodeReviewer.generate_report cc:9","(results:Dict[str,Any], project_name:str='Project') -> str"
+  code2logic/config.py:
+    functions[16]{line,name,sig}:
+      192,load_env,()
+      200,get_api_key,"(provider:str) -> Optional[str]"
+      205,get_model,"(provider:str) -> str"
+      56,Config.__init__,"(env_file:str=None)"
+      66,"Config._load_env_file cc:4","(env_file:str=None)"
+      81,"Config._parse_env_file cc:9","(path:Path)"
+      96,"Config._load_config_file cc:3",()
+      106,"Config.get_api_key cc:2","(provider:str) -> Optional[str]"
+      120,"Config.get_model cc:5","(provider:str) -> str"
+      144,Config.get_ollama_host,() -> str
+      148,Config.get_default_provider,() -> str
+      152,Config.is_verbose,() -> bool
+      156,Config.get_project_name,() -> str
+      164,Config.get_cache_dir,() -> Path
+      169,"Config.list_configured_providers cc:2","() -> Dict[str, bool]"
+      180,"Config.to_dict cc:2","() -> Dict[str, Any]"
+  code2logic/dependency.py:
+    functions[11]{line,name,sig}:
+      244,is_networkx_available,() -> bool
+      39,"DependencyAnalyzer.__init__ cc:2",()
+      45,"DependencyAnalyzer.build_graph cc:10","(modules:List[ModuleInfo]) -> Dict[str, List[str]]"
+      90,"DependencyAnalyzer.analyze_metrics cc:6","() -> Dict[str, DependencyNode]"
+      130,"DependencyAnalyzer.get_entrypoints cc:4","() -> List[str]"
+      141,"DependencyAnalyzer.get_hubs cc:3","() -> List[str]"
+      151,"DependencyAnalyzer.detect_cycles cc:3","() -> List[List[str]]"
+      167,"DependencyAnalyzer.get_strongly_connected_components cc:5","() -> List[List[str]]"
+      183,"DependencyAnalyzer._detect_clusters cc:5","() -> Dict[str, int]"
+      201,"DependencyAnalyzer._module_name cc:3","(path:str) -> str"
+      209,"DependencyAnalyzer.get_dependency_depth cc:9","(module_path:str) -> int"
+  code2logic/errors.py:
+    functions[13]{line,name,sig}:
+      431,create_error_handler,"(mode:str='lenient', max_file_size_mb:float=10.0) -> ErrorHandler"
+      60,AnalysisError.to_dict,"() -> Dict[str, Any]"
+      81,"AnalysisResult.add_error cc:3","(error:AnalysisError)"
+      90,AnalysisResult.has_errors,() -> bool
+      93,"AnalysisResult.summary cc:2",() -> str
+      136,"ErrorHandler.__init__ cc:2","(mode:str='lenient', max_file_size_mb:float=10.0, timeout_seconds:float=30.0, logger:Optional[Any]=None)"
+      149,ErrorHandler.reset,()
+      153,"ErrorHandler.handle_error cc:6","(error_type:ErrorType, path:str, message:str, exception:Optional[Exception]=None, severity:Optional[ErrorSeverity]=None) -> bool"
+      189,"ErrorHandler._default_severity cc:3","(error_type:ErrorType) -> ErrorSeverity"
+      207,"ErrorHandler._log_error cc:3","(error:AnalysisError)"
+      217,"ErrorHandler.safe_read_file cc:14","(path:Path) -> Optional[str]"
+      330,"ErrorHandler.safe_write_file cc:5","(path:Path, content:str) -> bool"
+      377,"ErrorHandler.safe_parse cc:5","(path:str, content:str, parser_func:Callable) -> Any"
+  code2logic/file_formats.py:
+    functions[4]{line,name,sig}:
+      13,"generate_file_csv cc:10","(file_path:Path) -> str"
+      69,"generate_file_json cc:10","(file_path:Path) -> str"
+      139,"generate_file_yaml cc:22","(file_path:Path) -> str"
+      218,"_parse_file_elements cc:45","(content:str) -> Dict[str, Any]"
+  code2logic/function_logic.py:
+    functions[13]{line,name,sig}:
+      13,FunctionLogicGenerator.__init__,"(verbose:bool=False) -> None"
+      16,"FunctionLogicGenerator.generate cc:8","(project:ProjectInfo, detail:str='full') -> str"
+      44,"FunctionLogicGenerator.generate_json cc:2","(project:ProjectInfo, detail:str='full') -> str"
+      52,"FunctionLogicGenerator.generate_yaml cc:3","(project:ProjectInfo, detail:str='full') -> str"
+      62,"FunctionLogicGenerator.generate_toon cc:44","(project:ProjectInfo, detail:str='full', no_repeat_name:bool=False, no_repeat_details:bool=False, include_does:bool=False, context:str='none') -> str"
+      186,FunctionLogicGenerator.generate_toon_schema,() -> str
+      252,"FunctionLogicGenerator._build_data cc:5","(project:ProjectInfo, detail:str) -> dict"
+      271,"FunctionLogicGenerator._module_items cc:7","(module) -> List[Tuple[str, str, FunctionInfo]]"
+      283,"FunctionLogicGenerator._build_sig cc:9","(func:FunctionInfo, include_async_prefix:bool=True, language:str='') -> str"
+      300,"FunctionLogicGenerator._build_loc cc:5","(func:FunctionInfo) -> str"
+      307,"FunctionLogicGenerator._build_does cc:5","(func:FunctionInfo) -> str"
+      313,"FunctionLogicGenerator._item_to_dict cc:17","(kind:str, qualified_name:str, func:FunctionInfo, detail:str, module_language:str='') -> dict"
+      352,"FunctionLogicGenerator._format_function cc:15","(kind:str, qualified_name:str, func:FunctionInfo, detail:str, indent:int, module_language:str='') -> List[str]"
+  code2logic/generators.py:
+    functions[60]{line,name,sig}:
+      26,"bytes_to_kb cc:2","(bytes_value:int) -> float"
+      49,"MarkdownGenerator.generate cc:26","(project:ProjectInfo, detail_level:str='standard') -> str"
+      149,"MarkdownGenerator._gen_tree cc:8","(lines:List[str], project:ProjectInfo)"
+      175,"MarkdownGenerator._print_tree cc:6","(lines:List[str], tree:dict, prefix:str, depth:int=0)"
+      192,"MarkdownGenerator._gen_module cc:20","(lines:List[str], m:ModuleInfo, detail:str, proj:ProjectInfo)"
+      250,"MarkdownGenerator._gen_class cc:12","(lines:List[str], cls:ClassInfo, detail:str)"
+      276,"MarkdownGenerator._sig cc:7","(f:FunctionInfo) -> str"
+      309,"CompactGenerator.generate cc:30","(project:ProjectInfo) -> str"
+      398,"JSONGenerator.generate cc:2","(project:ProjectInfo, flat:bool=False, detail:str='standard') -> str"
+      415,JSONGenerator.generate_from_module,"(module:ModuleInfo, detail:str='full') -> str"
+      431,"JSONGenerator._generate_nested cc:3","(project:ProjectInfo, detail:str) -> str"
+      498,"JSONGenerator._field_to_dict cc:4","(field:FieldInfo) -> dict"
+      509,"JSONGenerator._generate_flat cc:7","(project:ProjectInfo, detail:str) -> str"
+      546,"JSONGenerator._build_element_row cc:9","(m:ModuleInfo, elem_type:str, name:str, signature:str, f:FunctionInfo, deps:list, detail:str) -> dict"
+      575,"JSONGenerator._build_signature cc:7","(f:FunctionInfo) -> str"
+      586,JSONGenerator._categorize,"(name:str) -> str"
+      590,JSONGenerator._extract_domain,"(path:str) -> str"
+      594,JSONGenerator._compute_hash,"(name:str, signature:str) -> str"
+      633,"YAMLGenerator.generate cc:4","(project:ProjectInfo, flat:bool=False, detail:str='standard', compact:bool=True) -> str"
+      668,"YAMLGenerator.generate_schema cc:3","(format_type:str='compact') -> str"
+      685,YAMLGenerator._generate_compact_schema,() -> str
+      811,YAMLGenerator._generate_full_schema,() -> str
+      891,YAMLGenerator._generate_hybrid_schema,() -> str
+      1008,"YAMLGenerator.generate_hybrid cc:83","(project:ProjectInfo, detail:str='standard') -> str"
+      1266,"YAMLGenerator._build_enhanced_signature cc:12","(f:FunctionInfo) -> str"
+      1307,"YAMLGenerator._extract_constants cc:4","(module:ModuleInfo) -> list"
+      1322,"YAMLGenerator._extract_dataclasses cc:3","(module:ModuleInfo) -> list"
+      1333,"YAMLGenerator._extract_conditional_imports cc:4","(module:ModuleInfo) -> list"
+      1345,YAMLGenerator.generate_from_module,"(module:ModuleInfo, detail:str='full') -> str"
+      1361,"YAMLGenerator._build_flat_data cc:8","(project:ProjectInfo, detail:str) -> dict"
+      1397,"YAMLGenerator._build_nested_data cc:19","(project:ProjectInfo, detail:str) -> dict"
+      1471,"YAMLGenerator._constants_for_module_verbose cc:11","(module:ModuleInfo, limit:int=12) -> list"
+      1500,YAMLGenerator._build_row,"(path:str, elem_type:str, name:str, signature:str, language:str, detail:str, project:ProjectInfo) -> dict"
+      1512,"YAMLGenerator._build_function_row cc:4","(path:str, f:FunctionInfo, language:str, detail:str, project:ProjectInfo, imports:list) -> dict"
+      1540,"YAMLGenerator._build_method_row cc:4","(path:str, class_name:str, f:FunctionInfo, language:str, detail:str, project:ProjectInfo, imports:list) -> dict"
+      1569,"YAMLGenerator._function_to_dict cc:5","(f:FunctionInfo, detail:str) -> dict"
+      1587,"YAMLGenerator._method_to_dict cc:15","(f:FunctionInfo, detail:str) -> dict"
+      1628,"YAMLGenerator._build_signature cc:9","(f:FunctionInfo) -> str"
+      1647,YAMLGenerator._categorize,"(name:str) -> str"
+      1651,YAMLGenerator._extract_domain,"(path:str) -> str"
+      1655,YAMLGenerator._compute_hash,"(name:str, signature:str) -> str"
+      1659,"YAMLGenerator._generate_simple_yaml cc:11","(project:ProjectInfo, flat:bool, detail:str) -> str"
+      1697,"YAMLGenerator._build_compact_data cc:15","(project:ProjectInfo, detail:str) -> dict"
+      1766,"YAMLGenerator._compact_imports cc:2","(imports:list) -> list"
+      1772,"YAMLGenerator._compact_class cc:38","(cls:ClassInfo, detail:str, module_types:Optional[list]=None) -> dict"
+      1859,"YAMLGenerator._compact_function cc:11","(f:FunctionInfo, detail:str) -> dict"
+      1891,YAMLGenerator._compact_method,"(f:FunctionInfo, detail:str) -> dict"
+      1895,"YAMLGenerator._build_compact_signature cc:12","(f:FunctionInfo) -> str"
+      1936,"YAMLGenerator._constants_for_module_verbose cc:10","(module:ModuleInfo, limit:int=10) -> list"
+      1961,"YAMLGenerator._constants_for_module cc:6","(module:ModuleInfo, limit:int=10) -> list"
+      1976,"YAMLGenerator._constant_to_dict cc:5","(constant:ConstantInfo) -> dict"
+      1990,"YAMLGenerator._field_to_dict cc:4","(field:FieldInfo) -> dict"
+      2033,"CSVGenerator.generate cc:7","(project:ProjectInfo, detail:str='standard') -> str"
+      2086,"CSVGenerator._build_row cc:3","(m:ModuleInfo, elem_type:str, name:str, signature:str, calls:list, deps:str, detail:str) -> dict"
+      2115,"CSVGenerator._build_function_row cc:4","(m:ModuleInfo, elem_type:str, name:str, f:FunctionInfo, deps:str, detail:str, project:ProjectInfo) -> dict"
+      2146,"CSVGenerator._build_signature cc:9","(f:FunctionInfo) -> str"
+      2160,CSVGenerator._categorize,"(name:str) -> str"
+      2164,CSVGenerator._extract_domain,"(path:str) -> str"
+      2168,CSVGenerator._compute_hash,"(name:str, signature:str) -> str"
+      2174,"CSVGenerator._escape_csv cc:2","(text:str) -> str"
+  code2logic/gherkin.py:
+    functions[29]{line,name,sig}:
+      873,"csv_to_gherkin cc:6","(csv_content:str, language:str='en') -> str"
+      941,"gherkin_to_test_data cc:10","(gherkin_content:str) -> Dict[str, Any]"
+      163,GherkinGenerator.__init__,"(language:str='en')"
+      174,GherkinGenerator.generate,"(project:ProjectInfo, detail:str='standard', group_by:str='domain') -> str"
+      190,GherkinGenerator.generate_test_scenarios,"(project:ProjectInfo, group_by:str='domain') -> List[GherkinFeature]"
+      204,GherkinGenerator.get_step_definitions,"() -> List[StepDefinition]"
+      208,"GherkinGenerator._extract_features cc:12","(project:ProjectInfo, group_by:str) -> List[GherkinFeature]"
+      260,"GherkinGenerator._create_feature cc:8","(group_name:str, items:List[dict], project:ProjectInfo, group_by:str) -> GherkinFeature"
+      307,"GherkinGenerator._create_scenario cc:12","(category:str, items:List[dict], domain:str) -> GherkinScenario"
+      358,"GherkinGenerator._create_edge_case_scenarios cc:5","(category:str, items:List[dict]) -> List[GherkinScenario]"
+      386,"GherkinGenerator._create_when_step cc:4","(func:FunctionInfo, verb:str) -> str"
+      403,"GherkinGenerator._create_background cc:7","(domain:str, items:List[dict]) -> Optional[List[str]]"
+      421,"GherkinGenerator._create_examples_table cc:6","(items:List[dict]) -> List[Dict[str, str]]"
+      442,"GherkinGenerator._extract_param_placeholders cc:4","(func:FunctionInfo) -> str"
+      451,"GherkinGenerator._register_step cc:3","(step_type:str, pattern:str, func:FunctionInfo)"
+      466,"GherkinGenerator._render_features cc:2","(features:List[GherkinFeature], detail:str) -> str"
+      482,"GherkinGenerator._render_feature cc:9","(feature:GherkinFeature, detail:str) -> str"
+      511,"GherkinGenerator._render_scenario cc:16","(scenario:GherkinScenario, detail:str) -> str"
+      556,"GherkinGenerator._categorize cc:4","(name:str) -> str"
+      577,"GherkinGenerator._extract_domain cc:5","(path:str) -> str"
+      588,GherkinGenerator._name_to_readable,"(name:str) -> str"
+      596,GherkinGenerator._step_to_func_name,"(step:str) -> str"
+      614,"StepDefinitionGenerator.generate_pytest_bdd cc:6","(features:List[GherkinFeature]) -> str"
+      677,"StepDefinitionGenerator.generate_behave cc:6","(features:List[GherkinFeature]) -> str"
+      717,"StepDefinitionGenerator.generate_cucumber_js cc:7","(features:List[GherkinFeature]) -> str"
+      761,StepDefinitionGenerator._step_to_func_name,"(step:str) -> str"
+      775,"CucumberYAMLGenerator.generate cc:19","(project:ProjectInfo, detail:str='standard') -> str"
+      842,"CucumberYAMLGenerator._extract_domain cc:5","(path:str) -> str"
+      855,"CucumberYAMLGenerator._categorize cc:11","(name:str) -> str"
+  code2logic/intent.py:
+    functions[18]{line,name,sig}:
+      131,"EnhancedIntentGenerator.__init__ cc:8","(lang:str='en')"
+      165,"EnhancedIntentGenerator.generate cc:12","(name:str, docstring:Optional[str]=None) -> str"
+      212,"EnhancedIntentGenerator._extract_from_docstring cc:5","(docstring:str) -> Optional[str]"
+      232,"EnhancedIntentGenerator._split_name cc:6","(name:str) -> List[str]"
+      261,EnhancedIntentGenerator.get_available_features,"() -> dict[str, bool]"
+      282,IntentAnalyzer.__init__,()
+      299,"IntentAnalyzer._extract_keywords cc:3","(query:str) -> List[str]"
+      306,"IntentAnalyzer._calculate_intent_confidence cc:4","(keywords:List[str], patterns:List[str]) -> float"
+      313,"IntentAnalyzer._identify_target cc:8","(query:str, project:Any) -> str"
+      333,IntentAnalyzer._generate_description,"(intent_type:IntentType, target:str) -> str"
+      345,IntentAnalyzer._generate_suggestions,"(intent_type:IntentType, target:str, project:Any) -> List[str]"
+      381,"IntentAnalyzer.analyze_intent cc:3","(query:str, project:Any) -> List[Intent]"
+      413,"IntentAnalyzer.detect_code_smells cc:10","(project:Any) -> List[dict]"
+      466,"IntentAnalyzer.suggest_refactoring cc:6","(target:str, project:Any) -> List[str]"
+      491,"IntentAnalyzer._find_target_object cc:9","(target:str, project:Any) -> Any"
+      509,"IntentAnalyzer._suggest_module_refactoring cc:6","(module:Any) -> List[str]"
+      525,"IntentAnalyzer._suggest_class_refactoring cc:5","(cls:Any) -> List[str]"
+      538,"IntentAnalyzer._suggest_function_refactoring cc:8","(func:Any) -> List[str]"
+  code2logic/llm.py:
+    functions[8]{line,name,sig}:
+      335,"get_available_backends cc:7","() -> dict[str, bool]"
+      65,"CodeAnalyzer.__init__ cc:8","(model:str=None, provider:str=None, base_url:str=None, api_key:str=None)"
+      111,CodeAnalyzer.is_available,() -> bool
+      115,"CodeAnalyzer.suggest_refactoring cc:5","(project) -> list[dict[str, Any]]"
+      166,"CodeAnalyzer.find_semantic_duplicates cc:11","(project) -> list[dict[str, Any]]"
+      226,"CodeAnalyzer.generate_code cc:11","(project, target_lang:str, module_filter:Optional[str]=None) -> dict[str, str]"
+      290,CodeAnalyzer.translate_function,"(name:str, signature:str, intent:str, source_lang:str, target_lang:str) -> str"
+      326,"CodeAnalyzer._build_signature cc:3",(f) -> str
+  code2logic/llm_clients.py:
+    functions[12]{line,name,sig}:
+      95,_get_user_llm_config_path,() -> str
+      100,"_load_user_llm_config cc:4","() -> dict[str, Any]"
+      112,"_get_priority_mode cc:2",() -> str
+      118,get_priority_mode,() -> str
+      123,"_get_provider_priority_overrides cc:4","() -> dict[str, int]"
+      136,"_get_model_priority_rules cc:8","() -> dict[str, dict[str, int]]"
+      160,"_get_model_priority cc:6","(model_string:str) -> Optional[int]"
+      180,_get_provider_model_string,"(provider:str) -> str"
+      185,"_get_priority_order cc:2","() -> list[str]"
+      190,"_get_effective_provider_order cc:9","() -> list[tuple[str, int]]"
+      241,"get_effective_provider_priorities cc:2","() -> dict[str, int]"
+      246,_candidate_litellm_yaml_paths,"() -> list[str]"
+  code2logic/llm_profiler.py:
+    functions[23]{line,name,sig}:
+      169,_get_profiles_path,() -> Path
+      176,"load_profiles cc:4","() -> dict[str, LLMProfile]"
+      192,"save_profile cc:2","(profile:LLMProfile) -> None"
+      205,get_profile,"(provider:str, model:str) -> Optional[LLMProfile]"
+      212,"get_or_create_profile cc:2","(provider:str, model:str) -> LLMProfile"
+      222,"_create_default_profile cc:11","(provider:str, model:str) -> LLMProfile"
+      639,profile_llm,"(client, quick:bool=False) -> LLMProfile"
+      645,get_adaptive_chunker,"(provider:str, model:str) -> AdaptiveChunker"
+      146,"LLMProfile.__post_init__ cc:3",()
+      281,LLMProfiler.__init__,"(client, verbose:bool=True)"
+      294,"LLMProfiler.run_profile cc:9","(quick:bool=False) -> LLMProfile"
+      348,"LLMProfiler._test_reproduction cc:2","(name:str, code:str) -> ProfileTestResult"
+      397,"LLMProfiler._code_to_spec cc:7","(code:str) -> str"
+      427,"LLMProfiler._extract_code cc:5","(response:str) -> str"
+      444,"LLMProfiler._check_syntax cc:2","(code:str) -> bool"
+      452,LLMProfiler._calculate_similarity,"(original:str, reproduced:str) -> float"
+      460,"LLMProfiler._calculate_metrics cc:9","(profile:LLMProfile, results:list[ProfileTestResult]) -> LLMProfile"
+      499,"LLMProfiler._test_consistency cc:3","(profile:LLMProfile) -> LLMProfile"
+      525,"AdaptiveChunker.__init__ cc:2","(profile:Optional[LLMProfile]=None)"
+      537,AdaptiveChunker.get_optimal_settings,"() -> dict[str, Any]"
+      546,"AdaptiveChunker.chunk_spec cc:5","(spec:str, format:str='yaml') -> list[dict[str, Any]]"
+      606,"AdaptiveChunker.recommend_format cc:4","(spec_size_tokens:int) -> str"
+      631,"AdaptiveChunker.estimate_chunks_needed cc:2","(spec_size_tokens:int) -> int"
+  code2logic/logicml.py:
+    functions[9]{line,name,sig}:
+      369,generate_logicml,"(project:ProjectInfo, detail:str='standard') -> str"
+      80,LogicMLGenerator.__init__,"(verbose:bool=False) -> None"
+      83,"LogicMLGenerator.generate cc:3","(project:ProjectInfo, detail:str='standard', level:str='typed') -> LogicMLSpec"
+      115,"LogicMLGenerator._generate_module cc:26","(module:ModuleInfo, detail:str, level:str='typed') -> str"
+      179,"LogicMLGenerator._generate_imports cc:8","(imports:List[str]) -> str"
+      207,"LogicMLGenerator._generate_class cc:20","(cls:ClassInfo, detail:str, level:str='typed') -> str"
+      261,"LogicMLGenerator._generate_method cc:22","(method:FunctionInfo, detail:str, level:str='typed', indent:int=2) -> str"
+      326,"LogicMLGenerator._generate_functions cc:2","(functions:List[FunctionInfo], detail:str, level:str='typed') -> str"
+      336,"LogicMLGenerator._detect_side_effects cc:7","(method:FunctionInfo) -> Optional[str]"
+  code2logic/markdown_format.py:
+    functions[10]{line,name,sig}:
+      343,generate_markdown_hybrid,"(project:ProjectInfo, detail:str='full') -> str"
+      350,"generate_file_markdown cc:3","(file_path:str) -> str"
+      44,MarkdownHybridGenerator.__init__,"(verbose:bool=False)"
+      49,MarkdownHybridGenerator.generate,"(project:ProjectInfo, detail:str='full') -> MarkdownSpec"
+      93,"MarkdownHybridGenerator._generate_header cc:3","(project:ProjectInfo) -> str"
+      102,"MarkdownHybridGenerator._generate_tree cc:8","(project:ProjectInfo) -> str"
+      125,"MarkdownHybridGenerator._generate_imports cc:9","(project:ProjectInfo) -> str"
+      166,"MarkdownHybridGenerator._generate_classes_yaml cc:23","(project:ProjectInfo) -> str"
+      242,"MarkdownHybridGenerator._generate_functions_gherkin cc:18","(project:ProjectInfo) -> str"
+      314,"MarkdownHybridGenerator._generate_dependencies cc:9","(project:ProjectInfo) -> str"
+  code2logic/mcp_server.py:
+    functions[3]{line,name,sig}:
+      34,"handle_request cc:5","(request:dict) -> dict"
+      176,"call_tool cc:27","(tool_name:str, arguments:dict) -> str"
+      337,"run_server cc:5",()
+  code2logic/metrics.py:
+    functions[15]{line,name,sig}:
+      572,analyze_reproduction,"(original:str, generated:str, spec:str='', format_name:str='', verbose:bool=False) -> ReproductionResult"
+      595,"compare_formats cc:5","(original:str, results:Dict[str,Tuple[str,str]], verbose:bool=False) -> Dict[str, Any]"
+      116,ReproductionResult.to_dict,"() -> Dict[str, Any]"
+      119,"ReproductionResult.to_report cc:8",() -> str
+      185,"ReproductionMetrics.__init__ cc:2","(verbose:bool=False)"
+      190,"ReproductionMetrics.analyze cc:2","(original:str, generated:str, spec:str='', format_name:str='', source_file:str='') -> ReproductionResult"
+      245,"ReproductionMetrics._compute_text_metrics cc:12","(original:str, generated:str) -> TextMetrics"
+      289,"ReproductionMetrics._cosine_similarity cc:5","(words1:List[str], words2:List[str]) -> float"
+      305,"ReproductionMetrics._compute_structural_metrics cc:6","(original:str, generated:str) -> StructuralMetrics"
+      351,"ReproductionMetrics._count_elements_ast cc:11","(code:str) -> Dict[str, int]"
+      403,"ReproductionMetrics._compute_semantic_metrics cc:7","(original:str, generated:str) -> SemanticMetrics"
+      461,"ReproductionMetrics._compute_format_metrics cc:4","(original:str, generated:str, spec:str, format_name:str) -> FormatMetrics"
+      497,ReproductionMetrics._compute_overall_score,"(result:ReproductionResult) -> float"
+      528,"ReproductionMetrics._get_grade cc:5","(score:float) -> str"
+      541,"ReproductionMetrics._generate_recommendations cc:9","(result:ReproductionResult) -> List[str]"
+  code2logic/parsers.py:
+    functions[79]{line,name,sig}:
+      36,"_normalize_import_path cc:4","(import_path:str) -> str"
+      46,"_clean_imports cc:5","(imports:List[str]) -> List[str]"
+      60,"_combine_import_name cc:3","(module_name:str, identifier:str) -> str"
+      70,"_truncate_constant_value cc:3","(value_text:str, limit:int=400) -> str"
+      80,"_py_expr_to_dotted_name cc:8",(expr) -> str
+      212,"_analyze_python_function_node cc:3",(func_node)
+      2676,is_tree_sitter_available,() -> bool
+      96,_PyFunctionBodyAnalyzer.__init__,()
+      103,"_PyFunctionBodyAnalyzer._add_call cc:4","(name:str) -> None"
+      113,"_PyFunctionBodyAnalyzer._add_raise cc:4","(name:str) -> None"
+      123,"_PyFunctionBodyAnalyzer.visit_Call cc:3",(node)
+      132,"_PyFunctionBodyAnalyzer.visit_Raise cc:6",(node)
+      149,_PyFunctionBodyAnalyzer.visit_If,(node)
+      153,_PyFunctionBodyAnalyzer.visit_For,(node)
+      157,_PyFunctionBodyAnalyzer.visit_AsyncFor,(node)
+      161,_PyFunctionBodyAnalyzer.visit_While,(node)
+      165,_PyFunctionBodyAnalyzer.visit_IfExp,(node)
+      169,"_PyFunctionBodyAnalyzer.visit_BoolOp cc:4",(node)
+      177,"_PyFunctionBodyAnalyzer.visit_Try cc:3",(node)
+      184,"_PyFunctionBodyAnalyzer.visit_comprehension cc:3",(node)
+      192,"_PyFunctionBodyAnalyzer.visit_Match cc:3",(node)
+      199,_PyFunctionBodyAnalyzer.visit_FunctionDef,(node)
+      202,_PyFunctionBodyAnalyzer.visit_AsyncFunctionDef,(node)
+      205,_PyFunctionBodyAnalyzer.visit_ClassDef,(node)
+      208,_PyFunctionBodyAnalyzer.visit_Lambda,(node)
+      232,"TreeSitterParser.__init__ cc:2",()
+      241,"TreeSitterParser._init_parsers cc:3",()
+      265,TreeSitterParser.is_available,"(language:str) -> bool"
+      270,TreeSitterParser.get_supported_languages,"() -> List[str]"
+      274,"TreeSitterParser.parse cc:4","(filepath:str, content:str, language:str) -> Optional[ModuleInfo]"
+      299,"TreeSitterParser._parse_python cc:34","(filepath:str, content:str, tree) -> ModuleInfo"
+      414,"TreeSitterParser._extract_constants cc:18","(tree, content:str) -> List[ConstantInfo]"
+      445,"TreeSitterParser._extract_type_checking_imports cc:9","(tree, content:str) -> List[str]"
+      468,"TreeSitterParser._extract_conditional_imports cc:5","(node, content:str) -> List[str]"
+      483,"TreeSitterParser._extract_aliases cc:23","(tree, content:str) -> dict"
+      530,"TreeSitterParser._extract_py_function cc:31","(node, content:str, decorated_node=None, filepath:Optional[str]=None) -> Optional[FunctionInfo]"
+      634,"TreeSitterParser._extract_py_enum cc:24","(node, content:str) -> Optional[TypeInfo]"
+      676,"TreeSitterParser._extract_py_class cc:32","(node, content:str, decorated_node=None, filepath:Optional[str]=None) -> Optional[ClassInfo]"
+      761,"TreeSitterParser._extract_dataclass_field cc:18","(node, content:str) -> Optional[FieldInfo]"
+      825,"TreeSitterParser._extract_class_attribute cc:22","(node, content:str) -> Optional[AttributeInfo]"
+      869,TreeSitterParser._extract_init_attributes,"(func_node, content:str) -> List[AttributeInfo]"
+      894,"TreeSitterParser._extract_class_property cc:3","(node, content:str) -> Optional[str]"
+      909,"TreeSitterParser._extract_py_import cc:5","(node, content:str) -> List[str]"
+      921,"TreeSitterParser._extract_py_from_import cc:14","(node, content:str) -> List[str]"
+      961,"TreeSitterParser._extract_py_constant cc:29","(node, content:str) -> Optional[ConstantInfo]"
+      1021,"TreeSitterParser._extract_conditional_imports cc:5","(node, content:str) -> List[str]"
+      1036,"TreeSitterParser._parse_js_ts cc:36","(filepath:str, content:str, tree, language:str) -> ModuleInfo"
+      1144,"TreeSitterParser._extract_js_class cc:10","(node, content:str) -> Optional[ClassInfo]"
+      1180,"TreeSitterParser._extract_js_method cc:7","(node, content:str) -> Optional[FunctionInfo]"
+      1221,"TreeSitterParser._extract_js_function cc:4","(node, content:str) -> Optional[FunctionInfo]"
+      1257,"TreeSitterParser._extract_js_var_fn cc:9","(node, content:str) -> Optional[FunctionInfo]"
+      1305,TreeSitterParser._extract_js_arrow_fn,"(node, content:str) -> Optional[FunctionInfo]"
+      1309,"TreeSitterParser._extract_js_require_imports cc:9","(node, content:str, imports:list)"
+      1324,"TreeSitterParser._extract_from_expression_stmt cc:29","(node, content:str, functions:list, exports:list, seen_fn_names:set)"
+      1430,"TreeSitterParser._walk_nested_functions cc:3","(root, content:str, functions:list, seen_fn_names:set)"
+      1471,"TreeSitterParser._extract_js_params cc:8","(params_node, content:str) -> List[str]"
+      1491,"TreeSitterParser._extract_ts_type cc:4","(node, content:str) -> Optional[TypeInfo]"
+      1500,"TreeSitterParser._extract_ts_enum cc:10","(node, content:str) -> Optional[TypeInfo]"
+      1523,"TreeSitterParser._extract_js_constant cc:5","(node, content:str) -> Optional[str]"
+      1534,"TreeSitterParser._extract_js_comment cc:7","(node, content:str) -> Optional[str]"
+      1547,"TreeSitterParser._find_child cc:3","(node, type_name:str)"
+      1554,TreeSitterParser._text,"(node, content:str) -> str"
+      1562,"TreeSitterParser._extract_string cc:5","(node, content:str) -> str"
+      1571,"TreeSitterParser._truncate_docstring cc:6","(docstring:Optional[str], max_len:int=80) -> Optional[str]"
+      1609,UniversalParser.__init__,()
+      1613,"UniversalParser.parse cc:12","(filepath:str, content:str, language:str) -> Optional[ModuleInfo]"
+      1645,"UniversalParser._parse_python cc:38","(filepath:str, content:str) -> Optional[ModuleInfo]"
+      1721,"UniversalParser._extract_ast_enum cc:28","(node:Any) -> Optional[TypeInfo]"
+      1767,"UniversalParser._extract_ast_function cc:21",(node) -> FunctionInfo
+      1838,"UniversalParser._extract_ast_class cc:52","(node:Any) -> ClassInfo"
+      1948,"UniversalParser._extract_ast_constant cc:19","(node:Any, content:str) -> Optional[ConstantInfo]"
+      1990,"UniversalParser._format_ast_value cc:7","(value_node:Any, content:str) -> str"
+      2010,"UniversalParser._ann_str cc:6",(node) -> str
+      2025,"UniversalParser._parse_js_ts cc:49","(filepath:str, content:str, language:str) -> ModuleInfo"
+      2224,"UniversalParser._parse_go cc:14","(filepath:str, content:str) -> ModuleInfo"
+      2295,"UniversalParser._parse_rust cc:20","(filepath:str, content:str) -> ModuleInfo"
+      2465,"UniversalParser._parse_java cc:14","(filepath:str, content:str) -> ModuleInfo"
+      2543,"UniversalParser._parse_csharp cc:13","(filepath:str, content:str) -> ModuleInfo"
+      2615,"UniversalParser._parse_sql cc:7","(filepath:str, content:str) -> ModuleInfo"
+  code2logic/project_reproducer.py:
+    functions[8]{line,name,sig}:
+      377,reproduce_project,"(project_path:str, output_dir:str=None, target_lang:str=None, parallel:bool=False, use_llm:bool=True) -> ProjectResult"
+      87,ProjectReproducer.__init__,"(client:BaseLLMClient=None, max_workers:int=4, target_lang:str=None, use_llm:bool=True)"
+      108,"ProjectReproducer._get_client cc:2",() -> BaseLLMClient
+      116,"ProjectReproducer.find_source_files cc:8","(project_path:str, extensions:Set[str]=None, exclude_patterns:List[str]=None) -> List[Path]"
+      157,"ProjectReproducer.reproduce_file cc:3","(file_path:Path, output_dir:Path) -> FileResult"
+      209,"ProjectReproducer.reproduce_project cc:10","(project_path:str, output_dir:str=None, parallel:bool=False) -> ProjectResult"
+      271,"ProjectReproducer._aggregate_results cc:17","(project_path:str, results:List[FileResult]) -> ProjectResult"
+      330,"ProjectReproducer._save_report cc:4","(output_dir:Path, result:ProjectResult)"
+  code2logic/prompts.py:
+    functions[3]{line,name,sig}:
+      57,"get_reproduction_prompt cc:2","(spec:str, fmt:str, file_name:str, language:str='python', max_spec_length:int=5000) -> str"
+      94,get_review_prompt,"(code:str, spec:str, fmt:str) -> str"
+      129,"get_fix_prompt cc:2","(code:str, issues:list, spec:str) -> str"
+  code2logic/quality.py:
+    functions[10]{line,name,sig}:
+      213,analyze_quality,"(project:ProjectInfo, thresholds:Dict[str,int]=None) -> QualityReport"
+      228,"get_quality_summary cc:12","(report:QualityReport) -> str"
+      32,"QualityReport.to_dict cc:2","() -> Dict[str, Any]"
+      72,"QualityAnalyzer.__init__ cc:2","(thresholds:Dict[str,int]=None)"
+      78,"QualityAnalyzer.analyze cc:5","(project:ProjectInfo) -> QualityReport"
+      111,"QualityAnalyzer.analyze_modules cc:6","(modules:List[ModuleInfo]) -> QualityReport"
+      132,"QualityAnalyzer._analyze_module cc:5","(module:ModuleInfo, report:QualityReport)"
+      155,"QualityAnalyzer._check_function cc:4","(func, file_path:str, report:QualityReport)"
+      182,"QualityAnalyzer._check_class cc:3","(file_path:str, report:QualityReport)"
+      200,"QualityAnalyzer._get_file_recommendation cc:3","(module:ModuleInfo) -> str"
+  code2logic/refactor.py:
+    functions[7]{line,name,sig}:
+      108,"find_duplicates cc:10","(project_path:str, threshold:float=0.8) -> List[DuplicateGroup]"
+      165,"analyze_quality cc:8","(project_path:str, include_security:bool=True, include_performance:bool=True) -> RefactoringReport"
+      227,"suggest_refactoring cc:6","(project_path:str, use_llm:bool=False, client:BaseLLMClient=None) -> RefactoringReport"
+      292,compare_codebases,"(project1:str, project2:str) -> Dict[str, Any]"
+      348,"quick_analyze cc:8","(project_path:str) -> Dict[str, Any]"
+      61,RefactoringReport.to_dict,"() -> Dict[str, Any]"
+      64,"RefactoringReport.to_markdown cc:9",() -> str
+  code2logic/reproducer.py:
+    functions[28]{line,name,sig}:
+      19,"_safe_load_yaml_file cc:2","(path:str) -> Any"
+      638,"reproduce_project cc:11","(spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None, validate:bool=True, verbose:bool=True) -> ReproductionResult"
+      693,validate_files,"(spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None) -> List[FileValidation]"
+      50,"FileValidation.score cc:5",() -> float
+      67,FileValidation.to_dict,"() -> Dict[str, Any]"
+      91,"ReproductionResult.success_rate cc:2",() -> float
+      97,"ReproductionResult.average_score cc:3",() -> float
+      102,"ReproductionResult.summary cc:3",() -> str
+      129,SpecReproducer.__init__,"(verbose:bool=False)"
+      132,SpecReproducer.reproduce_from_yaml,"(spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult"
+      150,SpecReproducer.reproduce_from_json,"(spec_path:str, output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult"
+      162,"SpecReproducer._reproduce cc:10","(spec:Dict[str,Any], output_dir:str, filter_paths:Optional[List[str]]=None) -> ReproductionResult"
+      204,"SpecReproducer._generate_file cc:3","(module:Dict[str,Any], output_path:Path) -> bool"
+      222,"SpecReproducer._generate_python cc:10","(module:Dict[str,Any]) -> str"
+      269,"SpecReproducer._render_docstring cc:8","(text:str, indent:str) -> List[str]"
+      298,"SpecReproducer._sanitize_python_property cc:2","(prop:str) -> str"
+      328,"SpecReproducer._generate_python_class cc:11","(cls:Dict[str,Any]) -> List[str]"
+      371,"SpecReproducer._generate_python_method cc:4","(method:Dict[str,Any]) -> List[str]"
+      399,"SpecReproducer._generate_python_function cc:3","(func:Dict[str,Any]) -> List[str]"
+      420,"SpecReproducer._generate_typescript cc:7","(module:Dict[str,Any]) -> str"
+      450,"SpecReproducer._generate_ts_class cc:5","(cls:Dict[str,Any]) -> List[str]"
+      474,"SpecReproducer._generate_ts_method cc:2","(method:Dict[str,Any]) -> List[str]"
+      489,"SpecReproducer._generate_ts_function cc:2","(func:Dict[str,Any]) -> List[str]"
+      504,"SpecReproducer._parse_signature cc:4","(sig:str) -> str"
+      535,SpecValidator.__init__,()
+      538,"SpecValidator.validate cc:6","(spec_path:str, generated_dir:str, filter_paths:Optional[List[str]]=None) -> List[FileValidation]"
+      575,"SpecValidator._validate_file cc:10","(module:Dict[str,Any], base_path:Path) -> FileValidation"
+      628,"SpecValidator._check_python_syntax cc:2","(content:str, validation:FileValidation) -> bool"
+  code2logic/reproduction.py:
+    functions[8]{line,name,sig}:
+      26,"generate_file_gherkin cc:63","(file_path:Path) -> str"
+      225,"compare_code cc:6","(original:str, generated:str) -> Dict[str, Any]"
+      281,"extract_code_block cc:9","(text:str, language:str='python') -> str"
+      317,"CodeReproducer.__init__ cc:2","(client:BaseLLMClient=None, provider:str=None)"
+      326,"CodeReproducer.reproduce_file cc:2","(source_path:str, output_dir:str=None) -> Dict[str, Any]"
+      365,CodeReproducer.generate_from_gherkin,"(gherkin:str, language:str='python') -> str"
+      398,CodeReproducer._save_results,"(output_dir:Path, results:Dict[str,Any])"
+      410,"CodeReproducer._generate_report cc:4","(results:Dict[str,Any]) -> str"
+  code2logic/schemas/json_schema.py:
+    functions[4]{line,name,sig}:
+      110,"validate_json cc:8","(spec:str) -> Tuple[bool, List[str]]"
+      146,"_validate_json_module cc:8","(module:Dict, index:int) -> List[str]"
+      174,"_validate_json_class cc:8","(cls:Dict, prefix:str) -> List[str]"
+      198,"parse_json_spec cc:7","(spec:str) -> Optional[JSONSchema]"
+  code2logic/schemas/logicml_schema.py:
+    functions[3]{line,name,sig}:
+      111,"validate_logicml cc:29","(spec:str) -> Tuple[bool, List[str]]"
+      201,"parse_logicml_header cc:3","(line:str) -> Optional[Dict[str, Any]]"
+      214,"extract_logicml_signature cc:7","(sig_line:str) -> Dict[str, Any]"
+  code2logic/schemas/markdown_schema.py:
+    functions[2]{line,name,sig}:
+      89,"validate_markdown cc:16","(spec:str) -> Tuple[bool, List[str]]"
+      150,"extract_markdown_sections cc:5","(spec:str) -> Dict[str, Any]"
+  code2logic/schemas/yaml_schema.py:
+    functions[3]{line,name,sig}:
+      93,"validate_yaml cc:17","(spec:str) -> Tuple[bool, List[str]]"
+      155,"_validate_module cc:13","(module:Dict, index:int) -> List[str]"
+      190,"_validate_class cc:12","(cls:Dict, prefix:str) -> List[str]"
+  code2logic/shared_utils.py:
+    functions[12]{line,name,sig}:
+      23,"compact_imports cc:10","(imports:List[str], max_items:int=10) -> List[str]"
+      68,"deduplicate_imports cc:5","(imports:List[str]) -> List[str]"
+      127,"abbreviate_type cc:3","(type_str:str) -> str"
+      154,"expand_type cc:3","(abbrev:str) -> str"
+      179,"build_signature cc:12","(params:List[str], return_type:Optional[str]=None, include_self:bool=False, abbreviate:bool=False, max_params:int=6) -> str"
+      234,"remove_self_from_params cc:4","(params:List[str]) -> List[str]"
+      267,"categorize_function cc:4","(name:str) -> str"
+      296,"extract_domain cc:5","(path:str) -> str"
+      321,compute_hash,"(name:str, signature:str, length:int=8) -> str"
+      341,"truncate_docstring cc:5","(docstring:Optional[str], max_length:int=60) -> str"
+      378,"escape_for_yaml cc:4","(text:str) -> str"
+      401,"clean_identifier cc:2","(name:str) -> str"
+  code2logic/similarity.py:
+    functions[6]{line,name,sig}:
+      189,is_rapidfuzz_available,() -> bool
+      194,"get_refactoring_suggestions cc:15","(similar_functions:Dict[str,List[str]]) -> List[Dict[str, any]]"
+      42,SimilarityDetector.__init__,"(threshold:float=80.0)"
+      53,"SimilarityDetector.find_similar_functions cc:19","(modules:List[ModuleInfo]) -> Dict[str, List[str]]"
+      135,"SimilarityDetector.find_duplicate_signatures cc:9","(modules:List[ModuleInfo]) -> Dict[str, List[str]]"
+      170,"SimilarityDetector._build_signature cc:4","(name:str, params:List[str], return_type:str=None) -> str"
+  code2logic/terminal.py:
+    functions[52]{line,name,sig}:
+      573,"get_renderer cc:2","(use_colors:bool=True, verbose:bool=True) -> ShellRenderer"
+      581,set_renderer,"(renderer:ShellRenderer) -> None"
+      98,"ShellRenderer.__init__ cc:2","(use_colors:bool=True, verbose:bool=True)"
+      105,"ShellRenderer._supports_colors cc:4",() -> bool
+      118,ShellRenderer.enable_log,() -> None
+      123,ShellRenderer.get_log,() -> str
+      127,ShellRenderer.clear_log,() -> None
+      131,"ShellRenderer._log cc:3","(text:str) -> None"
+      141,"ShellRenderer._c cc:2","(color:str, text:str) -> str"
+      152,ShellRenderer.heading,"(level:int, text:str) -> None"
+      157,"ShellRenderer.codeblock cc:2","(language:Language, content:str) -> None"
+      172,"ShellRenderer.render_markdown cc:7","(text:str) -> None"
+      214,ShellRenderer.success,"(message:str) -> None"
+      218,ShellRenderer.error,"(message:str) -> None"
+      222,ShellRenderer.warning,"(message:str) -> None"
+      226,ShellRenderer.info,"(message:str) -> None"
+      230,ShellRenderer.status,"(icon:str, message:str, type:Literal[info,success,warning,error]='info') -> None"
+      245,ShellRenderer.kv,"(key:str, value:Any) -> None"
+      249,"ShellRenderer.progress cc:3","(done:int, total:int, label:str='') -> None"
+      260,ShellRenderer.separator,"(char:str='─', width:int=60) -> None"
+      264,"ShellRenderer.table cc:8","(headers:List[str], rows:List[List[Any]], widths:Optional[List[int]]=None) -> None"
+      285,"ShellRenderer.task cc:2","(name:str, status:Literal[pending,running,done,failed], duration:Optional[float]=None) -> None"
+      308,ShellRenderer.inline,"(text:str) -> str"
+      312,"ShellRenderer.print cc:2","(text:str, color:Optional[str]=None) -> None"
+      316,ShellRenderer.newline,() -> None
+      324,"ShellRenderer._highlight_line cc:9","(line:str, language:str) -> str"
+      347,"ShellRenderer._highlight_yaml cc:11","(line:str) -> str"
+      382,ShellRenderer._highlight_json,"(line:str) -> str"
+      406,"ShellRenderer._highlight_python cc:3","(line:str) -> str"
+      440,"ShellRenderer._highlight_bash cc:5","(line:str) -> str"
+      460,"ShellRenderer._highlight_js cc:3","(line:str) -> str"
+      490,"ShellRenderer._highlight_gherkin cc:12","(line:str) -> str"
+      516,"ShellRenderer._highlight_log cc:15","(line:str) -> str"
+      537,"ShellRenderer._highlight_markdown cc:5","(line:str) -> str"
+      558,ShellRenderer.save_log,"(filepath:str) -> None"
+      591,RenderAPI.heading,"(level:int, text:str) -> None"
+      595,RenderAPI.code,"(lang:Language, content:str) -> None"
+      599,RenderAPI.codeblock,"(lang:Language, content:str) -> None"
+      603,RenderAPI.markdown,"(text:str) -> None"
+      607,RenderAPI.success,"(message:str) -> None"
+      611,RenderAPI.error,"(message:str) -> None"
+      615,RenderAPI.warning,"(message:str) -> None"
+      619,RenderAPI.info,"(message:str) -> None"
+      623,RenderAPI.status,"(icon:str, message:str, type:Literal[info,success,warning,error]='info') -> None"
+      628,RenderAPI.kv,"(key:str, value:Any) -> None"
+      632,RenderAPI.progress,"(done:int, total:int, label:str='') -> None"
+      636,RenderAPI.separator,"(char:str='─', width:int=60) -> None"
+      640,RenderAPI.table,"(headers:List[str], rows:List[List[Any]], widths:Optional[List[int]]=None) -> None"
+      645,RenderAPI.task,"(name:str, status:Literal[pending,running,done,failed], duration:Optional[float]=None) -> None"
+      651,RenderAPI.inline,"(text:str) -> str"
+      655,RenderAPI.print,"(text:str, color:Optional[str]=None) -> None"
+      659,RenderAPI.newline,() -> None
+  code2logic/toon_format.py:
+    functions[21]{line,name,sig}:
+      840,generate_toon,"(project:ProjectInfo, detail:str='standard', use_tabs:bool=False) -> str"
+      856,parse_toon,"(content:str) -> Dict[str, Any]"
+      67,"TOONGenerator.__init__ cc:2","(delimiter:str=',', use_tabs:bool=False)"
+      80,"TOONGenerator._short_lang cc:2","(lang:str) -> str"
+      84,"TOONGenerator._compress_module_path cc:5","(path:str, prev_dir:Any) -> tuple[str, str]"
+      100,"TOONGenerator.generate cc:4","(project:ProjectInfo, detail:str='standard', no_repeat_name:bool=False) -> str"
+      135,"TOONGenerator.generate_hybrid cc:20","(project:ProjectInfo, detail:str='full', no_repeat_name:bool=True, hub_top_n:int=5, hub_functions_detail:str='full') -> str"
+      221,"TOONGenerator._generate_modules cc:25","(modules:List[ModuleInfo], detail:str, no_repeat_name:bool=False) -> List[str]"
+      303,"TOONGenerator._generate_types cc:13","(types:List[TypeInfo], indent:int=0) -> List[str]"
+      336,"TOONGenerator._generate_classes cc:18","(classes:List[ClassInfo], detail:str, indent:int=0) -> List[str]"
+      390,"TOONGenerator._generate_methods cc:12","(methods:List[FunctionInfo], detail:str='standard', indent:int=0) -> List[str]"
+      418,"TOONGenerator._generate_functions cc:14","(functions:List[FunctionInfo], detail:str, indent:int=0) -> List[str]"
+      449,"TOONGenerator._build_signature cc:8","(f:FunctionInfo) -> str"
+      478,"TOONGenerator._quote cc:8","(value:Any) -> str"
+      505,TOONGenerator.generate_compact,"(project:ProjectInfo) -> str"
+      509,TOONGenerator.generate_full,"(project:ProjectInfo) -> str"
+      513,"TOONGenerator.generate_schema cc:2","(format_type:str='standard') -> str"
+      666,"TOONGenerator.generate_ultra_compact cc:15","(project:ProjectInfo) -> str"
+      733,TOONParser.__init__,()
+      736,"TOONParser.parse cc:16","(content:str) -> Dict[str, Any]"
+      809,"TOONParser._parse_value cc:10","(value:str) -> Any"
+  code2logic/universal.py:
+    functions[31]{line,name,sig}:
+      1215,reproduce_file,"(source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True) -> Dict[str, Any]"
+      106,"CodeLogic.to_dict cc:2","() -> Dict[str, Any]"
+      118,"CodeLogic._element_to_dict cc:3","(elem:CodeElement) -> Dict[str, Any]"
+      135,"CodeLogic.to_compact cc:5",() -> str
+      159,"CodeLogic._element_to_compact cc:17","(elem:CodeElement, indent:int) -> List[str]"
+      237,"UniversalParser.detect_language cc:6","(content:str, file_ext:str) -> Language"
+      262,"UniversalParser.parse cc:8","(file_path:Union[str,Path]) -> CodeLogic"
+      288,"UniversalParser._parse_rust cc:8","(path:Path, content:str, hash_:str) -> CodeLogic"
+      315,"UniversalParser._parse_java cc:5","(path:Path, content:str, hash_:str) -> CodeLogic"
+      337,"UniversalParser._parse_csharp cc:5","(path:Path, content:str, hash_:str) -> CodeLogic"
+      359,"UniversalParser._parse_python cc:48","(path:Path, content:str, hash_:str) -> CodeLogic"
+      483,"UniversalParser._parse_js_ts cc:49","(path:Path, content:str, hash_:str, lang:Language) -> CodeLogic"
+      654,"UniversalParser._parse_go cc:17","(path:Path, content:str, hash_:str) -> CodeLogic"
+      716,"UniversalParser._parse_sql cc:5","(path:Path, content:str, hash_:str) -> CodeLogic"
+      760,"UniversalParser._parse_generic cc:3","(path:Path, content:str, hash_:str, lang:Language) -> CodeLogic"
+      787,"CodeGenerator.generate cc:8","(logic:CodeLogic, target_lang:Language) -> str"
+      806,"CodeGenerator._generate_python cc:9","(logic:CodeLogic) -> str"
+      839,"CodeGenerator._generate_python_element cc:19","(elem:CodeElement, indent:int=0) -> List[str]"
+      897,"CodeGenerator._generate_typescript cc:15","(logic:CodeLogic) -> str"
+      938,"CodeGenerator._generate_go cc:6","(logic:CodeLogic) -> str"
+      961,"CodeGenerator._generate_sql cc:5","(logic:CodeLogic) -> str"
+      977,"CodeGenerator._generate_rust cc:9","(logic:CodeLogic) -> str"
+      1003,"CodeGenerator._generate_java cc:10","(logic:CodeLogic) -> str"
+      1029,"CodeGenerator._generate_csharp cc:10","(logic:CodeLogic) -> str"
+      1055,CodeGenerator._generate_generic,"(logic:CodeLogic, target:Language) -> str"
+      1063,UniversalReproducer.__init__,"(client:BaseLLMClient=None)"
+      1069,"UniversalReproducer._get_client cc:2",() -> BaseLLMClient
+      1075,UniversalReproducer.extract_logic,"(file_path:str) -> CodeLogic"
+      1079,"UniversalReproducer.reproduce cc:5","(source_path:str, target_lang:str=None, output_dir:str=None, use_llm:bool=True) -> Dict[str, Any]"
+      1144,UniversalReproducer._generate_with_llm,"(logic:CodeLogic, target:Language) -> str"
+      1179,UniversalReproducer._save_result,"(output_dir:Path, original:str, logic:CodeLogic, generated:str, result:Dict[str,Any])"
+  code2logic/utils.py:
+    functions[3]{line,name,sig}:
+      7,estimate_tokens,"(text:str) -> int"
+      11,write_text_atomic,"(path:Path, content:str) -> None"
+      18,"cleanup_generated_root cc:5","(generated_root:Path, allowed_dirs:set[str]) -> None"
+  examples/01_quick_start.py:
+    functions[1]{line,name,sig}:
+      23,"main cc:3",()
+  examples/02_refactoring.py:
+    functions[1]{line,name,sig}:
+      22,"main cc:6",()
+  examples/03_reproduction.py:
+    functions[1]{line,name,sig}:
+      29,"main cc:3",()
+  examples/04_project.py:
+    functions[1]{line,name,sig}:
+      25,"main cc:5",()
+  examples/05_llm_integration.py:
+    functions[1]{line,name,sig}:
+      33,"main cc:12",()
+  examples/06_metrics.py:
+    functions[3]{line,name,sig}:
+      32,"analyze_file cc:6","(source_path:str, verbose:bool=False, no_llm:bool=False)"
+      94,"_template_generate cc:4","(spec:str) -> str"
+      106,main,()
+  examples/08_format_benchmark.py:
+    functions[3]{line,name,sig}:
+      24,"print_format_comparison cc:8",(result)
+      56,"print_per_file_results cc:5",(result)
+      79,"main cc:2",()
+  examples/09_async_benchmark.py:
+    functions[2]{line,name,sig}:
+      24,"print_results cc:3",(result)
+      45,main,()
+  examples/10_function_reproduction.py:
+    functions[2]{line,name,sig}:
+      24,"print_results cc:5",(result)
+      47,main,()
+  examples/11_token_benchmark.py:
+    functions[2]{line,name,sig}:
+      24,"print_token_efficiency cc:7",(result)
+      58,main,()
+  examples/12_comprehensive_analysis.py:
+    functions[2]{line,name,sig}:
+      26,"print_comprehensive_analysis cc:18",(result)
+      94,main,()
+  examples/13_project_benchmark.py:
+    functions[2]{line,name,sig}:
+      24,"print_project_results cc:6",(result)
+      60,main,()
+  examples/14_repeatability_test.py:
+    functions[10]{line,name,sig}:
+      38,"_template_generate cc:10","(spec:str, fmt:str, file_name:str) -> str"
+      117,"generate_spec cc:7","(project:ProjectInfo, fmt:str) -> str"
+      142,get_reproduction_prompt,"(spec:str, fmt:str, file_name:str) -> str"
+      167,"calculate_similarity cc:3","(code1:str, code2:str) -> float"
+      177,get_diff,"(code1:str, code2:str, label1:str='Run 1', label2:str='Run 2') -> List[str]"
+      186,"test_syntax cc:2","(code:str) -> bool"
+      195,"run_repeatability_test cc:20","(file_path:str, formats:List[str], num_runs:int=3, verbose:bool=False, no_llm:bool=False) -> Dict[str, RepeatabilityResult]"
+      333,"print_repeatability_summary cc:14","(results:Dict[str,RepeatabilityResult])"
+      382,"save_repeatability_report cc:6","(results:Dict[str,RepeatabilityResult], output:str)"
+      415,"main cc:2",()
+  examples/15_unified_benchmark.py:
+    functions[4]{line,name,sig}:
+      34,"print_format_results cc:5",(result)
+      59,"print_function_results cc:3",(result)
+      77,"print_project_results cc:3",(result)
+      96,"main cc:9",()
+  examples/16_terminal_demo.py:
+    functions[10]{line,name,sig}:
+      21,demo_headings,()
+      28,demo_codeblocks,()
+      82,demo_status_messages,()
+      99,demo_progress,()
+      116,demo_tasks,()
+      135,demo_key_value,()
+      146,demo_tables,()
+      160,demo_markdown,()
+      188,demo_log_highlighting,()
+      203,"main cc:2",()
+  examples/behavioral_benchmark.py:
+    functions[8]{line,name,sig}:
+      48,"_load_module_from_path cc:3","(path:Path, module_name:str) -> Any"
+      57,"_exec_function_from_code cc:3","(code:str, function_name:str) -> Callable[..., Any]"
+      79,"_values_equal cc:3","(got:Any, expected:Any) -> bool"
+      85,"_run_case cc:3","(label:str, fn:Callable[Any,Any], expected:Any) -> CaseResult"
+      95,"_looks_like_template_stub cc:5","(code:str) -> bool"
+      103,"_cases_for cc:9","(function_name:str) -> List[Tuple[str, Callable[[], Tuple[Tuple[Any, ...], Dict[str, Any]]]]]"
+      164,"_apply_env_hook cc:2","(kwargs:Dict[str,Any]) -> Dict[str, Any]"
+      172,"main cc:19",() -> None
+  examples/benchmark_report.py:
+    functions[8]{line,name,sig}:
+      26,"_load_json cc:2","(path:Path) -> Optional[Dict[str, Any]]"
+      32,"_sizeof cc:2","(path:Path) -> int"
+      39,"_fmt_bytes cc:3","(n:int) -> str"
+      47,_token_estimate_bytes,"(n:int) -> int"
+      51,"_calc_function_summary cc:7","(d:Dict[str,Any]) -> Tuple[int, float, float]"
+      62,"_calc_file_summary cc:5","(d:Dict[str,Any]) -> Tuple[int, float, float, float]"
+      73,"_read_commands cc:5","(commands_path:Path) -> List[str]"
+      80,"main cc:18",() -> None
+  examples/benchmark_summary.py:
+    functions[4]{line,name,sig}:
+      8,"_fmt_bytes cc:3","(n:int) -> str"
+      16,_token_estimate_bytes,"(n:int) -> int"
+      20,"_artifact_row cc:2","(label:str, path:str) -> str"
+      28,"main cc:19",()
+  examples/code2logic/sample_project/api/client.py:
+    functions[2]{line,name,sig}:
+      17,~APIClient.get,"(url:str) -> Response"
+      21,~APIClient.post,"(url:str, data:dict) -> Response"
+  examples/code2logic/sample_project/calculator.py:
+    functions[3]{line,name,sig}:
+      22,"factorial cc:3","(n:int) -> int"
+      7,Calculator.add,"(a:float, b:float) -> float"
+      11,"Calculator.divide cc:2","(a:float, b:float) -> float"
+  logic2code/cli.py:
+    functions[1]{line,name,sig}:
+      17,"main cc:17",()
+  logic2code/examples/01_quickstart.py:
+    functions[4]{line,name,sig}:
+      17,"example_basic_generation cc:2",()
+      47,example_with_config,()
+      66,"example_stubs_only cc:2",()
+      84,"example_single_module cc:3",()
+  logic2code/examples/02_llm_enhanced.py:
+    functions[3]{line,name,sig}:
+      16,"example_llm_generation cc:4",()
+      54,"example_hybrid_generation cc:2",()
+      78,"example_compare_outputs cc:2",()
+  logic2code/generator.py:
+    functions[11]{line,name,sig}:
+      55,"CodeGenerator.__init__ cc:6","(logic_file:Union[str,Path], config:Optional[GeneratorConfig]=None)"
+      95,"CodeGenerator.project cc:2",() -> ProjectSpec
+      102,"CodeGenerator.generate cc:11","(output_dir:Union[str,Path], modules:Optional[List[str]]=None) -> GenerationResult"
+      167,"CodeGenerator.generate_module cc:5","(module_path:str) -> str"
+      189,"CodeGenerator.generate_class cc:6","(class_name:str, module_path:Optional[str]=None) -> str"
+      210,"CodeGenerator.generate_function cc:6","(func_name:str, module_path:Optional[str]=None) -> str"
+      231,"CodeGenerator._get_output_path cc:3","(output_dir:Path, module_path:str) -> Path"
+      249,"CodeGenerator.summary cc:5",() -> Dict
+      284,"CodeGenerator.list_modules cc:2","() -> List[str]"
+      288,"CodeGenerator.list_classes cc:3","() -> List[str]"
+      296,"CodeGenerator.list_functions cc:3","() -> List[str]"
+  logic2code/renderers.py:
+    functions[15]{line,name,sig}:
+      31,"BaseRenderer.__init__ cc:2","(config:Optional[RenderConfig]=None)"
+      35,BaseRenderer.render_module,"(module:ModuleSpec) -> str"
+      40,BaseRenderer.render_class,"(cls:ClassSpec) -> str"
+      45,BaseRenderer.render_function,"(func:FunctionSpec) -> str"
+      59,"PythonRenderer.render_module cc:7","(module:ModuleSpec) -> str"
+      98,"PythonRenderer._collect_imports cc:24","(module:ModuleSpec) -> str"
+      169,"PythonRenderer._render_constant cc:13","(const:Dict[str,Any]) -> str"
+      193,"PythonRenderer.render_class cc:25","(cls:ClassSpec) -> str"
+      255,"PythonRenderer._render_field cc:5","(fld:Dict[str,Any]) -> str"
+      272,PythonRenderer._render_method,"(method:FunctionSpec) -> str"
+      276,PythonRenderer.render_function,"(func:FunctionSpec) -> str"
+      280,"PythonRenderer._render_function_internal cc:12","(func:FunctionSpec, is_method:bool=False) -> str"
+      323,"PythonRenderer._build_params cc:15","(func:FunctionSpec, is_method:bool) -> List[str]"
+      360,"PythonRenderer._split_params cc:8","(params_str:str) -> List[str]"
+      386,"PythonRenderer.render_init_file cc:6","(modules:List[ModuleSpec]) -> str"
+  logic2code/tests/test_basic.py:
+    functions[5]{line,name,sig}:
+      6,test_import_logic2code,()
+      13,test_import_generator,()
+      20,test_config_defaults,()
+      31,test_generator_config_custom,()
+      45,test_generator_config_llm,()
+  logic2test/cli.py:
+    functions[1]{line,name,sig}:
+      17,"main cc:21",()
+  logic2test/examples/01_quickstart.py:
+    functions[3]{line,name,sig}:
+      17,"example_basic_generation cc:2",()
+      46,example_with_config,()
+      65,"example_generate_all_types cc:4",()
+  logic2test/examples/02_custom_templates.py:
+    functions[4]{line,name,sig}:
+      17,example_function_test,()
+      37,example_class_test,()
+      78,example_dataclass_test,()
+      105,example_async_function_test,()
+  logic2test/generator.py:
+    functions[11]{line,name,sig}:
+      51,"TestGenerator.__init__ cc:2","(logic_file:Union[str,Path], config:Optional[GeneratorConfig]=None)"
+      69,"TestGenerator.project cc:2",() -> ProjectSpec
+      76,"TestGenerator.generate_unit_tests cc:7","(output_dir:Union[str,Path], modules:Optional[List[str]]=None) -> GenerationResult"
+      127,"TestGenerator._generate_module_tests cc:7","(module:ModuleSpec) -> tuple"
+      164,"TestGenerator._generate_class_tests cc:6","(cls:ClassSpec) -> str"
+      201,"TestGenerator._should_test_class cc:7","(cls:ClassSpec) -> bool"
+      219,"TestGenerator._should_test_function cc:9","(func:FunctionSpec) -> bool"
+      241,"TestGenerator._get_test_filename cc:2","(module_path:str) -> str"
+      256,"TestGenerator.generate_integration_tests cc:7","(output_dir:Union[str,Path], entry_points:Optional[List[str]]=None) -> GenerationResult"
+      329,"TestGenerator.generate_property_tests cc:6","(output_dir:Union[str,Path]) -> GenerationResult"
+      398,"TestGenerator.summary cc:7",() -> Dict
+  logic2test/parsers.py:
+    functions[11]{line,name,sig}:
+      62,LogicParser.__init__,"(file_path:Union[str,Path])"
+      68,LogicParser.parse,() -> ProjectSpec
+      73,"LogicParser._detect_and_parse_format cc:5",() -> None
+      86,"LogicParser._parse_yaml cc:4",() -> None
+      97,"LogicParser._parse_yaml_simple cc:17",() -> None
+      140,"LogicParser._parse_toon cc:18",() -> None
+      188,"LogicParser._build_project_spec cc:2",() -> ProjectSpec
+      205,"LogicParser._build_module_spec cc:4","(mod_data:Dict) -> ModuleSpec"
+      232,"LogicParser._build_class_spec cc:6","(cls_data:Dict, module_path:str) -> ClassSpec"
+      257,"LogicParser._build_function_spec cc:2","(func_data:Dict, module_path:str, is_method:bool=False, class_name:Optional[str]=None) -> FunctionSpec"
+      288,"LogicParser._parse_params_from_sig cc:19","(sig:str) -> List[str]"
+  logic2test/templates.py:
+    functions[4]{line,name,sig}:
+      15,"TestTemplate.render_test_file_header cc:5","(module_path:str, imports:List[str]=None) -> str"
+      45,"TestTemplate.render_function_test cc:32","(func_name:str, params:List[str], return_type:Optional[str]=None, docstring:Optional[str]=None, is_async:bool=False, class_name:Optional[str]=None) -> str"
+      152,"TestTemplate.render_class_test cc:14","(class_name:str, bases:List[str], is_dataclass:bool=False, fields:List[dict]=None, docstring:Optional[str]=None) -> str"
+      216,"TestTemplate.render_dataclass_test cc:3","(class_name:str, fields:List[dict]) -> str"
+  logic2test/tests/test_basic.py:
+    functions[4]{line,name,sig}:
+      6,test_import_logic2test,()
+      13,test_import_generator,()
+      20,test_config_defaults,()
+      31,test_generator_config_custom,()
+  lolm/cli.py:
+    functions[11]{line,name,sig}:
+      36,"cmd_status cc:5",(args) -> int
+      79,"cmd_set_provider cc:2",(args) -> int
+      97,cmd_set_model,(args) -> int
+      107,"cmd_key_set cc:3",(args) -> int
+      123,"cmd_key_show cc:4",(args) -> int
+      139,"cmd_models cc:7",(args) -> int
+      159,"cmd_test cc:5",(args) -> int
+      180,"cmd_config_show cc:5",(args) -> int
+      202,cmd_priority_set_provider,(args) -> int
+      215,"cmd_priority_set_mode cc:2",(args) -> int
+      233,"main cc:3",()
+  lolm/clients.py:
+    functions[20]{line,name,sig}:
+      18,"LLMRateLimitError.__init__ cc:2","(message:str, provider:str='', status_code:int=429, headers:dict=None, retry_after:float=None)"
+      27,"LLMRateLimitError.__str__ cc:2",()
+      56,"OpenRouterClient.__init__ cc:3","(api_key:str=None, model:str=None)"
+      67,"OpenRouterClient.generate cc:9","(prompt:str, system:str=None, max_tokens:int=4000) -> str"
+      114,OpenRouterClient.is_available,() -> bool
+      119,OpenRouterClient.list_recommended_models,"() -> List[tuple]"
+      129,"OllamaClient.__init__ cc:3","(model:str=None, host:str=None)"
+      140,"OllamaClient.generate cc:4","(prompt:str, system:str=None, max_tokens:int=4000) -> str"
+      161,"OllamaClient.is_available cc:3",() -> bool
+      171,"OllamaClient.list_models cc:5","() -> List[str]"
+      185,OllamaClient.list_recommended_models,"() -> List[tuple]"
+      195,"LiteLLMClient.__init__ cc:2","(model:str=None)"
+      204,"LiteLLMClient.generate cc:4","(prompt:str, system:str=None, max_tokens:int=4000) -> str"
+      225,LiteLLMClient.is_available,() -> bool
+      236,"GroqClient.__init__ cc:3","(api_key:str=None, model:str=None)"
+      240,"GroqClient.generate cc:8","(prompt:str, system:str=None, max_tokens:int=4000) -> str"
+      283,GroqClient.is_available,() -> bool
+      293,"TogetherClient.__init__ cc:3","(api_key:str=None, model:str=None)"
+      297,"TogetherClient.generate cc:8","(prompt:str, system:str=None, max_tokens:int=4000) -> str"
+      340,TogetherClient.is_available,() -> bool
+  lolm/config.py:
+    functions[14]{line,name,sig}:
+      108,get_config_dir,() -> Path
+      113,get_config_path,() -> Path
+      118,"load_config cc:4",() -> LLMConfig
+      131,save_config,"(config:LLMConfig) -> None"
+      139,"load_env_file cc:20","(search_paths:Optional[List[Path]]=None) -> None"
+      188,"load_litellm_config cc:7","(search_paths:Optional[List[Path]]=None) -> Dict[str, Any]"
+      212,"save_litellm_config cc:3","(config:Dict[str,Any], path:Optional[Path]=None) -> None"
+      225,"get_provider_model cc:4","(provider:str) -> str"
+      253,set_provider_model,"(provider:str, model:str) -> None"
+      260,"get_api_key cc:2","(provider:str) -> Optional[str]"
+      276,"set_api_key cc:8","(provider:str, key:str, env_path:Optional[Path]=None) -> None"
+      319,"get_provider_priorities_from_litellm cc:5","() -> Dict[str, int]"
+      88,LLMConfig.to_dict,"() -> Dict[str, Any]"
+      98,LLMConfig.from_dict,"(data:Dict[str,Any]) -> 'LLMConfig'"
+  lolm/examples/01_quickstart.py:
+    functions[4]{line,name,sig}:
+      11,example_simple_client,()
+      27,"example_specific_provider cc:2",()
+      42,"example_manager cc:3",()
+      67,"example_fallback cc:2",()
+  lolm/examples/02_configuration.py:
+    functions[5]{line,name,sig}:
+      23,"show_defaults cc:3",()
+      34,"show_recommended_models cc:3",()
+      44,"show_current_config cc:5",()
+      64,example_modify_config,()
+      85,"show_environment_config cc:5",()
+  lolm/examples/03_code_generation.py:
+    functions[4]{line,name,sig}:
+      16,generate_function,"(description:str) -> str"
+      34,generate_class,"(description:str) -> str"
+      52,explain_code,"(code:str) -> str"
+      70,review_code,"(code:str) -> str"
+  lolm/manager.py:
+    functions[25]{line,name,sig}:
+      469,"get_client cc:10","(provider:str=None, model:str=None) -> BaseLLMClient"
+      508,"list_available_providers cc:3","() -> List[str]"
+      42,ProviderInfo.__init__,"(name:str, status:LLMProviderStatus, client:Optional[BaseLLMClient]=None, model:str='', priority:int=100)"
+      77,"LLMManager.__init__ cc:2","(verbose:bool=False, enable_rotation:bool=True)"
+      90,"LLMManager.is_available cc:2",() -> bool
+      97,"LLMManager.is_ready cc:2",() -> bool
+      102,"LLMManager.primary_provider cc:4","() -> Optional[BaseLLMClient]"
+      111,LLMManager.providers,"() -> Dict[str, ProviderInfo]"
+      115,"LLMManager.initialize cc:13",() -> None
+      153,"LLMManager._init_openrouter cc:4",() -> None
+      178,"LLMManager._init_ollama cc:3",() -> None
+      198,"LLMManager._init_groq cc:4",() -> None
+      220,"LLMManager._init_together cc:4",() -> None
+      242,"LLMManager._init_litellm cc:3",() -> None
+      262,"LLMManager._get_effective_priority cc:3","(provider:str) -> int"
+      276,"LLMManager._get_priority_order cc:3","() -> List[str]"
+      284,"LLMManager.get_client cc:5","(provider:str=None) -> Optional[BaseLLMClient]"
+      297,"LLMManager.generate cc:3","(prompt:str, system:str=None, max_tokens:int=4000, provider:str=None) -> str"
+      328,"LLMManager.generate_with_fallback cc:12","(prompt:str, system:str=None, max_tokens:int=4000, providers:Optional[List[str]]=None) -> str"
+      388,"LLMManager.generate_with_rotation cc:4","(prompt:str, system:str=None, max_tokens:int=4000, max_retries:int=3) -> str"
+      428,LLMManager.get_rotation_queue,"() -> Optional[RotationQueue]"
+      432,"LLMManager.get_provider_health cc:4","(name:str=None) -> Dict"
+      441,"LLMManager.reset_provider cc:2","(name:str) -> bool"
+      447,"LLMManager.set_provider_priority cc:2","(name:str, priority:int) -> bool"
+      453,"LLMManager.get_status cc:3","() -> Dict[str, Dict]"
+  lolm/provider.py:
+    functions[14]{line,name,sig}:
+      31,"GenerateOptions.to_messages cc:3","() -> List[Dict[str, str]]"
+      68,BaseLLMClient.generate,"(prompt:str, system:str=None, max_tokens:int=4000) -> str"
+      73,BaseLLMClient.is_available,() -> bool
+      77,"BaseLLMClient.chat cc:3","(messages:List[Dict[str,str]], max_tokens:int=4000) -> str"
+      101,LLMProvider.name,() -> str
+      107,LLMProvider.model,() -> str
+      112,~LLMProvider.is_available,() -> bool
+      117,~LLMProvider.list_models,"() -> List[LLMModelInfo]"
+      122,~LLMProvider.generate,"(options:GenerateOptions) -> LLMResponse"
+      126,"~LLMProvider.has_model cc:3","(model_name:str) -> bool"
+      135,"LLMProvider.get_code_models cc:4","(models:List[LLMModelInfo]) -> List[LLMModelInfo]"
+      143,~LLMProvider.close,() -> None
+      147,~LLMProvider.__aenter__,()
+      150,~LLMProvider.__aexit__,()
+  lolm/rotation.py:
+    functions[37]{line,name,sig}:
+      455,"parse_rate_limit_headers cc:16","(headers:Dict[str,str]) -> Optional[RateLimitInfo]"
+      529,"is_rate_limit_error cc:4","(status_code:int=None, error_message:str=None) -> bool"
+      699,"create_rotation_manager cc:3","(providers:Dict[str,Tuple[Any,int]]=None, verbose:bool=False) -> LLMRotationManager"
+      48,"RateLimitInfo.get_wait_seconds cc:3",() -> float
+      94,"ProviderHealth.success_rate cc:2",() -> float
+      100,"ProviderHealth.is_available cc:4",() -> bool
+      108,"ProviderHealth.record_success cc:5","(latency_ms:float=0) -> None"
+      129,"ProviderHealth.record_failure cc:5","(error:str, is_rate_limit:bool=False, rate_limit_info:Optional[RateLimitInfo]=None) -> None"
+      159,"ProviderHealth._adjust_priority cc:3",() -> None
+      186,"ProviderHealth.check_cooldown cc:4",() -> bool
+      196,"ProviderHealth.to_dict cc:2","() -> Dict[str, Any]"
+      238,RotationQueue.__init__,"(max_consecutive_failures:int=3, default_cooldown_seconds:float=60, enable_health_recovery:bool=True)"
+      253,RotationQueue.add_provider,"(name:str, priority:int=100) -> None"
+      262,"RotationQueue.remove_provider cc:2","(name:str) -> bool"
+      270,"RotationQueue.set_priority cc:2","(name:str, priority:int) -> bool"
+      280,"RotationQueue.get_priority_order cc:8","() -> List[str]"
+      304,"RotationQueue.get_next cc:5","() -> Optional[str]"
+      322,"RotationQueue.get_available cc:5","() -> List[str]"
+      336,"RotationQueue.record_success cc:2","(name:str, latency_ms:float=0) -> None"
+      342,"RotationQueue.record_failure cc:10","(name:str, error:str, is_rate_limit:bool=False, rate_limit_info:Optional[RateLimitInfo]=None) -> None"
+      367,"RotationQueue.mark_rate_limited cc:4","(name:str, rate_limit_info:Optional[RateLimitInfo]=None, cooldown_seconds:Optional[float]=None) -> None"
+      390,"RotationQueue.reset_provider cc:2","(name:str) -> bool"
+      403,"RotationQueue.reset_all cc:2",() -> None
+      412,RotationQueue.get_health,"(name:str) -> Optional[ProviderHealth]"
+      417,"RotationQueue.get_all_health cc:2","() -> Dict[str, Dict[str, Any]]"
+      425,"RotationQueue.get_status cc:5","() -> Dict[str, Any]"
+      442,RotationQueue.on_provider_unavailable,"(callback:Callable[Any,None]) -> None"
+      446,RotationQueue.on_rate_limit,"(callback:Callable[Any,None]) -> None"
+      450,RotationQueue.on_rotation,"(callback:Callable[Any,None]) -> None"
+      569,LLMRotationManager.__init__,"(max_retries:int=3, default_cooldown:float=60.0, verbose:bool=False)"
+      579,LLMRotationManager.register,"(name:str, client:Any, priority:int=100) -> None"
+      585,"LLMRotationManager.unregister cc:2","(name:str) -> bool"
+      594,LLMRotationManager.set_priority,"(name:str, priority:int) -> bool"
+      598,"LLMRotationManager.generate cc:12","(prompt:str, system:str=None, max_tokens:int=4000, preferred_provider:str=None) -> str"
+      681,LLMRotationManager.get_queue,() -> RotationQueue
+      685,LLMRotationManager.get_status,"() -> Dict[str, Any]"
+      693,LLMRotationManager.reset,() -> None
+  lolm/tests/test_basic.py:
+    functions[6]{line,name,sig}:
+      6,test_import_lolm,()
+      14,test_import_config,()
+      28,test_import_clients,()
+      41,test_config_defaults,()
+      51,test_manager_init,()
+      61,test_recommended_models,()
+  raport/mermaid-init.js:
+    functions[2]{line,name,sig}:
+      3,convertMermaidCodeBlocks,()
+      18,~renderMermaid,()
+  scripts/configure_llm.py:
+    functions[11]{line,name,sig}:
+      46,log,"(msg:str, level:str='info')"
+      59,"check_ollama cc:6","() -> Dict[str, Any]"
+      95,"check_litellm cc:2","() -> Dict[str, Any]"
+      114,check_env_keys,"() -> Dict[str, bool]"
+      127,"categorize_models cc:10","(models:List[Dict]) -> Dict[str, List[Dict]]"
+      158,"get_recommended_models cc:9","(models:List[Dict]) -> Dict[str, str]"
+      201,"test_model cc:7","(model:str, timeout:int=30) -> Dict[str, Any]"
+      256,save_config,"(config:Dict[str,Any])"
+      268,"load_config cc:2","() -> Dict[str, Any]"
+      276,"format_size cc:3","(size_bytes:int) -> str"
+      285,"main cc:34",()
+  tests/conftest.py:
+    functions[9]{line,name,sig}:
+      14,sample_python_code,() -> str
+      59,sample_javascript_code,() -> str
+      107,sample_java_code,() -> str
+      147,temp_project_dir,()
+      154,sample_project,"(temp_project_dir, sample_python_code)"
+      182,sample_module,()
+      251,sample_project_model,()
+      333,mock_llm_config,()
+      345,sample_analysis_result,()
+  tests/samples/sample_algorithms.py:
+    functions[12]{line,name,sig}:
+      13,"binary_search cc:4","(arr:List[int], target:int) -> int"
+      37,"quicksort cc:8","(arr:List[int]) -> List[int]"
+      57,"merge_sort cc:2","(arr:List[int]) -> List[int]"
+      76,"_merge cc:4","(left:List[int], right:List[int]) -> List[int]"
+      95,"fibonacci cc:2","(n:int) -> int"
+      109,"fibonacci_generator cc:2","(limit:int) -> Generator[int, None, None]"
+      124,"is_prime cc:6","(n:int) -> bool"
+      146,"sieve_of_eratosthenes cc:7","(limit:int) -> List[int]"
+      169,"gcd cc:2","(a:int, b:int) -> int"
+      184,lcm,"(a:int, b:int) -> int"
+      197,"levenshtein_distance cc:5","(s1:str, s2:str) -> int"
+      227,"knapsack_01 cc:5","(weights:List[int], values:List[int], capacity:int) -> int"
+  tests/samples/sample_api.py:
+    functions[11]{line,name,sig}:
+      119,~fetch_user_async,"(api:UserAPI, user_id:int) -> APIResponse"
+      124,~create_user_async,"(api:UserAPI, username:str, email:str) -> APIResponse"
+      129,handle_api_error,(func)
+      34,APIError.__init__,"(message:str, code:int=400)"
+      43,UserAPI.__init__,()
+      47,"UserAPI.create_user cc:5","(username:str, email:str, roles:List[str]=None) -> APIResponse"
+      68,"UserAPI.get_user cc:2","(user_id:int) -> APIResponse"
+      75,"UserAPI.update_user cc:4","(user_id:int) -> APIResponse"
+      88,"UserAPI.delete_user cc:2","(user_id:int) -> APIResponse"
+      96,UserAPI.list_users,"(limit:int=10, offset:int=0) -> APIResponse"
+      109,"UserAPI.search_users cc:4","(query:str) -> APIResponse"
+  tests/samples/sample_async.py:
+    functions[15]{line,name,sig}:
+      144,~async_timer,"(name:str='operation')"
+      154,"~fetch_with_retry cc:5","(url:str, max_retries:int=3, delay:float=1.0) -> Dict[str, Any]"
+      175,"~parallel_map cc:2","(items:List[T], handler, max_concurrent:int=5) -> List[Any]"
+      190,"~race cc:3",() -> Any
+      205,"~timeout_wrapper cc:2","(coro, timeout_seconds:float, default=None)"
+      41,AsyncTaskQueue.__init__,"(max_concurrent:int=5)"
+      47,~AsyncTaskQueue.add_task,"(task:Task) -> None"
+      52,~AsyncTaskQueue.get_task,"(task_id:str) -> Optional[Task]"
+      56,"~AsyncTaskQueue.process_task cc:3","(task_id:str, handler) -> TaskResult"
+      91,"~AsyncTaskQueue.process_all cc:5","(handler) -> List[TaskResult]"
+      109,AsyncCache.__init__,"(ttl_seconds:int=300)"
+      114,"~AsyncCache.get cc:3","(key:str) -> Optional[Any]"
+      124,~AsyncCache.set,"(key:str, value:Any) -> None"
+      129,"~AsyncCache.delete cc:2","(key:str) -> bool"
+      137,~AsyncCache.clear,() -> None
+  tests/samples/sample_class.py:
+    functions[7]{line,name,sig}:
+      19,Calculator.__init__,"(precision:int=2)"
+      28,Calculator.add,"(a:float, b:float) -> float"
+      42,Calculator.subtract,"(a:float, b:float) -> float"
+      56,Calculator.multiply,"(a:float, b:float) -> float"
+      70,"Calculator.divide cc:2","(a:float, b:float) -> Optional[float]"
+      86,Calculator.clear_history,() -> None
+      90,Calculator.get_history,"() -> List[str]"
+  tests/samples/sample_csharp.cs:
+    functions[2]{line,name,sig}:
+      0,FilterActive,(IEnumerable<User> users) -> List<User>
+      0,FindById,"(IEnumerable<User> users, string id) -> User"
+  tests/samples/sample_enum.py:
+    functions[5]{line,name,sig}:
+      42,Color.from_hex,"(hex_code:str) -> \"Color\""
+      64,HttpStatus.is_success,() -> bool
+      69,HttpStatus.is_error,() -> bool
+      81,TaskType.get_timeout,() -> int
+      91,"TaskType.get_allowed_statuses cc:2","() -> List[Status]"
+  tests/samples/sample_functions.py:
+    functions[8]{line,name,sig}:
+      13,calculate_total,"(items:List[int], tax_rate:float=0.1) -> float"
+      27,"filter_by_status cc:3","(records:List[Dict], status:str) -> List[Dict]"
+      40,merge_configs,"(base:Dict[str,Any], override:Dict[str,Any]) -> Dict[str, Any]"
+      55,"validate_email cc:5","(email:str) -> bool"
+      70,"load_json_file cc:2","(path:str) -> Optional[Dict]"
+      86,get_env_or_default,"(key:str, default:str='') -> str"
+      99,"chunk_list cc:2","(items:List[Any], chunk_size:int) -> List[List[Any]]"
+      112,format_currency,"(amount:int, currency:str='USD') -> str"
+  tests/samples/sample_go.go:
+    functions[6]{line,name,sig}:
+      0,NewUserService,()
+      0,GetUser,"(id int) -> (*User, error)"
+      0,CreateUser,"(name, email string) -> (*User, error)"
+      0,CalculateTotal,"(items []OrderItem, taxRate float64) -> int64"
+      0,FilterProducts,"(products []Product, predicate func(Product) -> bool"
+      0,FormatPrice,"(cents int64, currency string) -> string"
+  tests/samples/sample_java.java:
+    functions[3]{line,name,sig}:
+      0,getId,() -> String
+      0,filterActive,(List<User> users) -> List<User>
+      0,sortByName,(List<User> users) -> List<User>
+  tests/samples/sample_javascript.js:
+    functions[12]{line,name,sig}:
+      91,calculateTotal,(items)
+      102,filterBy,"(arr, predicate)"
+      111,~fetchData,(url)
+      130,debounce,"(func, wait)"
+      143,deepClone,(obj)
+      16,User.constructor,"(id, name, email)"
+      28,User.getDisplayName,()
+      35,User.deactivate,()
+      50,Product.constructor,"(sku, name, price)"
+      62,Product.addTags,()
+      70,Product.isInStock,()
+      79,Product.formatPrice,()
+  tests/samples/sample_javascript_advanced.js:
+    functions[18]{line,name,sig}:
+      12,getArg,"(name, def)"
+      19,processItem,(item)
+      24,validate,(input)
+      30,~fetchResource,"(url, options)"
+      36,shouldIgnore,(filePath)
+      41,formatOutput,"(data, indent)"
+      46,walk,"(dir, onFile)"
+      56,findFiles,"(dir, extensions)"
+      76,~processFiles,(pattern)
+      111,outerFunction,(data)
+      122,main,()
+      59,traverse,(currentDir)
+      112,middleHelper,(items)
+      113,innerSort,"(a, b)"
+      86,FileProcessor.constructor,(rootDir)
+      92,~FileProcessor.analyze,(filePath)
+      100,FileProcessor.fromConfig,(configPath)
+      105,FileProcessor.getResults,()
+  tests/samples/sample_pydantic.py:
+    functions[5]{line,name,sig}:
+      39,"Task.name_not_empty cc:2","(v:str) -> str"
+      52,"TaskQueue.add_task cc:2","(task:Task) -> bool"
+      59,"TaskQueue.get_pending cc:3","() -> List[Task]"
+      63,"TaskQueue.get_by_status cc:3","(status:TaskStatus) -> List[Task]"
+      76,"Project.total_tasks cc:2",() -> int
+  tests/samples/sample_reexport/utils.py:
+    functions[2]{line,name,sig}:
+      6,"process_data cc:3","(data:Dict[str,Any]) -> Dict[str, Any]"
+      11,"validate_input cc:3","(data:Dict[str,Any]) -> bool"
+  tests/samples/sample_rust.rs:
+    functions[19]{line,name,sig}:
+      0,fmt,"(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result"
+      0,id,"(&self) -> Self::Id;"
+      0,id,"(&self) -> Self::Id"
+      0,id,"(&self) -> Self::Id"
+      0,new,() -> Self
+      0,add,"(&mut self, item: T)"
+      0,get,"(&self, id: &str) -> Option<&T>"
+      0,get_all,(&self) -> Vec<&T>
+      0,delete,"(&mut self, id: &str) -> bool"
+      0,count,(&self) -> usize
+      0,create_user,"(id: u64, name: &str, email: &str) -> User"
+      0,calculate_order_total,"(items: &[OrderItem]) -> f64"
+      0,validate_email,"(email: &str) -> Result<()>"
+      0,process_order,"(mut order: Order) -> Result<Order>"
+      0,test_create_user,()
+      0,test_calculate_order_total,()
+      0,test_validate_email,()
+      0,User.id,"(&self) -> Self::Id"
+      0,Order.id,"(&self) -> Self::Id"
+  tests/samples/sample_sql.sql:
+    functions[2]{line,name,sig}:
+      0,calculate_order_total,()
+      0,update_order_total,()
+  tests/samples/sample_sql_dsl.py:
+    functions[22]{line,name,sig}:
+      219,select,"(table:str) -> QueryBuilder"
+      224,insert,"(table:str) -> InsertBuilder"
+      229,update,"(table:str) -> UpdateBuilder"
+      41,"Condition.to_sql cc:6",() -> str
+      61,Join.to_sql,() -> str
+      69,QueryBuilder.__init__,"(table:str)"
+      79,"QueryBuilder.select cc:2","() -> \"QueryBuilder\""
+      84,"QueryBuilder.where cc:2","(column:str, operator:Union[SQLOperator,str], value:Any=None) -> \"QueryBuilder\""
+      91,QueryBuilder.join,"(table:str, on_left:str, on_right:str, join_type:JoinType=JoinType.INNER) -> \"QueryBuilder\""
+      96,QueryBuilder.order_by,"() -> \"QueryBuilder\""
+      101,QueryBuilder.group_by,"() -> \"QueryBuilder\""
+      106,QueryBuilder.limit,"(count:int) -> \"QueryBuilder\""
+      111,QueryBuilder.offset,"(count:int) -> \"QueryBuilder\""
+      116,"QueryBuilder.build cc:8",() -> str
+      146,InsertBuilder.__init__,"(table:str)"
+      151,InsertBuilder.columns,"() -> \"InsertBuilder\""
+      156,InsertBuilder.values,"() -> \"InsertBuilder\""
+      161,"InsertBuilder.build cc:5",() -> str
+      183,UpdateBuilder.__init__,"(table:str)"
+      188,UpdateBuilder.set,"(column:str, value:Any) -> \"UpdateBuilder\""
+      193,UpdateBuilder.where,"(column:str, operator:SQLOperator, value:Any=None) -> \"UpdateBuilder\""
+      198,"UpdateBuilder.build cc:6",() -> str
+  tests/samples/sample_ts_reexport/math.ts:
+    functions[2]{line,name,sig}:
+      3,add,"(a: number, b: number) -> number"
+      7,multiply,"(a: number, b: number) -> number"
+  tests/samples/sample_typescript.ts:
+    functions[11]{line,name,sig}:
+      43,createUser,"(id: number, name: string, email: string) -> User"
+      53,calculateOrderTotal,"(items: OrderItem[]) -> number"
+      57,filterByStatus,"(items: T[], status: string) -> T[]"
+      61,groupBy,"(items: T[], key: K) -> Map<T[K], T[]>"
+      73,~fetchUser,"(id: number) -> Promise<Result<User>>"
+      86,~processOrder,"(order: Order) -> Promise<Result<Order>>"
+      105,Repository.add,"(item: T) -> void"
+      109,Repository.get,"(id: T['id']) -> Nullable<T>"
+      113,Repository.getAll,"() -> T[]"
+      117,Repository.delete,"(id: T['id']) -> boolean"
+      121,Repository.count,() -> number
+  tests/test_analyzer.py:
+    functions[16]{line,name,sig}:
+      16,TestProjectAnalyzer.test_init,(temp_project_dir)
+      25,TestProjectAnalyzer.test_init_with_verbose,"(temp_project_dir, capsys)"
+      32,TestProjectAnalyzer.test_analyze_returns_project_info,(sample_project)
+      41,"TestProjectAnalyzer.test_analyze_finds_source_files cc:4",(sample_project)
+      52,"TestProjectAnalyzer.test_ignores_non_source_files cc:2",(temp_project_dir)
+      67,"TestProjectAnalyzer.test_ignores_common_dirs cc:2",(temp_project_dir)
+      91,"TestProjectAnalyzer.test_analyze_extracts_functions cc:4",(temp_project_dir)
+      115,"TestProjectAnalyzer.test_analyze_extracts_classes cc:3",(temp_project_dir)
+      140,"TestProjectAnalyzer.test_analyze_extracts_imports cc:3",(temp_project_dir)
+      160,"TestProjectAnalyzer.test_analyze_counts_lines cc:3",(temp_project_dir)
+      178,TestProjectAnalyzer.test_analyze_empty_project,(temp_project_dir)
+      187,"TestProjectAnalyzer.test_detect_entrypoints cc:2",(temp_project_dir)
+      199,TestProjectAnalyzer.test_get_statistics,(sample_project)
+      211,TestProjectAnalyzer.test_language_detection,(temp_project_dir)
+      226,TestAnalyzeProjectFunction.test_analyze_project,(sample_project)
+      237,"TestGetLibraryStatus.test_get_library_status cc:2",()
+  tests/test_e2e_projects.py:
+    functions[6]{line,name,sig}:
+      14,_repo_root,() -> Path
+      18,_copy_example_sample_project,"(tmp_path:Path) -> Path"
+      25,_write_code2logic_compact_yaml,"(project_dir:Path, out_file:Path) -> None"
+      31,test_e2e_pipeline_code2logic_logic2test_logic2code,"(tmp_path:Path) -> None"
+      72,"test_e2e_logic2test_on_examples_input cc:2","(tmp_path:Path) -> None"
+      85,test_e2e_logic2code_on_examples_input,"(tmp_path:Path) -> None"
+  tests/test_error_handling.py:
+    functions[29]{line,name,sig}:
+      34,error_handler,()
+      40,strict_handler,()
+      46,temp_project,(tmp_path)
+      71,"TestFilesystemErrors.test_file_not_found cc:2",(error_handler)
+      80,"TestFilesystemErrors.test_permission_denied cc:2","(error_handler, tmp_path)"
+      94,"TestFilesystemErrors.test_file_too_large cc:2",(tmp_path)
+      107,"TestFilesystemErrors.test_binary_file_detection cc:2","(error_handler, tmp_path)"
+      117,TestFilesystemErrors.test_encoding_fallback,"(error_handler, tmp_path)"
+      129,TestFilesystemErrors.test_empty_file,"(error_handler, tmp_path)"
+      147,"TestParsingErrors.test_syntax_error_in_python cc:2","(error_handler, tmp_path)"
+      169,"TestParsingErrors.test_deeply_nested_code cc:2",(error_handler)
+      179,TestParsingErrors.test_unsupported_language,(error_handler)
+      199,TestGenerationErrors.test_yaml_with_special_characters,(temp_project)
+      216,TestGenerationErrors.test_json_with_unicode,(temp_project)
+      232,"TestGenerationErrors.test_write_to_readonly_location cc:3","(error_handler, tmp_path)"
+      251,TestGenerationErrors.test_write_creates_directories,"(error_handler, tmp_path)"
+      269,TestErrorHandlerModes.test_lenient_mode_continues,(tmp_path)
+      281,TestErrorHandlerModes.test_strict_mode_stops,(tmp_path)
+      292,TestErrorHandlerModes.test_silent_mode_no_logging,"(tmp_path, caplog)"
+      301,"TestErrorHandlerModes.test_critical_error_stops_all_modes cc:2",()
+      323,TestIntegration.test_mixed_valid_invalid_files,(tmp_path)
+      349,TestIntegration.test_nested_folders_with_errors,(tmp_path)
+      369,"TestIntegration.test_large_project_resilience cc:2",(tmp_path)
+      393,TestAnalysisResult.test_result_summary,()
+      412,TestAnalysisResult.test_error_to_dict,()
+      438,TestEdgeCases.test_very_long_lines,(tmp_path)
+      449,"TestEdgeCases.test_many_functions cc:2",(tmp_path)
+      461,TestEdgeCases.test_deeply_nested_classes,(tmp_path)
+      477,TestEdgeCases.test_circular_imports_reference,(tmp_path)
+  tests/test_formats.py:
+    functions[41]{line,name,sig}:
+      50,sample_code,()
+      87,sample_project,"(tmp_path, sample_code)"
+      109,samples_project,()
+      115,rust_sample_project,(tmp_path)
+      149,get_generator,"(fmt:str)"
+      164,"generate_output cc:6","(generator, project, detail='standard')"
+      473,test_function_logic_toon_js_does_not_default_return_type_to_none,(tmp_path)
+      190,TestAllFormatsGeneration.test_format_generates_output,"(sample_project, fmt)"
+      199,"TestAllFormatsGeneration.test_format_contains_class_info cc:3","(sample_project, fmt)"
+      209,"TestAllFormatsGeneration.test_format_contains_function_info cc:2","(sample_project, fmt)"
+      220,"TestRustSupport.test_rust_parsing_finds_top_level_and_impl_methods cc:9",(rust_sample_project)
+      237,"TestRustSupport.test_rust_shows_up_in_toon_and_function_logic cc:2",(rust_sample_project)
+      251,TestFormatValidation.test_yaml_validation_valid,(sample_project)
+      259,TestFormatValidation.test_yaml_validation_invalid,()
+      264,TestFormatValidation.test_json_validation_valid,(sample_project)
+      272,TestFormatValidation.test_json_validation_invalid,()
+      277,TestFormatValidation.test_logicml_validation_valid,(sample_project)
+      285,TestFormatValidation.test_markdown_validation_valid,(sample_project)
+      298,"TestFormatEfficiency.test_format_sizes cc:3",(sample_project)
+      315,TestFormatEfficiency.test_logicml_compression,(sample_project)
+      327,"TestDetailLevels.test_detail_levels_ordering cc:2","(sample_project, fmt)"
+      349,TestYAMLSpecifics.test_yaml_parseable,(sample_project)
+      358,"TestYAMLSpecifics.test_yaml_includes_imports cc:2",(sample_project)
+      369,"TestJSONSpecifics.test_json_parseable cc:2",(sample_project)
+      378,"TestJSONSpecifics.test_json_structure cc:2",(sample_project)
+      390,TestLogicMLSpecifics.test_logicml_has_signatures,(sample_project)
+      397,TestLogicMLSpecifics.test_logicml_has_async_markers,(samples_project)
+      404,TestLogicMLSpecifics.test_logicml_token_estimate,(sample_project)
+      415,"TestGherkinSpecifics.test_gherkin_has_feature cc:2",(sample_project)
+      422,TestGherkinSpecifics.test_gherkin_has_scenarios,(sample_project)
+      429,"TestGherkinSpecifics.test_gherkin_has_steps cc:3",(sample_project)
+      441,TestTOONSpecifics.test_toon_array_syntax,(sample_project)
+      449,TestTOONSpecifics.test_toon_tabular_syntax,(sample_project)
+      457,"TestTOONSpecifics.test_toon_minimal_quoting cc:2",(sample_project)
+      465,TestTOONSpecifics.test_toon_with_tabs,(sample_project)
+      489,TestCSVSpecifics.test_csv_has_header,(sample_project)
+      497,TestCSVSpecifics.test_csv_consistent_columns,(sample_project)
+      511,TestCompactSpecifics.test_compact_is_small,(sample_project)
+      518,"TestCompactSpecifics.test_compact_has_summary cc:2",(sample_project)
+      534,"TestCrossFormatEquivalence.test_all_formats_have_project_name cc:5",(sample_project)
+      547,"TestCrossFormatEquivalence.test_all_formats_have_module_info cc:4",(sample_project)
+  tests/test_generators.py:
+    functions[15]{line,name,sig}:
+      18,sample_project,()
+      113,TestMarkdownGenerator.test_generate_basic,(sample_project)
+      122,TestMarkdownGenerator.test_generate_includes_modules,(sample_project)
+      130,TestMarkdownGenerator.test_generate_includes_classes,(sample_project)
+      138,TestMarkdownGenerator.test_generate_includes_functions,(sample_project)
+      146,TestMarkdownGenerator.test_generate_includes_entrypoints,(sample_project)
+      153,TestMarkdownGenerator.test_detail_levels,(sample_project)
+      169,TestCompactGenerator.test_generate_basic,(sample_project)
+      178,TestCompactGenerator.test_generate_includes_hubs,(sample_project)
+      186,TestCompactGenerator.test_compact_is_smaller,(sample_project)
+      200,TestJSONGenerator.test_generate_valid_json,(sample_project)
+      208,TestJSONGenerator.test_generate_structure,(sample_project)
+      220,"TestJSONGenerator.test_generate_modules cc:3",(sample_project)
+      234,"TestJSONGenerator.test_generate_functions cc:3",(sample_project)
+      248,"TestJSONGenerator.test_generate_classes cc:3",(sample_project)
+  tests/test_intent.py:
+    functions[34]{line,name,sig}:
+      12,"make_function cc:2","(name, params=None, complexity=1, lines=5, docstring=None)"
+      33,"make_class cc:3","(name, methods=None, bases=None)"
+      47,"make_module cc:4","(name, path, functions=None, classes=None, imports=None, lines_total=10)"
+      64,"make_project cc:2","(name, modules)"
+      84,TestIntentAnalyzer.test_init,()
+      93,TestIntentAnalyzer.test_extract_keywords,()
+      107,TestIntentAnalyzer.test_calculate_intent_confidence,()
+      123,TestIntentAnalyzer.test_identify_target_module,(sample_project_model)
+      132,TestIntentAnalyzer.test_identify_target_function,(sample_project_model)
+      146,TestIntentAnalyzer.test_identify_target_class,(sample_project_model)
+      160,TestIntentAnalyzer.test_identify_target_project,(sample_project_model)
+      169,TestIntentAnalyzer.test_generate_description,()
+      179,"TestIntentAnalyzer.test_generate_suggestions_refactor cc:2",()
+      187,"TestIntentAnalyzer.test_generate_suggestions_analyze cc:2",()
+      195,"TestIntentAnalyzer.test_generate_suggestions_optimize cc:2",()
+      203,"TestIntentAnalyzer.test_analyze_intent_refactor cc:3",(sample_project_model)
+      221,"TestIntentAnalyzer.test_analyze_intent_analyze cc:3",(sample_project_model)
+      234,"TestIntentAnalyzer.test_analyze_intent_optimize cc:3",(sample_project_model)
+      247,"TestIntentAnalyzer.test_analyze_intent_multiple cc:2",(sample_project_model)
+      262,"TestIntentAnalyzer.test_analyze_intent_sorting cc:2",(sample_project_model)
+      275,"TestIntentAnalyzer.test_detect_code_smells_long_module cc:4",()
+      294,"TestIntentAnalyzer.test_detect_code_smells_complex_function cc:4",()
+      316,"TestIntentAnalyzer.test_detect_code_smells_large_class cc:5",()
+      339,"TestIntentAnalyzer.test_detect_code_smells_too_many_imports cc:5",()
+      361,"TestIntentAnalyzer.test_suggest_refactoring_module cc:3",(sample_project_model)
+      374,"TestIntentAnalyzer.test_suggest_refactoring_class cc:4",(sample_project_model)
+      388,"TestIntentAnalyzer.test_suggest_refactoring_function cc:3",(sample_project_model)
+      402,TestIntentAnalyzer.test_find_target_object_module,(sample_project_model)
+      413,TestIntentAnalyzer.test_find_target_object_function,(sample_project_model)
+      427,TestIntentAnalyzer.test_find_target_object_class,(sample_project_model)
+      441,TestIntentAnalyzer.test_find_target_object_not_found,(sample_project_model)
+      449,"TestIntentAnalyzer.test_suggest_module_refactoring cc:3",()
+      467,"TestIntentAnalyzer.test_suggest_class_refactoring cc:4",()
+      485,"TestIntentAnalyzer.test_suggest_function_refactoring cc:5",()
+  tests/test_llm_priority.py:
+    functions[3]{line,name,sig}:
+      10,_write_user_llm_config,"(tmp_path:Path, data:dict) -> Path"
+      18,test_get_client_auto_prefers_override_provider_on_tie,"(tmp_path:Path, monkeypatch:Any)"
+      45,test_get_client_auto_model_first_uses_model_priority,"(tmp_path:Path, monkeypatch:Any)"
+  tests/test_llm_profiler.py:
+    functions[42]{line,name,sig}:
+      33,TestLLMProfile.test_profile_creation,()
+      45,TestLLMProfile.test_profile_id_consistency,()
+      52,TestLLMProfile.test_profile_defaults,()
+      63,TestLLMProfile.test_profile_custom_values,()
+      83,TestDefaultProfiles.test_gpt4_profile,()
+      90,TestDefaultProfiles.test_gpt4_turbo_profile,()
+      97,TestDefaultProfiles.test_claude_profile,()
+      104,TestDefaultProfiles.test_qwen_coder_profile,()
+      112,TestDefaultProfiles.test_deepseek_profile,()
+      119,TestDefaultProfiles.test_llama_70b_profile,()
+      126,TestDefaultProfiles.test_llama_7b_profile,()
+      133,TestDefaultProfiles.test_mistral_profile,()
+      140,TestDefaultProfiles.test_unknown_model_profile,()
+      152,TestProfileStorage.test_save_and_load_profile,(tmp_path)
+      176,TestProfileStorage.test_load_empty_profiles,(tmp_path)
+      184,TestProfileStorage.test_get_profile,(tmp_path)
+      196,TestProfileStorage.test_get_nonexistent_profile,(tmp_path)
+      204,TestProfileStorage.test_get_or_create_profile_existing,(tmp_path)
+      219,TestProfileStorage.test_get_or_create_profile_new,(tmp_path)
+      233,TestAdaptiveChunker.test_chunker_creation,()
+      248,TestAdaptiveChunker.test_chunker_default_profile,()
+      256,TestAdaptiveChunker.test_chunk_small_spec,()
+      271,"TestAdaptiveChunker.test_chunk_large_spec cc:3",()
+      290,TestAdaptiveChunker.test_chunk_format_adjustment,()
+      311,TestAdaptiveChunker.test_recommend_format_small_spec,()
+      325,TestAdaptiveChunker.test_recommend_format_large_spec,()
+      339,TestAdaptiveChunker.test_estimate_chunks_needed,()
+      356,TestLLMProfiler.test_profiler_creation,()
+      367,TestLLMProfiler.test_profiler_with_unknown_client,()
+      376,TestLLMProfiler.test_code_to_spec,()
+      396,TestLLMProfiler.test_extract_code_with_block,()
+      414,TestLLMProfiler.test_extract_code_without_block,()
+      424,TestLLMProfiler.test_check_syntax_valid,()
+      432,TestLLMProfiler.test_check_syntax_invalid,()
+      440,TestLLMProfiler.test_calculate_similarity,()
+      457,TestLLMProfiler.test_run_profile_quick,(tmp_path)
+      475,TestLLMProfiler.test_metrics_calculation,()
+      513,TestProfileTestCases.test_test_cases_exist,()
+      517,"TestProfileTestCases.test_test_cases_valid_python cc:3",()
+      525,"TestProfileTestCases.test_test_cases_have_functions_or_classes cc:3",()
+      534,TestConvenienceFunctions.test_get_adaptive_chunker,()
+      542,TestConvenienceFunctions.test_profile_llm_function,(tmp_path)
+  tests/test_parser_integrity.py:
+    functions[33]{line,name,sig}:
+      17,"parser cc:2",()
+      23,parse_python,"(parser, code:str)"
+      288,parse_js,"(parser, code:str)"
+      31,TestFunctionNameExtraction.test_function_name_not_truncated,(parser)
+      42,"TestFunctionNameExtraction.test_multiple_function_names cc:2",(parser)
+      63,"TestSignatureParsing.test_signature_with_types cc:2",(parser)
+      77,TestSignatureParsing.test_signature_with_defaults,(parser)
+      90,TestClassNameIntegrity.test_class_name_no_whitespace,(parser)
+      103,"TestClassNameIntegrity.test_class_with_bases cc:2",(parser)
+      118,"TestImportParsing.test_import_from_statement cc:4",(parser)
+      136,"TestImportParsing.test_no_duplicate_imports cc:3",(parser)
+      152,"TestExportsCompleteness.test_exports_complete cc:3",(parser)
+      177,"TestDocstringTruncation.test_long_docstring_truncated cc:2",(parser)
+      205,"TestUnicodeHandling.test_unicode_in_docstring cc:3",(parser)
+      221,"TestNestedClassMethods.test_class_methods cc:2",(parser)
+      243,"TestDecoratorCapture.test_decorators_captured cc:2",(parser)
+      270,"TestLargeFileHandling.test_many_functions cc:2",(parser)
+      296,"TestJavaScriptFunctionExtraction.test_regular_function_declaration cc:2",(parser)
+      302,"TestJavaScriptFunctionExtraction.test_async_function_declaration cc:3",(parser)
+      308,"TestJavaScriptFunctionExtraction.test_const_arrow_function cc:4",(parser)
+      316,"TestJavaScriptFunctionExtraction.test_let_arrow_function cc:2",(parser)
+      322,"TestJavaScriptFunctionExtraction.test_var_arrow_function cc:2",(parser)
+      328,"TestJavaScriptFunctionExtraction.test_const_function_expression cc:2",(parser)
+      334,"TestJavaScriptFunctionExtraction.test_var_function_expression cc:2",(parser)
+      340,"TestJavaScriptFunctionExtraction.test_iife_named_function cc:2",(parser)
+      346,"TestJavaScriptFunctionExtraction.test_nested_function_in_body cc:2",(parser)
+      361,"TestJavaScriptFunctionExtraction.test_deeply_nested_functions cc:2",(parser)
+      378,TestJavaScriptFunctionExtraction.test_module_exports_shorthand,(parser)
+      387,TestJavaScriptFunctionExtraction.test_commonjs_require_imports,(parser)
+      393,"TestJavaScriptFunctionExtraction.test_class_with_methods cc:2",(parser)
+      415,TestJavaScriptFunctionExtraction.test_export_clause,(parser)
+      424,"TestJavaScriptFunctionExtraction.test_no_duplicate_functions cc:3",(parser)
+      437,"TestMethodSignatureIntegrity.test_init_signature cc:4",(parser)
+  tests/test_reproduction.py:
+    functions[23]{line,name,sig}:
+      31,"TestYAMLGenerator.test_yaml_basic cc:2",()
+      40,"TestYAMLGenerator.test_yaml_includes_classes cc:2",()
+      49,"TestYAMLGenerator.test_yaml_includes_functions cc:2",()
+      62,"TestGherkinGenerator.test_gherkin_basic cc:2",()
+      71,"TestGherkinGenerator.test_gherkin_has_scenarios cc:2",()
+      83,TestMarkdownGenerator.test_markdown_basic,()
+      92,"TestMarkdownGenerator.test_markdown_has_yaml_section cc:2",()
+      105,TestReproductionMetrics.test_metrics_basic,()
+      116,TestReproductionMetrics.test_metrics_identical_code,()
+      128,TestReproductionMetrics.test_metrics_different_code,()
+      143,TestChunkedReproduction.test_estimate_tokens,()
+      151,TestChunkedReproduction.test_get_llm_limit,()
+      158,TestChunkedReproduction.test_chunk_yaml_spec,()
+      175,TestChunkedReproduction.test_chunk_gherkin_spec,()
+      199,TestProjectAnalysis.test_analyze_samples,()
+      207,"TestProjectAnalysis.test_analyze_detects_classes cc:2",()
+      214,"TestProjectAnalysis.test_analyze_detects_functions cc:2",()
+      225,TestLogicMLGenerator.test_logicml_basic,()
+      234,"TestLogicMLGenerator.test_logicml_includes_classes cc:2",()
+      242,TestLogicMLGenerator.test_logicml_includes_signatures,()
+      250,TestLogicMLGenerator.test_logicml_convenience_function,()
+      262,"TestFormatComparison.test_yaml_compact cc:2",()
+      274,TestFormatComparison.test_all_formats_produce_output,()
+  tests/test_shared_utils.py:
+    functions[47]{line,name,sig}:
+      27,"TestCompactImports.test_groups_submodules cc:2",()
+      35,TestCompactImports.test_preserves_standalone,()
+      41,"TestCompactImports.test_limits_output cc:2",()
+      47,TestCompactImports.test_handles_empty,()
+      51,TestCompactImports.test_skips_module_module_duplicates,()
+      62,"TestDeduplicateImports.test_removes_base_when_specific_exists cc:3",()
+      71,TestDeduplicateImports.test_handles_empty,()
+      79,TestAbbreviateType.test_simple_types,()
+      86,TestAbbreviateType.test_complex_types,()
+      91,TestAbbreviateType.test_optional_type,()
+      97,TestAbbreviateType.test_preserves_unknown,()
+      101,TestAbbreviateType.test_handles_empty,()
+      110,TestExpandType.test_expands_abbreviated,()
+      115,TestExpandType.test_handles_empty,()
+      123,TestBuildSignature.test_removes_self_by_default,()
+      129,TestBuildSignature.test_includes_self_when_requested,()
+      134,TestBuildSignature.test_removes_cls,()
+      140,TestBuildSignature.test_abbreviates_types,()
+      146,"TestBuildSignature.test_truncates_params cc:2",()
+      152,TestBuildSignature.test_includes_return_type,()
+      157,TestBuildSignature.test_no_return_type,()
+      166,TestRemoveSelfFromParams.test_removes_self,()
+      172,TestRemoveSelfFromParams.test_removes_cls,()
+      177,TestRemoveSelfFromParams.test_removes_typed_self,()
+      187,TestCategorizeFunction.test_read_category,()
+      194,TestCategorizeFunction.test_create_category,()
+      200,TestCategorizeFunction.test_update_category,()
+      205,TestCategorizeFunction.test_delete_category,()
+      210,TestCategorizeFunction.test_handles_method_names,()
+      214,TestCategorizeFunction.test_returns_other_for_unknown,()
+      223,TestExtractDomain.test_extracts_known_domain,()
+      228,TestExtractDomain.test_handles_windows_paths,()
+      232,TestExtractDomain.test_returns_parent_for_unknown,()
+      241,"TestComputeHash.test_returns_hex_string cc:2",()
+      246,TestComputeHash.test_respects_length,()
+      251,TestComputeHash.test_same_input_same_hash,()
+      257,TestComputeHash.test_different_input_different_hash,()
+      267,TestTruncateDocstring.test_truncates_long,()
+      273,TestTruncateDocstring.test_preserves_short,()
+      279,TestTruncateDocstring.test_removes_markers,()
+      285,TestTruncateDocstring.test_stops_at_sentence_end,()
+      291,TestTruncateDocstring.test_handles_empty,()
+      300,TestEscapeForYaml.test_removes_newlines,()
+      305,"TestEscapeForYaml.test_quotes_special_chars cc:2",()
+      310,TestEscapeForYaml.test_handles_empty,()
+      318,TestCleanIdentifier.test_removes_whitespace,()
+      323,TestCleanIdentifier.test_handles_empty,()
+  tests/test_yaml_compact.py:
+    functions[11]{line,name,sig}:
+      20,sample_project,()
+      81,TestYAMLShortKeys.test_short_keys_in_module,(sample_project)
+      95,TestYAMLShortKeys.test_short_keys_in_class,(sample_project)
+      111,"TestSelfRemoval.test_no_self_in_signature cc:4",(sample_project)
+      128,"TestImportDeduplication.test_typing_grouped cc:4",(sample_project)
+      145,TestEmptyFieldsOmitted.test_empty_bases_omitted,(sample_project)
+      153,TestEmptyFieldsOmitted.test_empty_decorators_omitted,(sample_project)
+      165,"TestMetaLegend.test_meta_legend_structure cc:2",(sample_project)
+      194,TestMetaLegend.test_meta_legend_in_output,(sample_project)
+      210,"TestCompactSizeReduction.test_compact_smaller_for_large_projects cc:2",()
+      232,"TestDocstringTruncation.test_class_docstring_truncated cc:2",(sample_project)

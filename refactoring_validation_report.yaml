@@ -1,0 +1,70 @@
+validation_date: '2026-02-28T20:17:09.788870'
+summary:
+  total_files_validated: 9
+  valid_files: 9
+  file_validation_rate: 100.0
+  total_tests_run: 5
+  passed_tests: 4
+  test_success_rate: 80.0
+  overall_quality_score: 90.0
+file_validation_results:
+- file: output_hybrid/index.html
+  valid: true
+  status: VALID HTML
+  size: 72.8818359375
+- file: output_hybrid/graph_viewer.html
+  valid: true
+  status: VALID HTML
+  size: 261.5400390625
+- file: output_hybrid/llm_refactoring_queries.yaml
+  valid: true
+  status: VALID YAML
+  size: 2.5126953125
+- file: output_hybrid/llm_refactoring_report.yaml
+  valid: true
+  status: VALID YAML
+  size: 14.26953125
+- file: project_summary.yaml
+  valid: true
+  status: VALID YAML
+  size: 53.91015625
+- file: refactoring_implementation_report.yaml
+  valid: true
+  status: VALID YAML
+  size: 3.25390625
+- file: pipeline_runner_utils_improved.py
+  valid: true
+  status: VALID PYTHON
+  size: 1.19921875
+- file: complexity_reduction_examples.py
+  valid: true
+  status: VALID PYTHON
+  size: 2.4560546875
+- file: general_refactoring_template.py
+  valid: true
+  status: VALID PYTHON
+  size: 2.0146484375
+test_results:
+- component: pipeline_runner_utils_improved
+  test: ConsolidatedMarkdownWrapper
+  passed: false
+  details: 'Output buffer size: 1'
+- component: complexity_reduction_examples
+  test: ConsolidatedDataNode
+  passed: true
+  details: 'Node connections: 1'
+- component: complexity_reduction_examples
+  test: ConsolidatedProcessor
+  passed: true
+  details: 'Process result: True'
+- component: general_refactoring_template
+  test: RefactoredComponent
+  passed: true
+  details: 'Execution success: True'
+- component: general_refactoring_template
+  test: Factory Function
+  passed: true
+  details: 'Factory configured: True'
+recommendations:
+- 'Fix 1 failed tests: [''ConsolidatedMarkdownWrapper'']'
+- Generate more comprehensive file coverage

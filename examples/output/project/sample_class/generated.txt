@@ -1,0 +1,19 @@
+""" Sample file with a class for reproduction testing.  This file contains a class with methods to test if code2logic can accurately reproduce class-based code. """
+
+from typing import List, Dict, Optional, Any
+
+class Calculator:
+    def __init__(self, precision: int = 2):
+        pass
+    def add(self, a: float, b: float) -> float:
+        pass
+    def subtract(self, a: float, b: float) -> float:
+        pass
+    def multiply(self, a: float, b: float) -> float:
+        pass
+    def divide(self, a: float, b: float) -> Optional[float]:
+        pass
+    def clear_history(self) -> None:
+        pass
+    def get_history(self) -> List[str]:
+        pass

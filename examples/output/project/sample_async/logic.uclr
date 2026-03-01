@@ -1,0 +1,19 @@
+# UCLR: tests/samples/sample_async.py
+# Lang: python
+# Doc:   import asyncio from typing import List, Dict, Optional, Any, TypeVar from dataclasses import datac
+
+@dataclass
+@class  TaskResult
+  .task_id: str
+  .success: bool
+  .data: Optional[Any] = None
+  .error: Optional[str] = None
+  .duration_ms: float = 0.0
+
+@class  AsyncTaskQueue
+@method  __init__(max_concurrent: int = 5)
+
+
+@class  AsyncCache
+@method  __init__(ttl_seconds: int = 300)
+

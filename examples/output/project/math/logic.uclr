@@ -1,0 +1,6 @@
+# UCLR: tests/samples/sample_ts_reexport/math.ts
+# Lang: typescript
+
+@func  add(a: number, b: number) -> n
+
+@func  multiply(a: number, b: number) -> n

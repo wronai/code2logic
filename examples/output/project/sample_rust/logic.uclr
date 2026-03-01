@@ -1,0 +1,31 @@
+# UCLR: tests/samples/sample_rust.rs
+# Lang: rust
+
+@imports
+  use std::collections::HashMap;
+  use std::fmt;
+  use super::*;
+
+@struct  User
+
+@struct  Product
+
+@struct  Order
+
+@struct  OrderItem
+
+@struct  Repository
+
+@enum OrderStatus
+
+@enum AppError
+
+@interface  Entity
+
+@func  create_user()
+
+@func  calculate_order_total()
+
+@func  validate_email()
+
+@func  process_order()

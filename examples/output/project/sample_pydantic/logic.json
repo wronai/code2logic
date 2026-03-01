@@ -1,0 +1,258 @@
+{
+  "source_file": "tests/samples/sample_pydantic.py",
+  "source_language": "python",
+  "source_hash": "b57c0f311271",
+  "module_doc": " Sample Pydantic models for testing.  Tests: - BaseModel inheritance - Field() with aliases - Validators - model_config ",
+  "imports": [
+    "from pydantic import BaseModel, Field, field_validator",
+    "from typing import List, Optional",
+    "from datetime import datetime",
+    "from enum import Enum"
+  ],
+  "elements": [
+    {
+      "type": "class",
+      "name": "TaskStatus",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "str",
+        "Enum"
+      ],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Task",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "name",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "description",
+          "type": "Optional[str]",
+          "default": "None"
+        },
+        {
+          "name": "status",
+          "type": "TaskStatus",
+          "default": "TaskStatus.PENDING"
+        },
+        {
+          "name": "priority",
+          "type": "int",
+          "default": "Field(default=1, ge=1, le=5)"
+        },
+        {
+          "name": "created_at",
+          "type": "Optional[datetime]",
+          "default": "Field(default=None, alias=\"createdAt\")"
+        },
+        {
+          "name": "tags",
+          "type": "List[str]",
+          "default": "Field(default_factory=list)"
+        }
+      ],
+      "children": [
+        {
+          "type": "method",
+          "name": "name_not_empty",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "cls",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "v",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "str",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "BaseModel"
+      ],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "TaskQueue",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "name",
+          "type": "str",
+          "default": "\"default\""
+        },
+        {
+          "name": "tasks",
+          "type": "List[Task]",
+          "default": "Field(default_factory=list)"
+        },
+        {
+          "name": "max_size",
+          "type": "int",
+          "default": "Field(default=100, ge=1)"
+        }
+      ],
+      "children": [
+        {
+          "type": "method",
+          "name": "add_task",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "task",
+              "type": "Task",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "bool",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "get_pending",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "List[Task]",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "get_by_status",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "status",
+              "type": "TaskStatus",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "List[Task]",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "BaseModel"
+      ],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Project",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "name",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "owner",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "queues",
+          "type": "List[TaskQueue]",
+          "default": "Field(default_factory=list)"
+        },
+        {
+          "name": "metadata",
+          "type": "dict",
+          "default": "Field(default_factory=dict)"
+        }
+      ],
+      "children": [
+        {
+          "type": "method",
+          "name": "total_tasks",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "int",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "BaseModel"
+      ],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

@@ -1,0 +1,444 @@
+{
+  "source_file": "tests/samples/sample_typescript.ts",
+  "source_language": "typescript",
+  "source_hash": "a147002e2112",
+  "module_doc": "",
+  "imports": [],
+  "elements": [
+    {
+      "type": "interface",
+      "name": "User",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "number",
+          "optional": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "isActive",
+          "type": "boolean",
+          "optional": false
+        },
+        {
+          "name": "createdAt",
+          "type": "Date",
+          "optional": false
+        }
+      ],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "interface",
+      "name": "Product",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "sku",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "price",
+          "type": "number",
+          "optional": false
+        },
+        {
+          "name": "quantity",
+          "type": "number",
+          "optional": false
+        },
+        {
+          "name": "tags",
+          "type": "string[]",
+          "optional": false
+        }
+      ],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "interface",
+      "name": "OrderItem",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "productId",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "quantity",
+          "type": "number",
+          "optional": false
+        },
+        {
+          "name": "unitPrice",
+          "type": "number",
+          "optional": false
+        }
+      ],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "interface",
+      "name": "Order",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "string",
+          "optional": false
+        },
+        {
+          "name": "userId",
+          "type": "number",
+          "optional": false
+        },
+        {
+          "name": "items",
+          "type": "OrderItem[]",
+          "optional": false
+        },
+        {
+          "name": "total",
+          "type": "number",
+          "optional": false
+        },
+        {
+          "name": "status",
+          "type": "'pending' | 'processing' | 'shipped' | 'delivered'",
+          "optional": false
+        }
+      ],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "type_alias",
+      "name": "Result",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "type_alias",
+      "name": "Nullable",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "createUser",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "number",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "email",
+          "type": "string",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "U",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "calculateOrderTotal",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "items",
+          "type": "OrderItem[]",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "n",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "filterByStatus",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "items",
+          "type": "T[]",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "T",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "groupBy",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "items",
+          "type": "T[]",
+          "default": "",
+          "is_optional": false
+        },
+        {
+          "name": "key",
+          "type": "K",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "M",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "fetchUser",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "number",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "P",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "processOrder",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "order",
+          "type": "Order",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "P",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Repository",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "add",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "item",
+              "type": "T",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "v",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "get",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "T['id']",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "N",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "getAll",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "T",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "delete",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "T['id']",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "b",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "count",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "n",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

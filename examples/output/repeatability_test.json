@@ -1,0 +1,137 @@
+{
+  "timestamp": "2026-02-25T10:37:50.767722",
+  "formats": {
+    "json": {
+      "avg_similarity": 100.0,
+      "min_similarity": 100.0,
+      "max_similarity": 100.0,
+      "all_syntax_ok": true,
+      "line_variance": 0.0,
+      "runs": [
+        {
+          "run_id": 1,
+          "lines": 15,
+          "syntax_ok": true,
+          "time_s": 0.0004551410675048828
+        },
+        {
+          "run_id": 2,
+          "lines": 15,
+          "syntax_ok": true,
+          "time_s": 0.00016021728515625
+        }
+      ],
+      "diff_line_count": 0
+    },
+    "yaml": {
+      "avg_similarity": 100.0,
+      "min_similarity": 100.0,
+      "max_similarity": 100.0,
+      "all_syntax_ok": true,
+      "line_variance": 0.0,
+      "runs": [
+        {
+          "run_id": 1,
+          "lines": 15,
+          "syntax_ok": true,
+          "time_s": 8.559226989746094e-05
+        },
+        {
+          "run_id": 2,
+          "lines": 15,
+          "syntax_ok": true,
+          "time_s": 8.988380432128906e-05
+        }
+      ],
+      "diff_line_count": 0
+    },
+    "toon": {
+      "avg_similarity": 100.0,
+      "min_similarity": 100.0,
+      "max_similarity": 100.0,
+      "all_syntax_ok": true,
+      "line_variance": 0.0,
+      "runs": [
+        {
+          "run_id": 1,
+          "lines": 15,
+          "syntax_ok": true,
+          "time_s": 7.987022399902344e-05
+        },
+        {
+          "run_id": 2,
+          "lines": 15,
+          "syntax_ok": true,
+          "time_s": 6.508827209472656e-05
+        }
+      ],
+      "diff_line_count": 0
+    },
+    "gherkin": {
+      "avg_similarity": 100.0,
+      "min_similarity": 100.0,
+      "max_similarity": 100.0,
+      "all_syntax_ok": true,
+      "line_variance": 0.0,
+      "runs": [
+        {
+          "run_id": 1,
+          "lines": 10,
+          "syntax_ok": true,
+          "time_s": 0.00010609626770019531
+        },
+        {
+          "run_id": 2,
+          "lines": 10,
+          "syntax_ok": true,
+          "time_s": 0.0001049041748046875
+        }
+      ],
+      "diff_line_count": 0
+    },
+    "markdown": {
+      "avg_similarity": 100.0,
+      "min_similarity": 100.0,
+      "max_similarity": 100.0,
+      "all_syntax_ok": true,
+      "line_variance": 0.0,
+      "runs": [
+        {
+          "run_id": 1,
+          "lines": 26,
+          "syntax_ok": true,
+          "time_s": 0.0001277923583984375
+        },
+        {
+          "run_id": 2,
+          "lines": 26,
+          "syntax_ok": true,
+          "time_s": 0.00010776519775390625
+        }
+      ],
+      "diff_line_count": 0
+    },
+    "logicml": {
+      "avg_similarity": 100.0,
+      "min_similarity": 100.0,
+      "max_similarity": 100.0,
+      "all_syntax_ok": true,
+      "line_variance": 0.0,
+      "runs": [
+        {
+          "run_id": 1,
+          "lines": 15,
+          "syntax_ok": true,
+          "time_s": 5.2928924560546875e-05
+        },
+        {
+          "run_id": 2,
+          "lines": 15,
+          "syntax_ok": true,
+          "time_s": 4.57763671875e-05
+        }
+      ],
+      "diff_line_count": 0
+    }
+  }
+}

@@ -1,0 +1,22 @@
+"""Sample models for re-export testing."""
+
+from dataclasses import dataclass
+from typing import List, Optional
+
+@dataclass
+class User:
+    id: int
+    name: str
+    email: str
+
+@dataclass
+class Order:
+    id: str
+    user_id: int
+    items: List[str]
+
+@dataclass
+class Product:
+    sku: str
+    name: str
+    price: float

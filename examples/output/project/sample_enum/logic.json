@@ -1,0 +1,179 @@
+{
+  "source_file": "tests/samples/sample_enum.py",
+  "source_language": "python",
+  "source_hash": "dc965a7874f5",
+  "module_doc": " Sample enum types for testing.  Tests: - Basic Enum - IntEnum - StrEnum - auto() values - Custom values ",
+  "imports": [
+    "from enum import Enum, IntEnum, auto",
+    "from typing import List"
+  ],
+  "elements": [
+    {
+      "type": "class",
+      "name": "Status",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "Enum"
+      ],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Priority",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "IntEnum"
+      ],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Color",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "from_hex",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "cls",
+              "type": "",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "hex_code",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "\"Color\"",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "Enum"
+      ],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "HttpStatus",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "is_success",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "bool",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "is_error",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "bool",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "IntEnum"
+      ],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "TaskType",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "get_timeout",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "int",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "get_allowed_statuses",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "List[Status]",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "Enum"
+      ],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

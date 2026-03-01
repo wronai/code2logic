@@ -1,0 +1,304 @@
+{
+  "source_file": "tests/samples/sample_api.py",
+  "source_language": "python",
+  "source_hash": "811c25613094",
+  "module_doc": "  from typing import Dict, List, Optional, Any from dataclasses import dataclass, field from datetime import datetime import json   @dataclass class APIResponse: \"\"\"Standard API response structure.",
+  "imports": [],
+  "elements": [
+    {
+      "type": "class",
+      "name": "User",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "int",
+          "default": ""
+        },
+        {
+          "name": "username",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "email",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "roles",
+          "type": "List[str]",
+          "default": "field(default_factory=list)"
+        },
+        {
+          "name": "created_at",
+          "type": "str",
+          "default": "\"\""
+        }
+      ],
+      "children": [],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "APIError",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "__init__",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "message",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "code",
+              "type": "int",
+              "default": "400",
+              "is_optional": false
+            }
+          ],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [
+        "Exception"
+      ],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "UserAPI",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [
+        {
+          "type": "method",
+          "name": "__init__",
+          "docstring": "",
+          "signature": "",
+          "parameters": [],
+          "return_type": "",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "create_user",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "username",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "email",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            },
+            {
+              "name": "roles",
+              "type": "List[str]",
+              "default": "None",
+              "is_optional": false
+            }
+          ],
+          "return_type": "APIResponse",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "get_user",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "user_id",
+              "type": "int",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "APIResponse",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "update_user",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "user_id",
+              "type": "int",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "APIResponse",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "delete_user",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "user_id",
+              "type": "int",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "APIResponse",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "list_users",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "limit",
+              "type": "int",
+              "default": "10",
+              "is_optional": false
+            },
+            {
+              "name": "offset",
+              "type": "int",
+              "default": "0",
+              "is_optional": false
+            }
+          ],
+          "return_type": "APIResponse",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        },
+        {
+          "type": "method",
+          "name": "search_users",
+          "docstring": "",
+          "signature": "",
+          "parameters": [
+            {
+              "name": "query",
+              "type": "str",
+              "default": "",
+              "is_optional": false
+            }
+          ],
+          "return_type": "APIResponse",
+          "attributes": [],
+          "children": [],
+          "decorators": [],
+          "modifiers": [],
+          "extends": [],
+          "implements": []
+        }
+      ],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "handle_api_error",
+      "docstring": "",
+      "signature": "",
+      "parameters": [
+        {
+          "name": "func",
+          "type": "",
+          "default": "",
+          "is_optional": false
+        }
+      ],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "function",
+      "name": "wrapper",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

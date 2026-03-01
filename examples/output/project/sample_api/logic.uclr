@@ -1,0 +1,35 @@
+# UCLR: tests/samples/sample_api.py
+# Lang: python
+# Doc:   from typing import Dict, List, Optional, Any from dataclasses import dataclass, field from datetim
+
+@dataclass
+@class  User
+  .id: int
+  .username: str
+  .email: str
+  .roles: List[str] = field(default_factory=list)
+  .created_at: str = ""
+
+@class  APIError extends Exception
+@method  __init__(message: str, code: int = 400)
+
+
+@class  UserAPI
+@method  __init__()
+
+@method  create_user(username: str, email: str, roles: List[str] = None) -> APIResponse
+
+@method  get_user(user_id: int) -> APIResponse
+
+@method  update_user(user_id: int) -> APIResponse
+
+@method  delete_user(user_id: int) -> APIResponse
+
+@method  list_users(limit: int = 10, offset: int = 0) -> APIResponse
+
+@method  search_users(query: str) -> APIResponse
+
+
+@func  handle_api_error(func: )
+
+@func  wrapper()

@@ -1,0 +1,109 @@
+{
+  "source_file": "tests/samples/sample_reexport/models.py",
+  "source_language": "python",
+  "source_hash": "b2205f7dec89",
+  "module_doc": "Sample models for re-export testing.",
+  "imports": [
+    "from dataclasses import dataclass",
+    "from typing import List, Optional"
+  ],
+  "elements": [
+    {
+      "type": "class",
+      "name": "User",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "int",
+          "default": ""
+        },
+        {
+          "name": "name",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "email",
+          "type": "str",
+          "default": ""
+        }
+      ],
+      "children": [],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Order",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "id",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "user_id",
+          "type": "int",
+          "default": ""
+        },
+        {
+          "name": "items",
+          "type": "List[str]",
+          "default": ""
+        }
+      ],
+      "children": [],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "Product",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [
+        {
+          "name": "sku",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "name",
+          "type": "str",
+          "default": ""
+        },
+        {
+          "name": "price",
+          "type": "float",
+          "default": ""
+        }
+      ],
+      "children": [],
+      "decorators": [
+        "@dataclass"
+      ],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

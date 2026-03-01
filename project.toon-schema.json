@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Code2Logic TOON Schema",
+  "description": "Schema for Code2Logic TOON (Token-Oriented Object Notation) format",
+  "type": "object",
+  "properties": {
+    "M": {
+      "type": "array",
+      "description": "Modules as [path,lines] pairs",
+      "items": {
+        "type": "array",
+        "items": [
+          {
+            "type": "string",
+            "description": "Module path"
+          },
+          {
+            "type": "integer",
+            "description": "Lines of code"
+          }
+        ],
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
+    "D": {
+      "type": "object",
+      "description": "Module details with compact keys",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "properties": {
+            "i": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Compact imports (grouped)"
+            },
+            "e": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Exports"
+            },
+            "c": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Classes with inline method counts"
+            },
+            "f": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Functions with signatures"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "source_file": "tests/samples/sample_csharp.cs",
+  "source_language": "csharp",
+  "source_hash": "ef0a2ffb6702",
+  "module_doc": "",
+  "imports": [
+    "using System;",
+    "using System.Collections.Generic;",
+    "using System.Linq;"
+  ],
+  "elements": [
+    {
+      "type": "interface",
+      "name": "IHasId",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    },
+    {
+      "type": "class",
+      "name": "User",
+      "docstring": "",
+      "signature": "",
+      "parameters": [],
+      "return_type": "",
+      "attributes": [],
+      "children": [],
+      "decorators": [],
+      "modifiers": [],
+      "extends": [],
+      "implements": []
+    }
+  ],
+  "metadata": {}
+}

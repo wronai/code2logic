@@ -1,0 +1,36 @@
+use std::collections::HashMap;
+use std::fmt;
+use super::*;
+
+pub struct User {
+}
+
+pub struct Product {
+}
+
+pub struct Order {
+}
+
+pub struct OrderItem {
+}
+
+pub struct Repository {
+}
+
+pub enum OrderStatus {
+}
+
+pub enum AppError {
+}
+
+pub fn create_user() {
+}
+
+pub fn calculate_order_total() {
+}
+
+pub fn validate_email() {
+}
+
+pub fn process_order() {
+}

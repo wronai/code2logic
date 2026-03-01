@@ -1,0 +1,7 @@
+"""Sample exceptions for re-export testing."""
+
+class ValidationError(Exception):
+    pass
+
+class ProcessingError(Exception):
+    pass

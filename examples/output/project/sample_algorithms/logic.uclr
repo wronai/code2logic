@@ -1,0 +1,25 @@
+# UCLR: tests/samples/sample_algorithms.py
+# Lang: python
+# Doc:   from typing import List, Optional, Tuple, Generator, TypeVar from functools import lru_cache  T = 
+
+@func  quicksort(arr: List[int]) -> List[int]
+
+@func  merge_sort(arr: List[int]) -> List[int]
+
+@func  _merge(left: List[int], right: List[int]) -> List[int]
+
+@func  fibonacci(n: int) -> int
+
+@func  fibonacci_generator(limit: int) -> Generator[int, None, None]
+
+@func  is_prime(n: int) -> bool
+
+@func  sieve_of_eratosthenes(limit: int) -> List[int]
+
+@func  gcd(a: int, b: int) -> int
+
+@func  lcm(a: int, b: int) -> int
+
+@func  levenshtein_distance(s1: str, s2: str) -> int
+
+@func  knapsack_01(weights: List[int], values: List[int], capacity: int) -> int

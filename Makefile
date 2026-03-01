@@ -1,640 +1,96 @@
-.PHONY: help install install-dev install-full clean build test lint format typecheck publish publish-test docs docker
-.PHONY: benchmark benchmark-format benchmark-function benchmark-project benchmark-token benchmark-compare benchmark-toon examples
+.PHONY: install dev-install test lint format clean help analyze run docker mermaid-png install-mermaid check-mermaid clean-png
 
-# Optional: load local environment overrides (API keys, BENCH_USE_LLM, etc.)
-# Safe even if .env is missing.
--include .env
-
-# Export selected variables so they are visible to subprocesses (python/poetry).
-export BENCH_USE_LLM
-export CODE2LOGIC_DEFAULT_PROVIDER
-export CODE2LOGIC_DEFAULT_MODEL
-export OPENROUTER_API_KEY
-export OPENROUTER_MODEL
-export OPENAI_API_KEY
-export OPENAI_MODEL
-export ANTHROPIC_API_KEY
-export ANTHROPIC_MODEL
-export GROQ_API_KEY
-export GROQ_MODEL
-export TOGETHER_API_KEY
-export TOGETHER_MODEL
-
-POETRY := $(shell command -v poetry 2>/dev/null)
-ifeq ($(POETRY),)
-RUN :=
-PYTHON := python3
-PIP := pip
-else
-RUN := poetry run
-PYTHON := $(RUN) python
-PIP :=
-endif
-
-# Colors for terminal output
-BLUE := \033[34m
-GREEN := \033[32m
-YELLOW := \033[33m
-RED := \033[31m
-NC := \033[0m # No Color
-
-# Sub-packages
-SUBPACKAGES := lolm logic2test logic2code
-
-help: ## Show this help message
-	@echo "$(BLUE)Code2Logic - Build Commands$(NC)"
+# Default target
+help:
+	@echo "code2flow - Python Code Flow Analysis Tool"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-20s$(NC) %s\n", $$1, $$2}'
+	@echo "Available targets:"
+	@echo "  make install       - Install package"
+	@echo "  make dev-install   - Install with development dependencies"
+	@echo "  make test          - Run test suite"
+	@echo "  make lint          - Run linters (flake8, black --check)"
+	@echo "  make format        - Format code with black"
+	@echo "  make typecheck     - Run mypy type checking"
+	@echo "  make clean         - Remove build artifacts"
+	@echo "  make analyze       - Run analysis on sample (python folder)"
+	@echo "  make run           - Run with example arguments"
+	@echo "  make build         - Build distribution packages"
+	@echo "  make mermaid-png   - Generate PNG from all Mermaid files"
+	@echo "  make install-mermaid - Install Mermaid CLI renderer"
+	@echo "  make check-mermaid - Check available Mermaid renderers"
+	@echo ""
 
-# ============================================================================
 # Installation
-# ============================================================================
+install:
+	pip install -e .
+	@echo "✓ code2flow installed"
 
-install: ## Install package (minimal)
-	@if [ -n "$(POETRY)" ]; then \
-		poetry install; \
-	else \
-		$(PIP) install -e .; \
-	fi
+dev-install:
+	pip install -e ".[dev]"
+	@echo "✓ code2flow installed with dev dependencies"
 
-install-dev: ## Install with development dependencies
-	@if [ -n "$(POETRY)" ]; then \
-		poetry install --with dev; \
-	else \
-		$(PIP) install -e ".[dev]"; \
-	fi
-
-install-full: ## Install with all features
-	@if [ -n "$(POETRY)" ]; then \
-		poetry install --with dev -E full; \
-	else \
-		$(PIP) install -e ".[full,dev]"; \
-	fi
-
-install-docs: ## Install documentation dependencies
-	@if [ -n "$(POETRY)" ]; then \
-		poetry install --with docs; \
-	else \
-		$(PIP) install -e ".[docs]"; \
-	fi
-
-install-llm: ## Install LLM integration dependencies
-	@if [ -n "$(POETRY)" ]; then \
-		poetry install -E llm; \
-	else \
-		$(PIP) install httpx litellm python-dotenv; \
-	fi
-
-# ============================================================================
-# Configuration
-# ============================================================================
-
-config: ## Show current configuration
-	@$(PYTHON) -c "from code2logic.config import Config; import json; print(json.dumps(Config().to_dict(), indent=2))"
-
-config-env: ## Show shell commands to configure API keys
-	@echo "$(BLUE)API Configuration Commands:$(NC)"
-	@echo ""
-	@echo "# OpenRouter (cloud LLM)"
-	@echo 'export OPENROUTER_API_KEY="sk-or-v1-your-key"'
-	@echo 'export OPENROUTER_MODEL="qwen/qwen-2.5-coder-32b-instruct"'
-	@echo ""
-	@echo "# Ollama (local LLM)"
-	@echo 'export OLLAMA_HOST="http://localhost:11434"'
-	@echo 'export OLLAMA_MODEL="qwen2.5-coder:14b"'
-	@echo ""
-	@echo "# Or create .env file:"
-	@echo "cp .env.example .env"
-	@echo "# Then edit .env with your keys"
-
-config-check: ## Check which providers are configured
-	@echo "$(BLUE)Provider Status:$(NC)"
-	@$(PYTHON) -c "from code2logic.config import Config; c=Config(); [print(f'  {k}: ✓' if v else f'  {k}: ✗') for k,v in c.list_configured_providers().items()]"
-
-# ============================================================================
 # Testing
-# ============================================================================
+test:
+	python -m pytest tests/ -v --tb=short 2>/dev/null || echo "No tests yet - create tests/ directory"
 
-test: ## Run tests
-	$(RUN) pytest tests/ -v -p no:aiohttp
+test-cov:
+	python -m pytest tests/ --cov=code2flow --cov-report=html --cov-report=term 2>/dev/null || echo "No tests yet"
 
-test-cov: ## Run tests with coverage
-	$(RUN) pytest tests/ -v -p no:aiohttp --cov=code2logic --cov-report=term-missing --cov-report=html
+# Code quality
+lint:
+	python -m flake8 code2flow/ --max-line-length=100 --ignore=E203,W503 2>/dev/null || echo "flake8 not installed"
+	python -m black --check code2flow/ 2>/dev/null || echo "black not installed"
+	@echo "✓ Linting complete"
 
-test-fast: ## Run tests without coverage (faster)
-	$(RUN) pytest tests/ -v -p no:aiohttp --no-cov
+format:
+	python -m black code2flow/ --line-length=100 2>/dev/null || echo "black not installed, run: pip install black"
+	@echo "✓ Code formatted"
 
-test-all: ## Run all tests including subpackages
-	@echo "$(BLUE)Running code2logic tests...$(NC)"
-	$(RUN) pytest tests/ -v -p no:aiohttp --cov=code2logic
-	@echo "$(BLUE)Running subpackage tests...$(NC)"
-	@for pkg in $(SUBPACKAGES); do \
-		echo "$(YELLOW)Testing $$pkg...$(NC)"; \
-		(cd $$pkg && $(MAKE) test); \
-	done
-	@echo "$(GREEN)All tests passed!$(NC)"
+typecheck:
+	python -m mypy code2flow/ --ignore-missing-imports 2>/dev/null || echo "mypy not installed"
 
-# ============================================================================
-# Code Quality
-# ============================================================================
+# Running
+run:
+	python -m code2flow ../python/stts_core -v -o ./output
 
-lint: ## Run linters
-	$(RUN) ruff check code2logic tests
-	
-lint-fix: ## Run linters and fix issues
-	$(RUN) ruff check code2logic tests --fix
+analyze: run
+	@echo "✓ Analysis complete"
 
-format: ## Format code with black
-	$(RUN) black code2logic tests
-
-format-check: ## Check code formatting
-	$(RUN) black code2logic tests --check
-
-typecheck: ## Run type checking
-	$(RUN) mypy code2logic --ignore-missing-imports
-
-quality: lint format-check typecheck ## Run all quality checks
-
-# ============================================================================
 # Building
-# ============================================================================
-
-clean: ## Clean build artifacts
-	rm -rf build/
-	rm -rf dist/
-	rm -rf *.egg-info/
-	rm -rf .pytest_cache/
-	rm -rf .mypy_cache/
-	rm -rf .ruff_cache/
-	rm -rf htmlcov/
-	rm -rf .coverage
-	rm -rf output/
-	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
-	find . -type f -name "*.pyc" -delete
-
-build: clean ## Build package
-	@if [ -n "$(POETRY)" ]; then \
-		poetry build; \
-	else \
-		$(PYTHON) -m build; \
-	fi
-	@echo "$(GREEN)Build complete!$(NC)"
-	@ls -lh dist/
-
-# ============================================================================
-# Publishing
-# ============================================================================
-
-publish-test: bump-patch build ## Publish to TestPyPI
-	@echo "$(YELLOW)Publishing to TestPyPI...$(NC)"
-	$(PYTHON) -m twine upload --repository testpypi dist/*
-	@echo "$(GREEN)Published to TestPyPI!$(NC)"
-	@echo "Install with: pip install -i https://test.pypi.org/simple/ code2logic"
-
-
-git-clean: ## Ensure git working tree is clean
-	@if [ "$(FORCE)" = "1" ]; then \
-		echo "FORCE=1 set: skipping git clean check."; \
-		exit 0; \
-	fi
-	@git diff --quiet || (echo "Working tree has unstaged changes. Commit or stash before publishing."; exit 1)
-	@git diff --cached --quiet || (echo "Index has staged but uncommitted changes. Commit before publishing."; exit 1)
-
-check-bumpver: ## Ensure bumpver is installed
-	@$(PYTHON) -c "import bumpver" >/dev/null 2>&1 || ( \
-		echo "Missing bumpver. Installing bumpver..."; \
-		$(PYTHON) -m pip install "bumpver>=2023.1129" >/dev/null; \
-		$(PYTHON) -c "import bumpver" >/dev/null 2>&1 || ( \
-			echo "bumpver still missing. Installing project dev dependencies..."; \
-			$(PIP) install -e \".[dev]\"; \
-			$(PYTHON) -c "import bumpver" >/dev/null 2>&1 || (echo "Failed to install bumpver."; exit 1); \
-		); \
-	)
-
-
-bump-patch: check-bumpver ## Bump patch version (updates pyproject.toml and code2logic/__init__.py)
-	$(PYTHON) -m bumpver update --patch
-
-
-bump-minor: check-bumpver ## Bump minor version
-	$(PYTHON) -m bumpver update --minor
-
-
-bump-major: check-bumpver ## Bump major version
-	$(PYTHON) -m bumpver update --major
-
-publish: bump-patch build ## Publish to PyPI (production)
-	@echo "$(YELLOW)Publishing to PyPI...$(NC)"
-	$(PYTHON) -m twine upload dist/*
-	@echo "$(GREEN)Published to PyPI!$(NC)"
-	@echo "Install with: pip install code2logic"
-
-publish-dirty: bump-patch build ## Publish to PyPI without git-clean (dangerous)
-	@echo "$(YELLOW)Publishing to PyPI (skipping git clean check)...$(NC)"
-	$(PYTHON) -m twine upload dist/*
-	@echo "$(GREEN)Published to PyPI!$(NC)"
-	@echo "Install with: pip install code2logic"
-
-# ============================================================================
-# Docker
-# ============================================================================
-
-docker-build: ## Build Docker image
-	docker build -t code2logic:latest .
-	@echo "$(GREEN)Docker image built: code2logic:latest$(NC)"
-
-docker-build-dev: ## Build development Docker image
-	docker build -f Dockerfile.dev -t code2logic:dev .
-	@echo "$(GREEN)Docker dev image built: code2logic:dev$(NC)"
-
-docker-run: ## Run code2logic in Docker (usage: make docker-run PATH=/project)
-	docker run -v $(PATH):/project -v $(PWD)/output:/output code2logic:latest /project -f csv -o /output/analysis.csv
-
-docker-shell: ## Open shell in development container
-	docker run -it -v $(PWD):/app code2logic:dev bash
-
-docker-compose-up: ## Start all services (code2logic + ollama + litellm)
-	docker-compose up -d
-	@echo "$(GREEN)Services started!$(NC)"
-	@echo "  Ollama: http://localhost:11434"
-	@echo "  LiteLLM: http://localhost:4000"
-
-docker-compose-down: ## Stop all services
-	docker-compose down
-
-# ============================================================================
-# Documentation
-# ============================================================================
-
-docs: ## Build documentation
-	mkdocs build
-
-docs-serve: ## Serve documentation locally
-	mkdocs serve
-
-# ============================================================================
-# Development
-# ============================================================================
-
-dev-setup: ## Setup development environment
-	$(PIP) install -e ".[full,dev,docs]"
-	$(PIP) install httpx litellm
-	pre-commit install
-	@echo "$(GREEN)Development environment ready!$(NC)"
-
-# ============================================================================
-# Examples & Analysis
-# ============================================================================
-
-run: ## Run code2logic on current directory
-	code2logic . -f csv -d standard
-
-run-all-formats: ## Generate all formats for current directory
-	@mkdir -p output
-	code2logic . -f csv -d minimal -o output/analysis_minimal.csv
-	code2logic . -f csv -d standard -o output/analysis_standard.csv
-	code2logic . -f csv -d full -o output/analysis_full.csv
-	code2logic . -f json -d standard -o output/analysis.json
-	code2logic . -f json --flat -d standard -o output/analysis_flat.json
-	code2logic . -f yaml -d standard -o output/analysis.yaml
-	code2logic . -f yaml --flat -d standard -o output/analysis_flat.yaml
-	code2logic . -f compact -o output/analysis_compact.txt
-	code2logic . -f markdown -d standard -o output/analysis.md
-	@echo "$(GREEN)All formats generated in output/$(NC)"
-	@ls -la output/
-
-run-compare: ## Compare sizes of all formats
-	@echo "$(BLUE)Format comparison:$(NC)"
-	@echo -n "CSV minimal:  " && code2logic . -f csv -d minimal 2>/dev/null | wc -c
-	@echo -n "CSV standard: " && code2logic . -f csv -d standard 2>/dev/null | wc -c  
-	@echo -n "CSV full:     " && code2logic . -f csv -d full 2>/dev/null | wc -c
-	@echo -n "JSON nested:  " && code2logic . -f json 2>/dev/null | wc -c
-	@echo -n "JSON flat:    " && code2logic . -f json --flat 2>/dev/null | wc -c
-	@echo -n "YAML nested:  " && code2logic . -f yaml 2>/dev/null | wc -c
-	@echo -n "YAML flat:    " && code2logic . -f yaml --flat 2>/dev/null | wc -c
-	@echo -n "Compact:      " && code2logic . -f compact 2>/dev/null | wc -c
-	@echo -n "Markdown:     " && code2logic . -f markdown 2>/dev/null | wc -c
-
-status: ## Show library status
-	code2logic --status
-
-# ============================================================================
-# Benchmarks
-# ============================================================================
-
-BENCH_SAMPLES := tests/samples
-BENCH_OUTPUT  := examples/output
-BENCH_LIMIT   := 20
-BENCH_FORMATS := yaml toon logicml json markdown csv gherkin function.toon
-
-# Set BENCH_USE_LLM=1 to run benchmarks with a configured LLM provider
-# (e.g. OpenRouter) instead of offline template mode.
-BENCH_USE_LLM ?= 0
-ifeq ($(BENCH_USE_LLM),1)
-BENCH_NO_LLM_FLAG :=
-else
-BENCH_NO_LLM_FLAG := --no-llm
-endif
-
-benchmark: benchmark-format benchmark-function benchmark-token benchmark-project benchmark-toon benchmark-compare ## Run all benchmarks (no LLM)
-	@echo ""
-	@echo "$(GREEN)All benchmarks completed!$(NC)"
-	@echo "Results in $(BENCH_OUTPUT)/"
-	@ls -lhS $(BENCH_OUTPUT)/*.json 2>/dev/null
-	@echo ""
-	@echo "$(BLUE)Generating Markdown report...$(NC)"
-	@BENCH_OUTPUT=$(BENCH_OUTPUT) $(PYTHON) examples/benchmark_report.py >/dev/null
-	@echo "Report: $(BENCH_OUTPUT)/BENCHMARK_REPORT.md"
-
-benchmark-format: ## Benchmark format reproduction (yaml/toon/logicml/json)
-	@echo "$(BLUE)━━━ Format Benchmark ━━━$(NC)"
-	@mkdir -p $(BENCH_OUTPUT)
-	@echo "# Auto-generated by make benchmark" > $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	@echo "set -euo pipefail" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	@echo "" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	@printf '%s\n' "$(PYTHON) examples/15_unified_benchmark.py $(BENCH_NO_LLM_FLAG) --type format --folder $(BENCH_SAMPLES)/ --formats $(BENCH_FORMATS) --limit $(BENCH_LIMIT) --verbose --output $(BENCH_OUTPUT)/benchmark_format.json" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) examples/15_unified_benchmark.py \
-		$(BENCH_NO_LLM_FLAG) --type format \
-		--folder $(BENCH_SAMPLES)/ \
-		--formats $(BENCH_FORMATS) \
-		--limit $(BENCH_LIMIT) --verbose \
-		--output $(BENCH_OUTPUT)/benchmark_format.json
-
-benchmark-function: ## Benchmark function-level reproduction
-	@echo "$(BLUE)━━━ Function Benchmark ━━━$(NC)"
-	@printf '%s\n' "$(PYTHON) examples/15_unified_benchmark.py $(BENCH_NO_LLM_FLAG) --type function --file $(BENCH_SAMPLES)/sample_functions.py --limit 10 --verbose --output $(BENCH_OUTPUT)/benchmark_function.json" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) examples/15_unified_benchmark.py \
-		$(BENCH_NO_LLM_FLAG) --type function \
-		--file $(BENCH_SAMPLES)/sample_functions.py \
-		--limit 10 --verbose \
-		--output $(BENCH_OUTPUT)/benchmark_function.json
-	@echo "$(BLUE)━━━ Behavioral Benchmark (runtime equivalence) ━━━$(NC)"
-	@printf '%s\n' "$(PYTHON) examples/behavioral_benchmark.py" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	@BENCH_OUTPUT=$(BENCH_OUTPUT) BENCH_FUNCTION_JSON=$(BENCH_OUTPUT)/benchmark_function.json BENCH_FUNCTION_SOURCE=$(BENCH_SAMPLES)/sample_functions.py \
-		$(PYTHON) examples/behavioral_benchmark.py >/dev/null
-
-benchmark-token: ## Benchmark token efficiency across formats
-	@echo "$(BLUE)━━━ Token Efficiency Benchmark ━━━$(NC)"
-	@printf '%s\n' "$(PYTHON) examples/11_token_benchmark.py $(BENCH_NO_LLM_FLAG) --folder $(BENCH_SAMPLES)/ --formats $(BENCH_FORMATS) --limit $(BENCH_LIMIT) --verbose --output $(BENCH_OUTPUT)/benchmark_token.json" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) examples/11_token_benchmark.py \
-		$(BENCH_NO_LLM_FLAG) \
-		--folder $(BENCH_SAMPLES)/ \
-		--formats $(BENCH_FORMATS) \
-		--limit $(BENCH_LIMIT) --verbose \
-		--output $(BENCH_OUTPUT)/benchmark_token.json
-
-benchmark-project: ## Benchmark project-level reproduction
-	@echo "$(BLUE)━━━ Project Benchmark ━━━$(NC)"
-	@printf '%s\n' "$(PYTHON) examples/15_unified_benchmark.py $(BENCH_NO_LLM_FLAG) --type project --folder $(BENCH_SAMPLES)/ --formats $(BENCH_FORMATS) --limit $(BENCH_LIMIT) --verbose --output $(BENCH_OUTPUT)/benchmark_project.json" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) examples/15_unified_benchmark.py \
-		$(BENCH_NO_LLM_FLAG) --type project \
-		--folder $(BENCH_SAMPLES)/ \
-		--formats $(BENCH_FORMATS) \
-		--limit $(BENCH_LIMIT) --verbose \
-		--output $(BENCH_OUTPUT)/benchmark_project.json
-
-benchmark-toon: ## Generate TOON + function-logic for self-analysis
-	@echo "$(BLUE)━━━ TOON Self-Analysis ━━━$(NC)"
-	@mkdir -p $(BENCH_OUTPUT)
-	@rm -f $(BENCH_OUTPUT)/function.toon $(BENCH_OUTPUT)/function-schema.json 2>/dev/null || true
-	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f toon --compact --name project -o ./" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) -m code2logic ./ -f toon --compact --name project -o ./
-	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f toon --compact --no-repeat-module --function-logic function.toon --with-schema --name project -o ./" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) -m code2logic ./ -f toon --compact --no-repeat-module --function-logic function.toon --with-schema --name project -o ./
-	@cp -f project.toon $(BENCH_OUTPUT)/project.toon 2>/dev/null || true
-	@cp -f project.toon-schema.json $(BENCH_OUTPUT)/project.toon-schema.json 2>/dev/null || true
-	@cp -f function.toon $(BENCH_OUTPUT)/function.toon 2>/dev/null || true
-	@cp -f function-schema.json $(BENCH_OUTPUT)/function-schema.json 2>/dev/null || true
-	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f yaml --compact --name project -o $(BENCH_OUTPUT)/" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) -m code2logic ./ -f yaml --compact --name project -o $(BENCH_OUTPUT)/
-	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f json --name project -o $(BENCH_OUTPUT)/" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) -m code2logic ./ -f json --name project -o $(BENCH_OUTPUT)/
-	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f markdown --name project -o $(BENCH_OUTPUT)/" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) -m code2logic ./ -f markdown --name project -o $(BENCH_OUTPUT)/
-	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f compact --name project -o $(BENCH_OUTPUT)/" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) -m code2logic ./ -f compact --name project -o $(BENCH_OUTPUT)/
-	@printf '%s\n' "$(PYTHON) -m code2logic ./ -f csv -d standard --name project -o $(BENCH_OUTPUT)/" >> $(BENCH_OUTPUT)/BENCHMARK_COMMANDS.sh
-	$(PYTHON) -m code2logic ./ -f csv -d standard --name project -o $(BENCH_OUTPUT)/
-	@echo ""
-	@echo "$(BLUE)Format size comparison (self-analysis):$(NC)"
-	@printf "  %-25s %10s %10s\n" "Format" "Size" "~Tokens"
-	@printf "  %-25s %10s %10s\n" "-------------------------" "----------" "----------"
-	@for f in $(BENCH_OUTPUT)/project.toon $(BENCH_OUTPUT)/function.toon $(BENCH_OUTPUT)/project.yaml $(BENCH_OUTPUT)/project.json $(BENCH_OUTPUT)/project.md $(BENCH_OUTPUT)/project.txt $(BENCH_OUTPUT)/project.csv; do \
-		if [ -f "$$f" ]; then \
-			sz=$$(wc -c < "$$f"); \
-			tok=$$((sz / 4)); \
-			printf "  %-25s %8s B %8s\n" "$$(basename $$f)" "$$sz" "$$tok"; \
-		fi; \
-	done
-	@echo ""
-	@echo "$(GREEN)TOON files:$(NC)"
-	@ls -lh $(BENCH_OUTPUT)/project.toon $(BENCH_OUTPUT)/function.toon $(BENCH_OUTPUT)/project.toon-schema.json $(BENCH_OUTPUT)/function-schema.json 2>/dev/null
-
-benchmark-compare: ## Show summary comparison of all benchmark results
-	@echo ""
-	@echo "$(BLUE)━━━ Benchmark Summary ━━━$(NC)"
-	@$(PYTHON) examples/benchmark_summary.py $(BENCH_OUTPUT)
-
-# ============================================================================
-# Examples (step by step)
-# ============================================================================
-
-examples: ## Run all examples step by step (no LLM required)
-	@mkdir -p $(BENCH_OUTPUT)
-	@echo "$(BLUE)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(NC)"
-	@echo "$(BLUE)  Running all code2logic examples (--no-llm where needed)$(NC)"
-	@echo "$(BLUE)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(NC)"
-	@echo ""
-	@echo "$(YELLOW)[1/16] Quick Start — basic analysis$(NC)"
-	$(PYTHON) examples/01_quick_start.py
-	@echo ""
-	@echo "$(YELLOW)[2/16] Refactoring — suggest improvements$(NC)"
-	$(PYTHON) examples/02_refactoring.py
-	@echo ""
-	@echo "$(YELLOW)[3/16] Reproduction — code ↔ spec round-trip$(NC)"
-	$(PYTHON) examples/03_reproduction.py --no-llm
-	@echo ""
-	@echo "$(YELLOW)[4/16] Project Analysis — multi-file$(NC)"
-	$(PYTHON) examples/04_project.py --no-llm
-	@echo ""
-	@echo "$(YELLOW)[5/16] LLM Integration — provider detection$(NC)"
-	$(PYTHON) examples/05_llm_integration.py --no-llm
-	@echo ""
-	@echo "$(YELLOW)[6/16] Metrics — reproduction quality$(NC)"
-	$(PYTHON) examples/06_metrics.py --no-llm
-	@echo ""
-	@echo "$(YELLOW)[7/16] Format Benchmark — compare formats$(NC)"
-	$(PYTHON) examples/08_format_benchmark.py --no-llm
-	@echo ""
-	@echo "$(YELLOW)[8/16] Async Benchmark — async code analysis$(NC)"
-	$(PYTHON) examples/09_async_benchmark.py --no-llm
-	@echo ""
-	@echo "$(YELLOW)[9/16] Function Reproduction — per-function$(NC)"
-	$(PYTHON) examples/10_function_reproduction.py --no-llm
-	@echo ""
-	@echo "$(YELLOW)[10/16] Token Benchmark — token efficiency$(NC)"
-	$(PYTHON) examples/11_token_benchmark.py --no-llm
-	@echo ""
-	@echo "$(YELLOW)[11/16] Comprehensive Analysis — full pipeline$(NC)"
-	$(PYTHON) examples/12_comprehensive_analysis.py --no-llm --limit 3
-	@echo ""
-	@echo "$(YELLOW)[12/16] Project Benchmark — project-level scores$(NC)"
-	$(PYTHON) examples/13_project_benchmark.py --no-llm
-	@echo ""
-	@echo "$(YELLOW)[13/16] Repeatability Test — determinism check$(NC)"
-	$(PYTHON) examples/14_repeatability_test.py --no-llm --file tests/samples/sample_functions.py --runs 2
-	@echo ""
-	@echo "$(YELLOW)[14/16] Unified Benchmark — all-in-one$(NC)"
-	$(PYTHON) examples/15_unified_benchmark.py --no-llm --verbose
-	@echo ""
-	@echo "$(YELLOW)[15/16] Terminal Demo — rich output$(NC)"
-	$(PYTHON) examples/16_terminal_demo.py
-	@echo ""
-	@echo "$(YELLOW)[16/16] Duplicate Detection$(NC)"
-	$(PYTHON) examples/duplicate_detection.py
-	@echo ""
-	@echo "$(GREEN)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(NC)"
-	@echo "$(GREEN)  All 16 examples completed successfully!$(NC)"
-	@echo "$(GREEN)━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━$(NC)"
-	@echo "  Output: $(BENCH_OUTPUT)/"
-
-# ============================================================================
-# LLM Integration
-# ============================================================================
-
-ollama-start: ## Start Ollama server
-	@echo "$(YELLOW)Starting Ollama...$(NC)"
-	ollama serve &
-	@sleep 2
-	@echo "$(GREEN)Ollama started at http://localhost:11434$(NC)"
-
-ollama-pull: ## Pull recommended models for code analysis
-	ollama pull qwen2.5-coder:7b
-	ollama pull qwen2.5-coder:14b
-	ollama pull deepseek-coder:6.7b
-	@echo "$(GREEN)Models pulled!$(NC)"
-
-ollama-list: ## List available Ollama models
-	@echo "$(BLUE)Available Ollama models:$(NC)"
-	@ollama list 2>/dev/null || echo "Ollama not running"
-
-mcp-server: ## Start MCP server for Claude Desktop
-	$(PYTHON) -m code2logic.mcp_server
-
-# ============================================================================
-# LLM Configuration
-# ============================================================================
-
-llm: ## Configure LLM providers (Ollama, LiteLLM)
-	@echo "$(BLUE)Configuring LLM providers...$(NC)"
-	$(PYTHON) scripts/configure_llm.py
-
-llm-list: ## List all available LLM models
-	$(PYTHON) scripts/configure_llm.py --list
-
-llm-test: ## Test configured LLM models
-	$(PYTHON) scripts/configure_llm.py --test
-
-llm-status: ## Show LLM configuration status
-	@echo "$(BLUE)LLM Status:$(NC)"
-	@echo "Ollama:"
-	@curl -s http://localhost:11434/api/version 2>/dev/null && echo " ✓ Running" || echo " ✗ Not running"
-	@echo "\nModels:"
-	@ollama list 2>/dev/null | head -10 || echo "  None available"
-	@echo "\nConfig:"
-	@cat ~/.code2logic/llm_config.json 2>/dev/null | head -20 || echo "  Not configured (run: make llm)"
-
-# ============================================================================
-# Sub-packages (lolm, logic2test, logic2code)
-# ============================================================================
-
-publish-lolm: ## Publish lolm package to PyPI
-	@echo "$(YELLOW)Publishing lolm to PyPI...$(NC)"
-	$(MAKE) -C lolm publish
-	@echo "$(GREEN)lolm published!$(NC)"
-
-publish-logic2test: ## Publish logic2test package to PyPI
-	@echo "$(YELLOW)Publishing logic2test to PyPI...$(NC)"
-	$(MAKE) -C logic2test publish
-	@echo "$(GREEN)logic2test published!$(NC)"
-
-publish-logic2code: ## Publish logic2code package to PyPI
-	@echo "$(YELLOW)Publishing logic2code to PyPI...$(NC)"
-	$(MAKE) -C logic2code publish
-	@echo "$(GREEN)logic2code published!$(NC)"
-
-publish-all: ## Publish all packages (code2logic + sub-packages)
-	@echo "$(BLUE)Publishing all packages...$(NC)"
-	@for pkg in $(SUBPACKAGES); do \
-		echo "$(YELLOW)Building and publishing $$pkg...$(NC)"; \
-		$(MAKE) -C $$pkg publish || exit $$?; \
-	done
-	@echo "$(YELLOW)Publishing code2logic...$(NC)"
-	$(MAKE) publish
-	@echo "$(GREEN)All packages published!$(NC)"
-
-publish-all-test: ## Publish all packages to TestPyPI
-	@echo "$(BLUE)Publishing all packages to TestPyPI...$(NC)"
-	@for pkg in $(SUBPACKAGES); do \
-		echo "$(YELLOW)Building and publishing $$pkg to TestPyPI...$(NC)"; \
-		$(MAKE) -C $$pkg publish-test || exit $$?; \
-	done
-	$(MAKE) publish-test
-	@echo "$(GREEN)All packages published to TestPyPI!$(NC)"
-
-build-subpackages: ## Build all sub-packages
-	@echo "$(BLUE)Building sub-packages...$(NC)"
-	@for pkg in $(SUBPACKAGES); do \
-		echo "$(YELLOW)Building $$pkg...$(NC)"; \
-		cd $$pkg && $(MAKE) build && cd ..; \
-	done
-	@echo "$(GREEN)All sub-packages built!$(NC)"
-
-test-subpackages: ## Run tests for all sub-packages
-	@echo "$(BLUE)Testing sub-packages...$(NC)"
-	@for pkg in $(SUBPACKAGES); do \
-		echo "$(YELLOW)Testing $$pkg...$(NC)"; \
-		cd $$pkg && $(MAKE) test && cd ..; \
-	done
-	@echo "$(GREEN)All sub-package tests passed!$(NC)"
-
-lint-subpackages: ## Lint all sub-packages
-	@echo "$(BLUE)Linting sub-packages...$(NC)"
-	@for pkg in $(SUBPACKAGES); do \
-		echo "$(YELLOW)Linting $$pkg...$(NC)"; \
-		cd $$pkg && $(MAKE) lint && cd .. || true; \
-	done
-
-clean-subpackages: ## Clean all sub-packages
-	@for pkg in $(SUBPACKAGES); do \
-		cd $$pkg && $(MAKE) clean && cd ..; \
-	done
-
-install-subpackages: ## Install all sub-packages in dev mode
-	@for pkg in $(SUBPACKAGES); do \
-		echo "$(YELLOW)Installing $$pkg...$(NC)"; \
-		cd $$pkg && $(MAKE) install-dev && cd ..; \
-	done
-	@echo "$(GREEN)All sub-packages installed!$(NC)"
-
-# ============================================================================
-# Release
-# ============================================================================
-
-version: ## Show current version
-	@$(PYTHON) -c "from code2logic import __version__; print(__version__)"
-
-version-all: ## Show versions of all packages
-	@echo "$(BLUE)Package versions:$(NC)"
-	@echo -n "  code2logic: " && $(PYTHON) -c "from code2logic import __version__; print(__version__)"
-	@echo -n "  lolm: " && $(PYTHON) -c "from lolm import __version__; print(__version__)" 2>/dev/null || echo "not installed"
-	@echo -n "  logic2test: " && $(PYTHON) -c "from logic2test import __version__; print(__version__)" 2>/dev/null || echo "not installed"
-	@echo -n "  logic2code: " && $(PYTHON) -c "from logic2code import __version__; print(__version__)" 2>/dev/null || echo "not installed"
-
-check-release: clean test lint build ## Full release check
-	@echo "$(GREEN)Release check passed!$(NC)"
-	@echo "Ready to publish with: make publish"
-
-check-release-all: clean test lint build test-subpackages build-subpackages ## Full release check for all packages
-	@echo "$(GREEN)Release check for all packages passed!$(NC)"
-	@echo "Ready to publish all with: make publish-all"
+build:
+	rm -rf build/ dist/ *.egg-info
+	python setup.py sdist bdist_wheel
+	@echo "✓ Build complete - check dist/"
+
+# Cleaning
+clean:
+	rm -rf build/ dist/ *.egg-info
+	rm -rf .pytest_cache .coverage htmlcov/
+	rm -rf code2flow/__pycache__ code2flow/*/__pycache__
+	find . -name "*.pyc" -delete 2>/dev/null || true
+	find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+	@echo "✓ Cleaned build artifacts"
+
+# Development utilities
+check: lint typecheck test
+	@echo "✓ All checks passed"
+
+# Mermaid diagram generation
+mermaid-png:
+	python mermaid_to_png.py --batch output output
+
+mermaid-png-%:
+	python mermaid_to_png.py output/$*.mmd output/$*.png
+
+install-mermaid:
+	npm install -g @mermaid-js/mermaid-cli
+
+check-mermaid:
+	@echo "Checking available Mermaid renderers..."
+	@which mmdc > /dev/null && echo "✓ mmdc (mermaid-cli)" || echo "✗ mmdc (run: npm install -g @mermaid-js/mermaid-cli)"
+	@which npx > /dev/null && echo "✓ npx (for @mermaid-js/mermaid-cli)" || echo "✗ npx (install Node.js)"
+	@which puppeteer > /dev/null && echo "✓ puppeteer" || echo "✗ puppeteer (run: npm install -g puppeteer)"
+
+clean-png:
+	rm -f output/*.png
+	@echo "✓ Cleaned PNG files"

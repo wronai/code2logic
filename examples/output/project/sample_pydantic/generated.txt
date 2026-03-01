@@ -1,0 +1,25 @@
+""" Sample Pydantic models for testing.  Tests: - BaseModel inheritance - Field() with aliases - Validators - model_config """
+
+from pydantic import BaseModel, Field, field_validator
+from typing import List, Optional
+from datetime import datetime
+from enum import Enum
+
+class TaskStatus(str, Enum):
+    pass
+
+class Task(BaseModel):
+    def name_not_empty(self, cls, v: str) -> str:
+        pass
+
+class TaskQueue(BaseModel):
+    def add_task(self, task: Task) -> bool:
+        pass
+    def get_pending(self) -> List[Task]:
+        pass
+    def get_by_status(self, status: TaskStatus) -> List[Task]:
+        pass
+
+class Project(BaseModel):
+    def total_tasks(self) -> int:
+        pass

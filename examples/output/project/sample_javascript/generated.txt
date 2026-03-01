@@ -1,0 +1,32 @@
+# UCLR: tests/samples/sample_javascript.js
+# Lang: javascript
+
+@class  User
+@method  constructor(id: , name: , email: )
+
+@method  getDisplayName()
+
+@method  deactivate()
+
+
+@class  Product
+@method  constructor(sku: , name: , price: )
+
+@method  addTags()
+
+@method  isInStock()
+
+@method  formatPrice(currency: )
+
+@method  clearTimeout(timeout: )
+
+
+@func  calculateTotal(items: , taxRate: )
+
+@func  filterBy(arr: , predicate: )
+
+@func  fetchData(url: )
+
+@func  debounce(func: , wait: )
+
+@func  deepClone(obj: )

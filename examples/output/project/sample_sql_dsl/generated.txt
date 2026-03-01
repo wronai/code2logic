@@ -1,0 +1,73 @@
+from dataclasses import dataclass, field
+from typing import Optional, List, Dict, Any
+
+"""  from typing import List, Optional, Dict, Any, Union from dataclasses import dataclass, field from enum import Enum   class SQLOperator(Enum): """SQL comparison operators."""
+
+class JoinType(Enum):
+    pass
+
+@dataclass
+class Condition:
+    column: str
+    operator: SQLOperator
+    value: Any = None
+    def to_sql(self) -> str:
+        pass
+
+@dataclass
+class Join:
+    table: str
+    on_left: str
+    on_right: str
+    join_type: JoinType = JoinType.INNER
+    def to_sql(self) -> str:
+        pass
+
+class QueryBuilder:
+    def __init__(self, table: str):
+        pass
+    def select(self) -> "QueryBuilder":
+        pass
+    def where(self, column: str, operator: Union[SQLOperator, str, value: Any = None) -> "QueryBuilder":
+        pass
+    def join(self, table: str, on_left: str, on_right: str, join_type: JoinType = JoinType.INNER) -> "QueryBuilder":
+        pass
+    def order_by(self) -> "QueryBuilder":
+        pass
+    def group_by(self) -> "QueryBuilder":
+        pass
+    def limit(self, count: int) -> "QueryBuilder":
+        pass
+    def offset(self, count: int) -> "QueryBuilder":
+        pass
+    def build(self) -> str:
+        pass
+
+class InsertBuilder:
+    def __init__(self, table: str):
+        pass
+    def columns(self) -> "InsertBuilder":
+        pass
+    def values(self) -> "InsertBuilder":
+        pass
+    def build(self) -> str:
+        pass
+
+class UpdateBuilder:
+    def __init__(self, table: str):
+        pass
+    def set(self, column: str, value: Any) -> "UpdateBuilder":
+        pass
+    def where(self, column: str, operator: SQLOperator, value: Any = None) -> "UpdateBuilder":
+        pass
+    def build(self) -> str:
+        pass
+
+def select(table: str) -> QueryBuilder:
+    pass
+
+def insert(table: str) -> InsertBuilder:
+    pass
+
+def update(table: str) -> UpdateBuilder:
+    pass
