@@ -325,6 +325,11 @@ prompt = f"Write tests for {gherkin}"
 
 ## MCP Server Integration
 
+The MCP server confines project reads to its current working directory. Set
+`CODE2LOGIC_MCP_PROJECT_ROOT=/path/to/projects` when clients need access to a
+different source tree. Paths outside that root, including symlink escapes, are
+rejected.
+
 For Claude Desktop / Windsurf:
 
 ```json

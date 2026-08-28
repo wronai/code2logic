@@ -23,7 +23,9 @@ Configuration for Claude Desktop (claude_desktop_config.json):
 """
 
 import json
+import os
 import sys
+from pathlib import Path
 
 from . import __version__
 
@@ -32,6 +34,23 @@ from . import __version__
 
 _PROTOCOL_VERSION = "2024-11-05"
 _NOTIFICATIONS = frozenset({"notifications/initialized", "notifications/cancelled"})
+
+
+def _project_root() -> Path:
+    return Path(os.getenv("CODE2LOGIC_MCP_PROJECT_ROOT", ".")).expanduser().resolve()
+
+
+def _require_project_path(raw_path: object) -> str:
+    if not isinstance(raw_path, str) or not raw_path.strip():
+        raise ValueError("project path must be a non-empty string")
+    candidate = Path(raw_path).expanduser().resolve(strict=False)
+    try:
+        candidate.relative_to(_project_root())
+    except ValueError as exc:
+        raise PermissionError(
+            "code2logic MCP path is outside CODE2LOGIC_MCP_PROJECT_ROOT"
+        ) from exc
+    return str(candidate)
 
 
 def handle_request(request: dict) -> dict | None:
@@ -180,7 +199,7 @@ def call_tool(tool_name: str, arguments: dict) -> str:
     )
 
     if tool_name == "analyze_project":
-        path = arguments.get("path")
+        path = _require_project_path(arguments.get("path"))
         format_type = arguments.get("format", "csv")
         detail = arguments.get("detail", "standard")
 
@@ -207,7 +226,7 @@ def call_tool(tool_name: str, arguments: dict) -> str:
             return gen.generate(project, detail)
 
     elif tool_name == "find_duplicates":
-        path = arguments.get("path")
+        path = _require_project_path(arguments.get("path"))
 
         analyzer = ProjectAnalyzer(path)
         project = analyzer.analyze()
@@ -247,8 +266,8 @@ def call_tool(tool_name: str, arguments: dict) -> str:
         return "\n".join(result)
 
     elif tool_name == "compare_projects":
-        path1 = arguments.get("path1")
-        path2 = arguments.get("path2")
+        path1 = _require_project_path(arguments.get("path1"))
+        path2 = _require_project_path(arguments.get("path2"))
 
         analyzer1 = ProjectAnalyzer(path1)
         analyzer2 = ProjectAnalyzer(path2)
@@ -290,7 +309,7 @@ def call_tool(tool_name: str, arguments: dict) -> str:
         return "\n".join(result)
 
     elif tool_name == "suggest_refactoring":
-        path = arguments.get("path")
+        path = _require_project_path(arguments.get("path"))
 
         analyzer = ProjectAnalyzer(path)
         project = analyzer.analyze()
