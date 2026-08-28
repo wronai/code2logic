@@ -63,3 +63,26 @@ def test_recommended_models():
     assert "openrouter" in RECOMMENDED_MODELS
     assert "ollama" in RECOMMENDED_MODELS
     assert len(RECOMMENDED_MODELS["openrouter"]) > 0
+
+
+def test_openrouter_client_uses_central_subllm(monkeypatch):
+    from lolm import clients
+
+    captured = {}
+
+    def fake_complete(application, function, messages, **kwargs):
+        captured.update(
+            application=application,
+            function=function,
+            messages=messages,
+            kwargs=kwargs,
+        )
+        return type("Response", (), {"content": "central result"})()
+
+    monkeypatch.setattr(clients, "subllm_complete", fake_complete)
+    client = clients.OpenRouterClient(api_key="test-key")
+
+    assert client.generate("inspect", system="be precise") == "central result"
+    assert captured["application"] == "semcod-code2logic"
+    assert captured["function"] == "analyze"
+    assert captured["kwargs"]["credentials"] == {"OPENROUTER_API_KEY": "test-key"}

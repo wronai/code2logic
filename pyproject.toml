@@ -45,6 +45,7 @@ dependencies = [
     "goal>=2.1.0",
     "costs>=0.1.20",
     "pfix>=0.1.60",
+    "subactor-subllm @ git+https://github.com/subactor/subllm.git@505d89f505e90c7b40d98cafdc9104cc61072460",
 ]
 
 [project.optional-dependencies]

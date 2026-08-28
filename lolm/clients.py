@@ -52,6 +52,14 @@ try:
 except ImportError:
     LITELLM_AVAILABLE = False
 
+try:
+    from subllm import complete as subllm_complete
+
+    SUBLLM_AVAILABLE = True
+except ImportError:
+    subllm_complete = None
+    SUBLLM_AVAILABLE = False
+
 
 class OpenRouterClient(BaseLLMClient):
     """OpenRouter API client for cloud LLM access."""
@@ -71,51 +79,27 @@ class OpenRouterClient(BaseLLMClient):
         self.model = model or get_provider_model("openrouter")
 
     def generate(self, prompt: str, system: str = None, max_tokens: int = 4000) -> str:
-        """Generate completion using OpenRouter."""
-        if not HTTPX_AVAILABLE:
-            raise ImportError("httpx required: pip install httpx")
-
-        if not self.api_key:
-            raise ValueError("OpenRouter API key not configured. Set OPENROUTER_API_KEY.")
+        """Generate a completion through the central SubLLM route."""
+        if not SUBLLM_AVAILABLE or subllm_complete is None:
+            raise ImportError("subactor-subllm is required")
 
         messages = []
         if system:
             messages.append({"role": "system", "content": system})
         messages.append({"role": "user", "content": prompt})
 
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/wronai/lolm",
-            "X-Title": "LOLM",
-        }
-
-        payload = {
-            "model": self.model,
-            "messages": messages,
-            "max_tokens": max_tokens,
-            "temperature": 0.2,
-        }
-
         try:
-            response = httpx.post(self.API_URL, headers=headers, json=payload, timeout=120)
-            response.raise_for_status()
-            data = response.json()
-            return data["choices"][0]["message"]["content"]
-        except httpx.HTTPStatusError as e:
-            if e.response.status_code == 429:
-                retry_after = e.response.headers.get("retry-after")
-                raise LLMRateLimitError(
-                    "OpenRouter rate limit exceeded",
-                    provider="openrouter",
-                    status_code=429,
-                    headers=dict(e.response.headers),
-                    retry_after=float(retry_after) if retry_after else None,
-                )
-            error_detail = e.response.text if hasattr(e, "response") else str(e)
-            raise RuntimeError(f"OpenRouter API error: {error_detail}")
+            credentials = {"OPENROUTER_API_KEY": self.api_key} if self.api_key else None
+            response = subllm_complete(
+                "semcod-code2logic",
+                "analyze",
+                messages,
+                timeout_seconds=120,
+                credentials=credentials,
+            )
+            return response.content
         except Exception as e:
-            raise RuntimeError(f"Request failed: {e}")
+            raise RuntimeError(f"SubLLM request failed: {e}") from e
 
     def is_available(self) -> bool:
         """Check if OpenRouter is configured."""
